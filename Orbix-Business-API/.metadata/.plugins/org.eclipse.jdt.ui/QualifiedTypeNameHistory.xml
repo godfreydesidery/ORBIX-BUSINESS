@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<qualifiedTypeNameHistroy>
+    <fullyQualifiedTypeName name="org.springframework.context.annotation.PropertySource"/>
+    <fullyQualifiedTypeName name="com.orbix.api.reports.models.DailySummaryReport"/>
+    <fullyQualifiedTypeName name="javax.servlet.http.HttpServletRequest"/>
+    <fullyQualifiedTypeName name="com.orbix.api.reports.models.ProductStockCardReport"/>
+    <fullyQualifiedTypeName name="com.orbix.api.reports.service.ProductStockCardReportService"/>
+    <fullyQualifiedTypeName name="com.orbix.api.repositories.ProductStockCardRepository"/>
+    <fullyQualifiedTypeName name="com.orbix.api.reports.models.NegativeStockReport"/>
+    <fullyQualifiedTypeName name="com.orbix.api.reports.service.NegativeStockReportService"/>
+    <fullyQualifiedTypeName name="com.orbix.api.repositories.ProductRepository"/>
+    <fullyQualifiedTypeName name="com.orbix.api.reports.models.SupplierStockStatusReport"/>
+    <fullyQualifiedTypeName name="com.orbix.api.reports.service.SupplierStockStatusReportService"/>
+    <fullyQualifiedTypeName name="com.orbix.api.reports.models.ProductListingReport"/>
+    <fullyQualifiedTypeName name="com.orbix.api.reports.service.ProductListingReportService"/>
+    <fullyQualifiedTypeName name="com.orbix.api.reports.service.FastMovingProductsReportService"/>
+    <fullyQualifiedTypeName name="com.orbix.api.reports.service.SlowMovingProductsReportService"/>
+    <fullyQualifiedTypeName name="com.orbix.api.reports.models.FastMovingProductsReport"/>
+    <fullyQualifiedTypeName name="com.orbix.api.repositories.SaleRepository"/>
+    <fullyQualifiedTypeName name="com.orbix.api.reports.models.SlowMovingProductsReport"/>
+    <fullyQualifiedTypeName name="org.springframework.web.bind.annotation.RequestMethod"/>
+    <fullyQualifiedTypeName name="lombok.Data"/>
+    <fullyQualifiedTypeName name="com.orbix.api.models.RecordModel"/>
+</qualifiedTypeNameHistroy>
