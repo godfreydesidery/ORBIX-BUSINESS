@@ -35,24 +35,29 @@ import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurerAdapter;
 
+import org.springframework.context.annotation.FullyQualifiedAnnotationBeanNameGenerator;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.orbix.api.domain.CompanyProfile;
 import com.orbix.api.domain.Day;
-import com.orbix.api.domain.Privilege;
-import com.orbix.api.domain.Role;
-import com.orbix.api.domain.User;
-import com.orbix.api.repositories.CompanyProfileRepository;
+import com.orbix.api.modules.adminunits.SystemProfile;
+import com.orbix.api.modules.adminunits.SystemProfileService;
+import com.orbix.api.modules.identityandaccess.Privilege;
+import com.orbix.api.modules.identityandaccess.PrivilegeRepository;
+import com.orbix.api.modules.identityandaccess.Role;
+import com.orbix.api.modules.identityandaccess.RoleRepository;
+import com.orbix.api.modules.identityandaccess.UserRepository;
+import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.repositories.DayRepository;
-import com.orbix.api.repositories.PrivilegeRepository;
-import com.orbix.api.repositories.RoleRepository;
-import com.orbix.api.repositories.UserRepository;
+
 import com.orbix.api.security.Object_;
 import com.orbix.api.security.Operation;
 import com.orbix.api.service.CompanyProfileService;
 import com.orbix.api.service.DayService;
-import com.orbix.api.service.UserService;
 
+
+
+import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +66,8 @@ import springfox.documentation.builders.RequestHandlerSelectors;
 import springfox.documentation.spi.DocumentationType;
 import springfox.documentation.spring.web.plugins.Docket;
 import springfox.documentation.swagger2.annotations.EnableSwagger2;
+
+
 
 @SpringBootApplication()
 @ComponentScan(basePackages={"com.orbix.api"})
@@ -73,15 +80,18 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @RequiredArgsConstructor
 public class MainApplication {
 	protected ConfigurableApplicationContext springContext;
+	
+	SystemProfileService systemProfileService;
+	UserService userService;
+	DayService dayService;
 
-    DayRepository dayRepository;
-    CompanyProfileRepository companyProfileRepository;
-    UserService userService;
+	private final DayRepository dayRepository;
+    
     private final PrivilegeRepository privilegeRepository;
     
 
 	private final RoleRepository roleRepository;
-	private final DayService dayService;
+	
 	private final UserRepository userRepository;
     
     @Autowired
@@ -113,9 +123,6 @@ public class MainApplication {
 	
 	public static void main(String[] args) throws Throwable {
 		SpringApplication.run(MainApplication.class, args);
-		
-		
-		
 	}
 	
 	
@@ -124,16 +131,16 @@ public class MainApplication {
 	
 	
 	
-	@Bean
-	void updateRecords() {
+	//@Bean
+	//void updateRecords() {
 		//thread to update patient records periodically
-		UpdatePatient updatePatient = new UpdatePatient(
+		//UpdatePatient updatePatient = new UpdatePatient(
 		
-				dayService
-				);
-	    Thread updatePatientThread = new Thread(updatePatient);
-	    updatePatientThread.start();
-	}
+				//dayService
+				//;
+	   // Thread updatePatientThread = new Thread(updatePatient);
+	   // updatePatientThread.start();
+	//}
 	
 	@Bean
 	PasswordEncoder passwordEncoder() {
@@ -141,13 +148,33 @@ public class MainApplication {
 	}
 	
 	@Bean
-	CommandLineRunner run(UserService userService, DayService dayService, CompanyProfileService companyProfileService) {
+	CommandLineRunner run(SystemProfileService systemProfileService, UserService userService, DayService dayService) {
 		return args -> {
-			if(!companyProfileService.hasData()) {
+			if(!systemProfileService.hasData()) {
 				log.info("Creating mock company");
-				CompanyProfile company = new CompanyProfile(null, "Company Name","Contact Name", null, "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "NAN", "", "", 0, "", "NAN");
-				companyProfileService.saveCompanyProfile(company);
+				SystemProfile system = new SystemProfile(
+						null,
+						"System Name",
+						false,
+						true,
+						"Contact Name",
+						null,
+						"NA",
+						"NA",
+						"NA",
+						"NA",
+						"NA",
+						"NA",
+						"NA",
+						"NA",
+						"NA",
+						"NA",
+						null
+						);
+				systemProfileService.saveSystemProfile(system);
 			}
+			
+			
 			
 			if(!dayService.hasData()) {
 				/**
@@ -166,7 +193,6 @@ public class MainApplication {
 			roleNames.add("PROCUREMENT");
 			roleNames.add("MANAGER");
 			roleNames.add("ACCOUNTANT");
-			//roleNames.add("STORE-KEEPER");
 			roleNames.add("STORE-PERSON");
 			roleNames.add("MANAGEMENT");
 			roleNames.add("CLINICIAN");
@@ -176,6 +202,7 @@ public class MainApplication {
 			roleNames.add("RADIOGRAPHER");
 			roleNames.add("RADIOLOGIST");
 			
+			/**
 			for(String roleName : roleNames) {
 				if(!roleRepository.existsByName(roleName)) {
 					try {
@@ -289,7 +316,7 @@ public class MainApplication {
 			for(Privilege privilege : destroyedPrivileges) {
 				privilegeRepository.delete(privilege);
 			}
-			
+			**/
 			
 		};
 	}

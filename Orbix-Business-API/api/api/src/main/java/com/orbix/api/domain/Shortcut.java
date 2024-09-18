@@ -47,12 +47,12 @@ public class Shortcut {
 	@NotBlank
 	private String link;
 		
-	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = true)
+	@ManyToOne(targetEntity = User1.class, fetch = FetchType.EAGER,  optional = true)
     @JoinColumn(name = "user_id", nullable = true , updatable = true)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
 	@Autowired
 	@Embedded
 	@JsonIgnoreProperties("roles")
-    private User user;
+    private User1 user;
 	
 }

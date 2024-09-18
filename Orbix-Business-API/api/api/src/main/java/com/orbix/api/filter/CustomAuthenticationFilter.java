@@ -29,7 +29,7 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orbix.api.exceptions.InvalidOperationException;
-import com.orbix.api.repositories.UserRepository;
+import com.orbix.api.repositories.UserRepository1;
 import com.orbix.api.service.UserService;
 import com.orbix.api.service.UserServiceImpl;
 
@@ -45,11 +45,11 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 	
-	private final UserRepository userRepository;
+	private final UserRepository1 userRepository;
 
 	private final AuthenticationManager authenticationManager;
 	
-	public CustomAuthenticationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
+	public CustomAuthenticationFilter(AuthenticationManager authenticationManager, UserRepository1 userRepository) {
 		this.authenticationManager = authenticationManager;
 		this.userRepository = userRepository;
 	}

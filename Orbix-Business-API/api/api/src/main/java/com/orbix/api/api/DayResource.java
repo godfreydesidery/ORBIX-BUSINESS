@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.orbix.api.domain.User;
+import com.orbix.api.domain.User1;
 import com.orbix.api.service.DayService;
 import com.orbix.api.service.UserService;
 

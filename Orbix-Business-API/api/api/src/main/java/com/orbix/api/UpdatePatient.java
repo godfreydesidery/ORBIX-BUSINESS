@@ -15,7 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.orbix.api.repositories.DayRepository;
-import com.orbix.api.repositories.UserRepository;
+import com.orbix.api.repositories.UserRepository1;
 import com.orbix.api.service.DayService;
 import com.orbix.api.service.UserService;
 
@@ -41,7 +41,7 @@ public class UpdatePatient implements Runnable{
 	 * then add respective parameters to the calling class
 	 */
 	
-	private final DayService dayService;	
+	//private final DayService dayService;	
 	
 	
 	/**

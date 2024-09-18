@@ -23,7 +23,7 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 import com.orbix.api.filter.CustomAuthenticationFilter;
 import com.orbix.api.filter.CustomAuthorizationFilter;
-import com.orbix.api.repositories.UserRepository;
+import com.orbix.api.repositories.UserRepository1;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,7 +41,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 	private final UserDetailsService userDetailsService;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	
-	private final UserRepository userRepository;
+	private final UserRepository1 userRepository;
 	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {		

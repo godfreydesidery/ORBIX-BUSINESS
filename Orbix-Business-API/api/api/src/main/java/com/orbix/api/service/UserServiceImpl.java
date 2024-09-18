@@ -22,20 +22,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.orbix.api.accessories.Formater;
-import com.orbix.api.domain.Privilege;
-import com.orbix.api.domain.Role;
+import com.orbix.api.domain.Privilege1;
+import com.orbix.api.domain.Role1;
 import com.orbix.api.domain.Shortcut;
-import com.orbix.api.domain.User;
+import com.orbix.api.domain.User1;
 import com.orbix.api.exceptions.DuplicateEntryException;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.MissingInformationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.models.RecordModel;
-import com.orbix.api.repositories.PrivilegeRepository;
-import com.orbix.api.repositories.RoleRepository;
+import com.orbix.api.repositories.PrivilegeRepository1;
+import com.orbix.api.repositories.RoleRepository1;
 import com.orbix.api.repositories.ShortcutRepository;
-import com.orbix.api.repositories.UserRepository;
+import com.orbix.api.repositories.UserRepository1;
 import com.orbix.api.security.Object_;
 import com.orbix.api.security.Operation;
 
@@ -52,9 +52,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class UserServiceImpl implements UserService, UserDetailsService {
 	
-	private final UserRepository userRepository;
-	private final RoleRepository roleRepository;
-	private final PrivilegeRepository privilegeRepository;
+	private final UserRepository1 userRepository;
+	private final RoleRepository1 roleRepository;
+	private final PrivilegeRepository1 privilegeRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final ShortcutRepository shortcutRepository;
 	
@@ -63,7 +63,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {		
-		Optional<User> u = userRepository.findByUsername(username);
+		Optional<User1> u = userRepository.findByUsername(username);
 		System.out.println(username);
 		if(u.isEmpty()) {
 			log.error("User not found in the database");
@@ -81,12 +81,12 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	}
 	
 	@Override
-	public User saveUser(User user, HttpServletRequest request) {
+	public User1 saveUser(User1 user, HttpServletRequest request) {
 		validateUser(user);
 		log.info("Saving user to the database");
 		if(user.getId() == null) {
 			if(user.getUsername().equalsIgnoreCase("root")) {
-				Optional<User> u = userRepository.findByUsername("root");
+				Optional<User1> u = userRepository.findByUsername("root");
 				if(u.isPresent()) {
 					throw new InvalidOperationException("root already exist");
 				}
@@ -94,7 +94,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 			user.setCode(this.requestUserCode().getCode());
 			user.setPassword(passwordEncoder.encode(user.getPassword()));			
 		}else {
-			User userToUpdate = userRepository.findById(user.getId()).get();
+			User1 userToUpdate = userRepository.findById(user.getId()).get();
 			if(!userToUpdate.getCode().equals(user.getCode())) {
 				throw new InvalidOperationException("Changing user code is not allowed");
 			}
@@ -110,8 +110,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		/**
 		 * First get user roles
 		 */
-		Collection<Role> roleCollection = user.getRoles();		
-		List<Role> roles = List.copyOf(roleCollection);
+		Collection<Role1> roleCollection = user.getRoles();		
+		List<Role1> roles = List.copyOf(roleCollection);
 		/**
 		 * Check the roles for specific roles, these roles are special for they carry out critical operations
 		 */
@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		return user;
 	}
 	
-	private boolean validateUser(User user) {
+	private boolean validateUser(User1 user) {
 		/**
 		 * Validate Username, username should be >=6 and <=16 in length
 		 */
@@ -158,9 +158,9 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	}
 
 	@Override
-	public Role saveRole(Role role, HttpServletRequest request) {		
+	public Role1 saveRole(Role1 role, HttpServletRequest request) {		
 		if(role.getName().equalsIgnoreCase("ROOT")) {
-			Optional<Role> r = roleRepository.findByName("ROOT");
+			Optional<Role1> r = roleRepository.findByName("ROOT");
 			if(r.isPresent()) {
 				throw new InvalidOperationException("Can not modify the ROOT role");
 			}
@@ -170,8 +170,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 	@Override
 	public void addRoleToUser(String username, String rolename, HttpServletRequest request) {
-		User user = userRepository.findByUsername(username).get();
-		Role role = roleRepository.findByName(rolename).get();
+		User1 user = userRepository.findByUsername(username).get();
+		Role1 role = roleRepository.findByName(rolename).get();
 		try {
 			if(!user.getRoles().contains(role)) {
 				user.getRoles().add(role);
@@ -182,20 +182,20 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	}
 
 	@Override
-	public User getUser(String username) {
+	public User1 getUser(String username) {
 		return userRepository.findByUsername(username).get();
 	}
 
 	@Override
-	public List<User> getUsers() {
+	public List<User1> getUsers() {
 		log.info("Fetching all users");
 		return userRepository.findAll();
 	}
 
 	@Override
-	public Privilege savePrivilege(Privilege privilege, HttpServletRequest request) {
+	public Privilege1 savePrivilege(Privilege1 privilege, HttpServletRequest request) {
 		
-		Optional<Privilege> p = privilegeRepository.findByName(privilege.getName());
+		Optional<Privilege1> p = privilegeRepository.findByName(privilege.getName());
 		if(p.isPresent()) {
 			throw new InvalidOperationException("Privilege already exist");
 		}
@@ -206,8 +206,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 	@Override
 	public void addPrivilegeToRole(String roleName, String privilegeName) {
-		Role role = roleRepository.findByName(roleName).get();
-		Optional<Privilege> p = privilegeRepository.findByName(privilegeName);
+		Role1 role = roleRepository.findByName(roleName).get();
+		Optional<Privilege1> p = privilegeRepository.findByName(privilegeName);
 		
 		try {
 			if(!role.getPrivileges().contains(p.get())) {
@@ -220,8 +220,8 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	
 	@Override
 	public void removePrivilegeFromRole(String roleName, String privilegeName) {
-		Role role = roleRepository.findByName(roleName).get();
-		Optional<Privilege> p = privilegeRepository.findByName(privilegeName);
+		Role1 role = roleRepository.findByName(roleName).get();
+		Optional<Privilege1> p = privilegeRepository.findByName(privilegeName);
 		
 		try {
 			role.getPrivileges().remove(p.get());			
@@ -231,13 +231,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	}
 
 	@Override
-	public List<Role> getRoles() {
+	public List<Role1> getRoles() {
 		log.info("Fetching all roles");
 		return roleRepository.findAll();
 	}
 
 	@Override
-	public User getUserById(Long id) {
+	public User1 getUserById(Long id) {
 		return userRepository.findById(id).get();
 	}
 	
@@ -250,7 +250,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	}
 
 	@Override
-	public boolean deleteUser(User user) {
+	public boolean deleteUser(User1 user) {
 		/**
 		 * Delete a user if a user is deletable
 		 */
@@ -261,13 +261,13 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		return true;
 	}
 	
-	private boolean allowDeleteUser(User user) {
+	private boolean allowDeleteUser(User1 user) {
 		
 		return false;
 	}
 
 	@Override
-	public Role getRole(String name) {
+	public Role1 getRole(String name) {
 		return roleRepository.findByName(name).get();
 	}
 
@@ -325,21 +325,21 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 
 	@Override
 	public List<String> getPrivileges(String roleName) {
-		Collection<Privilege> privileges = roleRepository.findByName(roleName).get().getPrivileges();
+		Collection<Privilege1> privileges = roleRepository.findByName(roleName).get().getPrivileges();
 		List<String> privilegesList = new ArrayList<String>();
-		for(Privilege privilege : privileges) {
+		for(Privilege1 privilege : privileges) {
 			privilegesList.add(privilege.getName());
 		}
 		return privilegesList;
 	}
 
 	@Override
-	public Role getRoleById(Long id) {
+	public Role1 getRoleById(Long id) {
 		return roleRepository.findById(id).get();
 	}
 
 	@Override
-	public boolean deleteRole(Role role) {
+	public boolean deleteRole(Role1 role) {
 		/**
 		 * Delete a role if a role is deletable
 		 */
@@ -350,7 +350,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		return true;
 	}
 	
-	private boolean allowDeleteRole(Role role) {
+	private boolean allowDeleteRole(Role1 role) {
 		/**
 		 * Code to check if a role is deletable
 		 * Returns false if not
@@ -363,11 +363,11 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 		Shortcut shortcut = new Shortcut();
 		
 		try {
-			User user = userRepository.findByUsername(username).get();
+			User1 user = userRepository.findByUsername(username).get();
 			shortcut.setUser(user);
 			shortcut.setName(name);
 			shortcut.setLink(link);
-			Optional<User> userExist = shortcutRepository.findByLinkAndUser(link, user);
+			Optional<User1> userExist = shortcutRepository.findByLinkAndUser(link, user);
 			if(!userExist.isPresent()) {
 				shortcutRepository.save(shortcut);
 			}else {
@@ -382,7 +382,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	@Override
 	public boolean removeShortcut(String username, String name) {			
 		try {
-			User user = userRepository.findByUsername(username).get();
+			User1 user = userRepository.findByUsername(username).get();
 			
 			Optional<Shortcut> shortcut = shortcutRepository.findByNameAndUser(name, user);
 			if(shortcut.isPresent()) {
@@ -399,7 +399,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	@Override
 	public List<Shortcut> loadShortcuts(String username) {
 		try {
-			User user = userRepository.findByUsername(username).get();
+			User1 user = userRepository.findByUsername(username).get();
 			return shortcutRepository.findByUser(user);
 		}catch(Exception e) {
 			throw new InvalidOperationException("Could not load shortcuts");
@@ -412,7 +412,7 @@ public class UserServiceImpl implements UserService, UserDetailsService {
 	}
 	
 	@Override
-	public User getUser(HttpServletRequest request) {
+	public User1 getUser(HttpServletRequest request) {
 		return userRepository.findByUsername(request.getUserPrincipal().getName()).get();
 	}
 	

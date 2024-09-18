@@ -9,7 +9,7 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import com.orbix.api.domain.Shortcut;
-import com.orbix.api.domain.User;
+import com.orbix.api.domain.User1;
 
 /**
  * @author GODFREY
@@ -22,20 +22,20 @@ public interface ShortcutRepository extends JpaRepository<Shortcut, Long> {
 	 * @param user
 	 * @return
 	 */
-	Optional<User> findByLinkAndUser(String link, User user);
+	Optional<User1> findByLinkAndUser(String link, User1 user);
 
 	/**
 	 * @param user
 	 * @return
 	 */
-	List<Shortcut> findByUser(User user);
+	List<Shortcut> findByUser(User1 user);
 
 	/**
 	 * @param name
 	 * @param user
 	 * @return
 	 */
-	Optional<Shortcut> findByNameAndUser(String name, User user);
+	Optional<Shortcut> findByNameAndUser(String name, User1 user);
 
 	
 

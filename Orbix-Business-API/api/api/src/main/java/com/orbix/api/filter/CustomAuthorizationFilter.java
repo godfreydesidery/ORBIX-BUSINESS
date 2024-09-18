@@ -32,12 +32,12 @@ import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.orbix.api.domain.Role;
-import com.orbix.api.domain.User;
+import com.orbix.api.domain.Role1;
+import com.orbix.api.domain.User1;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.repositories.DayRepository;
-import com.orbix.api.repositories.UserRepository;
+import com.orbix.api.repositories.UserRepository1;
 import com.orbix.api.service.DayService;
 import com.orbix.api.service.UserService;
 
@@ -53,7 +53,7 @@ import lombok.extern.slf4j.Slf4j;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
 	
-	private final UserRepository userRepository;
+	private final UserRepository1 userRepository;
 
 	@Override
 	protected void doFilterInternal(
