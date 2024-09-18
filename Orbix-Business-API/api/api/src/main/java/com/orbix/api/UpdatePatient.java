@@ -14,10 +14,6 @@ import javax.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.orbix.api.repositories.DayRepository;
-import com.orbix.api.repositories.UserRepository1;
-import com.orbix.api.service.DayService;
-import com.orbix.api.service.UserService;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;

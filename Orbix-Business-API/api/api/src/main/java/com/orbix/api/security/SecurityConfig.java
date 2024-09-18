@@ -21,9 +21,7 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-import com.orbix.api.filter.CustomAuthenticationFilter;
-import com.orbix.api.filter.CustomAuthorizationFilter;
-import com.orbix.api.repositories.UserRepository1;
+import com.orbix.api.modules.identityandaccess.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,7 +39,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 	private final UserDetailsService userDetailsService;
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	
-	private final UserRepository1 userRepository;
+	private final UserRepository userRepository;
 	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {		
@@ -51,7 +49,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 	@Override
 	public void configure(WebSecurity web) throws Exception {
 	    web.ignoring().antMatchers(
-	    		"/zana-hmis-api/auth/**",
+	    		"/orbix-business-api/auth/**",
 	    		"/v2/api-docs",
 	    		"/wms/**", 
 	            "/configuration/ui", 
@@ -72,7 +70,7 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
 		CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), userRepository);
-		customAuthenticationFilter.setFilterProcessesUrl("/zana-hmis-api/login");
+		customAuthenticationFilter.setFilterProcessesUrl("/orbix-business-api/login");
 		http.cors();
 		http.csrf().disable();
 		http.anonymous().disable();
@@ -82,8 +80,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 		.antMatchers("/v2/api-docs").permitAll()
 		.antMatchers("/swagger-ui.html").permitAll()
 		.antMatchers("/swagger-ui").permitAll()
-		.antMatchers("/zana-hmis-api/login/**").permitAll()
-		.antMatchers("/zana-hmis-api/token/refresh/**").permitAll()	
+		.antMatchers("/orbix-business-api/login/**").permitAll()
+		.antMatchers("/orbix-business-api/token/refresh/**").permitAll()	
 		.antMatchers("/wms/**").permitAll();
 		//Private endpoints
 		//.anyRequest().authenticated();

@@ -10,8 +10,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.orbix.api.service.DayService;
-import com.orbix.api.service.UserService;
+import com.orbix.api.modules.identityandaccess.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -27,7 +26,6 @@ import lombok.RequiredArgsConstructor;
 public class ConnectionResource {
 
 	private final UserService userService;
-	private final DayService dayService;
 	
 	@GetMapping("/ping")
 	public boolean ping(){

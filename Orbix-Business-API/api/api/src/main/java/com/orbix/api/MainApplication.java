@@ -39,21 +39,20 @@ import org.springframework.context.annotation.FullyQualifiedAnnotationBeanNameGe
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import com.orbix.api.domain.Day;
+import com.orbix.api.modules.adminunits.Day;
+import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.adminunits.SystemProfile;
 import com.orbix.api.modules.adminunits.SystemProfileService;
 import com.orbix.api.modules.identityandaccess.Privilege;
 import com.orbix.api.modules.identityandaccess.PrivilegeRepository;
 import com.orbix.api.modules.identityandaccess.Role;
 import com.orbix.api.modules.identityandaccess.RoleRepository;
+import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
-import com.orbix.api.repositories.DayRepository;
 
 import com.orbix.api.security.Object_;
 import com.orbix.api.security.Operation;
-import com.orbix.api.service.CompanyProfileService;
-import com.orbix.api.service.DayService;
 
 
 
@@ -85,7 +84,6 @@ public class MainApplication {
 	UserService userService;
 	DayService dayService;
 
-	private final DayRepository dayRepository;
     
     private final PrivilegeRepository privilegeRepository;
     
@@ -202,7 +200,7 @@ public class MainApplication {
 			roleNames.add("RADIOGRAPHER");
 			roleNames.add("RADIOLOGIST");
 			
-			/**
+			
 			for(String roleName : roleNames) {
 				if(!roleRepository.existsByName(roleName)) {
 					try {
@@ -219,7 +217,7 @@ public class MainApplication {
 			
 			if(!userRepository.existsByUsername("root")) {
 				try {
-					userService.saveUser(new User(null, "ROOT", "Root", "Root", "Root", "Root@Root", "root", "r00tpA55", null, true, new ArrayList<>(), null, null, LocalDateTime.now()), null);
+					userService.saveUser(new User(null, "ROOT", "Root", "Root", "Root", "Root@Root", "root", "r00tpA55", "", true, new ArrayList<>(), null, null, LocalDateTime.now()), null);
 				}catch(Exception e) {}	
 			}
 					
@@ -316,7 +314,7 @@ public class MainApplication {
 			for(Privilege privilege : destroyedPrivileges) {
 				privilegeRepository.delete(privilege);
 			}
-			**/
+			
 			
 		};
 	}

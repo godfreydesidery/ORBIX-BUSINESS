@@ -100,4 +100,21 @@ public class Formater {
 		
 		return formattedValue;
 	}
+	
+	public static String formatTwelvePlain(String value) {
+		String formattedValue = "";
+		
+		int tokenLength = 12;
+    	int serialLength = value.length();
+    	tokenLength = tokenLength - serialLength;
+    	String token = "";
+    	for(int i = 0; i < tokenLength; i++) {
+    		token = token + "0";
+    	}
+    	value = token + value;
+    	StringBuffer sb = new StringBuffer(value);
+    	formattedValue = sb.toString();
+		
+		return formattedValue;
+	}
 }
