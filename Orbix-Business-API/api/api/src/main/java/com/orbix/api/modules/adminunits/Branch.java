@@ -41,11 +41,9 @@ public class Branch {
 	
 	@NotBlank
 	@Column(unique = true)
-	private String name; 
-	
-	private String level;
-	
-	
+	private String name; 	
+	private String level;	
+	private String type;
 	
 	
 	@ManyToOne(targetEntity = Company.class, fetch = FetchType.EAGER,  optional = false)

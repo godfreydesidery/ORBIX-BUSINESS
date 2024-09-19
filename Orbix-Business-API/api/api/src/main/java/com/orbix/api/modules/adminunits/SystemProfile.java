@@ -41,6 +41,8 @@ public class SystemProfile {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	@Column(unique = true, nullable = false, updatable = false)
+	private String systemroot; // this ensures only a single instance of the system is created. Please do not change
 	/**
 	 * Name of the system, or company administering the system
 	 */
@@ -74,7 +76,4 @@ public class SystemProfile {
 	private String website;
 	private String fax;
 	
-	@ManyToMany(fetch = FetchType.EAGER)
-	@Fetch(FetchMode.SUBSELECT)
-	private Collection<Company> companies = new ArrayList<>();
 }

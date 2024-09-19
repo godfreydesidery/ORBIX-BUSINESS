@@ -32,6 +32,7 @@ public class User {
 	private Long id;
 	@Column(unique = true, nullable = false, updatable = false)
 	private String code;
+	private String type;
 	@NotBlank
 	private String firstName;
 	private String middleName;

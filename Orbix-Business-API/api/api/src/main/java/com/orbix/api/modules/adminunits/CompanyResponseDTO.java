@@ -1,57 +1,22 @@
 package com.orbix.api.modules.adminunits;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.Collection;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
 import javax.persistence.Lob;
-import javax.persistence.ManyToMany;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.Size;
 
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.OnDelete;
-import org.hibernate.annotations.OnDeleteAction;
-
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
-import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
-
-
-@Entity
-@Data 
-//@NoArgsConstructor 
-@AllArgsConstructor
-@RequiredArgsConstructor
-@Table(name = "companies")
-public class Company {
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
-	
-	@NotBlank
-	@Column(unique = true)
+@Data
+@NoArgsConstructor
+public class CompanyResponseDTO {
+	private String id;
 	private String name; 
-	@NotBlank
-	@Column(unique = true)
 	private String brandName; 
 	private String symbol;
-	
-	@NotBlank
-	@Column(unique = true)
+
 	private String domain; 
 	
 	private String legalType;
@@ -94,18 +59,6 @@ public class Company {
 	private String bankPostAddress3;
 	private String bankName3;
 	private String bankAccountNo3;
-
-	@ManyToMany(fetch = FetchType.EAGER)
-	@Fetch(FetchMode.SUBSELECT)
-	private Collection<Branch> branches = new ArrayList<>();
 	
 	
-	
-	
-	
-	
-	
-	
-	
-
 }

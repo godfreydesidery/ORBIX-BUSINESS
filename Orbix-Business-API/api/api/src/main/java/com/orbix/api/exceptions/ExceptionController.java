@@ -22,10 +22,10 @@ public class ExceptionController {
 	   public ResponseEntity<Object> exception(DuplicateEntryException exception) {
 	      return new ResponseEntity<>("Duplicate entry: "+exception.message, HttpStatus.CONFLICT);
 	   }
-	@ExceptionHandler(value = InvalidEntryException.class)
-	   public ResponseEntity<Object> exception(InvalidEntryException exception) {
-	      return new ResponseEntity<>("Invalid entry: "+exception.message, HttpStatus.CONFLICT);
-	   }
+	//@ExceptionHandler(value = InvalidEntryException.class)
+	   //public ResponseEntity<Object> exception(InvalidEntryException exception) {
+	      //return new ResponseEntity<>("Invalid entry: "+exception.message, HttpStatus.CONFLICT);
+	   //}
 	@ExceptionHandler(value = InvalidOperationException.class)
 	   public ResponseEntity<Object> exception(InvalidOperationException exception) {
 	      return new ResponseEntity<>("Invalid operation: "+exception.message, HttpStatus.CONFLICT);

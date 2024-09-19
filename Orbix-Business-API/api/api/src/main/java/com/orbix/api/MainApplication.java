@@ -149,9 +149,10 @@ public class MainApplication {
 	CommandLineRunner run(SystemProfileService systemProfileService, UserService userService, DayService dayService) {
 		return args -> {
 			if(!systemProfileService.hasData()) {
-				log.info("Creating mock company");
+				log.info("Creating the system instance");
 				SystemProfile system = new SystemProfile(
 						null,
+						"systemroot", //please do not change this, it ensures the a single instance of the system is maintained
 						"System Name",
 						false,
 						true,
@@ -166,8 +167,7 @@ public class MainApplication {
 						"NA",
 						"NA",
 						"NA",
-						"NA",
-						null
+						"NA"
 						);
 				systemProfileService.saveSystemProfile(system);
 			}
@@ -217,7 +217,7 @@ public class MainApplication {
 			
 			if(!userRepository.existsByUsername("root")) {
 				try {
-					userService.saveUser(new User(null, "ROOT", "Root", "Root", "Root", "Root@Root", "root", "r00tpA55", "", true, new ArrayList<>(), null, null, LocalDateTime.now()), null);
+					userService.saveUser(new User(null, "ROOT", "SYSTEM-ROOT-USER", "Root", "Root", "Root", "Root@Root", "root", "r00tpA55", "", true, new ArrayList<>(), null, null, LocalDateTime.now()), null);
 				}catch(Exception e) {}	
 			}
 					
@@ -339,6 +339,8 @@ public class MainApplication {
 	    multipartFilter.setMultipartResolverBeanName("multipartResolver");
 	    return multipartFilter;
 	}
+	
+	
 	
 	
 	

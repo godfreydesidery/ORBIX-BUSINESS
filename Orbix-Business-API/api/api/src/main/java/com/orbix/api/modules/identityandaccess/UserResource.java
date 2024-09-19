@@ -14,5 +14,5 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @Transactional
 public class UserResource {
-
+	
 }
