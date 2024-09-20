@@ -24,7 +24,7 @@ import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.MissingInformationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.DayService;
-import com.orbix.api.modules.utilities.Formater;
+import com.orbix.api.modules.utilities.Formatter;
 import com.orbix.api.modules.utilities.RecordModel;
 import com.orbix.api.modules.utilities.Shortcut;
 import com.orbix.api.modules.utilities.ShortcutRepository;
@@ -409,8 +409,8 @@ public class UserServiceController implements UserService, UserDetailsService {
 			
 		}
 		RecordModel model = new RecordModel();
-		model.setCode("USR-"+Formater.formatTwelvePlain(id.toString()));
-		model.setNo("USR-"+Formater.formatTwelvePlain(id.toString()));
+		model.setCode("USR-"+Formatter.formatTwelvePlain(id.toString()));
+		model.setNo("USR-"+Formatter.formatTwelvePlain(id.toString()));
 		return model;
 	}
 }

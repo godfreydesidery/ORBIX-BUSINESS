@@ -28,18 +28,27 @@ public class CompanyResource {
 	
 	private final CompanyService companyService;
 	
-	@GetMapping("/companies")
-	public ResponseEntity<List<CompanyResponseDTO>>getAll(HttpServletRequest request){
-		return ResponseEntity.ok().body(companyService.getAll(request));
+	@GetMapping("/companies/get_all_companies")
+	public ResponseEntity<List<CompanyResponseDTO>>getAllCompanies(HttpServletRequest request){
+		return ResponseEntity.ok().body(companyService.getAllCompanies(request));
 	}
 	
-	@PostMapping("/companies/create")
+	@PostMapping("/companies/create_company")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
-	public ResponseEntity<CompanyResponseDTO>create(
+	public ResponseEntity<CompanyResponseDTO>createCompany(
 			@RequestBody CompanyRequestDTO companyRequest,
 			HttpServletRequest request){		
-		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/companies/save").toUriString());
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/companies/create_company").toUriString());
 		return ResponseEntity.created(uri).body(companyService.createCompany(companyRequest, request));
+	}
+	
+	@PostMapping("/companies/update_company")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<CompanyResponseDTO>updateCompany(
+			@RequestBody CompanyRequestDTO companyRequest,
+			HttpServletRequest request){		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/companies/update_company").toUriString());
+		return ResponseEntity.created(uri).body(companyService.updateCompany(companyRequest, request));
 	}
 	
 	

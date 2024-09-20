@@ -10,7 +10,7 @@ import java.time.format.DateTimeFormatter;
  * @author GODFREY
  *
  */
-public class Formater {
+public class Formatter {
 	public static String formatWithCurrentDate(String prefix, String suffix) {
 		DateTimeFormatter f = DateTimeFormatter.ofPattern("yyyyMMdd");
 		return prefix + f.format(LocalDateTime.now()) + "-" +suffix;

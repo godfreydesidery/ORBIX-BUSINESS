@@ -41,6 +41,9 @@ public class Company {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	@NotBlank
+	@Column(unique = true)
+	private String code;
 	
 	@NotBlank
 	@Column(unique = true)

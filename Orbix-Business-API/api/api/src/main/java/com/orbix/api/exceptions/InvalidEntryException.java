@@ -15,7 +15,6 @@ public class InvalidEntryException extends RuntimeException{
 	public String message;
 	
 	public InvalidEntryException(String message){
-		//this.message = message;
 		super(message);
 	}
 }

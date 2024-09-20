@@ -14,10 +14,10 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
  */
 @ControllerAdvice
 public class ExceptionController {
-	@ExceptionHandler(value = NotFoundException.class)
-	   public ResponseEntity<Object> exception(NotFoundException exception) {
-	      return new ResponseEntity<>("Not found: "+exception.message, HttpStatus.NOT_FOUND);
-	   }
+	//@ExceptionHandler(value = NotFoundException.class)
+	  // public ResponseEntity<Object> exception(NotFoundException exception) {
+	  //    return new ResponseEntity<>("Not found: "+exception.message, HttpStatus.NOT_FOUND);
+	   //}
 	@ExceptionHandler(value = DuplicateEntryException.class)
 	   public ResponseEntity<Object> exception(DuplicateEntryException exception) {
 	      return new ResponseEntity<>("Duplicate entry: "+exception.message, HttpStatus.CONFLICT);
