@@ -1,0 +1,61 @@
+<div class="sidebar" [ngClass]="{'menu-collapsed': isMenuCollapsed}" (mouseleave)="hoverElemTop=-200">
+    <ul class="nav nav-sidebar flex-column">
+        <ng-scrollbar pointerEventsMethod="scrollbar" orientation="vertical">
+            @for (item of menuItems; track $index) { 
+                <li class="sidebar-list-item">
+                    @if (!item.routerLink && !item.subMenu) {
+                        <a [attr.href]="item.url || ''" [attr.target]="item.target || ''" (mouseenter)="hoverItem($event, item)"  class="sidebar-list-link">
+                            <i class="fa {{ item.icon }}"></i><span>{{ item.title }}</span>
+                        </a>
+                    }
+                    @if (item.routerLink && !item.subMenu) {
+                        <a [routerLink]="[item.routerLink]" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}" (click)="collapseMenu($event, item)" (mouseenter)="hoverItem($event, item)" class="sidebar-list-link">
+                            <i class="fa {{ item.icon }}"></i><span>{{ item.title }}</span>
+                        </a>
+                    }
+                    @if (item.subMenu) {
+                        <a [attr.href]="''" (click)="collapseMenu($event, item)" (mouseenter)="hoverItem($event, item)" class="sidebar-list-link">
+                            <i class="fa {{ item.icon }}"></i><span>{{ item.title }}</span>
+                            <b class="fa fa-angle-down"></b>
+                        </a>
+                        <ul class="sidebar-sublist">
+                            @for (subitem of item.subMenu; track $index) { 
+                                <li class="sidebar-sublist-item">            
+        
+                                    @if (subitem.subMenu) {
+                                        <a [attr.href]="''" (click)="collapseMenu($event, item)" (mouseenter)="hoverItem($event, item)" class="sidebar-list-link subitem-submenu-link">
+                                            <span>{{ subitem.title }}</span>
+                                            <b class="fa fa-angle-down"></b>
+                                        </a>
+                                        <ul class="sidebar-sublist subitem-submenu-list">
+                                            @for (subSubitem of subitem.subMenu; track $index) {
+                                                <li (mouseenter)="hoverItem($event, item)"> 
+                                                    @if (subSubitem.routerLink) {
+                                                        <a (mouseenter)="hoverItem($event, item)" [attr.target]="subSubitem.target || ''" [routerLink]="[subSubitem.routerLink]" routerLinkActive="active-link">{{ subSubitem.title }}</a>
+                                                    } @else {
+                                                        <a (mouseenter)="hoverItem($event, item)" [attr.href]="subSubitem.url || ''" [attr.target]="subSubitem.target || ''">{{ subSubitem.title }}</a>
+                                                    }                                                 
+                                                </li>
+                                            }                                           
+                                        </ul>
+                                    }
+                                    @if (subitem.routerLink && !subitem.subMenu) {
+                                        <a [routerLink]="[subitem.routerLink]" routerLinkActive="active-link" [routerLinkActiveOptions]="{exact:true}" (click)="collapseMenu($event, item)" (mouseenter)="hoverItem($event, item)">
+                                            {{ subitem.title}}
+                                        </a>
+                                    }
+                                    @if (!subitem.routerLink && !subitem.subMenu) {
+                                        <a [attr.href]="subitem.url || ''" [attr.target]="subitem.target || ''" (mouseenter)="hoverItem($event, item)">
+                                            {{ subitem.title}}
+                                        </a>
+                                    }
+                                </li>
+                            }
+                        </ul>
+                    } 
+                </li>
+            }
+        </ng-scrollbar>
+    </ul>
+    <div class="sidebar-hover-elem" [ngStyle]="{top: hoverElemTop + 'px', height: hoverElemHeight + 'px'}" [ngClass]="{'show-hover-elem': showHoverElem }"></div>
+</div>

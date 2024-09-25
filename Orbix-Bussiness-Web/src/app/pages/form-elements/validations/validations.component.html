@@ -1,0 +1,126 @@
+<div class="row">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>VALIDATORS</span>
+                <div class="widget-controls">              
+                    <a data-widgster="expand" href="#" class="transition"><i class="fa fa-chevron-down"></i></a>
+                    <a data-widgster="collapse" href="#" class="transition"><i class="fa fa-chevron-up"></i></a>
+                    <a data-widgster="fullscreen" href="#" class="transition"><i class="fa fa-expand"></i></a>
+                    <a data-widgster="restore" href="#" class="transition"><i class="fa fa-compress"></i></a>                          
+                    <a data-widgster="close" href="#" class="transition"><i class="fa fa-times"></i></a>
+                </div>        
+            </div>
+            <div class="card-body widget-body">
+
+                <div class="row justify-content-center">
+                    <div class="col-md-9 col-12">
+
+                        <form (ngSubmit)="onSubmit(myForm)" [formGroup]="myForm">
+                        
+                            <div class="form-group row text-sm-right">
+                                <label class="col-sm-3 form-control-label m-t-5">Simple</label>
+                                <div class="col-sm-8 text-left">
+                                    <input class="form-control checking-field" type="text" formControlName="simple" required>
+                                    @if (myForm.get('simple')!.touched && myForm.get('simple')!.hasError('required')) {
+                                        <span class="help-block text-danger">Field is required</span>   
+                                    }                  
+                                </div>
+                            </div>
+
+                            <div class="form-group row text-sm-right">
+                                <label class="col-sm-3 form-control-label m-t-5">Min length (3)</label>
+                                <div class="col-sm-8 text-left">
+                                    <input class="form-control checking-field" type="text" formControlName="minLength" required>
+                                    @if (myForm.get('minLength')!.touched) {
+                                        <span class="help-block">
+                                            @if (myForm.get('minLength')!.hasError('required')) {
+                                                <span class="text-danger">Field is required</span>
+                                            }
+                                            @if (myForm.get('minLength')!.hasError('minlength')) {
+                                                <span class="text-danger">Minimum of 3 characters</span>
+                                            } 
+                                        </span>
+                                    }                                   
+                                </div>
+                            </div>
+
+                            <div class="form-group row text-sm-right">
+                                <label class="col-sm-3 form-control-label m-t-5">Max length (10)</label>
+                                <div class="col-sm-8 text-left">
+                                    <input class="form-control checking-field" type="text" formControlName="maxLength" required>
+                                    @if (myForm.get('maxLength')!.touched && myForm.get('maxLength')!.hasError('required')) {
+                                        <span class="help-block text-danger">Field is required</span>    
+                                    }
+                                    @if (myForm.get('maxLength')!.touched && myForm.get('maxLength')!.hasError('maxlength')) {
+                                        <span class="help-block text-danger">Maximum of 10 characters</span>
+                                    } 
+                                </div>
+                            </div>
+
+                            <div class="form-group row text-sm-right">
+                                <label class="col-sm-3 form-control-label m-t-5">Email</label>
+                                <div class="col-sm-8 text-left">
+                                    <input class="form-control checking-field" type="email" formControlName="email" required>
+                                    @if (myForm.get('email')!.touched && myForm.get('email')!.hasError('required')) {
+                                        <span class="help-block text-danger">Email is required</span>    
+                                    }
+                                    @if (myForm.get('email')!.touched && myForm.get('email')!.hasError('invalidEmail')) {
+                                        <span class="help-block text-danger">Invalid email address</span>
+                                    } 
+                                </div>
+                            </div>
+
+                            <div class="form-group row text-sm-right">
+                                <label class="col-sm-3 form-control-label m-t-5">Password</label>
+                                <div class="col-sm-8 text-left">
+                                    <input class="form-control checking-field" type="password" formControlName="password" minlength="6" required>
+                                    @if (myForm.get('password')!.touched && myForm.get('password')!.hasError('required')) {
+                                        <span class="help-block text-danger">Password is required</span>        
+                                    }
+                                    @if (myForm.get('password')!.touched && myForm.get('password')!.hasError('minlength')) {
+                                        <span class="help-block text-danger">Password isn't long enough, minimum of 6 characters</span>
+                                    } 
+                                </div>
+                            </div>
+
+                            <div class="form-group row text-sm-right">
+                                <label class="col-sm-3 form-control-label m-t-5">Confirm Password</label>
+                                <div class="col-sm-8 text-left">
+                                    <input class="form-control checking-field" type="password" formControlName="confirmPassword" required>
+                                    @if (myForm.get('confirmPassword')!.touched && myForm.get('confirmPassword')!.hasError('required')) {
+                                        <span class="help-block text-danger">Password is required</span>   
+                                    }
+                                    @if (myForm.get('confirmPassword')!.touched && myForm.get('confirmPassword')!.hasError('mismatchedPasswords')) {
+                                        <span class="help-block text-danger">Passwords do not match</span> 
+                                    }  
+                                </div>
+                            </div>
+
+                            <div class="form-group row text-sm-right">
+                                <label class="col-sm-3 form-control-label m-t-5">Website</label>
+                                <div class="col-sm-8 text-left">
+                                    <input class="form-control checking-field" type="text" formControlName="website" required>
+                                    @if (myForm.get('website')!.touched && myForm.get('website')!.hasError('required')) {
+                                        <span class="help-block text-danger">Website is required</span>  
+                                    }
+                                    @if (myForm.get('website')!.touched && myForm.get('website')!.hasError('invalidUrl')) {
+                                        <span class="help-block text-danger">Invalid url address</span>
+                                    }  
+                                </div>
+                            </div>
+                            
+                            <div class="form-group row">
+                                <div class="col-sm-8 mx-auto text-center">
+                                    <button class="btn btn-main" type="submit" [disabled]="myForm.invalid">Validate &amp; Submit</button>
+                                </div>
+                            </div>
+                        </form> 
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
