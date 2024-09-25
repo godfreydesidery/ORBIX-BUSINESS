@@ -1,5 +1,5 @@
 export const menuItems = [
-    {
+    /*{
         title: 'Dashboard',
         routerLink: 'dashboard',
         icon: 'fa-home',
@@ -257,5 +257,93 @@ export const menuItems = [
         expanded: false,
         order: 800,
         target: '_blank'
-    }
+    },*/
+    {
+        title: 'Dashboard',
+        routerLink: 'dashboard',
+        icon: 'fa-home',
+        selected: false,
+        expanded: false,
+        order: 0
+    },
+    {
+        title: 'Parking Management',
+        routerLink: ' ',
+        icon: 'fa-car',
+        selected: false,
+        expanded: false,
+        order: 100,
+        subMenu: [
+            {
+                title: 'Vehicle Management',
+                routerLink: '/app/parking/vehicle-management'
+            },
+            {
+                title: 'Slot Management',
+                routerLink: '/app/parking/slot-management'
+            }
+        ]
+    },
+    {
+        title: 'IAM',
+        routerLink: ' ',
+        icon: 'fa-user-circle-o',
+        selected: false,
+        expanded: false,
+        order: 100,
+        subMenu: [
+            {
+                title: 'User',
+                routerLink: '/app/user'
+            },
+            {
+                title: 'Role',
+                routerLink: '/app/role'
+            }
+        ]
+    },
+    {
+        title: 'Units',
+        routerLink: ' ',
+        icon: 'fa-bank',
+        selected: false,
+        expanded: false,
+        order: 200,
+        subMenu: [
+            {
+                title: 'Company',
+                routerLink: '/app/company'
+            },
+            {
+                title: 'Branch',
+                routerLink: '/app/branch'
+            },
+            {
+                title: 'Department',
+                routerLink: '/app/department'
+            },
+            {
+                title: 'Warehouse',
+                routerLink: '/app/warehouse'
+            },
+            {
+                title: 'Shop',
+                routerLink: '/app/shop'
+            }
+        ]
+    },
+    {
+        title: 'System Settings',
+        routerLink: ' ',
+        icon: 'fa-gears',
+        selected: false,
+        expanded: false,
+        order: 100,
+        subMenu: [
+            {
+                title: 'System Profile',
+                routerLink: '/app/settings/system-profile'
+            },
+        ]
+    },
 ];

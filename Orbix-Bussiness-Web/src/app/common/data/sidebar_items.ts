@@ -45,5 +45,16 @@ export const sidebarItems = [
     new SidebarItem(142, 'MenuLevel 3', null, null, 'fa-folder-open-o', null, true, 141),
     new SidebarItem(143, 'MenuLevel 4', null, null, 'fa-folder-open-o', null, true, 142),
     new SidebarItem(144, 'MenuLevel 5', null, null, 'fa-folder-o', null, false, 143),
-    new SidebarItem(200, 'External Link', null, 'http://themeseason.com', 'fa-external-link', '_blank', false, 0)
+    new SidebarItem(200, 'External Link', null, 'http://themeseason.com', 'fa-external-link', '_blank', false, 0),
+
+
+
+
+
+//this is currently disabled
+
+
+    //new SidebarItem(201, 'IAM', null, null, 'fa-bar-chart', null, true, 0),
+    //new SidebarItem(202, 'User', 'app/user', null, 'fa-caret-right', null, false, 201),
+    //new SidebarItem(203, 'Role', 'app/role', null, 'fa-caret-right', null, false, 201),
 ];

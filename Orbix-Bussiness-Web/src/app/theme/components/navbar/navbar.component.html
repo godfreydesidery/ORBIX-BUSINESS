@@ -1,14 +1,15 @@
 <nav class="nav az-navbar fixed-top">
     <a class="navbar-brand" routerLink="/" (click)="closeSubMenus()">
-        <img src="img/logo/az_logo_full.png" alt="" class="d-md-block d-none"> 
+        <!--<img src="img/logo/az_logo_full.png" alt="" class="d-md-block d-none"> -->
+        <img src="img/logo/az_logo.png" alt="" class="d-md-block d-none">
         <img src="img/logo/az_logo.png" alt="" class="d-md-none"> 
     </a>
     <div id="lines" class="transition" (click)="toggleMenu()"></div>
     
-    <form role="search" class="app-search d-md-block d-none">
+    <!--<form role="search" class="app-search d-md-block d-none">
         <input type="text" placeholder="Search..." class="form-control">
         <a href="javascript:void(0)"><i class="fa fa-search"></i></a>
-    </form>
+    </form>-->
 
     <ul class="nav right-section">
         <li class="nav-item">
@@ -18,7 +19,7 @@
           <div class="dropdown float-right user-menu">
               <a class="dropdown-toggle user-link" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
                   <img src="img/users/user.jpg" alt="user-img" class="img-circle user-img">
-                  <span class="d-lg-inline d-none">Emilio Verdines</span>
+                  <span class="d-lg-inline d-none">Godfrey Desidery</span>
               </a>
 
               <ul class="dropdown-menu">
@@ -26,7 +27,9 @@
                       <img src="img/users/user.jpg" alt="user-img" class="img-circle user-img">                    
                       <p>
                           Emilio Verdines - Web Developer
+                          
                           <small>Member since Dec. 2015</small>
+                          
                       </p>
                   </li>
                   <a class="dropdown-item" routerLink="/pages/profile/projects"><i class="fa fa-user"></i>Profile</a>

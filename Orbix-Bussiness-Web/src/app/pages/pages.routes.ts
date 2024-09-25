@@ -1,5 +1,7 @@
 import { Routes } from '@angular/router';
 import { PagesComponent } from './pages.component';
+import { UserComponent } from './identity-and-access/user/user.component';
+import { RoleComponent } from './identity-and-access/role/role.component';
 
 export const routes: Routes = [
   {
@@ -16,6 +18,19 @@ export const routes: Routes = [
         loadComponent: () => import('./dashboard/dashboard.component').then(c => c.DashboardComponent),
         data: { breadcrumb: 'Dashboard' }
       },
+      //Identity and Access
+      {
+        path : 'user',
+        loadComponent : () => import('./identity-and-access/identity-and-access.routes').then(c => UserComponent),
+        data : { breadcrumb : 'User'}
+      },
+      {
+        path : 'role',
+        loadComponent : () => import('./identity-and-access/identity-and-access.routes').then(c => RoleComponent),
+        data : { breadcrumb : 'Role'}
+      },
+
+
       { 
         path: 'blank', 
         loadComponent: () => import('./blank/blank.component').then(c => c.BlankComponent),

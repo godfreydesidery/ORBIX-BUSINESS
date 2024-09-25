@@ -1,4 +1,4 @@
-import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { Component, OnInit, ViewChild, ViewEncapsulation } from '@angular/core';
 import { Location, NgClass } from '@angular/common';
 import { AppState } from '@services/app.state';
 import { NavbarComponent } from '@components/navbar/navbar.component';
@@ -28,6 +28,9 @@ export class PagesComponent implements OnInit {
 
   public isMenuCollapsed: boolean = false;
 
+  @ViewChild(NavbarComponent) childComponent!: NavbarComponent;
+
+
   constructor(private _state: AppState, private _location: Location) {
     this._state.subscribe('menu.isCollapsed', (isCollapsed: boolean) => {
       this.isMenuCollapsed = isCollapsed;
@@ -55,6 +58,10 @@ export class PagesComponent implements OnInit {
 
   public ngAfterViewInit(): void {
     document.getElementById('preloader')!.style['display'] = 'none';
+  }
+
+  public test(){
+    this.childComponent.test = 'Test succeeded'
   }
 
 }

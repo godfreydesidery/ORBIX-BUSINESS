@@ -20,6 +20,8 @@ import { SidebarService } from '@services/sidebar.service';
 export class NavbarComponent {
     public isMenuCollapsed: boolean = false;
 
+    public test : string = ''
+
     constructor(private _state: AppState, private _sidebarService: SidebarService) {
         this._state.subscribe('menu.isCollapsed', (isCollapsed: boolean) => {
             this.isMenuCollapsed = isCollapsed;
