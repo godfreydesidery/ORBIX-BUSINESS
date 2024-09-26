@@ -1,11 +1,18 @@
 <!doctype html>
 <html lang="en">
 <head>
-  <meta charset="utf-8"> 
+  <script>
+    // Check if the page is being reloaded
+    if (performance.navigation.type === performance.navigation.TYPE_RELOAD) {
+      // Redirect to the desired URL
+      window.location.href = '';
+    }
+  </script>
+  <meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <title>Azimuth - Angular Admin Template</title>
+  <title>Orbix Business</title>
 	<meta name="description" content="Admin template based on Angular and Bootstrap 4">
-  <base href="./">	
+  <base href="./">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <link rel="icon" type="image/x-icon" href="favicon.ico">
   <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyAO7Mg2Cs1qzo_3jkKkZAKY6jtwIlm41-I"></script>
@@ -29,7 +36,9 @@
         </div>
     </div>
   </div>
-  <script data-pace-options='{ "target": ".main-wrapper", "ghostTime": 1000 }'></script> 
-  <script src="https://cdn.ckeditor.com/4.7.0/full-all/ckeditor.js"></script> 
+  <script data-pace-options='{ "target": ".main-wrapper", "ghostTime": 1000 }'></script>
+  <script src="https://cdn.ckeditor.com/4.7.0/full-all/ckeditor.js"></script>
+  <!-- app.component.html or any HTML template in Angular -->
+  
 </body>
 </html>

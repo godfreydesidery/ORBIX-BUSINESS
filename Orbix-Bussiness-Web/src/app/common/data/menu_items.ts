@@ -264,7 +264,7 @@ export const menuItems = [
         icon: 'fa-home',
         selected: false,
         expanded: false,
-        order: 0
+        order: 0,        
     },
     {
         title: 'Parking Management',
@@ -275,18 +275,14 @@ export const menuItems = [
         order: 100,
         subMenu: [
             {
-                title: 'Vehicle Management',
-                routerLink: '/app/parking/vehicle-management'
-            },
-            {
-                title: 'Slot Management',
-                routerLink: '/app/parking/slot-management'
+                title: 'Vehicle Register',
+                routerLink: '/app/parking-management/vehicle-register'
             }
         ]
     },
-    {
-        title: 'IAM',
-        routerLink: ' ',
+    /*{
+        title: 'Identity and Access',
+        routerLink: '',
         icon: 'fa-user-circle-o',
         selected: false,
         expanded: false,
@@ -294,16 +290,20 @@ export const menuItems = [
         subMenu: [
             {
                 title: 'User',
-                routerLink: '/app/user'
+                routerLink: '/app/identity-and-access/user'
             },
             {
                 title: 'Role',
-                routerLink: '/app/role'
+                routerLink: '/app/identity-and-access/role'
+            },
+            {
+                title: 'Role Access',
+                routerLink: '/app/identity-and-access/role-access'
             }
         ]
     },
     {
-        title: 'Units',
+        title: 'Administration',
         routerLink: ' ',
         icon: 'fa-bank',
         selected: false,
@@ -312,37 +312,117 @@ export const menuItems = [
         subMenu: [
             {
                 title: 'Company',
-                routerLink: '/app/company'
+                routerLink: '/app/admin-unit/company'
             },
             {
                 title: 'Branch',
-                routerLink: '/app/branch'
+                routerLink: '/app/admin-unit/branch'
             },
             {
                 title: 'Department',
-                routerLink: '/app/department'
+                routerLink: '/app/admin-unit/department'
             },
             {
                 title: 'Warehouse',
-                routerLink: '/app/warehouse'
+                routerLink: '/app/admin-unit/warehouse'
             },
             {
                 title: 'Shop',
-                routerLink: '/app/shop'
+                routerLink: '/app/admin-unit/shop'
+            },
+            {
+                title: 'Shop-Till',
+                routerLink: '/app/admin-unit/shop-till'
+            },
+        ]
+    },*/
+    {
+        title: 'Admin',
+        icon: 'fa-cogs',
+        selected: false,
+        expanded: false,
+        order: 700,
+        subMenu: [
+            {
+                title: 'Identity and Access',
+                url: '#',
+                subMenu: [
+                    {
+                        title: 'User',
+                        routerLink: '/app/identity-and-access/user'
+                    },
+                    {
+                        title: 'Role',
+                        routerLink: '/app/identity-and-access/role'
+                    },
+                    {
+                        title: 'Role Access',
+                        routerLink: '/app/identity-and-access/role-access'
+                    }
+                ]
+            },
+            {
+                title: 'Admin Units',
+                url: '#',
+                subMenu: [
+                    {
+                        title: 'Company',
+                        routerLink: '/app/admin-unit/company'
+                    },
+                    {
+                        title: 'Branch',
+                        routerLink: '/app/admin-unit/branch'
+                    },
+                    {
+                        title: 'Department',
+                        routerLink: '/app/admin-unit/department'
+                    },
+                    {
+                        title: 'Warehouse',
+                        routerLink: '/app/admin-unit/warehouse'
+                    },
+                    {
+                        title: 'Shop',
+                        routerLink: '/app/admin-unit/shop'
+                    },
+                    {
+                        title: 'Shop-Till',
+                        routerLink: '/app/admin-unit/shop-till'
+                    },
+                ]
+            },
+            {
+                title: 'Parking Management',
+                url: '#',
+                subMenu: [
+                    {
+                        title: 'Parking Zone',
+                        routerLink: '/app/parking-management/parking-zone'
+                    },
+                    {
+                        title: 'Vehicle Type',
+                        routerLink: '/app/parking-management/vehicle-type'
+                    },
+                    {
+                        title: 'Pricing Plan',
+                        routerLink: '/app/parking-management/parking-price-plan'
+                    },
+                ]
             }
+            
         ]
     },
     {
         title: 'System Settings',
         routerLink: ' ',
-        icon: 'fa-gears',
+        icon: 'fa-wrench',
         selected: false,
         expanded: false,
         order: 100,
         subMenu: [
             {
                 title: 'System Profile',
-                routerLink: '/app/settings/system-profile'
+                routerLink: '/app/system/system-profile'
             },
         ]
     },

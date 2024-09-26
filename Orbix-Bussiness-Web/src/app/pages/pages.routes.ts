@@ -2,6 +2,14 @@ import { Routes } from '@angular/router';
 import { PagesComponent } from './pages.component';
 import { UserComponent } from './identity-and-access/user/user.component';
 import { RoleComponent } from './identity-and-access/role/role.component';
+import { CompanyComponent } from './administration-units/company/company.component';
+import { BranchComponent } from './administration-units/branch/branch.component';
+import { DepartmentComponent } from './administration-units/department/department.component';
+import { WarehouseComponent } from './administration-units/warehouse/warehouse.component';
+import { ShopComponent } from './administration-units/shop/shop.component';
+import { ShopTillComponent } from './administration-units/shop-till/shop-till.component';
+import { SystemProfileComponent } from './system/system-profile/system-profile.component';
+import { RoleAccessComponent } from './identity-and-access/role-access/role-access.component';
 
 export const routes: Routes = [
   {
@@ -20,15 +28,86 @@ export const routes: Routes = [
       },
       //Identity and Access
       {
-        path : 'user',
+        path : 'identity-and-access/user',
         loadComponent : () => import('./identity-and-access/identity-and-access.routes').then(c => UserComponent),
-        data : { breadcrumb : 'User'}
+        data : { breadcrumb : 'Identity and Acces > User'}
       },
       {
-        path : 'role',
+        path : 'identity-and-access/role',
         loadComponent : () => import('./identity-and-access/identity-and-access.routes').then(c => RoleComponent),
-        data : { breadcrumb : 'Role'}
+        data : { breadcrumb : 'Identity and Acces/Role'}
       },
+      {
+        path : 'identity-and-access/role-access',
+        loadComponent : () => import('./identity-and-access/identity-and-access.routes').then(c => RoleAccessComponent),
+        data : { breadcrumb : 'Identity and Acces/Role Access'}
+      },
+      
+      //Administration Units
+      {
+        path : 'admin-unit/company',
+        loadComponent : () => import('./administration-units/administration-units.routes').then(c => CompanyComponent),
+        data : { breadcrumb : 'Admin Unit/Company'}
+      },
+      {
+        path : 'admin-unit/branch',
+        loadComponent : () => import('./administration-units/administration-units.routes').then(c => BranchComponent),
+        data : { breadcrumb : 'Admin Unit/Branch'}
+      },
+      {
+        path : 'admin-unit/department',
+        loadComponent : () => import('./administration-units/administration-units.routes').then(c => DepartmentComponent),
+        data : { breadcrumb : 'Admin Unit/Department'}
+      },
+      {
+        path : 'admin-unit/warehouse',
+        loadComponent : () => import('./administration-units/administration-units.routes').then(c => WarehouseComponent),
+        data : { breadcrumb : 'Admin Unit/Warehouse'}
+      },
+      {
+        path : 'admin-unit/shop',
+        loadComponent : () => import('./administration-units/administration-units.routes').then(c => ShopComponent),
+        data : { breadcrumb : 'Admin Unit/Shop'}
+      },
+      {
+        path : 'admin-unit/shop-till',
+        loadComponent : () => import('./administration-units/administration-units.routes').then(c => ShopTillComponent),
+        data : { breadcrumb : 'Admin Unit/Shop Till'}
+      },
+      //System Profile
+      /**Start of System Profile */
+      {
+        path : 'system/system-profile',
+        loadComponent : () => import('./administration-units/administration-units.routes').then(c => SystemProfileComponent),
+        data : { breadcrumb : 'System/System Profile'}
+      },
+      /**End of System Profile */
+
+      //Parking Management
+      /**Start of parking management */
+      {
+        path : 'parking-management/vehicle-register',
+        loadComponent: () => import('./parking-management/vehicle-register/vehicle-register.component').then(c => c.VehicleRegisterComponent),
+        data : { breadcrumb : 'Parking Management/Vehicle Register'}
+      },
+      {
+        path : 'parking-management/parking-zone',
+        loadComponent: () => import('./parking-management/parking-zone/parking-zone.component').then(c => c.ParkingZoneComponent),
+        data : { breadcrumb : 'Parking Management/Parking Zone'}
+      },
+      {
+        path : 'parking-management/vehicle-type',
+        loadComponent: () => import('./parking-management/vehicle-type/vehicle-type.component').then(c => c.VehicleTypeComponent),
+        data : { breadcrumb : 'Parking Management/Vehicle Type'}
+      },
+      {
+        path : 'parking-management/parking-price-plan',
+        loadComponent: () => import('./parking-management/parking-price-plan/parking-price-plan.component').then(c => c.ParkingPricePlanComponent),
+        data : { breadcrumb : 'Parking Management/Parking Price Plan'}
+      },
+
+      /**End of Parking Management */
+
 
 
       { 

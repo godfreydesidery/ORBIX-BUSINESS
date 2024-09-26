@@ -1,6 +1,6 @@
 import 'pace';
 import { ApplicationConfig, importProvidersFrom, provideZoneChangeDetection } from '@angular/core';
-import { PreloadAllModules, provideRouter, withPreloading } from '@angular/router';
+import { PreloadAllModules, provideRouter, RouterModule, withPreloading } from '@angular/router';
 import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 
@@ -16,6 +16,9 @@ export const appConfig: ApplicationConfig = {
     importProvidersFrom([
       BrowserAnimationsModule,
       ToastrModule.forRoot(), 
+      RouterModule.forRoot(routes, {useHash : true})
     ])
-  ]
+  ],
 };
+
+

@@ -3,9 +3,9 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
     { 
         path: '', 
-        redirectTo: 'app', 
+        redirectTo: 'app',
         pathMatch: 'full' 
-    },
+    },   
     {
         path: 'app', 
         loadChildren: () => import('./pages/pages.routes').then(p => p.routes)

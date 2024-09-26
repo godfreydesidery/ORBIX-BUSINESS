@@ -39,6 +39,7 @@ export class PagesComponent implements OnInit {
 
   ngOnInit() {
     this.getCurrentPageName();
+
   }
 
   public getCurrentPageName(): void {
