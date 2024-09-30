@@ -1,6 +1,8 @@
 import { Component, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
+import { AuthService } from 'src/app/auth.service';
+import { first } from 'rxjs';
 
 @Component({
   selector: 'az-login',
@@ -16,17 +18,24 @@ import { Router, RouterModule } from '@angular/router';
 export class LoginComponent {
   public router: Router;
   public form: FormGroup;
-  public email: FormControl;
+  public username: FormControl;
   public password: FormControl;
 
-  constructor(router: Router, fb: FormBuilder) {
+  status : string = ''
+
+   
+
+  constructor(
+    private auth : AuthService,
+    router: Router, 
+    fb: FormBuilder) {
     this.router = router;
     this.form = fb.group({
-      'email': ['', Validators.compose([Validators.required, emailValidator])],
+      'username': ['', Validators.compose([Validators.required])],
       'password': ['', Validators.compose([Validators.required, Validators.minLength(6)])]
     });
 
-    this.email = this.form.controls['email'] as FormControl;;
+    this.username = this.form.controls['username'] as FormControl;;
     this.password = this.form.controls['password'] as FormControl;;
   }
 
@@ -36,6 +45,40 @@ export class LoginComponent {
       this.router.navigate(['pages/dashboard']);
     }
   }
+
+
+  async loginUser(){
+    localStorage.removeItem('user-name')
+    localStorage.removeItem('system-date')
+
+    if(this.username.value == '' || this.password.value == ''){ 
+      alert('Please fill in your username and password')
+      //this.msgBox.showErrorMessage3('Please fill in your username and password')
+      return
+    }
+    this.status = 'Loading... Please wait.'
+    await this.auth.loginUser(this.username.value, this.password.value)
+      .pipe(first())
+      .toPromise()
+      .then(
+        async () => {
+          this.status = 'Loading User... Please wait.'
+          await this.auth.loadUserSession(this.username.value)
+          this.status = 'Authenticated'
+          window.location.reload()
+        }
+      )
+      .catch(error => {
+        this.status = ''
+        localStorage.removeItem('current-user')
+        alert('Invalid username and password')
+        //this.msgBox.showErrorMessage(error, 'Invalid username and password')
+        console.log(error)
+        return
+      })    
+  }
+
+
 }
 
 export function emailValidator(control: FormControl): {[key: string]: any} | null {

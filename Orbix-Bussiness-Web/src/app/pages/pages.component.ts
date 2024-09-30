@@ -4,7 +4,7 @@ import { AppState } from '@services/app.state';
 import { NavbarComponent } from '@components/navbar/navbar.component';
 import { MenuComponent } from '@components/menu/menu.component';
 import { BreadcrumbComponent } from '@components/breadcrumb/breadcrumb.component';
-import { RouterOutlet } from '@angular/router';
+import { Router, RouterOutlet } from '@angular/router';
 import { BackTopComponent } from '@components/back-top/back-top.component';
 // import { SidebarComponent } from '@components/sidebar/sidebar.component';
 
@@ -26,18 +26,43 @@ import { BackTopComponent } from '@components/back-top/back-top.component';
 })
 export class PagesComponent implements OnInit {
 
+  isLoggedIn : boolean = false;
+
+  userName : string = ''
+
   public isMenuCollapsed: boolean = false;
 
   @ViewChild(NavbarComponent) childComponent!: NavbarComponent;
 
 
-  constructor(private _state: AppState, private _location: Location) {
+  constructor(
+    private _state: AppState, 
+    private _location: Location,
+    private router : Router
+  ) {
     this._state.subscribe('menu.isCollapsed', (isCollapsed: boolean) => {
       this.isMenuCollapsed = isCollapsed;
     });
   }
 
-  ngOnInit() {
+  async ngOnInit() {
+    
+
+    var currentUser = null
+    if(localStorage.getItem('user-name') != null){
+      this.userName = localStorage.getItem('user-name')!
+    }else{
+      this.userName = ''
+    }
+    if(localStorage.getItem('current-user') != null){
+      currentUser = localStorage.getItem('current-user')
+    }
+    if(currentUser != null){
+      this.isLoggedIn = true
+    }else{
+      this.isLoggedIn = false
+      await this.router.navigate(['login'])//Navigates to home if url is entered on address bar
+    }  
     this.getCurrentPageName();
 
   }
@@ -65,4 +90,11 @@ export class PagesComponent implements OnInit {
     this.childComponent.test = 'Test succeeded'
   }
 
+
+  public async logout() : Promise<any>{
+    localStorage.removeItem('current-user')
+    alert('You have logged out!')
+    //await this.router.navigate([''])
+    window.location.reload()
+  }
 }

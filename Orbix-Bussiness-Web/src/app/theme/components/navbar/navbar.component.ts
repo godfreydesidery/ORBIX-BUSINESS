@@ -1,6 +1,6 @@
 import { Component, ViewEncapsulation } from '@angular/core'; 
 import { AppState } from '@services/app.state';
-import { RouterLink } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { MessagesComponent } from '../messages/messages.component';
 import { SidebarService } from '@services/sidebar.service';
 
@@ -22,7 +22,11 @@ export class NavbarComponent {
 
     public test : string = ''
 
-    constructor(private _state: AppState, private _sidebarService: SidebarService) {
+    constructor(
+        private _state: AppState, 
+        private _sidebarService: SidebarService,
+        private router : Router
+    ) {
         this._state.subscribe('menu.isCollapsed', (isCollapsed: boolean) => {
             this.isMenuCollapsed = isCollapsed;
         });
@@ -37,5 +41,13 @@ export class NavbarComponent {
         this.isMenuCollapsed = !this.isMenuCollapsed;
         this._state.notifyDataChanged('menu.isCollapsed', this.isMenuCollapsed);
     }
+
+    public async logout() : Promise<any>{
+        localStorage.removeItem('current-user')
+        alert('You have logged out!')
+        await this.router.navigate(['login'])
+        //window.location.reload()
+      }
+    
 
 }

@@ -5,9 +5,13 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 
 import { routes } from './app.routes';
+import { provideHttpClient } from '@angular/common/http';
+import { DatePipe } from '@angular/common';
 
 export const appConfig: ApplicationConfig = {
   providers: [
+    DatePipe,
+    provideHttpClient(),
     provideZoneChangeDetection({ eventCoalescing: true }), 
     provideRouter(
       routes,

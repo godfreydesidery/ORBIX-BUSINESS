@@ -1,28 +1,31 @@
-<az-navbar></az-navbar>
-<div class="container-fluid">         
-    <div class="row"> 
-        <az-menu></az-menu>
-        <!-- <az-sidebar></az-sidebar> -->
-        <div class="main-wrapper"  [ngClass]="{'menu-collapsed': isMenuCollapsed}">
-            @if (!isMenuCollapsed) {
-                <div class="az-overlay" (click)="hideMenu()"></div>
-            } 
-            <div class="main">
 
-                <!--<button (click)="test()">Test Button</button>-->
+@if(isLoggedIn){
+    <az-navbar></az-navbar>
+    <div class="container-fluid">         
+        <div class="row"> 
+            <az-menu></az-menu>
+            <!-- <az-sidebar></az-sidebar> -->
+            <div class="main-wrapper"  [ngClass]="{'menu-collapsed': isMenuCollapsed}">
+                @if (!isMenuCollapsed) {
+                    <div class="az-overlay" (click)="hideMenu()"></div>
+                } 
+                <div class="main">
 
-                <az-breadcrumb></az-breadcrumb>
-                <!--Router outlet-->
-                <router-outlet></router-outlet>
-                <!--Router outlet-->
-            </div>  
-            <footer class="footer text-center clearfix">
-                <div class="footer-main pull-left  clearfix">
-                    <div class="copyright pull-left">&copy; <a class="font-weight-bold">Sighman Limited</a> 2024</div>
+                    <!--<button (click)="test()">Test Button</button>-->
+
+                    <az-breadcrumb></az-breadcrumb>
+                    <!--Router outlet-->
+                    <router-outlet></router-outlet>
+                    <!--Router outlet-->
                 </div>  
-                <div class="pull-right created"> <i class="fa fa-globe"></i></div> 
-            </footer> 
-            <az-back-top [position]="200"></az-back-top> 
+                <footer class="footer text-center clearfix">
+                    <div class="footer-main pull-left  clearfix">
+                        <div class="copyright pull-left">&copy; <a class="font-weight-bold">Sighman Limited</a> 2024</div>
+                    </div>  
+                    <div class="pull-right created"> <i class="fa fa-globe"></i></div> 
+                </footer> 
+                <az-back-top [position]="200"></az-back-top> 
+            </div>
         </div>
     </div>
-</div>
+}

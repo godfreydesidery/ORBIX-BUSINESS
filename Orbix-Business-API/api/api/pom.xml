@@ -4,10 +4,10 @@
 
   <groupId>com.orbix</groupId>
   <artifactId>api</artifactId>
-  <version>0.0.1-Orbix-Bussiness-Suite</version>
+  <version>0.0.1-Orbix-Business</version>
   <packaging>jar</packaging>
 
-  <name>orbix-bussiness-suite-api</name>
+  <name>orbix-business-api</name>
   <url>http://maven.apache.org</url>
 
   <properties>

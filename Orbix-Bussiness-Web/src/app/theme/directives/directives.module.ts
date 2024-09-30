@@ -16,7 +16,7 @@ import { DropzoneUpload } from './dropzone/dropzone.directive';
     declarations: [ 
         SlimScroll,
         Widget,
-        Skycon,
+        //Skycon,
         Counter,
         LiveTile,
         ProgressAnimate,
@@ -25,7 +25,7 @@ import { DropzoneUpload } from './dropzone/dropzone.directive';
     exports: [ 
         SlimScroll,
         Widget,
-        Skycon,
+        //Skycon,
         Counter,
         LiveTile,
         ProgressAnimate,
