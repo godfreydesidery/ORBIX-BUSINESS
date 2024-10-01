@@ -43,6 +43,17 @@ public class CompanyServiceController implements CompanyService {
 	}
 	
 	@Override
+	public CompanyResponseDTO get(
+			Long id, 
+			HttpServletRequest request) {		
+		Optional<Company> _company = companyRepository.findById(id);
+		if(_company.isEmpty()) {
+			throw new NotFoundException("Company not found");
+		}		
+		return companyResponseDTOMapper(_company.get());	
+	}
+	
+	@Override
 	public CompanyResponseDTO createCompany(CompanyRequestDTO companyRequest, HttpServletRequest request) {
 		//Validate data
 		if(!validateCompanyData(companyRequest)) {
@@ -54,6 +65,7 @@ public class CompanyServiceController implements CompanyService {
 		company.setCode("CMP" + String.valueOf(Math.random()));
 		company.setName(companyRequest.getName());
 		company.setBrandName(companyRequest.getBrandName());
+		company.setContactName(companyRequest.getContactName());
 		company.setDomain(companyRequest.getDomain().replace(" ", ""));
 		
 		company = companyRepository.save(company);
@@ -103,10 +115,14 @@ public class CompanyServiceController implements CompanyService {
 	private CompanyResponseDTO companyResponseDTOMapper(Company company) {
 		CompanyResponseDTO companyResponse = new CompanyResponseDTO();
 		companyResponse.setId(company.getId().toString());
+		companyResponse.setCode(company.getCode());
 		companyResponse.setName(company.getName());
 		companyResponse.setBrandName(company.getBrandName());
+		companyResponse.setContactName(company.getContactName());
 		companyResponse.setDomain(company.getDomain());
 		
 		return companyResponse;
 	}
+
+	
 }

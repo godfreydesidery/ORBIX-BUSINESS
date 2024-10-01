@@ -13,8 +13,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class CompanyResponseDTO {
 	private String id;
+	private String code;
 	private String name; 
 	private String brandName; 
+	private String contactName;
 	private String symbol;
 
 	private String domain; 

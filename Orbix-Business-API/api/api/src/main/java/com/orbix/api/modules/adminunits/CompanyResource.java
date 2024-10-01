@@ -33,6 +33,15 @@ public class CompanyResource {
 		return ResponseEntity.ok().body(companyService.getAllCompanies(request));
 	}
 	
+	@GetMapping("/companies/get")
+	public ResponseEntity<CompanyResponseDTO>get(
+			Long id,
+			HttpServletRequest request){
+		
+		return ResponseEntity.ok().body(companyService.get(id, request));
+		
+	}
+	
 	@PostMapping("/companies/create")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<CompanyResponseDTO>create(

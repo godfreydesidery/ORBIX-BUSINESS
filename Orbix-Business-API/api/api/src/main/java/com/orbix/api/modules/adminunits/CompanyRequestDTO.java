@@ -15,11 +15,10 @@ import lombok.Data;
 @Data
 public class CompanyRequestDTO {
 	private Long id;
-	
-	@NotBlank(message = "Name must not be blank")
-    @Size(min = 10, message = "Name must be at least 10 characters long")
+	private String code;
 	private String name; 
 	private String brandName; 
+	private String contactName;
 	private String symbol;
 
 	private String domain; 

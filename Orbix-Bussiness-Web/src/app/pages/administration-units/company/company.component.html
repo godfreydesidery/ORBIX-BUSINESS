@@ -30,33 +30,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>11001</td>
-                                <td>GESCO COMPANY LIMITED</td>
-                                <td>GESCO</td>
-                                <td>Gissima Nyamohanga</td>
-                                <td><span>ACTIVE    </span> <i class="fa fa-lock" style="cursor: pointer;"></i></td>
-                                <td><a class="bg" style="cursor: pointer;">Select</a></td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>11002</td>
-                                <td>OTAPP COMPANY LIMITED</td>
-                                <td>OTAPP</td>
-                                <td>Joachim Ferdinand</td>
-                                <td><span>ACTIVE    </span> <i class="fa fa-lock" style="cursor: pointer;"></i></td>
-                                <td><a class="bg" style="cursor: pointer;">Select</a></td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>11003</td>
-                                <td>OLOTU GENERAL SUPPLIES</td>
-                                <td>OLOTU</td>
-                                <td>Michael Olotu</td>
-                                <td><span>INACTIVE    </span> <i class="fa fa-unlock" style="cursor: pointer;"></i></td>
-                                <td><a class="bg" style="cursor: pointer;">Select</a></td>
-                            </tr>
+                            @for (company of companies; track company.id) {
+                                <tr>
+                                    <td>{{company.sn}}</td>
+                                    <td>{{company.code}}</td>
+                                    <td>{{company.name}}</td>
+                                    <td>{{company.brandName}}</td>
+                                    <td>{{company.contactName}}</td>
+                                    <td><span>ACTIVE    </span> <i class="fa fa-lock" style="cursor: pointer;"></i></td>
+                                    <td><a class="bg" (click)="get(company.id)" data-toggle="modal" data-target="#company-modal" style="cursor: pointer;">Select</a></td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
@@ -79,21 +63,26 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-lg-3">
+                        <input type="hidden" [(ngModel)]="id">
                         <div class="form-group">
                             <label>Company Code</label>
-                            <input class="form-control" type="text" autocomplete="nope">
+                            <input class="form-control" type="text" [(ngModel)]="code" autocomplete="nope" readonly>
                         </div>
                         <div class="form-group">
                             <label>Company Name</label>
-                            <input class="form-control" type="text" autocomplete="nope">
+                            <input class="form-control" type="text" [(ngModel)]="name" autocomplete="nope">
                         </div>
                         <div class="form-group">
                             <label>Brand Name</label>
-                            <input class="form-control" type="text" autocomplete="nope">
+                            <input class="form-control" type="text" [(ngModel)]="brandName" autocomplete="nope">
                         </div>
                         <div class="form-group">
                             <label>Contact Name</label>
-                            <input class="form-control" type="text" autocomplete="nope">
+                            <input class="form-control" type="text" [(ngModel)]="contactName" autocomplete="nope">
+                        </div>
+                        <div class="form-group">
+                            <label>Domain</label>
+                            <input class="form-control" type="text" [(ngModel)]="domain" autocomplete="nope">
                         </div>
                         <div class="form-group">
                             <div class="form-group">

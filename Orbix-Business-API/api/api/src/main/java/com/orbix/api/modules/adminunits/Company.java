@@ -51,6 +51,7 @@ public class Company {
 	@NotBlank
 	@Column(unique = true)
 	private String brandName; 
+	private String contactName;
 	private String symbol;
 	
 	@NotBlank
