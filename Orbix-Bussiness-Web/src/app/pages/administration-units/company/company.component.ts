@@ -3,6 +3,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/auth.service';
 import { ICompany } from 'src/app/domain/company';
+import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
 
 const API_URL = environment.apiUrl;
@@ -25,7 +26,25 @@ export class CompanyComponent {
   brandName : string = ''
   contactName : string = ''
   domain : string = ''
+  symbol : string = ''
+  active : boolean = false
 
+  legalType : string = ''
+  industry : string = ''
+  country : string = ''
+  timeZone : string = ''
+  foundingDate : Date
+  logo : Byte[]
+  tin : string = ''
+  vrn : string = ''
+  physicalAddress : string = ''
+  postalCode : string = ''
+  postalAddress : string = ''
+  telephone : string = ''
+  mobile : string = ''
+  email : string = ''
+  website : string = ''
+  fax : string = ''
 
   /**Collections */
   companies : ICompany[] = []
@@ -81,15 +100,33 @@ export class CompanyComponent {
     }
 
     var company : ICompany = {
-      id : this.id,
-      code : this.code,
-      name : this.name,
-      brandName : this.brandName,
-      contactName : this.contactName,
-      domain : this.domain,
+      id: this.id,
+      code: this.code,
+      name: this.name,
+      brandName: this.brandName,
+      contactName: this.contactName,
+      domain: this.domain,
+      active: this.active,
+
+      symbol: '',
+      legalType: '',
+      industry: '',
+      country: '',
+      timeZone: '',
+      foundingDate: undefined!,
+      logo: [],
+      tin: '',
+      vrn: '',
+      physicalAddress: '',
+      postalCode: '',
+      postalAddress: '',
+      telephone: '',
+      mobile: '',
+      email: '',
+      website: '',
+      fax: '',
 
       sn : 0
-
     }
 
     if(company.id === null){
@@ -104,7 +141,10 @@ export class CompanyComponent {
 
           console.log(data)
 
+          this.getAllCompanies()
+
           alert('Company created successifully')
+
         }
 
       )
@@ -125,6 +165,8 @@ export class CompanyComponent {
           this.name = data!.name
 
           console.log(data)
+
+          this.getAllCompanies()
 
           alert('Company updated successifully')
         }

@@ -71,7 +71,7 @@ export class LoginComponent {
       .catch(error => {
         this.status = ''
         localStorage.removeItem('current-user')
-        alert('Invalid username and password')
+        alert(error['statusText'] + ' | Could ')
         //this.msgBox.showErrorMessage(error, 'Invalid username and password')
         console.log(error)
         return

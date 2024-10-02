@@ -62,15 +62,32 @@ public class CompanyServiceController implements CompanyService {
 		
 		Company company = new Company();
 		
-		company.setCode("CMP" + String.valueOf(Math.random()));
+		company.setCode(String.valueOf(Math.random()));
 		company.setName(companyRequest.getName());
 		company.setBrandName(companyRequest.getBrandName());
 		company.setContactName(companyRequest.getContactName());
 		company.setDomain(companyRequest.getDomain().replace(" ", ""));
+		//company.setSymbol(symbol);
+		//company.setLegalType(legalType);
+		//company.setIndustry(industry);
+		//company.setCountry(country);
+		//company.setTimeZone(timeZone);
+		//company.setFoundingDate(foundingDate);
+		//company.setTin(tin);
+		//company.setVrn(vrn);
+		//company.setPhysicalAddress(physicalAddress);
+		//company.setPostalCode(postalAddress);
+		//company.setPostalAddress(postalAddress);
+		//company.setTelephone(telephone);
+		//company.setMobile(mobile);
+		//company.setEmail(email);
+		//company.setFax(fax);
 		
 		company = companyRepository.save(company);
+		//Create company code
+		company.setCode("CMP/"+ company.getId().toString());
+		company = companyRepository.save(company);
 		
-		//company.setCode(company.getId().toString());
 		
 		//Create a main branch for the company. This branch can be edited later
 		Branch branch = new Branch();		

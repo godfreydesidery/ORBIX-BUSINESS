@@ -3,6 +3,7 @@
     <div class="card">
       <div class="card-body text-center">
         <h2 class="card-title"><i class="fa fa-user"></i> User Login</h2>
+        <span  class="text-success">{{status}}</span>
           <div class="form-group">
             <input [formControl]="username" class="form-control checking-field" placeholder="Username" type="text">
             @if (form.get('username')!.touched && form.get('username')!.hasError('required')) {
