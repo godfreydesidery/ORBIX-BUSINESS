@@ -1,3 +1,4 @@
+import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +13,8 @@ const API_URL = environment.apiUrl;
   selector: 'az-company',
   standalone: true,
   imports: [
-    FormsModule
+    FormsModule,
+    CommonModule
   ],
   templateUrl: './company.component.html',
   styleUrl: './company.component.scss'
@@ -27,7 +29,7 @@ export class CompanyComponent {
   contactName : string = ''
   domain : string = ''
   symbol : string = ''
-  active : boolean = false
+  active : string = 'Inactive'
 
   legalType : string = ''
   industry : string = ''
@@ -74,6 +76,7 @@ export class CompanyComponent {
           this.companies.push(element)
           sn = sn + 1
         })
+        console.log(data)
       }
     )
   }
@@ -108,23 +111,23 @@ export class CompanyComponent {
       domain: this.domain,
       active: this.active,
 
-      symbol: '',
-      legalType: '',
-      industry: '',
-      country: '',
-      timeZone: '',
-      foundingDate: undefined!,
+      symbol: this.symbol,
+      legalType: this.legalType,
+      industry: this.industry,
+      country: this.country,
+      timeZone: this.timeZone,
+      foundingDate: this.foundingDate,
       logo: [],
-      tin: '',
-      vrn: '',
-      physicalAddress: '',
-      postalCode: '',
-      postalAddress: '',
-      telephone: '',
-      mobile: '',
-      email: '',
-      website: '',
-      fax: '',
+      tin: this.tin,
+      vrn: this.vrn,
+      physicalAddress: this.physicalAddress,
+      postalCode: this.postalCode,
+      postalAddress: this.postalAddress,
+      telephone: this.telephone,
+      mobile: this.mobile,
+      email: this.email,
+      website: this.website,
+      fax: this.fax,
 
       sn : 0
     }
@@ -135,9 +138,7 @@ export class CompanyComponent {
       .toPromise()
       .then(
         data => {
-          this.id = data?.id
-          this.code = data!.code
-          this.name = data!.name
+          this.showCompanyData(data!)
 
           console.log(data)
 
@@ -160,9 +161,7 @@ export class CompanyComponent {
       .toPromise()
       .then(
         data => {
-          this.id = data?.id
-          this.code = data!.code
-          this.name = data!.name
+          this.showCompanyData(data!)
 
           console.log(data)
 
@@ -181,6 +180,68 @@ export class CompanyComponent {
     }
   }
 
+  async activate(id : any){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    var company = {
+      id : id
+    }
+
+    await this.http.post<String>(API_URL+'/companies/activate', company, options)
+      .toPromise()
+      .then(
+        data => {
+
+          console.log(data)
+
+          this.getAllCompanies()
+
+          alert('Company activated successifully')
+
+        }
+
+      )
+      .catch(
+        error => {
+          console.log(error)
+          alert('An error has occured')
+        }
+      )
+  }
+
+  async deactivate(id : any){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    var company = {
+      id : id
+    }
+
+    await this.http.post<String>(API_URL+'/companies/deactivate', company, options)
+      .toPromise()
+      .then(
+        data => {
+
+          console.log(data)
+
+          this.getAllCompanies()
+
+          alert('Company deactivated successifully')
+
+        }
+
+      )
+      .catch(
+        error => {
+          console.log(error)
+          alert('An error has occured')
+        }
+      )
+  }
+
   showCompanyData(data : ICompany){
     this.id = data?.id
     this.code = data!.code
@@ -188,6 +249,23 @@ export class CompanyComponent {
     this.brandName = data!.brandName
     this.contactName = data!.contactName
     this.domain = data!.domain
+
+    this.symbol = data!.symbol
+    this.legalType = data!.legalType
+    this.industry = data!.industry
+    this.country = data!.country
+    this.timeZone = data!.timeZone
+    this.foundingDate = data!.foundingDate
+    this.tin = data!.tin
+    this.vrn = data!.vrn
+    this.physicalAddress = data!.physicalAddress
+    this.postalCode = data!.postalCode
+    this.postalAddress = data!.postalAddress
+    this.telephone = data!.telephone
+    this.mobile = data!.mobile
+    this.email = data!.email
+    this.website = data!.website
+    this.fax = data!.fax
   }
 
   clearCompanyData(){
@@ -197,5 +275,21 @@ export class CompanyComponent {
     this.brandName = ''
     this.contactName = ''
     this.domain = ''
+    this.symbol = ''
+    this.legalType = ''
+    this.industry = ''
+    this.country = ''
+    this.timeZone = ''
+    this.foundingDate!
+    this.tin = ''
+    this.vrn = ''
+    this.physicalAddress = ''
+    this.postalCode = ''
+    this.postalAddress = ''
+    this.telephone = ''
+    this.mobile = ''
+    this.email = ''
+    this.website = ''
+    this.fax = ''
   }
 }

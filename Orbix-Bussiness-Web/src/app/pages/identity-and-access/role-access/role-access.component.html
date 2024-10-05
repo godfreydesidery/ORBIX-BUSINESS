@@ -3,91 +3,82 @@
     <div class="col">
         <div widget class="card">
             <div class="card-header">
-                <span>Access Management</span>
+                <span>Role - Permission Management</span>
             </div>
             <div class="card-body widget-body"> 
-
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label for="exampleSelect1"><b>Select Role to View / Configure Privileges</b></label>
-                            <select class="form-control" id="exampleSelect1">
-                                <option>ROLE 1</option>
-                                <option>ROLE 2</option>
-                                <option>ROLE 3</option>
-                                <option>ROLE 4</option>
-                                <option>ROLE 5</option>
-                            </select>
-                        </div>
-                    </div>
-                </div>
-                <br><br>
-
-                
-
-                <div class="table-responsive">
-                    <table class="table table-bordered table-sm">
-                        <thead>
-                            <tr>
-                                <th>Item</th>
-                                <th>Privileges</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr>
-                                <td>LPO</td>
-                                <td>
-                                    <table>
-                                        <tr>
-                                            <td><input type="checkbox" class="checkbox-main"><label>ALL</label></td>
-                                            <td><input type="checkbox" class="checkbox-main"><label>APR</label></td>
-                                            <td><input type="checkbox" class="checkbox-main"><label>CNC</label></td>
-                                            <td><input type="checkbox" class="checkbox-main"><label>ARC</label></td> 
-                                            <td><input type="checkbox" class="checkbox-main"><label>ALL</label></td>
-                                            <td><input type="checkbox" class="checkbox-main"><label>APR</label></td>
-                                            <td><input type="checkbox" class="checkbox-main"><label>CNC</label></td>
-                                            <td><input type="checkbox" class="checkbox-main"><label>ARC</label></td>      
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>LPO</td>
-                                <td>
-                                    <table>
-                                        <tr>
-                                            <td><input type="checkbox" class="checkbox-main"><label>ALL</label></td>
-                                            <td><input type="checkbox" class="checkbox-main"><label>APR</label></td>
-                                            <td><input type="checkbox" class="checkbox-main"><label>CNC</label></td>
-                                            <td><input type="checkbox" class="checkbox-main"><label>ARC</label></td>    
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                            <tr>
-                                <td>LPO</td>
-                                <td>
-                                    <table>
-                                        <tr>
-                                            <td><input type="checkbox" class="checkbox-main"><label>ALL</label></td>
-                                            <td><input type="checkbox" class="checkbox-main"><label>APR</label></td>
-                                            <td><input type="checkbox" class="checkbox-main"><label>CNC</label></td>
-                                            <td><input type="checkbox" class="checkbox-main"><label>ARC</label></td>    
-                                        </tr>
-                                    </table>
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
                 <div class="row">
                     <div class="col-sm-12">
-                        <button type="button" class="btn btn-success pull-right">Save</button>
+                        <table style="width: 100%;">
+                            <tr style="width: 100%;">
+                                <td style="vertical-align: top; height: 75vh;">
+                                    <div class="container-fluid">
+                                        <div class="row">
+                                            
+                                            <div class="col-sm-12">
+                                                <div>
+                                                    <label>Select Role:</label><br>
+                                                    <select [ngModel]="selectedRole" (ngModelChange)="selectRole($event)" class="form-control">
+                                                        <option></option>
+                                                        <option *ngFor="let role of roles">{{role}}</option>
+                                                    </select>
+                                                </div>
+                                                <br>
+                                                <label>{{selectedRoleMessage}}</label><br>
+                                                <table class="table table-bordered">
+                                                    <thead>
+                                                        <tr>
+                                                            <td>Item</td>
+                                                            <td>Priviledges</td>
+                                                        </tr>
+                                                    </thead>
+                                                    <tbody>
+                                                        <!--<tr *ngFor="let object of objects">
+                                                            <td style="vertical-align: top;">{{object}}</td>
+                                                            <td style="vertical-align: top;">
+                                                                <button *ngFor="let operation of operations" class="btn btn-light" style="margin-left: 1mm; margin-right: 1mm;"><input type="checkbox" [checked]="privilegeChecked(object, operation)" (change)="addOrRemovePrivilege($event, object, operation)" style="height: 5mm; width: 5mm;"><label>{{operation}}</label></button>
+                                                            </td>
+                                                        </tr> -->
+                                                        <tr *ngFor="let model of privModels">
+                                                            <td style="vertical-align: top;">{{model.object}}</td>
+                                                            <td style="vertical-align: top;">
+                                                                <button *ngFor="let operation of model.operations" class="btn btn-light" style="margin-left: 1mm; margin-right: 1mm;"><input type="checkbox" [checked]="privilegeChecked(model.object, operation)" (change)="addOrRemovePrivilege($event, model.object, operation)" style="height: 5mm; width: 5mm;"><label>{{operation}}</label></button>
+                                                            </td>
+                                                        </tr> 
+                                                    </tbody>
+                                                </table>
+                                                <table class="table">
+                                                    <tbody>
+                                                        <tr>
+                                                            <td><button class="btn btn-success" (click)="addPrivilegeToRole(selectedRole)">Save</button></td>
+                                                        </tr>
+                                                    </tbody>
+                                                </table>
+                                                <div>
+                                                    <label>Access Summary</label><br>
+                                                    <table class="table table-bordered table-striped table-sm">
+                                                        <thead>
+                                                            <tr>
+                                                                <td>Role</td>
+                                                                <td>Privileges</td>
+                                                            </tr>
+                                                        </thead>
+                                                        <tbody>
+                                                            <tr *ngFor="let item of privileges | keyvalue">
+                                                                <td>{{item.key | json}}</td>
+                                                                <td>{{item.value | json}}</td>
+                                                            </tr>
+                                                        </tbody>
+                                                    </table>
+                                                </div> 
+                                            </div>
+                                        </div>
+                                    </div>
+                                </td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
-
-

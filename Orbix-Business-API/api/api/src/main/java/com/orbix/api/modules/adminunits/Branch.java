@@ -1,6 +1,7 @@
 package com.orbix.api.modules.adminunits;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -24,10 +25,13 @@ import org.hibernate.annotations.OnDeleteAction;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.orbix.api.modules.identityandaccess.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data 
@@ -38,14 +42,38 @@ public class Branch {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-	
+	@NotBlank
+	@Column(unique = true)
+	private String code; 		
 	@NotBlank
 	@Column(unique = true)
 	private String name; 	
 	private String level;	
 	private String type;
+	private boolean active = false;
+		
+	private String physicalAddress;
+	private String postalCode;
+	private String postalAddress;
+	private String telephone;
+	private String mobile;
+	private String email;
+	private String website;
+	private String fax;
+	
+    private String city;
+    private String state;
+    private String country;
+	
+	private String managerName;
+	private String openingHours;
+	private int numberOfStaff;
+	private double salesTargets;
+	private LocalDate dateEstablished;
+	private String notes;
 	
 	
+
 	@ManyToOne(targetEntity = Company.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "company_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
@@ -60,6 +88,23 @@ public class Branch {
 	
 	@ManyToMany(fetch = FetchType.EAGER)
 	@Fetch(FetchMode.SUBSELECT)
-	private Collection<Branch> branches = new ArrayList<>();
+	private Collection<Branch> childBranches = new ArrayList<>();
+	
+	
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "created_by_user_id", nullable = false , updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User createdByUser;
+	
+	@ManyToOne(targetEntity = Day.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "created_on_day_id", nullable = false , updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Day createdOnDay;
+	
+	private LocalDateTime createdDateTime = LocalDateTime.now();
 
 }

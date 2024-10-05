@@ -18,11 +18,15 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.DuplicateEntryException;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.MissingInformationException;
 import com.orbix.api.exceptions.NotFoundException;
+import com.orbix.api.modules.adminunits.Company;
+import com.orbix.api.modules.adminunits.CompanyRequestDTO;
+import com.orbix.api.modules.adminunits.CompanyResponseDTO;
 import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.utilities.Formatter;
 import com.orbix.api.modules.utilities.RecordModel;
@@ -172,9 +176,13 @@ public class UserServiceController implements UserService, UserDetailsService {
 	}
 
 	@Override
-	public List<User> getUsers() {
+	public List<UserResponseDTO> getUsers() {
 		log.info("Fetching all users");
-		return userRepository.findAll();
+		List<UserResponseDTO> userList = new ArrayList<>();
+		for(User user : userRepository.findAll()) {
+			userList.add(userResponseDTOMapper(user));
+		}
+		return userList;
 	}
 
 	@Override
@@ -401,6 +409,38 @@ public class UserServiceController implements UserService, UserDetailsService {
 		return userRepository.findByUsername(request.getUserPrincipal().getName()).get();
 	}
 	
+	
+	@Override
+	public ApiCustomResponse activateUser(UserRequestDTO user, HttpServletRequest request) {
+		Optional<User> user_ = userRepository.findById(user.getId());		
+		if(user_.isEmpty()) {
+			throw new NotFoundException("User not found");
+		}		
+		if(user_.get().isActive() == true) {
+			throw new InvalidOperationException("User already active");
+		}
+		user_.get().setActive(true);
+		userRepository.save(user_.get());		
+		return new ApiCustomResponse(200, "OK", "Success", "User Activated successifully");
+	}
+	
+	@Override
+	public ApiCustomResponse deactivateUser(UserRequestDTO user, HttpServletRequest request) {
+		Optional<User> user_ = userRepository.findById(user.getId());		
+		if(user_.isEmpty()) {
+			throw new NotFoundException("User not found");
+		}
+		if(user_.get().getUsername().equals("root")) {
+			throw new InvalidOperationException("Can not deactivate the root user");
+		}
+		if(user_.get().isActive() == false) {
+			throw new InvalidOperationException("User already inactive");
+		}
+		user_.get().setActive(false);
+		userRepository.save(user_.get());		
+		return new ApiCustomResponse(200, "OK", "Success", "User Activated successifully");
+	}
+	
 	public RecordModel requestUserCode() {
 		Long id = 1L;
 		try {
@@ -412,5 +452,24 @@ public class UserServiceController implements UserService, UserDetailsService {
 		model.setCode("USR-"+Formatter.formatTwelvePlain(id.toString()));
 		model.setNo("USR-"+Formatter.formatTwelvePlain(id.toString()));
 		return model;
+	}
+	
+	
+	private UserResponseDTO userResponseDTOMapper(User user) {
+		UserResponseDTO userResponse = new UserResponseDTO();
+		
+		userResponse.setId(user.getId().toString());
+		userResponse.setCode(user.getCode());
+		userResponse.setFirstName(user.getFirstName());
+		userResponse.setMiddleName(user.getMiddleName());
+		userResponse.setLastName(user.getLastName());
+		userResponse.setNickname(user.getNickname());
+		userResponse.setType(user.getType());
+		if(user.isActive()) {
+			userResponse.setActive("Active");
+		}else {
+			userResponse.setActive("Inactive");
+		}		
+		return userResponse;
 	}
 }

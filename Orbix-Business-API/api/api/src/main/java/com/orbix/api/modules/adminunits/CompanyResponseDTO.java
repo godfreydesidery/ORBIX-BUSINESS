@@ -24,6 +24,7 @@ public class CompanyResponseDTO {
 	private String country;
 	private String timeZone;	
 	private LocalDate foundingDate;
+	private String active;
 	@Lob
 	private byte[] logo;
 	private String tin;

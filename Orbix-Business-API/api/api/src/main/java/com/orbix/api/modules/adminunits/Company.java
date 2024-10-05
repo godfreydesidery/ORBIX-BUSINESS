@@ -1,6 +1,7 @@
 package com.orbix.api.modules.adminunits;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -23,11 +24,14 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.orbix.api.modules.identityandaccess.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
+import lombok.ToString;
 
 
 
@@ -79,8 +83,28 @@ public class Company {
 	private String website;
 	private String fax;
 	
+	private boolean active = false;
+	
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "created_by_user_id", nullable = false , updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User createdByUser;
+	
+	@ManyToOne(targetEntity = Day.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "created_on_day_id", nullable = false , updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Day createdOnDay;
+	
+	private LocalDateTime createdDateTime = LocalDateTime.now();
+	
 	@ManyToMany(fetch = FetchType.EAGER)
 	@Fetch(FetchMode.SUBSELECT)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
 	private Collection<Branch> branches = new ArrayList<>();
 	
 	

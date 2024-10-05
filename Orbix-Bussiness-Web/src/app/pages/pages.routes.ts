@@ -10,6 +10,7 @@ import { ShopComponent } from './administration-units/shop/shop.component';
 import { ShopTillComponent } from './administration-units/shop-till/shop-till.component';
 import { SystemProfileComponent } from './system/system-profile/system-profile.component';
 import { RoleAccessComponent } from './identity-and-access/role-access/role-access.component';
+import { AuthGuard } from '../auth-guard';
 
 export const routes: Routes = [
   {
@@ -25,61 +26,72 @@ export const routes: Routes = [
         path: 'dashboard',
         loadComponent: () => import('./dashboard/dashboard.component').then(c => c.DashboardComponent),
         data: { breadcrumb: 'Dashboard' }
+        //canActivate : [AuthGuard]
       },
       //Identity and Access
       {
         path : 'identity-and-access/user',
         loadComponent : () => import('./identity-and-access/identity-and-access.routes').then(c => UserComponent),
-        data : { breadcrumb : 'Identity and Acces > User'}
+        data : { breadcrumb : 'Identity and Acces > User'},
+        canActivate : [AuthGuard]
       },
       {
         path : 'identity-and-access/role',
         loadComponent : () => import('./identity-and-access/identity-and-access.routes').then(c => RoleComponent),
-        data : { breadcrumb : 'Identity and Acces/Role'}
+        data : { breadcrumb : 'Identity and Acces/Role'},
+        canActivate : [AuthGuard]
       },
       {
         path : 'identity-and-access/role-access',
         loadComponent : () => import('./identity-and-access/identity-and-access.routes').then(c => RoleAccessComponent),
-        data : { breadcrumb : 'Identity and Acces/Role Access'}
+        data : { breadcrumb : 'Identity and Acces/Role Access'},
+        canActivate : [AuthGuard]
       },
       
       //Administration Units
       {
         path : 'admin-unit/company',
         loadComponent : () => import('./administration-units/administration-units.routes').then(c => CompanyComponent),
-        data : { breadcrumb : 'Admin Unit/Company'}
+        data : { breadcrumb : 'Admin Unit/Company'},
+        canActivate : [AuthGuard]
       },
       {
         path : 'admin-unit/branch',
         loadComponent : () => import('./administration-units/administration-units.routes').then(c => BranchComponent),
-        data : { breadcrumb : 'Admin Unit/Branch'}
+        data : { breadcrumb : 'Admin Unit/Branch'},
+        canActivate : [AuthGuard]
       },
       {
         path : 'admin-unit/department',
         loadComponent : () => import('./administration-units/administration-units.routes').then(c => DepartmentComponent),
-        data : { breadcrumb : 'Admin Unit/Department'}
+        data : { breadcrumb : 'Admin Unit/Department'},
+        canActivate : [AuthGuard]
       },
       {
         path : 'admin-unit/warehouse',
         loadComponent : () => import('./administration-units/administration-units.routes').then(c => WarehouseComponent),
-        data : { breadcrumb : 'Admin Unit/Warehouse'}
+        data : { breadcrumb : 'Admin Unit/Warehouse'},
+        canActivate : [AuthGuard]
       },
       {
         path : 'admin-unit/shop',
         loadComponent : () => import('./administration-units/administration-units.routes').then(c => ShopComponent),
-        data : { breadcrumb : 'Admin Unit/Shop'}
+        data : { breadcrumb : 'Admin Unit/Shop'},
+        canActivate : [AuthGuard]
       },
       {
         path : 'admin-unit/shop-till',
         loadComponent : () => import('./administration-units/administration-units.routes').then(c => ShopTillComponent),
-        data : { breadcrumb : 'Admin Unit/Shop Till'}
+        data : { breadcrumb : 'Admin Unit/Shop Till'},
+        canActivate : [AuthGuard]
       },
       //System Profile
       /**Start of System Profile */
       {
         path : 'system/system-profile',
         loadComponent : () => import('./administration-units/administration-units.routes').then(c => SystemProfileComponent),
-        data : { breadcrumb : 'System/System Profile'}
+        data : { breadcrumb : 'System/System Profile'},
+        canActivate : [AuthGuard]
       },
       /**End of System Profile */
 
@@ -88,22 +100,26 @@ export const routes: Routes = [
       {
         path : 'parking-management/vehicle-register',
         loadComponent: () => import('./parking-management/vehicle-register/vehicle-register.component').then(c => c.VehicleRegisterComponent),
-        data : { breadcrumb : 'Parking Management/Vehicle Register'}
+        data : { breadcrumb : 'Parking Management/Vehicle Register'},
+        canActivate : [AuthGuard]
       },
       {
         path : 'parking-management/parking-zone',
         loadComponent: () => import('./parking-management/parking-zone/parking-zone.component').then(c => c.ParkingZoneComponent),
-        data : { breadcrumb : 'Parking Management/Parking Zone'}
+        data : { breadcrumb : 'Parking Management/Parking Zone'},
+        canActivate : [AuthGuard]
       },
       {
         path : 'parking-management/vehicle-type',
         loadComponent: () => import('./parking-management/vehicle-type/vehicle-type.component').then(c => c.VehicleTypeComponent),
-        data : { breadcrumb : 'Parking Management/Vehicle Type'}
+        data : { breadcrumb : 'Parking Management/Vehicle Type'},
+        canActivate : [AuthGuard]
       },
       {
         path : 'parking-management/parking-price-plan',
         loadComponent: () => import('./parking-management/parking-price-plan/parking-price-plan.component').then(c => c.ParkingPricePlanComponent),
-        data : { breadcrumb : 'Parking Management/Parking Price Plan'}
+        data : { breadcrumb : 'Parking Management/Parking Price Plan'},
+        canActivate : [AuthGuard]
       },
 
       /**End of Parking Management */
@@ -113,7 +129,7 @@ export const routes: Routes = [
       { 
         path: 'blank', 
         loadComponent: () => import('./blank/blank.component').then(c => c.BlankComponent),
-        data: { breadcrumb: 'Blank page' } 
+        data: { breadcrumb: 'Blank page'}
       },
       { 
         path: 'search', 

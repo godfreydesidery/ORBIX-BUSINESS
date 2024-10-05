@@ -185,21 +185,12 @@ public class MainApplication {
 			List<String> roleNames = new ArrayList<>();
 			roleNames.add("ROOT");
 			roleNames.add("ADMIN");
+			roleNames.add("MANAGER");
+			roleNames.add("HUMAN-RESOURCE");
+			roleNames.add("ACCOUNTANT");
+			roleNames.add("PROCUREMENT");
 			roleNames.add("RECEPTION");
 			roleNames.add("CASHIER");
-			roleNames.add("HUMAN-RESOURCE");
-			roleNames.add("PROCUREMENT");
-			roleNames.add("MANAGER");
-			roleNames.add("ACCOUNTANT");
-			roleNames.add("STORE-PERSON");
-			roleNames.add("MANAGEMENT");
-			roleNames.add("CLINICIAN");
-			roleNames.add("NURSE");
-			roleNames.add("PHARMACIST");
-			roleNames.add("LABORATORIST");
-			roleNames.add("RADIOGRAPHER");
-			roleNames.add("RADIOLOGIST");
-			
 			
 			for(String roleName : roleNames) {
 				if(!roleRepository.existsByName(roleName)) {

@@ -373,11 +373,12 @@ export const menuItems = [
                         title: 'Branch',
                         routerLink: '/app/admin-unit/branch'
                     },
-                    {
+                   /*  
+                   {
                         title: 'Department',
                         routerLink: '/app/admin-unit/department'
                     },
-                    {
+                   {
                         title: 'Warehouse',
                         routerLink: '/app/admin-unit/warehouse'
                     },
@@ -388,7 +389,7 @@ export const menuItems = [
                     {
                         title: 'Shop-Till',
                         routerLink: '/app/admin-unit/shop-till'
-                    },
+                    },*/
                 ]
             },
             {

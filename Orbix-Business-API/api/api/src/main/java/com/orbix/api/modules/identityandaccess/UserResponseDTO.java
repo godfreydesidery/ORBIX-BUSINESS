@@ -5,5 +5,13 @@ import lombok.Data;
 @Data
 public class UserResponseDTO {
 	private String id;
-	private String alias;
+	private String code;	
+	private String type;
+	private String firstName;
+	private String middleName;
+	private String lastName;
+	private String nickname;
+	private String username;
+	private String password;
+	private String active;
 }

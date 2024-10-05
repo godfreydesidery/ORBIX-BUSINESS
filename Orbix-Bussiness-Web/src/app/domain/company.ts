@@ -9,7 +9,7 @@ export interface ICompany {
     contactName : string
     symbol : string
     domain : string
-    active : boolean
+    active : string
     legalType : string
     industry : string
     country : string

@@ -9,7 +9,7 @@ export interface IUser {
     nickname    : string
     username    : string
     password    : string
-    active      : boolean
+    active      : string
 
     //roles : IRole[]
     

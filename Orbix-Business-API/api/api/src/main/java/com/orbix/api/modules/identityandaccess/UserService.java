@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.modules.adminunits.CompanyRequestDTO;
 import com.orbix.api.modules.utilities.Shortcut;
 
 public interface UserService {
@@ -15,7 +17,7 @@ public interface UserService {
 	User getUserById(Long id);
 	String getNicknameByUserId(Long id);
 	boolean deleteUser(User user);
-	List<User>getUsers(); //edit this to limit the number, for perfomance.
+	List<UserResponseDTO>getUsers(); //edit this to limit the number, for perfomance.
 	void addPrivilegeToRole(String roleName, String privilegeName);
 	void removePrivilegeFromRole(String roleName, String privilegeName);
 	List<Role>getRoles(); // return all the roles
@@ -31,4 +33,7 @@ public interface UserService {
 	
 	Long getUserId(HttpServletRequest request);
 	User getUser(HttpServletRequest request);
+	
+	ApiCustomResponse activateUser(UserRequestDTO user, HttpServletRequest request);
+	ApiCustomResponse deactivateUser(UserRequestDTO user, HttpServletRequest request);
 }
