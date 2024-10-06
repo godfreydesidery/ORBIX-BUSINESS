@@ -10,12 +10,21 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
+import javax.persistence.ManyToOne;
+import javax.persistence.OneToOne;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.Fetch;
 import org.hibernate.annotations.FetchMode;
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.orbix.api.modules.adminunits.Branch;
+import com.orbix.api.modules.adminunits.Company;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -32,6 +41,7 @@ public class User {
 	private Long id;
 	@Column(unique = true, nullable = false, updatable = false)
 	private String code;
+	@NotBlank
 	private String type;
 	@NotBlank
 	private String firstName;
@@ -55,10 +65,21 @@ public class User {
 	@Fetch(FetchMode.SUBSELECT)
 	private Collection<Role> roles = new ArrayList<>();
 	
-
 	@Column(name = "created_by_user_id", nullable = true , updatable = false)
     private Long createdBy;
 	@Column(name = "created_on_day_id", nullable = true , updatable = false)
     private Long createdOn;
 	private LocalDateTime createdAt = LocalDateTime.now();
+	
+	@OneToOne(targetEntity = Company.class, fetch = FetchType.EAGER,  optional = true)
+    @JoinColumn(name = "company_id", nullable = true , updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@JsonIgnoreProperties("branches")
+    private Company company;
+	
+	@OneToOne(targetEntity = Branch.class, fetch = FetchType.EAGER,  optional = true)
+    @JoinColumn(name = "branch_id", nullable = true , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@JsonIgnoreProperties("branches")
+    private Branch branch;
 }

@@ -14,7 +14,7 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-sm-6">
+                    <div class="col-sm-4">
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>
@@ -35,7 +35,7 @@
                         </div>
                     </div>
 
-                    <div class="col-sm-6">
+                    <div class="col-sm-8">
                         <div class="table-responsive">
                             <table class="table table-bordered">
                                 <thead>
@@ -49,8 +49,8 @@
                                     @for (role of roles; track role.id) {
                                         <tr *ngIf="role.owner != 'SYSTEM'">
                                             <td style="vertical-align: top;"><b>{{role.name}}</b></td>
-                                            <td style="vertical-align: top;">{{role?.owner}}</td>
-                                            <td style="vertical-align: top;"><font (click)="getRole(role.name)" *ngIf="role?.owner != 'SYSTEM'" data-toggle="modal" data-target="#role-modal" style="cursor: pointer; color: rgb(35, 32, 224);">Select</font></td>
+                                            <td style="vertical-align: top;">{{role?.owner}} | {{role.companyName}}</td>
+                                            <td style="vertical-align: top;"><font (click)="get(role.id)" *ngIf="role?.owner != 'SYSTEM'" data-toggle="modal" data-target="#role-modal" style="cursor: pointer; color: rgb(35, 32, 224);">Select</font></td>
                                         </tr>
                                     }
                                 </tbody>
@@ -83,7 +83,7 @@
                     <div class="col-lg-6">
                         <input type="hidden" [(ngModel)]="id">
                         <div class="form-group">
-                            <label>Code</label>
+                            <label>Name</label>
                             <input class="form-control" type="text" [(ngModel)]="name" autocomplete="nope">
                         </div>                       
                     </div>  

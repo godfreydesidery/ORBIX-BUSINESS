@@ -13,22 +13,25 @@
 
     <ul class="nav right-section">
         <li class="nav-item">
-           <az-messages></az-messages>
+           <!--<az-messages></az-messages>--> <!--Do not remove this, it will be helpful later-->
         </li>
         <li class="nav-item">
           <div class="dropdown float-right user-menu">
               <a class="dropdown-toggle user-link" data-toggle="dropdown" href="#" role="button" aria-expanded="false">
-                  <img src="img/users/user.jpg" alt="user-img" class="img-circle user-img">
-                  <span class="d-lg-inline d-none">Godfrey Desidery</span>
+                  <img src="img/users/user-icon-image.png" alt="user-img" class="img-circle user-img">
+
+                  <span class="d-lg-inline d-none" style="margin-top: 8mm;">User: {{userName}}</span>
               </a>
 
               <ul class="dropdown-menu">
                   <li class="user-info">
-                      <img src="img/users/user.jpg" alt="user-img" class="img-circle user-img">                    
+                      <img src="img/users/user-icon-image.png" alt="user-img" class="img-circle user-img">                    
                       <p>
-                          Emilio Verdines - Web Developer
+
+                        {{userName}} - 
+                        {{companyName}}  {{branchName}}
                           
-                          <small>Member since Dec. 2015</small>
+                          <small>{{userType}}</small>
                           
                       </p>
                   </li>
@@ -36,7 +39,8 @@
                   <a class="dropdown-item" routerLink="/"><i class="fa fa-cog"></i>Settings</a>
                   <a class="dropdown-item" routerLink="/"><i class="fa fa-lock"></i>Lock screen</a>
                   <div class="dropdown-divider"></div>
-                  <a class="dropdown-item" (click)="logout()"><i class="fa fa-power-off"></i>Log out</a>
+                  <br><br>
+                  <a class="dropdown-item" (click)="logout()" style="cursor: pointer;"><i class="fa fa-power-off"></i>Log Out</a>
               </ul>
           </div>
         </li>

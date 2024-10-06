@@ -123,7 +123,7 @@ export class RoleComponent {
     }
 
     //this.spinner.show()
-    await this.http.get<IRole[]>(API_URL+'/roles', options)
+    await this.http.get<IRole[]>(API_URL+'/roles/custom', options)
     //.pipe(finalize(() => this.spinner.hide()))
     .toPromise()
     .then(
@@ -150,6 +150,35 @@ export class RoleComponent {
     this.name = this.searchKey
     //this.spinner.show()
     await this.http.get<IRole>(API_URL+'/roles/get_role?name='+this.searchKey, options)
+    //.pipe(finalize(() => this.spinner.hide()))
+    .toPromise()
+    .then(
+      data => {
+        this.nameLocked = true
+
+        this.id = data?.id
+        this.name = data!.name
+        this.enableDelete = true 
+      }
+    )
+    .catch(
+      error=>{
+        console.log(error) 
+        this.name = ''   
+        //this.msgBox.showErrorMessage(error, 'No matching role')    
+        alert('error')
+      }
+    )
+  }
+
+  async get(id : any): Promise<any> {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    this.clearFields()
+    //this.spinner.show()
+    await this.http.get<IRole>(API_URL+'/roles/get?id='+id, options)
     //.pipe(finalize(() => this.spinner.hide()))
     .toPromise()
     .then(

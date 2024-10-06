@@ -24,7 +24,10 @@ import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.MissingInformationException;
 import com.orbix.api.exceptions.NotFoundException;
+import com.orbix.api.modules.adminunits.Branch;
+import com.orbix.api.modules.adminunits.BranchRepository;
 import com.orbix.api.modules.adminunits.Company;
+import com.orbix.api.modules.adminunits.CompanyRepository;
 import com.orbix.api.modules.adminunits.CompanyRequestDTO;
 import com.orbix.api.modules.adminunits.CompanyResponseDTO;
 import com.orbix.api.modules.adminunits.DayService;
@@ -48,6 +51,9 @@ public class UserServiceController implements UserService, UserDetailsService {
 	private final PrivilegeRepository privilegeRepository;
 	private final PasswordEncoder passwordEncoder;
 	private final ShortcutRepository shortcutRepository;
+	
+	private final CompanyRepository companyRepository;
+	private final BranchRepository branchRepository;
 	
 	//private final UserService userService; //do not use this here
 	private final DayService dayService;
@@ -78,14 +84,65 @@ public class UserServiceController implements UserService, UserDetailsService {
 		validateUser(user);
 		log.info("Saving user to the database");
 		if(user.getId() == null) {
+			
+			User newUser = new User();
+			
 			if(user.getUsername().equalsIgnoreCase("root")) {
 				Optional<User> u = userRepository.findByUsername("root");
 				if(u.isPresent()) {
 					throw new InvalidOperationException("root already exist");
 				}
 			}
+			
+			
+			if(user.getType().equals("COMPANY-ROOT-USER") || user.getType().equals("COMPANY-USER")) {
+//				if(user.getCompany().getId() == null) {
+//					throw new InvalidOperationException("Company User must have a company");
+//				}
+				if(user.getCompany().getName().equals("")) {
+					throw new InvalidOperationException("Company User must have a company");
+				}
+//				Optional<Company> company_ = companyRepository.findById(user.getCompany().getId());
+				Optional<Company> company_ = companyRepository.findByName(user.getCompany().getName());
+				if(company_.isEmpty()) {
+					throw new NotFoundException("Company not found");
+				}
+				user.setCompany(company_.get());
+//				if(user.getBranch().getId() == null) {
+//					throw new InvalidOperationException("Company User must have a branch");
+//				}
+				if(user.getBranch().getName().equals("")) {
+					throw new InvalidOperationException("Company User must have a branch");
+				}
+//				Optional<Branch> branch_ = branchRepository.findById(user.getBranch().getId());
+				Optional<Branch> branch_ = branchRepository.findByName(user.getBranch().getName());
+				if(branch_.isEmpty()) {
+					throw new NotFoundException("Branch not found");
+				}
+				if(branch_.get().getCompany().getId() != company_.get().getId()) {
+					throw new InvalidOperationException("Branch does not belong to the specified company");
+				}
+				user.setBranch(branch_.get());
+				
+				
+				
+				if(user.getUsername().contains("@")) {
+					throw new InvalidEntryException("Invalid Entry in username");
+				}
+				
+				user.setUsername(user.getUsername() + "@" + company_.get().getDomain().replace(" ", ""));
+				
+				
+			}else if(user.getType().equals("SYSTEM-ROOT-USER") || user.getType().equals("SYSTEM-USER")) {
+				user.setCompany(null);
+				user.setBranch(null);
+			}else {
+				throw new InvalidOperationException("User type is invalid.");
+			}
+			
 			user.setCode(this.requestUserCode().getCode());
-			user.setPassword(passwordEncoder.encode(user.getPassword()));			
+			user.setPassword(passwordEncoder.encode(user.getPassword()));
+			
 		}else {
 			User userToUpdate = userRepository.findById(user.getId()).get();
 			if(!userToUpdate.getCode().equals(user.getCode())) {
@@ -96,8 +153,12 @@ public class UserServiceController implements UserService, UserDetailsService {
 			}else {
 				user.setPassword(passwordEncoder.encode(user.getPassword()));
 			}
-			user.setActive(true);// use this in the mean time before implementing actiavate and deactivate user
+			//user.setActive(true);// use this in the mean time before implementing actiavate and deactivate user
+		
+			user.setCompany(userToUpdate.getCompany());
+			user.setBranch(userToUpdate.getBranch());
 		}
+		
 		user = userRepository.saveAndFlush(user);
 		
 		/**
@@ -154,6 +215,13 @@ public class UserServiceController implements UserService, UserDetailsService {
 				throw new InvalidOperationException("Can not modify the ROOT role");
 			}
 		}
+		try {
+			if(this.getUser(request).getCompany() != null) {
+				role.setCompany(this.getUser(request).getCompany());
+				role.setName(role.getName() + "-" + this.getUser(request).getCompany().getId().toString());				
+			}
+		}catch(Exception e) {}
+			
 		return roleRepository.save(role);
 	}
 
@@ -222,13 +290,33 @@ public class UserServiceController implements UserService, UserDetailsService {
 			log.info(e.getMessage());
 		}			
 	}
-
+	
 	@Override
 	public List<Role> getRoles() {
 		log.info("Fetching all roles");
 		return roleRepository.findAll();
 	}
 
+	@Override
+	public List<RoleResponseDTO> getRolesCustom() {
+		log.info("Fetching all roles");	
+		
+		List<RoleResponseDTO> roleList = new ArrayList<>();
+		
+		for(Role role : roleRepository.findAll()) {
+			char character = '-';
+			RoleResponseDTO roleResponse = new RoleResponseDTO();
+			roleResponse.setId(role.getId().toString());
+			roleResponse.setName(removeFromCharacter(role.getName(), character));
+			roleResponse.setOwner(role.getOwner());
+			if(role.getCompany() != null) {
+				roleResponse.setCompanyName(role.getCompany().getName());
+			}
+			roleList.add(roleResponse);
+		}		
+		return roleList;
+	}
+	
 	@Override
 	public User getUserById(Long id) {
 		return userRepository.findById(id).get();
@@ -327,9 +415,32 @@ public class UserServiceController implements UserService, UserDetailsService {
 	}
 
 	@Override
-	public Role getRoleById(Long id) {
-		return roleRepository.findById(id).get();
+	public Role getRoleById(Long id) {	
+		
+		Role role = roleRepository.findById(id).get();
+		
+		char character = '-';
+		
+		String readalbeRoleName = removeFromCharacter(role.getName(), character);
+		
+		
+		role.setName(readalbeRoleName);
+		
+		return role;
 	}
+	
+	public static String removeFromCharacter(String input, char character) {
+        // Find the index of the specified character
+        int index = input.indexOf(character);
+        
+        // If the character exists, return the substring up to that index
+        if (index != -1) {
+            return input.substring(0, index);
+        }
+        
+        // If the character is not found, return the original string
+        return input;
+    }
 
 	@Override
 	public boolean deleteRole(Role role) {
@@ -460,11 +571,18 @@ public class UserServiceController implements UserService, UserDetailsService {
 		
 		userResponse.setId(user.getId().toString());
 		userResponse.setCode(user.getCode());
+		userResponse.setUsername(user.getUsername());
 		userResponse.setFirstName(user.getFirstName());
 		userResponse.setMiddleName(user.getMiddleName());
 		userResponse.setLastName(user.getLastName());
 		userResponse.setNickname(user.getNickname());
 		userResponse.setType(user.getType());
+		if(user.getCompany() != null) {
+			userResponse.setCompanyName(user.getCompany().getName());
+		}
+		if(user.getBranch() != null) {
+			userResponse.setBranchName(user.getBranch().getName());
+		}
 		if(user.isActive()) {
 			userResponse.setActive("Active");
 		}else {

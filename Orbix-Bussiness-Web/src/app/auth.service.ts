@@ -11,7 +11,15 @@ import { IUser } from './domain/user'
 const API_URL = environment.apiUrl;
 
 interface IUserData{
-  alias : string
+  //alias : string
+  nickname : string
+  type : string
+  companyId : string
+  companyCode : string
+  companyName : string
+  branchId : string
+  branchCode : string
+  branchName : string
 }
 
 interface IDayData{
@@ -120,7 +128,14 @@ export class AuthService {
     let currentUser : {
       username : string, 
       access_token : string, 
-      refresh_token : string
+      refresh_token : string,
+      type : string,
+      companyId : string,
+      companyCode : string,
+      companyName : string,
+      branchId : string,
+      branchCode : string,
+      branchName : string
     } = JSON.parse(localStorage.getItem('current-user')!)    
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+currentUser.access_token)
@@ -130,10 +145,19 @@ export class AuthService {
     .toPromise()
     .then(
       data => {
-        localStorage.setItem('user-name', data?.alias!+'')  
+        localStorage.setItem('user-name', data?.nickname!+'')  
         localStorage.setItem('username', username)  
+        localStorage.setItem('user-type', data?.type!+'')
+        localStorage.setItem('company-id', data?.companyId!+'')
+        localStorage.setItem('company-code', data?.companyCode!+'')
+        localStorage.setItem('company-name', data?.companyName!+'')
+        localStorage.setItem('branch-id', data?.branchId!+'')
+        localStorage.setItem('branch-code', data?.branchCode!+'')
+        localStorage.setItem('branch-name', data?.branchName!+'')
       }
     )
+
+    
 
     await this.http.get<IDayData>(API_URL+'/days/get_bussiness_date', options)
     .toPromise()
@@ -145,13 +169,22 @@ export class AuthService {
         console.log(error)
       }
     )
+    alert('Logged in as ' + localStorage.getItem('user-type'))
+
    //localStorage.setItem('system-date', '2021-12-02')
   }
 
   public unloadUserSession(){
     localStorage.removeItem('username')
     localStorage.removeItem('user-name')
+    localStorage.removeItem('user-type')
     localStorage.removeItem('system-date')
+    localStorage.removeItem('company-id')
+    localStorage.removeItem('company-code')
+    localStorage.removeItem('company-name')
+    localStorage.removeItem('branch-id')
+    localStorage.removeItem('branch-code')
+    localStorage.removeItem('branch-name')
   }
 
   public checkPrivilege(priv : string) : boolean{

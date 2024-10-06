@@ -14,4 +14,11 @@ public class UserResponseDTO {
 	private String username;
 	private String password;
 	private String active;
+	
+	private String companyId;
+	private String companyCode;
+	private String companyName;
+	private String branchId;
+	private String branchCode;
+	private String branchName;
 }

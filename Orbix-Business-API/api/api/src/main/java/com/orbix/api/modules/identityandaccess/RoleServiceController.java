@@ -12,6 +12,9 @@ import org.springframework.stereotype.Service;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
+import com.orbix.api.modules.adminunits.Company;
+import com.orbix.api.modules.adminunits.CompanyRepository;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -22,6 +25,8 @@ import lombok.extern.slf4j.Slf4j;
 public class RoleServiceController implements RoleService {
 	
 	private final RoleRepository roleRepository;
+	private final CompanyRepository companyRepository;
+	private final UserService userService;
 	
 	@Override
 	public List<RoleResponseDTO> getAllRoles(HttpServletRequest request) {
@@ -42,7 +47,15 @@ public class RoleServiceController implements RoleService {
 			throw new InvalidEntryException("Validation failed");
 		}	
 		Role role = new Role();
-		role.setName(roleRequest.getName());
+		role.setName(roleRequest.getName().replace("-", ""));
+		
+		
+		
+		Optional<Company> company_ = companyRepository.findById(userService.getUser(request).getCompany().getId());
+		if(company_.isEmpty()) {
+			throw new NotFoundException("Company not found");
+		}
+		role.setName(role.getName() + "-" + company_.get().getId().toString());
 		role.setOwner("COMPANY");
 		role = roleRepository.save(role);	
 		return roleResponseDTOMapper(role);

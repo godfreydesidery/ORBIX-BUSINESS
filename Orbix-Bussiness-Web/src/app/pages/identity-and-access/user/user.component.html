@@ -25,8 +25,12 @@
                                 <thead>
                                     <tr>
                                         <th>Code</th>
+                                        <th>Username</th>
                                         <th>Name</th>
                                         <th>Nickname</th>
+                                        <th>Type</th>
+                                        <th>Company</th>
+                                        <th>Branch</th>
                                         <th>Active</th>
                                         <th>Select</th>
                                     </tr>
@@ -35,8 +39,12 @@
                                     @for (user of users; track user.id) {
                                         <tr>
                                             <td>{{user.code}}</td>
+                                            <td>{{user.username}}</td>
                                             <td>{{user.lastName}}, {{user.firstName}}</td>
                                             <td>{{user.nickname}}</td>
+                                            <td>{{user.type}}</td>
+                                            <td>{{user.companyName}}</td>
+                                            <td>{{user.branchName}}</td>
                                             <td>
                                                 <span *ngIf="user.active ==='Active'">Active__</span><span *ngIf="user.active ==='Inactive'">Inactive </span> | 
                                                 <button *ngIf="user.active ==='Inactive'" (click)="activate(user.id)"><i class="fa fa-unlock text-success"></i></button>
@@ -96,23 +104,30 @@
                         </div>
                         <div class="form-group">
                             <label>Select User Type : System user or Company User</label>
-                            <select class="form-control" [(ngModel)]="userType" (ngModelChange)="checkUserType(userType)">
+                            <select class="form-control" [(ngModel)]="type" (ngModelChange)="checkUserType(type)">
                                 <option></option>
                                 <option>SYSTEM-USER</option>
                                 <option>COMPANY-USER</option>
                             </select>
                         </div>
-                        <div class="form-group" *ngIf="userType === 'COMPANY-USER'">
+                        <div class="form-group" *ngIf="type === 'COMPANY-USER'">
                             <label>Select Company</label>
                             <select class="form-control" [(ngModel)]="companyName">
-                                <option></option>
-                                <option>ZANA</option>
-                                <option>OTAPP</option>
+                                <option></option>  
+                                @for (company of companies; track company.id) {
+                                    <option >{{company.name}}</option>
+                                }
                             </select>
                         </div>
-
-
-                        
+                        <div class="form-group" *ngIf="type === 'COMPANY-USER'">
+                            <label>Select Branch</label>
+                            <select class="form-control" [(ngModel)]="branchName">
+                                <option></option>  
+                                @for (branch of branches; track branch.id) {
+                                    <option >{{branch.name}}</option>
+                                }
+                            </select>
+                        </div>
                     </div>  
                     <div class="col-lg-6">
                         

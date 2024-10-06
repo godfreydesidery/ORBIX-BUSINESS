@@ -24,6 +24,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.orbix.api.modules.identityandaccess.User;
 
 import lombok.AllArgsConstructor;
@@ -47,10 +48,12 @@ public class Company {
 	private Long id;
 	@NotBlank
 	@Column(unique = true)
+	@JsonProperty("code")  // Maps the "code" field from JSON
 	private String code;
 	
 	@NotBlank
 	@Column(unique = true)
+	@JsonProperty("name")  // Maps the "code" field from JSON
 	private String name; 
 	@NotBlank
 	@Column(unique = true)

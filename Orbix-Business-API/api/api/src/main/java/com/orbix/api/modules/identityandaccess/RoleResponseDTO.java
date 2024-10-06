@@ -10,5 +10,6 @@ public class RoleResponseDTO {
 	private String id;
 	private String name; 	
 	private String owner;
+	private String companyName;
 	private Collection<Privilege> privileges = new ArrayList<>();	
 }

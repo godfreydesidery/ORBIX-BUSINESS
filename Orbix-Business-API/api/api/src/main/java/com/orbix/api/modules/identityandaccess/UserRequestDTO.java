@@ -1,20 +1,5 @@
 package com.orbix.api.modules.identityandaccess;
 
-import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collection;
-
-import javax.persistence.Column;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.ManyToMany;
-import javax.validation.constraints.NotBlank;
-
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-
 import lombok.Data;
 
 @Data
@@ -29,4 +14,12 @@ public class UserRequestDTO {
 	private String username;
 	private String password;
 	private boolean active = false;	
+	
+	private Long companyId;
+	private String companyCode;
+	private String companyName;
+	private Long branchId;
+	private String branchCode;
+	private String branchName;
+	
 }

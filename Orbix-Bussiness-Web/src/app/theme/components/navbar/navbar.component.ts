@@ -20,6 +20,12 @@ import { SidebarService } from '@services/sidebar.service';
 export class NavbarComponent {
     public isMenuCollapsed: boolean = false;
 
+    public userName : string = ''
+    public userType : string = ''
+
+    public companyName : string = ''
+    public branchName : string = ''
+
     public test : string = ''
 
     constructor(
@@ -30,6 +36,11 @@ export class NavbarComponent {
         this._state.subscribe('menu.isCollapsed', (isCollapsed: boolean) => {
             this.isMenuCollapsed = isCollapsed;
         });
+        this.userName = localStorage.getItem('user-name')!
+        this.userType = localStorage.getItem('user-type')!
+
+        this.companyName = localStorage.getItem('company-name')!
+        this.branchName = localStorage.getItem('branch-name')!
     }
 
     public closeSubMenus() {

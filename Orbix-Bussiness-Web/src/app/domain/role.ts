@@ -4,6 +4,8 @@ export interface IRole {
     owner   : string
     granted : boolean
     active  : boolean
+
+    companyName : string
     
     created       : string
 }

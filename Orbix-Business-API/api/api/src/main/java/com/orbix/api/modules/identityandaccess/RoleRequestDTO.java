@@ -10,5 +10,8 @@ public class RoleRequestDTO {
 	private Long id;
 	private String name; 	
 	private String owner;
+	private Long companyId;
+	private String companyCode;
+	private String companyName;
 	private Collection<Privilege> privileges = new ArrayList<>();	
 }

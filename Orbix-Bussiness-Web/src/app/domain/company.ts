@@ -1,4 +1,7 @@
+import { HttpClient, HttpHeaders } from "@angular/common/http"
 import { Byte } from "src/custom-packages/util"
+import { AuthService } from "../auth.service"
+
 
 export interface ICompany {
     //Basic attributes
@@ -30,3 +33,4 @@ export interface ICompany {
     //Numbering
     sn : number
 }
+

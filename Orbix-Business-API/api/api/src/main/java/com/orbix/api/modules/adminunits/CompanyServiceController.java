@@ -136,7 +136,7 @@ public class CompanyServiceController implements CompanyService {
 		company.setName(companyRequest.getName());
 		company.setBrandName(companyRequest.getBrandName());
 		company.setContactName(companyRequest.getContactName());
-		company.setDomain(companyRequest.getDomain().replace(" ", ""));
+		//company.setDomain(companyRequest.getDomain().replace(" ", ""));//Domain name do not change
 		company.setSymbol(companyRequest.getSymbol());
 		company.setLegalType(companyRequest.getLegalType());
 		company.setIndustry(companyRequest.getIndustry());

@@ -98,6 +98,14 @@ public class UserResource {
 		UserResponseDTO userResponse = new UserResponseDTO();
 		userResponse.setId(user.getId().toString());
 		userResponse.setNickname(user.getNickname());
+		userResponse.setType(user.getType());
+		userResponse.setCompanyId("");
+		userResponse.setCompanyCode("");
+		userResponse.setCompanyName("");
+		userResponse.setBranchId("");
+		userResponse.setBranchCode("");
+		userResponse.setBranchName("");
+		
 		return ResponseEntity.ok().body(userResponse);
 	}
 	
@@ -213,8 +221,15 @@ public class UserResource {
 		return ResponseEntity.ok().body(userService.getRole(name));
 	}
 	
+	@GetMapping("/roles/get")
+	public ResponseEntity<Role> getRole(
+			@RequestParam(name = "id") Long id,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(userService.getRoleById(id));
+	}
+	
 	@PostMapping("/roles/create")
-	@PreAuthorize("hasAnyAuthority('ROLE-ALL','ADMIN-ACCESS')")
+	//@PreAuthorize("hasAnyAuthority('ROLE-ALL','ADMIN-ACCESS')")
 	public ResponseEntity<Role>saveRole(
 			@RequestBody Role role,
 			HttpServletRequest request){
@@ -225,19 +240,6 @@ public class UserResource {
 		List<String> roleNames = new ArrayList<>();
 		roleNames.add("ROOT");
 		roleNames.add("ADMIN");
-		roleNames.add("RECEPTION");
-		roleNames.add("CASHIER");
-		roleNames.add("HUMAN-RESOURCE");
-		roleNames.add("PROCUREMENT");
-		roleNames.add("MANAGER");
-		roleNames.add("ACCOUNTANT");
-		roleNames.add("STORE-PERSON");
-		roleNames.add("CLINICIAN");
-		roleNames.add("NURSE");
-		roleNames.add("PHARMACIST");
-		roleNames.add("LABORATORIST");
-		roleNames.add("RADIOGRAPHER");
-		roleNames.add("RADIOLOGIST");
 		
 		for(String roleName : roleNames) {
 			if(role.getName().equalsIgnoreCase(roleName)) {
@@ -245,32 +247,13 @@ public class UserResource {
 			}
 		}
 		
-		
-		if(role.getName().equalsIgnoreCase("CLINICIAN")) {
-			throw new InvalidOperationException("Role name not available");
-		}
-		if(role.getName().equalsIgnoreCase("NURSE")) {
-			throw new InvalidOperationException("Role name not available");
-		}
-		if(role.getName().equalsIgnoreCase("PHARMACIST")) {
-			throw new InvalidOperationException("Role name not available");
-		}
-		if(role.getName().equalsIgnoreCase("LABORATORIST")) {
-			throw new InvalidOperationException("Role name not available");
-		}
-		if(role.getName().equalsIgnoreCase("RADIOLOGIST")) {
-			throw new InvalidOperationException("Role name not available");
-		}
-		if(role.getName().equalsIgnoreCase("STORE-PERSON")) {
-			throw new InvalidOperationException("Role name not available");
-		}
 		role.setOwner("ORGANIZATION");
 		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/roles/save").toUriString());
 		return ResponseEntity.created(uri).body(userService.saveRole(role, request));
 	}
 	
 	@PutMapping("/roles/update")
-	@PreAuthorize("hasAnyAuthority('ROLE-ALL','ADMIN-ACCESS')")
+	//@PreAuthorize("hasAnyAuthority('ROLE-ALL','ADMIN-ACCESS')")
 	public ResponseEntity<Role>updateRole(
 			@RequestBody Role role,
 			HttpServletRequest request){
@@ -401,6 +384,12 @@ public class UserResource {
 	public ResponseEntity<List<Role>>getRoles(
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(userService.getRoles());
+	}
+	
+	@GetMapping("/roles/custom")
+	public ResponseEntity<List<RoleResponseDTO>>getRolesCustom(
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(userService.getRolesCustom());
 	}
 	
 	@GetMapping("/operations")

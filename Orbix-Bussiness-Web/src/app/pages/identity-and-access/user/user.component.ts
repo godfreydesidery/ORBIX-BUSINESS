@@ -2,8 +2,11 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, ViewEncapsulation, ViewChild, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+//import { ICompany } from '@services/custom/data.service';
 import { DatatableComponent, NgxDatatableModule, SelectionType } from '@swimlane/ngx-datatable';
 import { AuthService } from 'src/app/auth.service';
+import { IBranch } from 'src/app/domain/branch';
+import { ICompany } from 'src/app/domain/company';
 import { IRole } from 'src/app/domain/role';
 import { IUser } from 'src/app/domain/user';
 import { DirectivesModule } from 'src/app/theme/directives/directives.module';
@@ -57,8 +60,15 @@ export class UserComponent {
 
   filterRecords : string = ''
 
-  userType : string = ''
+  type : string = ''
+  companyId : any = null
+  companyCode : any = ''
   companyName : string = ''
+  branchId : any = null
+  branchCode : any = ''
+  branchName : string = ''
+
+ 
 
   constructor(private auth : AuthService,
     private http :HttpClient,
@@ -78,6 +88,8 @@ export class UserComponent {
   this.active          = true
   this.roles           = []
   this.users           = []
+
+
   }  
   getUserData(): any {
     var userRoles : IRole[] = []
@@ -96,14 +108,28 @@ export class UserComponent {
       lastName    : this.lastName,
       nickname    : this.nickname,
       active      : this.active,
-      roles       : userRoles
+      company : {
+        id : this.companyId,
+        name : this.companyName
+      } ,
+      branch : {
+        id : this.branchId,
+        name : this.branchName
+      },
+      roles       : userRoles,
+      type : this.type,
+      
     }
   }
 
-  ngOnInit(): void {
-    this.getUsers()
-    this.getRoles()
+  async ngOnInit(): Promise<void> {
+    await this.getUsers()
+    await this.getRoles()
+    await this.getAllCompanies()
+    await this.getAllBranches()
   }
+
+  
 
   async saveUser(){
     /**
@@ -202,6 +228,7 @@ export class UserComponent {
             this.users.push(element)
           }
         )
+        console.log(data)
       }
     )
     .catch(error => {
@@ -486,6 +513,53 @@ export class UserComponent {
     if(type != 'COMPANY-USER'){
       this.companyName = ''
     }
+  }
+
+
+
+  companies : ICompany[] = []
+  async getAllCompanies(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    this.companies = []
+
+    await this.http.get<ICompany[]>(API_URL+'/companies', options)
+    .toPromise()
+    .then(
+      data => {
+        data?.forEach(element => {
+          this.companies.push(element)
+        })
+        console.log(data)
+      }
+    )
+  }
+
+  branches : IBranch[] = []
+  async getAllBranches(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    this.branches = []
+
+    await this.http.get<IBranch[]>(API_URL+'/branches', options)
+    .toPromise()
+    .then(
+      data => {
+        var sn = 1
+        data?.forEach(element => {
+          element.sn = sn
+          this.branches.push(element)
+          sn = sn + 1
+        })
+        console.log(data)
+      }
+    )
+  }
+
+  test(id : any){
+    alert(id)
   }
 
 

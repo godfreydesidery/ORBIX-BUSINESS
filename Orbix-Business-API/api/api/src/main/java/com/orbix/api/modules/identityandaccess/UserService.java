@@ -20,6 +20,7 @@ public interface UserService {
 	List<UserResponseDTO>getUsers(); //edit this to limit the number, for perfomance.
 	void addPrivilegeToRole(String roleName, String privilegeName);
 	void removePrivilegeFromRole(String roleName, String privilegeName);
+	List<RoleResponseDTO>getRolesCustom(); // return all the roles
 	List<Role>getRoles(); // return all the roles
 	Role getRole(String name);
 	Role getRoleById(Long id);

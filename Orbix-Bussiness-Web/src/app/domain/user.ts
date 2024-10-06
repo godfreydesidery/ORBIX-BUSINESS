@@ -11,8 +11,13 @@ export interface IUser {
     password    : string
     active      : string
 
+    type : string
+
     //roles : IRole[]
     
     created : string
+
+    companyName : string
+    branchName : string
 
 }

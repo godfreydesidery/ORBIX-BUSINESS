@@ -184,18 +184,12 @@ public class MainApplication {
 			
 			List<String> roleNames = new ArrayList<>();
 			roleNames.add("ROOT");
-			roleNames.add("ADMIN");
-			roleNames.add("MANAGER");
-			roleNames.add("HUMAN-RESOURCE");
-			roleNames.add("ACCOUNTANT");
-			roleNames.add("PROCUREMENT");
-			roleNames.add("RECEPTION");
-			roleNames.add("CASHIER");
+			roleNames.add("ADMIN");			
 			
 			for(String roleName : roleNames) {
 				if(!roleRepository.existsByName(roleName)) {
 					try {
-						userService.saveRole(new Role(null, roleName, "SYSTEM", null), null);
+						userService.saveRole(new Role(null, roleName, "SYSTEM", null, null), null);
 					}catch(Exception e) {}	
 				}
 			}
@@ -208,7 +202,7 @@ public class MainApplication {
 			
 			if(!userRepository.existsByUsername("root")) {
 				try {
-					userService.saveUser(new User(null, "ROOT", "SYSTEM-ROOT-USER", "Root", "Root", "Root", "Root@Root", "root", "r00tpA55", "", true, new ArrayList<>(), null, null, LocalDateTime.now()), null);
+					userService.saveUser(new User(null, "ROOT", "SYSTEM-ROOT-USER", "Root", "Root", "Root", "Root@Root", "root", "r00tpA55", "", true, new ArrayList<>(), null, null, LocalDateTime.now(),null, null), null);
 				}catch(Exception e) {}	
 			}
 					
