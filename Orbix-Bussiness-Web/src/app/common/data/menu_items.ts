@@ -267,9 +267,9 @@ export const menuItems = [
         order: 0,        
     },
     {
-        title: 'Parking Management',
+        title: 'Reception',
         routerLink: ' ',
-        icon: 'fa-car',
+        icon: 'fa-keyboard-o',
         selected: false,
         expanded: false,
         order: 100,
@@ -336,6 +336,106 @@ export const menuItems = [
             },
         ]
     },*/
+
+    {
+        title: 'Finance',
+        routerLink: ' ',
+        icon: 'fa-money',
+        selected: false,
+        expanded: false,
+        order: 100,
+        subMenu: [
+            {
+                title: 'Finance',
+                routerLink: '/app/blank'
+            }
+        ]
+    },
+
+
+    {
+        title: 'Shop',
+        icon: 'fa-cogs',
+        selected: false,
+        expanded: false,
+        order: 700,
+        subMenu: [
+            {
+                title: 'Sales',
+                url: '#',
+                subMenu: [
+                    {
+                        title: 'Sales List',
+                        routerLink: '/app/blank'
+                    },
+                    {
+                        title: 'Sales Order',
+                        routerLink: '/app/blank'
+                    },
+                ]
+            },
+            {
+                title: 'Inventory',
+                routerLink: '/app/blank'
+            },
+            {
+                title: 'GRN',
+                routerLink: '/app/blank'
+            },
+        ]
+    },
+    {
+        title: 'Procurement',
+        routerLink: ' ',
+        icon: 'fa-money',
+        selected: false,
+        expanded: false,
+        order: 100,
+        subMenu: [
+            {
+                title: 'LPO',
+                routerLink: '/app/blank'
+            },
+            {
+                title: 'BLO',
+                routerLink: '/app/blank'
+            },
+            {
+                title: 'GRN',
+                routerLink: '/app/blank'
+            }
+        ]
+    },
+    {
+        title: 'Management',
+        routerLink: ' ',
+        icon: 'fa-money',
+        selected: false,
+        expanded: false,
+        order: 100,
+        subMenu: [
+            {
+                title: 'Management Board',
+                routerLink: '/app/blank'
+            },
+            {
+                title: 'Collection Report',
+                routerLink: '/app/blank'
+            },
+            {
+                title: 'Revenue Report',
+                routerLink: '/app/blank'
+            },
+            {
+                title: 'Sales report',
+                routerLink: '/app/blank'
+            },
+            {
+                title: 'Invoice Report',
+                routerLink: '/app/blank'
+            }
+        ]
+    },
     {
         title: 'Admin',
         icon: 'fa-cogs',
@@ -398,15 +498,15 @@ export const menuItems = [
                 subMenu: [
                     {
                         title: 'Parking Zone',
-                        routerLink: '/app/parking-management/parking-zone'
+                        routerLink: '/app/blank'
                     },
                     {
                         title: 'Vehicle Type',
-                        routerLink: '/app/parking-management/vehicle-type'
+                        routerLink: '/app/blank'
                     },
                     {
                         title: 'Pricing Plan',
-                        routerLink: '/app/parking-management/parking-price-plan'
+                        routerLink: '/app/blank'
                     },
                 ]
             }

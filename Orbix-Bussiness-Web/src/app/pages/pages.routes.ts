@@ -95,6 +95,13 @@ export const routes: Routes = [
       },
       /**End of System Profile */
 
+      {
+        path : 'blank',
+        loadComponent: () => import('./blank/blank.component').then(c => c.BlankComponent),
+        data : { breadcrumb : 'Blank: Please ignore'},
+        canActivate : [AuthGuard]
+      },
+
       //Parking Management
       /**Start of parking management */
       {
