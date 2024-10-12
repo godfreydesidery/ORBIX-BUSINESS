@@ -1,5 +1,5 @@
 Manifest-Version: 1.0
-Build-Jdk-Spec: 19
+Build-Jdk-Spec: 23
 Implementation-Title: orbix-business-api
 Implementation-Version: 0.0.1-Orbix-Business
 Created-By: Maven Integration for Eclipse

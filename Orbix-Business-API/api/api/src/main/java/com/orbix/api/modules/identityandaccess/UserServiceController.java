@@ -590,4 +590,14 @@ public class UserServiceController implements UserService, UserDetailsService {
 		}		
 		return userResponse;
 	}
+
+	@Override
+	public Company getUserCompany(HttpServletRequest request) {
+		return userRepository.findByUsername(request.getUserPrincipal().getName()).get().getCompany();
+	}
+
+	@Override
+	public Branch getUserBranch(HttpServletRequest request) {
+		return userRepository.findByUsername(request.getUserPrincipal().getName()).get().getBranch();
+	}
 }

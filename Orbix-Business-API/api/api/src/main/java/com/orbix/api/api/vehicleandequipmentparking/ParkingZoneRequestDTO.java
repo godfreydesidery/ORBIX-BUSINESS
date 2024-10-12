@@ -8,7 +8,6 @@ public class ParkingZoneRequestDTO {
 	String code;
 	String name;
 	int noOfSlots;
-	boolean active;
 	
 	Long branchId;
 	Long companyId;

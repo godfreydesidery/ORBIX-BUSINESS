@@ -5,6 +5,8 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.modules.adminunits.Branch;
+import com.orbix.api.modules.adminunits.Company;
 import com.orbix.api.modules.adminunits.CompanyRequestDTO;
 import com.orbix.api.modules.utilities.Shortcut;
 
@@ -34,6 +36,9 @@ public interface UserService {
 	
 	Long getUserId(HttpServletRequest request);
 	User getUser(HttpServletRequest request);
+	
+	Company getUserCompany(HttpServletRequest request);
+	Branch getUserBranch(HttpServletRequest request);
 	
 	ApiCustomResponse activateUser(UserRequestDTO user, HttpServletRequest request);
 	ApiCustomResponse deactivateUser(UserRequestDTO user, HttpServletRequest request);

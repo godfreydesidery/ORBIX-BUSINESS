@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.OnDelete;
@@ -29,7 +30,8 @@ import lombok.ToString;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "parking_zone_slots")
+@Table(name = "parking_zone_slots", uniqueConstraints = { @UniqueConstraint(columnNames = {"id", "no"})})
+
 public class ParkingZoneSlot {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

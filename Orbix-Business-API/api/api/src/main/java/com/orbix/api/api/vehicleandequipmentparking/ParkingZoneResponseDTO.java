@@ -10,9 +10,11 @@ public class ParkingZoneResponseDTO {
 	String noOfSlots;
 	String active;
 	
-	String branchId;
 	String companyId;
-	
+	String companyName;
+	String branchId;
+	String branchName;
+
 	String createdByUser;
 	String createdDateTime;
 }

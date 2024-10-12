@@ -34,7 +34,7 @@ import lombok.ToString;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "parking_zones", uniqueConstraints = { @UniqueConstraint(columnNames = {"id", "code", "name" })})
+@Table(name = "parking_zones", uniqueConstraints = { @UniqueConstraint(columnNames = {"id", "code"}), @UniqueConstraint(columnNames = {"id", "name"})})
 public class ParkingZone {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

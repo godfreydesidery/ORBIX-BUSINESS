@@ -1,127 +1,145 @@
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfileServiceController.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchServiceController.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\ecommerce\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\NegativeStockReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\InvalidOperationException.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\ServletInitializer.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\DayResource.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfileRequestDTO.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleService.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfileRepository.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\production\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\Role.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\Shortcut.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchResource.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\Privilege.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\LpoReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleResource.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\Branch.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\Company.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\InvalidEntryException.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\Test.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\warehouse\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchResponseDTO.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\integration\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\Sanitizer.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BusinessDayServiceController.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfileResponseDTO.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\RecordModel.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\service\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\GlobalExceptionHandler.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\CompanyResponseDTO.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\CompanyServiceController.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\SecurityConfig.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BusinessDayService.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\PrivilegeService.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchService.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\SupplySalesReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\compliance\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleRepository.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\MaterialUsageReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\UserRepository.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\SlowMovingProductsReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\ErrorResponse.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\CollectionReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\UserRequestDTO.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\OperationFailedException.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\DailyPurchaseReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\PrivilegeResource.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\UserServiceController.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfileService.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\FastMovingItems.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\DayRepository.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\ProductStockSummaryReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\SupplierStockStatusReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleRequestDTO.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfile.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\CustomAuthorizationFilter.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\CompanyResource.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\CompanyRepository.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\FastMovingProductsReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\ShortcutRepository.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\CustomAuthenticationFilter.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\CompanyRequestDTO.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\commons\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\document\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\PurchaseSummaryReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\Operation.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\DayServiceController.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\salesandmarketing\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\UserResponseDTO.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\service\InventoryReportServiceImpl.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\ResourceNotFoundException.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleResponseDTO.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\WebConfig.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BusinessDay.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\PrivilegeServiceController.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\NotFoundException.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\GrnReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\DailySalesReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\SlowMovingItems.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchRequestDTO.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\PurchasesAndSalesSummaryReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\DailySummaryReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\ClinicianPerformanceReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\ConnectionResource.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\projectmanagement\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\User.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchRepository.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\UnitResource.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\MissingInformationException.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BusinessDayResource.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\businessintelligence\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\CompanyService.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\commons\ApiCustomResponse.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\Formatter.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\Day.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\MainApplication.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\UpdatePatient.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\humanresource\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\DebtTrackerReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\DayService.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\DuplicateEntryException.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\SalesSummaryReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\Object_.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\UserResource.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\supplychain\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\service\InventoryReportService.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfileResource.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BusinessDayRepository.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\PrivilegeRepository.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleServiceController.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\Validator.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\FastMovingDrugs.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\DailyProductionReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\UserService.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\LabTestCollectionReport.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\customerrelationship\package-info.java
-D:\My Works\ORBIX BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\ExceptionController.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\production\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchResource.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\FastMovingDrugs.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\service\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneResponseDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\MissingInformationException.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\NegativeStockReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\InvalidOperationException.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\projectmanagement\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\Company.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\supplychain\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\ProductStockSummaryReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\ClinicianPerformanceReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\UserServiceController.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\Validator.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleAndEquipmentTypeServiceController.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BusinessDayRepository.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfileService.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\FastMovingItems.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\SlowMovingProductsReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\CompanyResponseDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfileServiceController.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleResponseDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchService.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\UserResponseDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\GlobalExceptionHandler.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneRequestDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZone.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\NotFoundException.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BusinessDayServiceController.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\warehouse\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\ConnectionResource.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\PrivilegeResource.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\Privilege.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\compliance\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\GrnReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfileResponseDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\SlowMovingItems.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfile.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\MainApplication.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneSlotRequestDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\Sanitizer.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\businessintelligence\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\LabTestCollectionReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BusinessDay.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\DayServiceController.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\PrivilegeService.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneResource.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\service\InventoryReportService.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\CompanyServiceController.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\ErrorResponse.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\DayService.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\Test.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\CustomAuthenticationFilter.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\salesandmarketing\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneRepository.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneSlotResponse.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleServiceController.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\InvalidEntryException.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\humanresource\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\FastMovingProductsReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\PurchasesAndSalesSummaryReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\OperationFailedException.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\CollectionReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\PrivilegeServiceController.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\Day.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleAndEquipmentTypeRepository.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\DebtTrackerReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\integration\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\UnitResource.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchRequestDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\SalesSummaryReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\CompanyRequestDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BusinessDayService.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\UserResource.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleAndEquipmentType.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleAndEquipmentTypeRequestDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\Object_.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleService.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchRepository.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\DailySummaryReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\PurchaseSummaryReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\CompanyRepository.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneServiceController.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleRequestDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\UserRepository.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\SupplierStockStatusReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleRepository.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\DailySalesReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\DuplicateEntryException.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\DayRepository.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\DayResource.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\Branch.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleAndEquipmentTypeService.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\PrivilegeRepository.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\ShortcutRepository.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleAndEquipmentTypeResponseDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\CompanyService.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfileRepository.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneSlot.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\ecommerce\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\SupplySalesReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\ServletInitializer.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\ResourceNotFoundException.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfileResource.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\MaterialUsageReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\User.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\commons\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\DailyProductionReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleAndEquipmentTypeResource.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\CompanyResource.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\Formatter.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\customerrelationship\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\Role.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\LpoReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchServiceController.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\service\InventoryReportServiceImpl.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneService.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\Operation.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\UpdatePatient.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchResponseDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\SecurityConfig.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\UserRequestDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\commons\ApiCustomResponse.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleResource.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\CustomAuthorizationFilter.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BusinessDayResource.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\document\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\UserService.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\Shortcut.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfileRequestDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\DailyPurchaseReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\WebConfig.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\ExceptionController.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\RecordModel.java

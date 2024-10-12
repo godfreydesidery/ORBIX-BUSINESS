@@ -498,11 +498,11 @@ export const menuItems = [
                 subMenu: [
                     {
                         title: 'Parking Zone',
-                        routerLink: '/app/blank'
+                        routerLink: '/app/parking-management/parking-zone'
                     },
                     {
                         title: 'Vehicle Type',
-                        routerLink: '/app/blank'
+                        routerLink: '/app/parking-management/vehicle-and-equipment-type'
                     },
                     {
                         title: 'Pricing Plan',

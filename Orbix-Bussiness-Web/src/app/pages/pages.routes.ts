@@ -123,6 +123,12 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
       {
+        path : 'parking-management/vehicle-and-equipment-type',
+        loadComponent: () => import('./parking-management/vehicle-and-equipment-type/vehicle-and-equipment-type.component').then(c => c.VehicleAndEquipmentTypeComponent),
+        data : { breadcrumb : 'Parking Management/Vehicle Type'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'parking-management/parking-price-plan',
         loadComponent: () => import('./parking-management/parking-price-plan/parking-price-plan.component').then(c => c.ParkingPricePlanComponent),
         data : { breadcrumb : 'Parking Management/Parking Price Plan'},

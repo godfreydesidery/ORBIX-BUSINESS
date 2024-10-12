@@ -214,3 +214,7 @@ ng-scrollbar {
 .btn-round-custom {
     border-radius: 4px;
 }
+
+.modal {
+    top: 0 !important; /* Force modal to be at the top */
+  }
