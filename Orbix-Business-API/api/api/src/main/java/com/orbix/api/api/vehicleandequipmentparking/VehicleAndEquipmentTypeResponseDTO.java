@@ -12,5 +12,7 @@ public class VehicleAndEquipmentTypeResponseDTO {
 	
 	private String companyId;
 	private String companyName;
+	
+	private String dailyPrice;
 		
 }

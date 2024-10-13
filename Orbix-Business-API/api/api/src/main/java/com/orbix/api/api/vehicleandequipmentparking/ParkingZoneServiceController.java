@@ -35,7 +35,6 @@ public class ParkingZoneServiceController implements ParkingZoneService {
 	private final ParkingZoneRepository parkingZoneRepository;
 	private final CompanyRepository companyRepository;
 	private final BranchRepository branchRepository;
-	private final SystemProfileRepository systemProfileRepository;
 	private final UserService userService;
 	private final DayService dayService;
 	

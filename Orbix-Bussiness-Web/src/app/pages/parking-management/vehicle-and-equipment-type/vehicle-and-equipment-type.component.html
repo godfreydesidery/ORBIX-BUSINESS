@@ -20,9 +20,10 @@
                         <thead>
                             <tr>
                                 <th>SN</th>
-                                <th>ParkingZone Code</th>
-                                <th>ParkingZone Name</th>
+                                <th>Type Code</th>
+                                <th>Type Name</th>
                                 <th>Company</th>
+                                <th>Price(Daily)</th>
                                 <th>Active?</th>
                                 <th>Action</th>
                             </tr>
@@ -34,6 +35,7 @@
                                     <td>{{v.code}}</td>
                                     <td>{{v.name}}</td>
                                     <td>{{v.companyName}}</td>
+                                    <td style="text-align: right;">{{v.dailyPrice | currency:'':''}}</td>
                                     <td>
                                         <span *ngIf="v.active ==='Active'">Active__</span><span *ngIf="v.active ==='Inactive'">Inactive </span> | 
                                         <button *ngIf="v.active ==='Inactive'" (click)="activate(v.id)"><i class="fa fa-unlock text-success"></i></button>
@@ -72,6 +74,10 @@
                         <div class="form-group">
                             <label>Type Name</label>
                             <input class="form-control" type="text" [(ngModel)]="name" autocomplete="nope">
+                        </div>
+                        <div class="form-group">
+                            <label>Price(Daily)</label>
+                            <input class="form-control" type="text" [(ngModel)]="dailyPrice" autocomplete="nope" style="text-align: right;">
                         </div>
                         
                         

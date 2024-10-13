@@ -10,4 +10,6 @@ public class VehicleAndEquipmentTypeRequestDTO {
 
 	private Long companyId;
 	private String companyName;
+	
+	double dailyPrice;
 }

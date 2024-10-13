@@ -82,6 +82,7 @@ public class VehicleAndEquipmentTypeServiceController implements VehicleAndEquip
 		VehicleAndEquipmentType vehicleAndEquipmentType = new VehicleAndEquipmentType();		
 		vehicleAndEquipmentType.setCode(String.valueOf(Math.random()));
 		vehicleAndEquipmentType.setName(vehicleAndEquipmentTypeRequest.getName());
+		vehicleAndEquipmentType.setDailyPrice(vehicleAndEquipmentTypeRequest.getDailyPrice());
 		vehicleAndEquipmentType.setCompany(company_.get());
 		
 		vehicleAndEquipmentType.setCreatedByUser(userService.getUser(request));
@@ -109,6 +110,7 @@ public class VehicleAndEquipmentTypeServiceController implements VehicleAndEquip
 		
 		VehicleAndEquipmentType vehicleAndEquipmentType = vehicleAndEquipmentType_.get();
 		vehicleAndEquipmentType.setName(vehicleAndEquipmentTypeRequest.getName());
+		vehicleAndEquipmentType.setDailyPrice(vehicleAndEquipmentTypeRequest.getDailyPrice());
 				
 		vehicleAndEquipmentType = vehicleAndEquipmentTypeRepository.save(vehicleAndEquipmentType);
 		
@@ -151,6 +153,7 @@ public class VehicleAndEquipmentTypeServiceController implements VehicleAndEquip
 		vehicleAndEquipmentTypeResponse.setId(vehicleAndEquipmentType.getId().toString());
 		vehicleAndEquipmentTypeResponse.setCode(vehicleAndEquipmentType.getCode());
 		vehicleAndEquipmentTypeResponse.setName(vehicleAndEquipmentType.getName());
+		vehicleAndEquipmentTypeResponse.setDailyPrice(String.valueOf(vehicleAndEquipmentType.getDailyPrice()));
 		vehicleAndEquipmentTypeResponse.setCompanyName(vehicleAndEquipmentType.getCompany().getName());
 	
 		if(vehicleAndEquipmentType.isActive()) {

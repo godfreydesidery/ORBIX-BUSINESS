@@ -7,6 +7,8 @@ export interface IVehicleAndEquipmentType {
     code : string
     name : string
 
+    dailyPrice : number
+
     active : string
 
     company : ICompany

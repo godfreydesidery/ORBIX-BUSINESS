@@ -504,10 +504,10 @@ export const menuItems = [
                         title: 'Vehicle Type',
                         routerLink: '/app/parking-management/vehicle-and-equipment-type'
                     },
-                    {
-                        title: 'Pricing Plan',
-                        routerLink: '/app/blank'
-                    },
+                    // {
+                    //     title: 'Pricing Plan',
+                    //     routerLink: '/app/blank'
+                    // },
                 ]
             }
             

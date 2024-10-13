@@ -28,6 +28,8 @@ export class VehicleAndEquipmentTypeComponent {
   name : string = '' 
   active : string = 'Inactive'
 
+  dailyPrice : number = 0;
+
   /**Collections */
   vehicleAndEquipmentTypes : IVehicleAndEquipmentType[] = []
 
@@ -87,6 +89,7 @@ export class VehicleAndEquipmentTypeComponent {
       id: this.id,
       code: this.code,
       name: this.name,
+      dailyPrice : this.dailyPrice,
 
       active: this.active,
 
@@ -211,11 +214,13 @@ export class VehicleAndEquipmentTypeComponent {
     this.id = data?.id
     this.code = data!.code
     this.name = data!.name
+    this.dailyPrice = data!.dailyPrice
   }
 
   clearVehicleAndEquipmentTypeData(){
     this.id = null
     this.code = ''
     this.name = ''
+    this.dailyPrice = 0
   }
 }

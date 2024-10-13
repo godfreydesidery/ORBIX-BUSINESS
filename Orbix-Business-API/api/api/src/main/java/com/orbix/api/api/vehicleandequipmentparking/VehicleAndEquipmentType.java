@@ -42,6 +42,11 @@ public class VehicleAndEquipmentType {
 	@Column(nullable = false)
 	private String name;
 	
+	double dailyPrice = 0;
+	boolean dailyPriceActive = true;
+	double hourlyPrice = 0;
+	boolean hourlyPriceActive = false;
+	
 	private boolean active = false;
 		
 	@ManyToOne(targetEntity = Company.class, fetch = FetchType.EAGER,  optional = false)

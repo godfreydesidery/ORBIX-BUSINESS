@@ -30,7 +30,7 @@ import lombok.ToString;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "parking_zone_slots", uniqueConstraints = { @UniqueConstraint(columnNames = {"id", "no"})})
+@Table(name = "parking_zone_slots", uniqueConstraints = { @UniqueConstraint(columnNames = {"no", "parking_zone_id"})})
 
 public class ParkingZoneSlot {
 	@Id
