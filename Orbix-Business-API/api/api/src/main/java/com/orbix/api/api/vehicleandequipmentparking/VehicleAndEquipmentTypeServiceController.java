@@ -49,6 +49,19 @@ public class VehicleAndEquipmentTypeServiceController implements VehicleAndEquip
 		}		
 		return vehicleAndEquipmentTypeResponses;
 	}
+	
+	@Override
+	public List<VehicleAndEquipmentTypeResponseDTO> getAllCompanyActiveVehicleAndEquipmentTypes(
+			HttpServletRequest request) {
+		Company company = userService.getUser(request).getCompany();	
+		List<VehicleAndEquipmentType> vehicleAndEquipmentTypes = vehicleAndEquipmentTypeRepository.findAllByCompanyAndActive(company, true);
+		List<VehicleAndEquipmentTypeResponseDTO> vehicleAndEquipmentTypeResponses = new ArrayList<>();
+
+		for(VehicleAndEquipmentType vehicleAndEquipmentType : vehicleAndEquipmentTypes) {
+			vehicleAndEquipmentTypeResponses.add(vehicleAndEquipmentTypeResponseDTOMapper(vehicleAndEquipmentType));					
+		}		
+		return vehicleAndEquipmentTypeResponses;
+	}
 
 	@Override
 	public VehicleAndEquipmentTypeResponseDTO get(Long id, HttpServletRequest request) {		
@@ -169,5 +182,7 @@ public class VehicleAndEquipmentTypeServiceController implements VehicleAndEquip
 		
 		return true;
 	}
+
+	
 
 }

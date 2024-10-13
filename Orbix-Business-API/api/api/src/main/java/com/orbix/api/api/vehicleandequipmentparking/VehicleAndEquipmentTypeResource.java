@@ -2,6 +2,7 @@ package com.orbix.api.api.vehicleandequipmentparking;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -16,6 +17,8 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.modules.adminunits.Company;
+import com.orbix.api.modules.identityandaccess.UserService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -25,11 +28,19 @@ import lombok.RequiredArgsConstructor;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @Transactional
 public class VehicleAndEquipmentTypeResource {
+	
 private final VehicleAndEquipmentTypeService vehicleAndEquipmentTypeService;
+private final UserService userService;
+private final VehicleAndEquipmentTypeRepository vehicleAndEquipmentTypeRepository;
 	
 	@GetMapping("/vehicle_and_equipment_types")
 	public ResponseEntity<List<VehicleAndEquipmentTypeResponseDTO>>getAll(HttpServletRequest request){
 		return ResponseEntity.ok().body(vehicleAndEquipmentTypeService.getAllVehicleAndEquipmentTypes(request));
+	}
+	
+	@GetMapping("/vehicle_and_equipment_types/get_all_company_active")
+	public ResponseEntity<List<VehicleAndEquipmentTypeResponseDTO>>getAllCompanyActive(HttpServletRequest request){		
+		return ResponseEntity.ok().body(vehicleAndEquipmentTypeService.getAllCompanyActiveVehicleAndEquipmentTypes(request));
 	}
 	
 	

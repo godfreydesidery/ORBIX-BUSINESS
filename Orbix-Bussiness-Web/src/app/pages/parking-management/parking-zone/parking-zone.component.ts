@@ -38,10 +38,10 @@ export class ParkingZoneComponent {
   ) {}
 
   ngOnInit(){
-    this.getAllCompanies()
+    this.getAllParkingZones()
   }
 
-  async getAllCompanies(){
+  async getAllParkingZones(){
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
@@ -109,7 +109,7 @@ export class ParkingZoneComponent {
 
           console.log(data)
 
-          this.getAllCompanies()
+          this.getAllParkingZones()
 
           alert('ParkingZone created successifully')
 
@@ -132,7 +132,7 @@ export class ParkingZoneComponent {
 
           console.log(data)
 
-          this.getAllCompanies()
+          this.getAllParkingZones()
 
           alert('ParkingZone updated successifully')
         }
@@ -163,7 +163,7 @@ export class ParkingZoneComponent {
 
           console.log(data)
 
-          this.getAllCompanies()
+          this.getAllParkingZones()
 
           alert('ParkingZone activated successifully')
 
@@ -194,7 +194,7 @@ export class ParkingZoneComponent {
 
           console.log(data)
 
-          this.getAllCompanies()
+          this.getAllParkingZones()
 
           alert('ParkingZone deactivated successifully')
 

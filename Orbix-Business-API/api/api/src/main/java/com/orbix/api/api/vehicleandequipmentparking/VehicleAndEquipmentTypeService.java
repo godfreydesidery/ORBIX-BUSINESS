@@ -8,6 +8,7 @@ import com.orbix.api.api.commons.ApiCustomResponse;
 
 public interface VehicleAndEquipmentTypeService {
 	List<VehicleAndEquipmentTypeResponseDTO> getAllVehicleAndEquipmentTypes(HttpServletRequest request);	
+	List<VehicleAndEquipmentTypeResponseDTO> getAllCompanyActiveVehicleAndEquipmentTypes(HttpServletRequest request);		
 	VehicleAndEquipmentTypeResponseDTO get(Long id, HttpServletRequest request);
 	VehicleAndEquipmentTypeResponseDTO createVehicleAndEquipmentType(VehicleAndEquipmentTypeRequestDTO vehicleAndEquipmentTypeRequest, HttpServletRequest request);
 	VehicleAndEquipmentTypeResponseDTO updateVehicleAndEquipmentType(VehicleAndEquipmentTypeRequestDTO vehicleAndEquipmentTypeRequest, HttpServletRequest request);

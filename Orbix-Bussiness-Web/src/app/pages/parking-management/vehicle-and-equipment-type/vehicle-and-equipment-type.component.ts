@@ -39,10 +39,10 @@ export class VehicleAndEquipmentTypeComponent {
   ) {}
 
   ngOnInit(){
-    this.getAllCompanies()
+    this.getAllVehicleAndEquipmentTypes()
   }
 
-  async getAllCompanies(){
+  async getAllVehicleAndEquipmentTypes(){
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
@@ -110,7 +110,7 @@ export class VehicleAndEquipmentTypeComponent {
 
           console.log(data)
 
-          this.getAllCompanies()
+          this.getAllVehicleAndEquipmentTypes()
 
           alert('Type created successifully')
 
@@ -133,7 +133,7 @@ export class VehicleAndEquipmentTypeComponent {
 
           console.log(data)
 
-          this.getAllCompanies()
+          this.getAllVehicleAndEquipmentTypes()
 
           alert('Type updated successifully')
         }
@@ -164,7 +164,7 @@ export class VehicleAndEquipmentTypeComponent {
 
           console.log(data)
 
-          this.getAllCompanies()
+          this.getAllVehicleAndEquipmentTypes()
 
           alert('Type activated successifully')
 
@@ -195,7 +195,7 @@ export class VehicleAndEquipmentTypeComponent {
 
           console.log(data)
 
-          this.getAllCompanies()
+          this.getAllVehicleAndEquipmentTypes()
 
           alert('VehicleAndEquipmentType deactivated successifully')
 
