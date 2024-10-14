@@ -42,7 +42,7 @@ public class ParkingRequestDTO {
 	String agentAddress;
 	String agentPhoneNo;
 	String agentEmail;
-	String tNumber;
+	String tformNumber;
 
 	/**Vehicle or Equipment Information*/
 	String registrationNo;
@@ -66,9 +66,12 @@ public class ParkingRequestDTO {
 	String tireIndicator;
 	Byte[] image;
 	
+	String vehicleAndEquipmentCategory;
+	
 	String status = "PENDING";
 
     Long parkingZoneId;
+    String parkingZoneName;
 	
     Long vehicleAndEquipmentTypeId;	
     Long branchId;

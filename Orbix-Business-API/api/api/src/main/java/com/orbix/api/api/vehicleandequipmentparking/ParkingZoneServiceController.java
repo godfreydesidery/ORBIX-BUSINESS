@@ -50,6 +50,19 @@ public class ParkingZoneServiceController implements ParkingZoneService {
 		}		
 		return parkingZoneResponses;
 	}
+	
+	@Override
+	public List<ParkingZoneResponseDTO> getAllBranchActiveParkingZones(
+			HttpServletRequest request) {
+		Branch branch = userService.getUser(request).getBranch();	
+		List<ParkingZone> parkingZones = parkingZoneRepository.findAllByBranchAndActive(branch, true);
+		List<ParkingZoneResponseDTO> parkingZoneResponses = new ArrayList<>();
+
+		for(ParkingZone parkingZone : parkingZones) {
+			parkingZoneResponses.add(parkingZoneResponseDTOMapper(parkingZone));					
+		}		
+		return parkingZoneResponses;
+	}
 
 	@Override
 	public ParkingZoneResponseDTO get(Long id, HttpServletRequest request) {		

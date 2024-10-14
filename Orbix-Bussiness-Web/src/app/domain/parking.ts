@@ -18,7 +18,7 @@ export interface IParking {
     agentAddress: string
     agentPhoneNo: string
     agentEmail: string
-    tNumber: string
+    tformNumber: string
 
     // Vehicle or Equipment Information
     registrationNo: string
@@ -41,6 +41,7 @@ export interface IParking {
     roundMirror: string
     tireIndicator: string
     //image: Byte[]
+    vehicleAndEquipmentCategory : string
 
     billingType : string
     billingAmount : number
@@ -57,5 +58,7 @@ export interface IParking {
     sn: number
 
     vehicleAndEquipmentTypeName : string
+
+    parkingZoneName : string
 
 }

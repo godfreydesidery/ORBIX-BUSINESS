@@ -346,9 +346,19 @@ export const menuItems = [
         order: 100,
         subMenu: [
             {
-                title: 'Finance',
-                routerLink: '/app/blank'
-            }
+                title: 'Invoices',
+                url: '#',
+                subMenu: [
+                    {
+                        title: 'Receivable',
+                        routerLink: '/app/accounts-and-finance/invoices/receivable-invoice-list'
+                    },
+                    {
+                        title: 'Payable',
+                        routerLink: '/app/blank'
+                    },
+                ]
+            },
         ]
     },
 

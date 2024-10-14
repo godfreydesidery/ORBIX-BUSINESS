@@ -138,6 +138,13 @@ export const routes: Routes = [
       /**End of Parking Management */
 
 
+      {
+        path : 'accounts-and-finance/invoices/receivable-invoice-list',
+        loadComponent: () => import('./accounts-and-finance/invoices/receivable-invoice-list/receivable-invoice-list.component').then(c => c.ReceivableInvoiceListComponent),
+        data : { breadcrumb : 'Accounts & Finance/Invoices/Receivable Invoices'},
+        canActivate : [AuthGuard]
+      },
+
 
       { 
         path: 'blank', 

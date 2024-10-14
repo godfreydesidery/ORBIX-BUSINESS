@@ -24,7 +24,7 @@ public class ParkingResponseDTO {
 	String agentAddress;
 	String agentPhoneNo;
 	String agentEmail;
-	String tNumber;
+	String tformNumber;
 
 	/**Vehicle or Equipment Information*/
 	String registrationNo;
@@ -47,6 +47,8 @@ public class ParkingResponseDTO {
 	String roundMirror;
 	String tireIndicator;
 	Byte[] image;
+	
+	String vehicleAndEquipmentCategory;
 
 	String status = "PENDING";
 

@@ -1,0 +1,46 @@
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>Invoice List</span>
+            </div>
+            <div class="card-body widget-body"> 
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <!-- <button type="button" class="btn btn-outline-success btn-round-custom" (click)="clearVehicleAndEquipmentTypeData()" data-toggle="modal" data-target="#parkingZone-modal">New Type</button> -->
+                        <!-- <button type="button" class="btn btn-outline-success btn-round-custom" (click)="clearParkingData()" data-toggle="modal" data-target="#parkingZone-modal">New Vehicle</button>
+                        <br><br> -->
+                    </div>
+                </div>
+
+                <div class="table-responsive table-sm">
+                    <table class="table">
+                        <thead>
+                            
+                            <tr>
+                                <th>SN</th>
+                                <th>No</th>
+                                <th>Status</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+
+                        <tbody>
+                            @for (invoice of invoiceReceivables; track invoice.id) {
+                            <tr>
+                                <td>{{invoice.sn}}</td>
+                                <td>{{invoice.no}}</td>
+                                <td>{{invoice.status}}</td>
+                                <td></td>
+                            </tr>
+                        }
+                        </tbody>
+                        
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

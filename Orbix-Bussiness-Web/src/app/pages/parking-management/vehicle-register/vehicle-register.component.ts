@@ -4,6 +4,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/auth.service';
 import { IParking } from 'src/app/domain/parking';
+import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleAndEquipmentType } from 'src/app/domain/vehicle-and-equipment-type';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
@@ -41,7 +42,7 @@ export class VehicleRegisterComponent {
   agentAddress: string = ''
   agentPhoneNo: string = ''
   agentEmail: string = ''
-  tNumber: string = ''
+  tformNumber: string = ''
 
   // Vehicle or Equipment Information
   registrationNo: string = ''
@@ -64,7 +65,10 @@ export class VehicleRegisterComponent {
   roundMirror: string = ''
   tireIndicator: string = ''
 
+  vehicleAndEquipmentCategory : string = ''
+
   billingType : string = ''
+  billingAmount : number = 0
   //image: Byte[]
 
   status: string = "PENDING"
@@ -76,12 +80,16 @@ export class VehicleRegisterComponent {
   branchId: any = ''
   companyId: any = ''
 
+  parkingZoneName : string = ''
+
   
 
   /**Collections */
   parkings : IParking[] = []
 
   vehicleAndEquipmentTypes  : IVehicleAndEquipmentType[] = []
+
+  parkingZones : IParkingZone[] = []
 
   
   constructor(
@@ -92,6 +100,7 @@ export class VehicleRegisterComponent {
   ngOnInit(){
     this.getAllParkings()   
     this.getAllCompanyActiveVehicleAndEquipmentTypes()
+    this.getAllBranchActiveParkingZones();
   }
 
   async getAllParkings(){
@@ -153,6 +162,27 @@ export class VehicleRegisterComponent {
     )
   }
 
+  async getAllBranchActiveParkingZones(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    this.parkingZones = []
+
+    await this.http.get<IParkingZone[]>(API_URL+'/parking_zones/get_all_branch_active', options)
+    .toPromise()
+    .then(
+      data => {
+        var sn = 1
+        data?.forEach(element => {
+          element.sn = sn
+          this.parkingZones.push(element)
+          sn = sn + 1
+        })
+        console.log(data)
+      }
+    )
+  }
+
   selectedOption: string = '';
   options: string[] = ['Option 1', 'Option 2', 'Option 3'];
 
@@ -179,7 +209,11 @@ export class VehicleRegisterComponent {
       agentAddress: this.agentAddress,
       agentPhoneNo: this.agentPhoneNo,
       agentEmail: this.agentEmail,
-      tNumber: this.tNumber,
+      tformNumber: this.tformNumber,
+
+      billingType : this.billingType,
+
+      billingAmount : this.billingAmount,
 
       // Vehicle or Equipment Information
       registrationNo: this.registrationNo,
@@ -201,7 +235,9 @@ export class VehicleRegisterComponent {
       wheelCap: this.wheelCap,
       roundMirror: this.roundMirror,
       tireIndicator: this.tireIndicator,
-      vehicleAndEquipmentTypeName : this.vehicleAndEquipmentTypeName
+      vehicleAndEquipmentTypeName : this.vehicleAndEquipmentTypeName,
+
+      vehicleAndEquipmentCategory : this.vehicleAndEquipmentCategory,
     }
 
     console.log(parking)
@@ -285,6 +321,38 @@ export class VehicleRegisterComponent {
       )
   }
 
+  async checkIn(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    var parking = {
+      id : this.id,
+      parkingZoneName : this.parkingZoneName
+    }
+
+    await this.http.post<IParking>(API_URL+'/parkings/check_in', parking, options)
+      .toPromise()
+      .then(
+        data => {
+
+          console.log(data)
+
+          this.getAllParkings()
+
+          alert('Checked in Successifully')
+
+        }
+
+      )
+      .catch(
+        error => {
+          console.log(error)
+          alert('An error has occured')
+        }
+      )
+  }
+
   async deactivate(id : any){
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
@@ -334,7 +402,10 @@ export class VehicleRegisterComponent {
     this.agentAddress = data?.agentAddress;
     this.agentPhoneNo = data?.agentPhoneNo;
     this.agentEmail = data?.agentEmail;
-    this.tNumber = data?.tNumber;
+    this.tformNumber = data?.tformNumber;
+
+    this.billingType = data?.billingType
+    this.billingAmount = data?.billingAmount
 
     // Vehicle or Equipment Information
     this.registrationNo = data?.registrationNo;
@@ -356,7 +427,12 @@ export class VehicleRegisterComponent {
     this.wheelCap = data?.wheelCap;
     this.roundMirror = data?.roundMirror;
     this.tireIndicator = data?.tireIndicator;
-    this.vehicleAndEquipmentTypeName = data!.vehicleAndEquipmentTypeName
+    this.vehicleAndEquipmentTypeName = data!.vehicleAndEquipmentTypeName,
+
+    this.vehicleAndEquipmentCategory = data!.vehicleAndEquipmentCategory
+
+    this.parkingZoneName = data!.parkingZoneName
+
   }
 
   clearParkingData(){
@@ -377,7 +453,10 @@ export class VehicleRegisterComponent {
     this.agentAddress = ''
     this.agentPhoneNo = ''
     this.agentEmail = ''
-    this.tNumber = ''
+    this.tformNumber = ''
+
+    this.billingType = ''
+    this.billingAmount = 0
 
     // Vehicle or Equipment Information
     this.registrationNo = ''
@@ -400,5 +479,9 @@ export class VehicleRegisterComponent {
     this.roundMirror = ''
     this.tireIndicator = ''
     this.vehicleAndEquipmentTypeName = ''
+
+    this.vehicleAndEquipmentCategory = ''
+
+    this.parkingZoneName = ''
   }
 }

@@ -31,6 +31,11 @@ public class ParkingZoneResource {
 		return ResponseEntity.ok().body(parkingZoneService.getAllParkingZones(request));
 	}
 	
+	@GetMapping("/parking_zones/get_all_branch_active")
+	public ResponseEntity<List<ParkingZoneResponseDTO>>getAllBranchActive(HttpServletRequest request){		
+		return ResponseEntity.ok().body(parkingZoneService.getAllBranchActiveParkingZones(request));
+	}
+	
 	
 	@GetMapping("/parking_zones/get")
 	public ResponseEntity<ParkingZoneResponseDTO>get(

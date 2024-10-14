@@ -18,6 +18,12 @@ import com.orbix.api.modules.adminunits.BranchRepository;
 import com.orbix.api.modules.adminunits.Company;
 import com.orbix.api.modules.adminunits.CompanyRepository;
 import com.orbix.api.modules.adminunits.DayService;
+import com.orbix.api.modules.finance.BillReceivable;
+import com.orbix.api.modules.finance.BillReceivableRepository;
+import com.orbix.api.modules.finance.InvoiceReceivable;
+import com.orbix.api.modules.finance.InvoiceReceivableDetail;
+import com.orbix.api.modules.finance.InvoiceReceivableDetailRepository;
+import com.orbix.api.modules.finance.InvoiceReceivableRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -35,7 +41,17 @@ public class ParkingServiceController implements ParkingService {
 	private final UserService userService;
 	private final DayService dayService;
 	
+	private final ParkingZoneRepository parkingZoneRepository;
+	
 	private final VehicleAndEquipmentTypeRepository vehicleAndEquipmentTypeRepository;
+	
+	private final BillReceivableRepository billReceivableRepository;
+	
+	private final ParkingBillReceivableRepository parkingBillReceivableRepository;
+	private final ParkingInvoiceReceivableRepository parkingInvoiceReceivableRepository;
+	
+	private final InvoiceReceivableRepository invoiceReceivableRepository;
+	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
 	
 	
 
@@ -100,7 +116,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setAgentAddress(parkingRequest.getAgentAddress());
 		parking.setAgentPhoneNo(parkingRequest.getAgentPhoneNo());
 		parking.setAgentEmail(parkingRequest.getAgentEmail());
-		parking.setTNumber(parkingRequest.getTNumber());
+		parking.setTformNumber(parkingRequest.getTformNumber());
 		parking.setRegistrationNo(parkingRequest.getRegistrationNo());
 		parking.setChasisNo(parkingRequest.getChasisNo());
 		parking.setLeftFrontLamp(parkingRequest.getLeftFrontLamp());
@@ -123,6 +139,8 @@ public class ParkingServiceController implements ParkingService {
 		//parking.setImage(parkingRequest.getImage());
 		parking.setStatus("PENDING");
 		parking.setVehicleAndEquipmentType(vehicleAndEquipmentType_.get());
+		
+		parking.setVehicleAndEquipmentCategory(parkingRequest.getVehicleAndEquipmentCategory());
 		
 		parking.setCompany(company_.get());
 		parking.setBranch(branch_.get());
@@ -196,7 +214,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setAgentAddress(parkingRequest.getAgentAddress());
 		parking.setAgentPhoneNo(parkingRequest.getAgentPhoneNo());
 		parking.setAgentEmail(parkingRequest.getAgentEmail());
-		parking.setTNumber(parkingRequest.getTNumber());
+		parking.setTformNumber(parkingRequest.getTformNumber());
 		parking.setRegistrationNo(parkingRequest.getRegistrationNo());
 		parking.setChasisNo(parkingRequest.getChasisNo());
 		parking.setLeftFrontLamp(parkingRequest.getLeftFrontLamp());
@@ -217,6 +235,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setRoundMirror(parkingRequest.getRoundMirror());
 		parking.setTireIndicator(parkingRequest.getTireIndicator());
 		parking.setVehicleAndEquipmentType(vehicleAndEquipmentType_.get());
+		parking.setVehicleAndEquipmentCategory(parkingRequest.getVehicleAndEquipmentCategory());
 				
 		parking = parkingRepository.save(parking);
 		
@@ -242,7 +261,7 @@ public class ParkingServiceController implements ParkingService {
 		parkingResponse.setAgentAddress(parking.getAgentAddress());
 		parkingResponse.setAgentPhoneNo(parking.getAgentPhoneNo());
 		parkingResponse.setAgentEmail(parking.getAgentEmail());
-		parkingResponse.setTNumber(parking.getTNumber());
+		parkingResponse.setTformNumber(parking.getTformNumber());
 		parkingResponse.setRegistrationNo(parking.getRegistrationNo());
 		parkingResponse.setChasisNo(parking.getChasisNo());
 		parkingResponse.setLeftFrontLamp(parking.getLeftFrontLamp());
@@ -262,8 +281,9 @@ public class ParkingServiceController implements ParkingService {
 		parkingResponse.setWheelCap(parking.getWheelCap());
 		parkingResponse.setRoundMirror(parking.getRoundMirror());
 		parkingResponse.setTireIndicator(parking.getTireIndicator());
+		parkingResponse.setVehicleAndEquipmentCategory(parking.getVehicleAndEquipmentCategory());
 		//parking.setImage(parkingRequest.getImage());
-		parkingResponse.setStatus("PENDING");
+		parkingResponse.setStatus(parking.getStatus());
 		parkingResponse.setCompanyId(parking.getCompany().getId().toString());
 		parkingResponse.setBranchId(parking.getBranch().getId().toString());
 		
@@ -278,6 +298,111 @@ public class ParkingServiceController implements ParkingService {
 	boolean validateParkingData(ParkingRequestDTO parkingRequest) {
 		
 		return true;
+	}
+
+	@Override
+	public ParkingResponseDTO checkIn(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
+		
+		Optional<Parking> parking_ = parkingRepository.findById(parkingRequest.getId());
+		
+		if(parking_.isEmpty()) 
+			throw new NotFoundException("Parking not found");			
+		if(parking_.get().getBranch().getId() != userService.getUser(request).getBranch().getId()) 
+			throw new InvalidOperationException("Checking in can only be done by a branch user");
+		if(!parking_.get().getStatus().equals("PENDING")) 
+			throw new InvalidOperationException("Can not check in, only a pending parking can be checked in");
+		
+		//now check in vehicle, if it has a pending status
+		
+		Parking parking = parking_.get();
+		
+		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), parking_.get().getBranch());
+		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
+		
+		parking.setBillingAmount(parking.getVehicleAndEquipmentType().getDailyPrice());
+		
+		parking.setParkingZone(parkingZone_.get());
+		parking.setStatus("CHECKED-IN");
+		parking.setCheckedInByUser(userService.getUser(request));
+		parking.setCheckedInDateTime(dayService.getTimeStamp());
+		
+		parking = parkingRepository.save(parking);
+		
+		//generate bill, for day 1 depending on billing type
+		
+		BillReceivable billReceivable = new BillReceivable();
+		billReceivable.setNo(String.valueOf(Math.random()));
+		billReceivable.setAmount(parking.getBillingAmount());
+		billReceivable.setPaid(0);
+		billReceivable.setDue(parking.getBillingAmount());
+		billReceivable.setCompany(parking.getCompany());
+		billReceivable.setBranch(parking.getBranch());
+		billReceivable.setCreatedDateTime(dayService.getTimeStamp());
+		
+		billReceivable.setStatus("UNPAID");
+		billReceivable.setSummary("Parking bill for parking#: " + parking.getNo());
+		
+		billReceivable = billReceivableRepository.save(billReceivable);
+		billReceivable.setNo("BR" + billReceivable.getId().toString());
+		billReceivableRepository.save(billReceivable);
+		
+		
+		
+		InvoiceReceivable invoiceReceivable = null;
+		ParkingInvoiceReceivable parkingInvoiceReceivable = null;
+		
+		List<ParkingInvoiceReceivable> parkingInvoiceReceivables = parkingInvoiceReceivableRepository.findAllByParking(parking);
+		for(ParkingInvoiceReceivable pInvoiceReceivable : parkingInvoiceReceivables) {
+			if(pInvoiceReceivable.getInvoiceReceivable().getStatus()
+					.equals("OPEN")) {
+				invoiceReceivable = pInvoiceReceivable.getInvoiceReceivable();
+				break;
+			}
+		}
+		if(invoiceReceivable == null) {
+			invoiceReceivable = new InvoiceReceivable();
+			invoiceReceivable.setNo(String.valueOf(Math.random()));
+			invoiceReceivable.setCompany(parking.getCompany());
+			invoiceReceivable.setBranch(parking.getBranch());
+			invoiceReceivable.setStatus("OPEN");
+			invoiceReceivable.setSummary("Auto invoice, for parking# " + parking.getNo());
+			
+			invoiceReceivable = invoiceReceivableRepository.save(invoiceReceivable);
+			invoiceReceivable.setNo("RINV" + invoiceReceivable.getId().toString());
+			
+			invoiceReceivable = invoiceReceivableRepository.save(invoiceReceivable);
+			
+			parkingInvoiceReceivable = new ParkingInvoiceReceivable();
+			parkingInvoiceReceivable.setParking(parking);
+			parkingInvoiceReceivable.setInvoiceReceivable(invoiceReceivable);
+			
+			parkingInvoiceReceivableRepository.save(parkingInvoiceReceivable);
+		}
+		
+		InvoiceReceivableDetail invoiceReceivableDetail = new InvoiceReceivableDetail();
+		invoiceReceivableDetail.setInvoiceReceivable(invoiceReceivable);
+		invoiceReceivableDetail.setAmount(parking.getBillingAmount());
+		invoiceReceivableDetail.setDue(parking.getBillingAmount());
+		invoiceReceivableDetail.setPaid(0);
+		invoiceReceivableDetail.setSummary("Payment for parking# " + parking.getNo());
+		
+		invoiceReceivableDetail = invoiceReceivableDetailRepository.save(invoiceReceivableDetail);
+		
+		ParkingBillReceivable parkingBillReceivable = new ParkingBillReceivable();
+		parkingBillReceivable.setBillReceivable(billReceivable);
+		parkingBillReceivable.setParking(parking);
+		parkingBillReceivable.setInvoiceReceivableDetail(invoiceReceivableDetail);
+		
+		parkingBillReceivableRepository.save(parkingBillReceivable);
+	
+		
+		return parkingResponseDTOMapper(parking);
+	}
+
+	@Override
+	public ParkingResponseDTO checkOut(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 
 }

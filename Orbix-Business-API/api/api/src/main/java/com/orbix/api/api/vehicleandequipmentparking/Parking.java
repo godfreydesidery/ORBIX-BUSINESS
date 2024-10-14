@@ -56,7 +56,7 @@ public class Parking {
 	private String agentAddress;
 	private String agentPhoneNo;
 	private String agentEmail;
-	private String tNumber;
+	private String tformNumber;
 	
 	/**Vehicle or Equipment Information*/
 	private String registrationNo;
@@ -79,6 +79,8 @@ public class Parking {
 	private String roundMirror;
 	private String tireIndicator;
 	private Byte[] image;
+	
+	private String vehicleAndEquipmentCategory;
 	
 	private String status = "PENDING";
 	

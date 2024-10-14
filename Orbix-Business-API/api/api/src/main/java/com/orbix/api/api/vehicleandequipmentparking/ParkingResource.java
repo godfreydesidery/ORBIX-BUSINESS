@@ -59,6 +59,20 @@ private final ParkingService parkingService;
 		return ResponseEntity.created(uri).body(parkingService.updateParking(parkingRequest, request));
 	}
 	
+	@PostMapping("/parkings/check_in")
+	public ResponseEntity<ParkingResponseDTO>checkIn(
+			@RequestBody ParkingRequestDTO parkingRequest,
+			HttpServletRequest request){		
+		return ResponseEntity.ok().body(parkingService.checkIn(parkingRequest, request));		
+	}
+	
+	@PostMapping("/parkings/check_out")
+	public ResponseEntity<ParkingResponseDTO>checkOut(
+			@RequestBody ParkingRequestDTO parkingRequest,
+			HttpServletRequest request){		
+		return ResponseEntity.ok().body(parkingService.checkOut(parkingRequest, request));		
+	}
+	
 //	@PostMapping("/parkings/activate")
 //	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 //	public ResponseEntity<ApiCustomResponse>activate(
