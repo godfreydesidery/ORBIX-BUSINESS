@@ -19,4 +19,11 @@ public class InvoiceReceivableResponseDTO {
 	String companyId;
 	String companyName;
 	
+	//For vehicle parking
+	String ownerName;
+	String ownerPhoneNo;
+	String chasisNo;
+	String cardNo;
+	String model;
+	
 }

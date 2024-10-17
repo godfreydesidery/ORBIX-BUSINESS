@@ -119,6 +119,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setTformNumber(parkingRequest.getTformNumber());
 		parking.setRegistrationNo(parkingRequest.getRegistrationNo());
 		parking.setChasisNo(parkingRequest.getChasisNo());
+		parking.setCardNo(parkingRequest.getCardNo());
 		parking.setLeftFrontLamp(parkingRequest.getLeftFrontLamp());
 		parking.setRightFrontLamp(parkingRequest.getRightFrontLamp());
 		parking.setLeftRearLamp(parkingRequest.getLeftRearLamp());
@@ -217,6 +218,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setTformNumber(parkingRequest.getTformNumber());
 		parking.setRegistrationNo(parkingRequest.getRegistrationNo());
 		parking.setChasisNo(parkingRequest.getChasisNo());
+		parking.setCardNo(parkingRequest.getCardNo());
 		parking.setLeftFrontLamp(parkingRequest.getLeftFrontLamp());
 		parking.setRightFrontLamp(parkingRequest.getRightFrontLamp());
 		parking.setLeftRearLamp(parkingRequest.getLeftRearLamp());
@@ -323,6 +325,7 @@ public class ParkingServiceController implements ParkingService {
 		
 		parking.setParkingZone(parkingZone_.get());
 		parking.setStatus("CHECKED-IN");
+		parking.setCardNo(parkingRequest.getCardNo());
 		parking.setCheckedInByUser(userService.getUser(request));
 		parking.setCheckedInDateTime(dayService.getTimeStamp());
 		

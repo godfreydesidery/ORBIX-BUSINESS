@@ -66,6 +66,8 @@ public class ParkingRequestDTO {
 	String tireIndicator;
 	Byte[] image;
 	
+	String cardNo;
+	
 	String vehicleAndEquipmentCategory;
 	
 	String status = "PENDING";

@@ -65,6 +65,8 @@ export class VehicleRegisterComponent {
   roundMirror: string = ''
   tireIndicator: string = ''
 
+  cardNo : string = ''
+
   vehicleAndEquipmentCategory : string = ''
 
   billingType : string = ''
@@ -238,6 +240,10 @@ export class VehicleRegisterComponent {
       vehicleAndEquipmentTypeName : this.vehicleAndEquipmentTypeName,
 
       vehicleAndEquipmentCategory : this.vehicleAndEquipmentCategory,
+
+      cardNo : this.cardNo,
+
+      billintType : this.billingType
     }
 
     console.log(parking)
@@ -328,6 +334,7 @@ export class VehicleRegisterComponent {
 
     var parking = {
       id : this.id,
+      cardNo : this.cardNo,
       parkingZoneName : this.parkingZoneName
     }
 
@@ -431,7 +438,10 @@ export class VehicleRegisterComponent {
 
     this.vehicleAndEquipmentCategory = data!.vehicleAndEquipmentCategory
 
-    this.parkingZoneName = data!.parkingZoneName
+    this.parkingZoneName = data!.parkingZoneName,
+     this.cardNo = data!.cardNo
+
+     this.billingType = data!.billingType
 
   }
 
@@ -483,5 +493,7 @@ export class VehicleRegisterComponent {
     this.vehicleAndEquipmentCategory = ''
 
     this.parkingZoneName = ''
+
+    this.billingType = ''
   }
 }

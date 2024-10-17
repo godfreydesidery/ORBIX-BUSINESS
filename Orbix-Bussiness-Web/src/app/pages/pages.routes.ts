@@ -145,6 +145,21 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
 
+      {
+        path : 'accounts-and-finance/invoices/parking-receivable-invoice-list',
+        loadComponent: () => import('./accounts-and-finance/invoices/parking-receivable-invoice-list/parking-receivable-invoice-list.component').then(c => c.ParkingReceivableInvoiceListComponent),
+        data : { breadcrumb : 'Accounts & Finance/Invoices/Parking Receivable Invoices'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'accounts-and-finance/invoices/receivable-invoice',
+        loadComponent: () => import('./accounts-and-finance/invoices/receivable-invoice/receivable-invoice.component').then(c => c.ReceivableInvoiceComponent),
+        data : { breadcrumb : 'Accounts & Finance/Invoices/Receivable Invoice'},
+        canActivate : [AuthGuard]
+      },
+
+
 
       { 
         path: 'blank', 

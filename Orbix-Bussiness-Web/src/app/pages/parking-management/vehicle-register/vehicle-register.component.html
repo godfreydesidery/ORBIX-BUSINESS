@@ -42,8 +42,14 @@
                                     <td>{{p.status}}</td>
                                     
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-round-custom btn-sm" (click)="get(p.id)" data-toggle="modal" data-target="#parkingZone-modal" style="cursor: pointer;">Edit</button>
-                                        <button type="button" class="btn btn-success btn-round-custom btn-sm" (click)="get(p.id)" data-toggle="modal" data-target="#complete-registration-modal" style="cursor: pointer; margin-left: 3px;">Complete Registration</button>
+                                        <table>
+                                            <tr>
+                                                <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(p.id)" data-toggle="modal" data-target="#parkingZone-modal" style="cursor: pointer;">Edit</button></td>
+                                                <td><button type="button" class="btn btn-success btn-round-custom" (click)="get(p.id)" data-toggle="modal" data-target="#complete-registration-modal" style="cursor: pointer; margin-left: 3px;">Complete Registration</button></td>
+                                            </tr>
+                                        </table>
+                                        
+                                        
                                         <!-- <button type="button" class="btn btn-success btn-round-custom btn-sm" data-toggle="modal" data-target="#check-in-modal" style="cursor: pointer; margin-left: 3px;">Check In</button>
                                         <button type="button" class="btn btn-success btn-round-custom btn-sm" data-toggle="modal" data-target="#check-out-modal" style="cursor: pointer; margin-left: 3px;">Check Out</button> -->
                                     </td>
@@ -107,9 +113,10 @@
                             <label>ID Type</label>
                             <select class="form-control" [(ngModel)]="ownerIdType">
                                 <option></option>
-                                <option>NATIONAL</option>
-                                <option>VOTER</option>
+                                <option>NATIONAL ID</option>
+                                <option>VOTER ID</option>
                                 <option>PASSPORT</option>
+                                <option>DRIVING LICENCE</option>
                                 <option>LETTER</option>
                             </select>
                         </div>
@@ -173,14 +180,12 @@
                                 <tbody>
                                     <td>
                                         <select class="form-control" [(ngModel)]="leftFrontLamp">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
                                     </td>
                                     <td>
                                         <select class="form-control" [(ngModel)]="rightFrontLamp">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
@@ -197,14 +202,12 @@
                                 <tbody>
                                     <td>
                                         <select class="form-control" [(ngModel)]="leftRearLamp">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
                                     </td>
                                     <td>
                                         <select class="form-control" [(ngModel)]="rightRearLamp">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
@@ -221,14 +224,12 @@
                                 <tbody>
                                     <td>
                                         <select class="form-control" [(ngModel)]="leftSideMirror">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
                                     </td>
                                     <td>
                                         <select class="form-control" [(ngModel)]="rightSideMirror">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
@@ -245,14 +246,12 @@
                                 <tbody>
                                     <td>
                                         <select class="form-control" [(ngModel)]="leftWiper">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
                                     </td>
                                     <td>
                                         <select class="form-control" [(ngModel)]="rightWiper">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
@@ -265,11 +264,10 @@
                         <div class="form-group">
                             <label>Back Wipers</label>
                             <table class="table table-sm table-bordered">
-                                <thead><td>Left/Right</td></thead>
+                                <thead><td>|</td></thead>
                                 <tbody>
                                     <td>
                                         <select class="form-control" [(ngModel)]="backWiper">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
@@ -282,11 +280,10 @@
                         <div class="form-group">
                             <label>Fuel Cap</label>
                             <table class="table table-sm table-bordered">
-                                <thead><td>Left/Right</td></thead>
+                                <thead><td>|</td></thead>
                                 <tbody>
                                     <td>
                                         <select class="form-control" [(ngModel)]="fuelCap">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
@@ -299,11 +296,10 @@
                         <div class="form-group">
                             <label>Spare Tires</label>
                             <table class="table table-sm table-bordered">
-                                <thead><td>L/R</td></thead>
+                                <thead><td>|</td></thead>
                                 <tbody>
                                     <td>
                                         <select class="form-control" [(ngModel)]="spareTire">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
@@ -316,11 +312,10 @@
                         <div class="form-group">
                             <label>Battery</label>
                             <table class="table table-sm table-bordered">
-                                <thead><td>P</td></thead>
+                                <thead><td>|</td></thead>
                                 <tbody>
                                     <td>
                                         <select class="form-control" [(ngModel)]="battery">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
@@ -333,11 +328,10 @@
                         <div class="form-group">
                             <label>Starter</label>
                             <table class="table table-sm table-bordered">
-                                <thead><td>P</td></thead>
+                                <thead><td>|</td></thead>
                                 <tbody>
                                     <td>
                                         <select class="form-control" [(ngModel)]="starter">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
@@ -350,11 +344,10 @@
                         <div class="form-group">
                             <label>Aerial</label>
                             <table class="table table-sm table-bordered">
-                                <thead><td>P</td></thead>
+                                <thead><td>|</td></thead>
                                 <tbody>
                                     <td>
                                         <select class="form-control" [(ngModel)]="aerial">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
@@ -367,11 +360,10 @@
                         <div class="form-group">
                             <label>Wheel Cap</label>
                             <table class="table table-sm table-bordered">
-                                <thead><td>P</td></thead>
+                                <thead><td>|</td></thead>
                                 <tbody>
                                     <td>
                                         <select class="form-control" [(ngModel)]="wheelCap">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
@@ -384,11 +376,10 @@
                         <div class="form-group">
                             <label>Round Mirror</label>
                             <table class="table table-sm table-bordered">
-                                <thead><td>P</td></thead>
+                                <thead><td>|</td></thead>
                                 <tbody>
                                     <td>
                                         <select class="form-control" [(ngModel)]="roundMirror">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
@@ -401,11 +392,10 @@
                         <div class="form-group">
                             <label>Tire Indicator</label>
                             <table class="table table-sm table-bordered">
-                                <thead><td>P</td></thead>
+                                <thead><td>|</td></thead>
                                 <tbody>
                                     <td>
                                         <select class="form-control" [(ngModel)]="tireIndicator">
-                                            <option></option>
                                             <option>YES</option>
                                             <option>NO</option>
                                         </select>
@@ -537,7 +527,7 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Card No</label><br>
-                            <input class="form-control" type="tel" autocomplete="nope">
+                            <input class="form-control" type="tel" [(ngModel)]="cardNo" autocomplete="nope">
                         </div>
                     </div> 
                     <div class="col-lg-3">

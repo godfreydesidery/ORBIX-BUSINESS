@@ -61,4 +61,6 @@ export interface IParking {
 
     parkingZoneName : string
 
+    cardNo : string
+
 }

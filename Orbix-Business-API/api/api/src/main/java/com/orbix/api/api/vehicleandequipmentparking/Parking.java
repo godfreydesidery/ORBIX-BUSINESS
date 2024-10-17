@@ -58,7 +58,7 @@ public class Parking {
 	private String agentEmail;
 	private String tformNumber;
 	
-	/**Vehicle or Equipment Information*/
+	/**Vehicle or Equipment Information*/  ///Attention, change the boolean values to boolean instead of string, for database performance issues
 	private String registrationNo;
 	private String chasisNo;
 	private String leftFrontLamp;
@@ -79,6 +79,7 @@ public class Parking {
 	private String roundMirror;
 	private String tireIndicator;
 	private Byte[] image;
+	private String cardNo;
 	
 	private String vehicleAndEquipmentCategory;
 	

@@ -2,14 +2,20 @@ package com.orbix.api.modules.finance;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.orbix.api.api.vehicleandequipmentparking.Parking;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingInvoiceReceivable;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingInvoiceReceivableRepository;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingRepository;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingZoneRepository;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingZoneServiceController;
+import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.BranchRepository;
 import com.orbix.api.modules.adminunits.CompanyRepository;
 import com.orbix.api.modules.adminunits.DayService;
@@ -25,6 +31,8 @@ import lombok.extern.slf4j.Slf4j;
 public class InvoiceReceivableServiceController implements InvoiceReceivableService {
 	
 	private final InvoiceReceivableRepository invoiceReceivableRepository;
+	private final ParkingInvoiceReceivableRepository parkingInvoiceReceivableRepository;
+	private final ParkingRepository parkingRepository;
 	
 	public List<InvoiceReceivableResponseDTO> getAllInvoiceReceivables(HttpServletRequest request) {
 		List<InvoiceReceivable> invoiceReceivables = invoiceReceivableRepository.findAll();
@@ -33,6 +41,51 @@ public class InvoiceReceivableServiceController implements InvoiceReceivableServ
 		for(InvoiceReceivable invoiceReceivable : invoiceReceivables) {
 			invoiceReceivableResponses.add(invoiceReceivableResponseDTOMapper(invoiceReceivable));					
 		}		
+		return invoiceReceivableResponses;
+	}
+	
+	public InvoiceReceivableResponseDTO get(Long id, HttpServletRequest request) {
+		
+		Optional<InvoiceReceivable> invoiceReceivable_ = invoiceReceivableRepository.findById(id);
+		
+		InvoiceReceivable invoiceReceivable = invoiceReceivable_.orElseThrow(() -> 
+	    new NotFoundException("Invoice Receivable not found with id: " + id));
+		
+		return invoiceReceivableResponseDTOMapper(invoiceReceivable);		
+	}
+	
+	@Override
+	public List<InvoiceReceivableResponseDTO> getPendingParkingInvoiceReceivables(HttpServletRequest request) {
+		List<Parking> parkings = parkingRepository.findAll(); // Later change to find all by status, open, pending etc to avoid loading completed or canceled invoices
+		List<ParkingInvoiceReceivable> parkingInvoiceReceivables = parkingInvoiceReceivableRepository.findAllByParkingIn(parkings);
+		
+		List<InvoiceReceivable> invoiceReceivables = new ArrayList<>();
+		
+		for(ParkingInvoiceReceivable parkingInvoiceReceivable : parkingInvoiceReceivables) {
+			invoiceReceivables.add(parkingInvoiceReceivable.getInvoiceReceivable());
+		}
+		
+		List<InvoiceReceivableResponseDTO> invoiceReceivableResponses = new ArrayList<>();
+		
+		for(InvoiceReceivable invoiceReceivable : invoiceReceivables) {
+			InvoiceReceivableResponseDTO invoiceReceivableResponse = new InvoiceReceivableResponseDTO();
+			invoiceReceivableResponse.setId(invoiceReceivable.getId().toString());
+			invoiceReceivableResponse.setNo(invoiceReceivable.getNo());
+			ParkingInvoiceReceivable parkingInvoiceReceivable = parkingInvoiceReceivableRepository.findByInvoiceReceivable(invoiceReceivable);
+			invoiceReceivableResponse.setOwnerName(
+				    parkingInvoiceReceivable.getParking().getOwnerFirstName() + " " +
+				    (parkingInvoiceReceivable.getParking().getOwnerMiddleName() == null ? "" : (parkingInvoiceReceivable.getParking().getOwnerMiddleName()) + " ") + 
+				    parkingInvoiceReceivable.getParking().getOwnerLastName()
+				);
+			invoiceReceivableResponse.setOwnerPhoneNo(parkingInvoiceReceivable.getParking().getOwnerPhoneNo());
+			invoiceReceivableResponse.setCardNo(parkingInvoiceReceivable.getParking().getCardNo());
+			invoiceReceivableResponse.setModel(parkingInvoiceReceivable.getParking().getVehicleAndEquipmentType().getName());
+			invoiceReceivableResponse.setChasisNo(parkingInvoiceReceivable.getParking().getChasisNo());
+			invoiceReceivableResponse.setStatus(parkingInvoiceReceivable.getInvoiceReceivable().getStatus());
+			
+			invoiceReceivableResponses.add(invoiceReceivableResponse);
+		}
+		
 		return invoiceReceivableResponses;
 	}
 
@@ -49,6 +102,8 @@ public class InvoiceReceivableServiceController implements InvoiceReceivableServ
 		
 		return invoiceReceivableResponse;
 	}
+
+	
 
 
 
