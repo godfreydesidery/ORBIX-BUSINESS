@@ -41,9 +41,11 @@ public class ParkingServiceController implements ParkingService {
 	private final UserService userService;
 	private final DayService dayService;
 	
+	private final VehicleEquipmentRepository vehicleEquipmentRepository;
+	
 	private final ParkingZoneRepository parkingZoneRepository;
 	
-	private final VehicleAndEquipmentTypeRepository vehicleAndEquipmentTypeRepository;
+	private final VehicleEquipmentTypeRepository vehicleEquipmentTypeRepository;
 	
 	private final BillReceivableRepository billReceivableRepository;
 	
@@ -58,6 +60,22 @@ public class ParkingServiceController implements ParkingService {
 	@Override
 	public List<ParkingResponseDTO> getAllParkings(HttpServletRequest request) {
 		List<Parking> parkings = parkingRepository.findAll();
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+
+		for(Parking parking : parkings) {
+			parkingResponses.add(parkingResponseDTOMapper(parking));					
+		}		
+		return parkingResponses;
+	}
+	
+	@Override
+	public List<ParkingResponseDTO> getAllPendingOrCheckedInParkings(HttpServletRequest request) {
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");
+		statuses.add("CHECKED-IN");
+		
+		List<Parking> parkings = parkingRepository.findAllByStatusIn(statuses);
 		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
 
 		for(Parking parking : parkings) {
@@ -92,14 +110,16 @@ public class ParkingServiceController implements ParkingService {
 			throw new NotFoundException("Branch not found");
 		}
 		
-		Optional<VehicleAndEquipmentType> vehicleAndEquipmentType_ = vehicleAndEquipmentTypeRepository.findByNameAndCompany(parkingRequest.getVehicleAndEquipmentTypeName(), company_.get());
-		if(vehicleAndEquipmentType_.isEmpty()) {
-			throw new NotFoundException("Vehicle or equipment type not found");
+		Optional<VehicleEquipmentType> vehicleEquipmentType_ = vehicleEquipmentTypeRepository.findByNameAndCompany(parkingRequest.getVehicleEquipmentTypeName(), company_.get());
+		if(vehicleEquipmentType_.isEmpty()) {
+			throw new NotFoundException("Vehicle or  a equipment type not found");
 		}
-		if(vehicleAndEquipmentType_.get().getCompany().getId() != company_.get().getId()) {
+		if(vehicleEquipmentType_.get().getCompany().getId() != company_.get().getId()) {
 			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
 		}
 		
+		Optional<VehicleEquipment> vehicleEquipment_ = vehicleEquipmentRepository.findById(parkingRequest.getVehicleEquipmentId());
+		if(vehicleEquipment_.isEmpty()) throw new NotFoundException("Vehicle and equipment not found");
 		
 		Parking parking = new Parking();
 		parking.setNo(String.valueOf(Math.random()));
@@ -120,28 +140,29 @@ public class ParkingServiceController implements ParkingService {
 		parking.setRegistrationNo(parkingRequest.getRegistrationNo());
 		parking.setChasisNo(parkingRequest.getChasisNo());
 		parking.setCardNo(parkingRequest.getCardNo());
-		parking.setLeftFrontLamp(parkingRequest.getLeftFrontLamp());
-		parking.setRightFrontLamp(parkingRequest.getRightFrontLamp());
-		parking.setLeftRearLamp(parkingRequest.getLeftRearLamp());
-		parking.setRightRearLamp(parkingRequest.getRightRearLamp());
-		parking.setLeftSideMirror(parkingRequest.getLeftSideMirror());
-		parking.setRightSideMirror(parkingRequest.getRightSideMirror());
-		parking.setLeftWiper(parkingRequest.getLeftWiper());
-		parking.setRightWiper(parkingRequest.getRightWiper());
-		parking.setBackWiper(parkingRequest.getBackWiper());
-		parking.setFuelCap(parkingRequest.getFuelCap());
-		parking.setSpareTire(parkingRequest.getSpareTire());
-		parking.setBattery(parkingRequest.getBattery());
-		parking.setStarter(parkingRequest.getStarter());
-		parking.setAerial(parkingRequest.getAerial());
-		parking.setWheelCap(parkingRequest.getWheelCap());
-		parking.setRoundMirror(parkingRequest.getRoundMirror());
-		parking.setTireIndicator(parkingRequest.getTireIndicator());
+		parking.setLeftFrontLamp(parkingRequest.isLeftFrontLamp());
+		parking.setRightFrontLamp(parkingRequest.isRightFrontLamp());
+		parking.setLeftRearLamp(parkingRequest.isLeftRearLamp());
+		parking.setRightRearLamp(parkingRequest.isRightRearLamp());
+		parking.setLeftSideMirror(parkingRequest.isLeftSideMirror());
+		parking.setRightSideMirror(parkingRequest.isRightSideMirror());
+		parking.setLeftWiper(parkingRequest.isLeftWiper());
+		parking.setRightWiper(parkingRequest.isRightWiper());
+		parking.setBackWiper(parkingRequest.isBackWiper());
+		parking.setFuelCap(parkingRequest.isFuelCap());
+		parking.setSpareTire(parkingRequest.isSpareTire());
+		parking.setBattery(parkingRequest.isBattery());
+		parking.setStarter(parkingRequest.isStarter());
+		parking.setAerial(parkingRequest.isAerial());
+		parking.setWheelCap(parkingRequest.isWheelCap());
+		parking.setRoundMirror(parkingRequest.isRoundMirror());
+		parking.setTireIndicator(parkingRequest.isTireIndicator());
 		//parking.setImage(parkingRequest.getImage());
 		parking.setStatus("PENDING");
-		parking.setVehicleAndEquipmentType(vehicleAndEquipmentType_.get());
+		parking.setVehicleEquipmentType(vehicleEquipmentType_.get());
 		
-		parking.setVehicleAndEquipmentCategory(parkingRequest.getVehicleAndEquipmentCategory());
+		parking.setVehicleEquipmentCategory(parkingRequest.getVehicleEquipmentCategory());
+		parking.setVehicleEquipment(vehicleEquipment_.get());
 		
 		parking.setCompany(company_.get());
 		parking.setBranch(branch_.get());
@@ -159,7 +180,7 @@ public class ParkingServiceController implements ParkingService {
 
 //		
 //		parking.setParkingZone(parkingRequest.getParkingZone());
-//		parking.setVehicleAndEquipmentType(parkingRequest.getVehicleAndEquipmentType());
+//		parking.setVehicleEquipmentType(parkingRequest.getVehicleEquipmentType());
 //		parking.setCreatedByUser(parkingRequest.getCreatedByUser());
 //		parking.setCreatedDateTime(parkingRequest.getCreatedDateTime() != null ? parkingRequest.getCreatedDateTime() : LocalDateTime.now());
 //		parking.setCheckedInByUser(parkingRequest.getCheckedInByUser());
@@ -180,24 +201,26 @@ public class ParkingServiceController implements ParkingService {
 	public ParkingResponseDTO updateParking(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
 		
 		Optional<Parking> parking_ = parkingRepository.findById(parkingRequest.getId());
-		if(parking_.isEmpty()) {
+		if(parking_.isEmpty()) 
 			throw new NotFoundException("Parking not found in database");
-		}
+
+		if(!parking_.get().getStatus().equals("PENDING"))
+			throw new NotFoundException("Can not update, only pending parking can be updated");
 		
-		if(!validateParkingData(parkingRequest)) {
+		if(!validateParkingData(parkingRequest)) 
 			throw new InvalidEntryException("Could not validate data");
-		}
+
 		
 		Optional<Company> company_ = companyRepository.findById(userService.getUserCompany(request).getId());
 		if(company_.isEmpty()) {
 			throw new NotFoundException("Company not found");
 		}
 		
-		Optional<VehicleAndEquipmentType> vehicleAndEquipmentType_ = vehicleAndEquipmentTypeRepository.findByNameAndCompany(parkingRequest.getVehicleAndEquipmentTypeName(), company_.get());
-		if(vehicleAndEquipmentType_.isEmpty()) {
-			throw new NotFoundException("Vehicle or equipment type not found");
+		Optional<VehicleEquipmentType> vehicleEquipmentType_ = vehicleEquipmentTypeRepository.findByNameAndCompany(parkingRequest.getVehicleEquipmentTypeName(), company_.get());
+		if(vehicleEquipmentType_.isEmpty()) {
+			throw new NotFoundException("Vehicle or b equipment type not found");
 		}
-		if(vehicleAndEquipmentType_.get().getCompany().getId() != company_.get().getId()) {
+		if(vehicleEquipmentType_.get().getCompany().getId() != company_.get().getId()) {
 			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
 		}
 		
@@ -219,25 +242,27 @@ public class ParkingServiceController implements ParkingService {
 		parking.setRegistrationNo(parkingRequest.getRegistrationNo());
 		parking.setChasisNo(parkingRequest.getChasisNo());
 		parking.setCardNo(parkingRequest.getCardNo());
-		parking.setLeftFrontLamp(parkingRequest.getLeftFrontLamp());
-		parking.setRightFrontLamp(parkingRequest.getRightFrontLamp());
-		parking.setLeftRearLamp(parkingRequest.getLeftRearLamp());
-		parking.setRightRearLamp(parkingRequest.getRightRearLamp());
-		parking.setLeftSideMirror(parkingRequest.getLeftSideMirror());
-		parking.setRightSideMirror(parkingRequest.getRightSideMirror());
-		parking.setLeftWiper(parkingRequest.getLeftWiper());
-		parking.setRightWiper(parkingRequest.getRightWiper());
-		parking.setBackWiper(parkingRequest.getBackWiper());
-		parking.setFuelCap(parkingRequest.getFuelCap());
-		parking.setSpareTire(parkingRequest.getSpareTire());
-		parking.setBattery(parkingRequest.getBattery());
-		parking.setStarter(parkingRequest.getStarter());
-		parking.setAerial(parkingRequest.getAerial());
-		parking.setWheelCap(parkingRequest.getWheelCap());
-		parking.setRoundMirror(parkingRequest.getRoundMirror());
-		parking.setTireIndicator(parkingRequest.getTireIndicator());
-		parking.setVehicleAndEquipmentType(vehicleAndEquipmentType_.get());
-		parking.setVehicleAndEquipmentCategory(parkingRequest.getVehicleAndEquipmentCategory());
+		parking.setLeftFrontLamp(parkingRequest.isLeftFrontLamp());
+		parking.setRightFrontLamp(parkingRequest.isRightFrontLamp());
+		parking.setLeftRearLamp(parkingRequest.isLeftRearLamp());
+		parking.setRightRearLamp(parkingRequest.isRightRearLamp());
+		parking.setLeftSideMirror(parkingRequest.isLeftSideMirror());
+		parking.setRightSideMirror(parkingRequest.isRightSideMirror());
+		parking.setLeftWiper(parkingRequest.isLeftWiper());
+		parking.setRightWiper(parkingRequest.isRightWiper());
+		parking.setBackWiper(parkingRequest.isBackWiper());
+		parking.setFuelCap(parkingRequest.isFuelCap());
+		parking.setSpareTire(parkingRequest.isSpareTire());
+		parking.setBattery(parkingRequest.isBattery());
+		parking.setStarter(parkingRequest.isStarter());
+		parking.setAerial(parkingRequest.isAerial());
+		parking.setWheelCap(parkingRequest.isWheelCap());
+		parking.setRoundMirror(parkingRequest.isRoundMirror());
+		parking.setTireIndicator(parkingRequest.isTireIndicator());
+		parking.setVehicleEquipmentType(vehicleEquipmentType_.get());
+		parking.setVehicleEquipmentCategory(parkingRequest.getVehicleEquipmentCategory());
+		
+		parking.setBillingType(parkingRequest.getBillingType());
 				
 		parking = parkingRepository.save(parking);
 		
@@ -266,24 +291,25 @@ public class ParkingServiceController implements ParkingService {
 		parkingResponse.setTformNumber(parking.getTformNumber());
 		parkingResponse.setRegistrationNo(parking.getRegistrationNo());
 		parkingResponse.setChasisNo(parking.getChasisNo());
-		parkingResponse.setLeftFrontLamp(parking.getLeftFrontLamp());
-		parkingResponse.setRightFrontLamp(parking.getRightFrontLamp());
-		parkingResponse.setLeftRearLamp(parking.getLeftRearLamp());
-		parkingResponse.setRightRearLamp(parking.getRightRearLamp());
-		parkingResponse.setLeftSideMirror(parking.getLeftSideMirror());
-		parkingResponse.setRightSideMirror(parking.getRightSideMirror());
-		parkingResponse.setLeftWiper(parking.getLeftWiper());
-		parkingResponse.setRightWiper(parking.getRightWiper());
-		parkingResponse.setBackWiper(parking.getBackWiper());
-		parkingResponse.setFuelCap(parking.getFuelCap());
-		parkingResponse.setSpareTire(parking.getSpareTire());
-		parkingResponse.setBattery(parking.getBattery());
-		parkingResponse.setStarter(parking.getStarter());
-		parkingResponse.setAerial(parking.getAerial());
-		parkingResponse.setWheelCap(parking.getWheelCap());
-		parkingResponse.setRoundMirror(parking.getRoundMirror());
-		parkingResponse.setTireIndicator(parking.getTireIndicator());
-		parkingResponse.setVehicleAndEquipmentCategory(parking.getVehicleAndEquipmentCategory());
+		parkingResponse.setCardNo(parking.getCardNo());
+		parkingResponse.setLeftFrontLamp( parking.isLeftFrontLamp() ? "1" : "0");
+		parkingResponse.setRightFrontLamp(parking.isRightFrontLamp() ? "1" : "0");
+		parkingResponse.setLeftRearLamp(parking.isLeftRearLamp() ? "1" : "0");
+		parkingResponse.setRightRearLamp(parking.isRightRearLamp() ? "1" : "0");
+		parkingResponse.setLeftSideMirror(parking.isLeftSideMirror() ? "1" : "0");
+		parkingResponse.setRightSideMirror(parking.isRightSideMirror() ? "1" : "0");
+		parkingResponse.setLeftWiper(parking.isLeftWiper() ? "1" : "0");
+		parkingResponse.setRightWiper(parking.isRightWiper() ? "1" : "0");
+		parkingResponse.setBackWiper(parking.isBackWiper() ? "1" : "0");
+		parkingResponse.setFuelCap(parking.isFuelCap() ? "1" : "0");
+		parkingResponse.setSpareTire(parking.isSpareTire() ? "1" : "0");
+		parkingResponse.setBattery(parking.isBattery() ? "1" : "0");
+		parkingResponse.setStarter(parking.isStarter() ? "1" : "0");
+		parkingResponse.setAerial(parking.isAerial() ? "1" : "0");
+		parkingResponse.setWheelCap(parking.isWheelCap() ? "1" : "0");
+		parkingResponse.setRoundMirror(parking.isRoundMirror() ? "1" : "0");
+		parkingResponse.setTireIndicator(parking.isTireIndicator() ? "1" : "0");
+		parkingResponse.setVehicleEquipmentCategory(parking.getVehicleEquipmentCategory());
 		//parking.setImage(parkingRequest.getImage());
 		parkingResponse.setStatus(parking.getStatus());
 		parkingResponse.setCompanyId(parking.getCompany().getId().toString());
@@ -292,7 +318,7 @@ public class ParkingServiceController implements ParkingService {
 		parkingResponse.setBillingType(parking.getBillingType());
 		parkingResponse.setBillingAmount(String.valueOf(parking.getBillingAmount()));
 		
-		parkingResponse.setVehicleAndEquipmentTypeName(parking.getVehicleAndEquipmentType().getName());
+		parkingResponse.setVehicleEquipmentTypeName(parking.getVehicleEquipmentType().getName());
 		
 		return parkingResponse;
 	}
@@ -321,7 +347,7 @@ public class ParkingServiceController implements ParkingService {
 		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), parking_.get().getBranch());
 		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
 		
-		parking.setBillingAmount(parking.getVehicleAndEquipmentType().getDailyPrice());
+		parking.setBillingAmount(parking.getVehicleEquipmentType().getDailyPrice());
 		
 		parking.setParkingZone(parkingZone_.get());
 		parking.setStatus("CHECKED-IN");

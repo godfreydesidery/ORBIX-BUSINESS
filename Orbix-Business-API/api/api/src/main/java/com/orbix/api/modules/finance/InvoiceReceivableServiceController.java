@@ -79,7 +79,7 @@ public class InvoiceReceivableServiceController implements InvoiceReceivableServ
 				);
 			invoiceReceivableResponse.setOwnerPhoneNo(parkingInvoiceReceivable.getParking().getOwnerPhoneNo());
 			invoiceReceivableResponse.setCardNo(parkingInvoiceReceivable.getParking().getCardNo());
-			invoiceReceivableResponse.setModel(parkingInvoiceReceivable.getParking().getVehicleAndEquipmentType().getName());
+			invoiceReceivableResponse.setModel(parkingInvoiceReceivable.getParking().getVehicleEquipmentType().getName());
 			invoiceReceivableResponse.setChasisNo(parkingInvoiceReceivable.getParking().getChasisNo());
 			invoiceReceivableResponse.setStatus(parkingInvoiceReceivable.getInvoiceReceivable().getStatus());
 			

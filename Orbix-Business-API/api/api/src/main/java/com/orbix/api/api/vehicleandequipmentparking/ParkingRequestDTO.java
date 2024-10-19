@@ -47,39 +47,41 @@ public class ParkingRequestDTO {
 	/**Vehicle or Equipment Information*/
 	String registrationNo;
 	String chasisNo;
-	String leftFrontLamp;
-	String rightFrontLamp;
-	String leftRearLamp;
-	String rightRearLamp;
-	String leftSideMirror;
-	String rightSideMirror;
-	String leftWiper;
-	String rightWiper;
-	String backWiper;
-	String fuelCap;
-	String spareTire;
-	String battery;
-	String starter;
-	String aerial;
-	String wheelCap;
-	String roundMirror;
-	String tireIndicator;
+	boolean leftFrontLamp;
+	boolean rightFrontLamp;
+	boolean leftRearLamp;
+	boolean rightRearLamp;
+	boolean leftSideMirror;
+	boolean rightSideMirror;
+	boolean leftWiper;
+	boolean rightWiper;
+	boolean backWiper;
+	boolean fuelCap;
+	boolean spareTire;
+	boolean battery;
+	boolean starter;
+	boolean aerial;
+	boolean wheelCap;
+	boolean roundMirror;
+	boolean tireIndicator;
 	Byte[] image;
 	
 	String cardNo;
 	
-	String vehicleAndEquipmentCategory;
+	String vehicleEquipmentCategory;
 	
 	String status = "PENDING";
 
     Long parkingZoneId;
     String parkingZoneName;
 	
-    Long vehicleAndEquipmentTypeId;	
+    Long vehicleEquipmentTypeId;	
     Long branchId;
     Long companyId;
     
-    String vehicleAndEquipmentTypeName;
+    String vehicleEquipmentTypeName;
+    
+    Long vehicleEquipmentId;
     
     String billingType;
     double billingAmount;

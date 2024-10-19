@@ -29,6 +29,7 @@ public class ParkingResponseDTO {
 	/**Vehicle or Equipment Information*/
 	String registrationNo;
 	String chasisNo;
+	String cardNo;
 	String leftFrontLamp;
 	String rightFrontLamp;
 	String leftRearLamp;
@@ -48,7 +49,7 @@ public class ParkingResponseDTO {
 	String tireIndicator;
 	Byte[] image;
 	
-	String vehicleAndEquipmentCategory;
+	String vehicleEquipmentCategory;
 
 	String status = "PENDING";
 
@@ -67,7 +68,7 @@ public class ParkingResponseDTO {
     String canceledAt;
     String canceledBy;
     
-    String vehicleAndEquipmentTypeName;
+    String vehicleEquipmentTypeName;
     
     String billingType;
     String billingAmount;

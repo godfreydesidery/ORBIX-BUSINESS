@@ -1,4 +1,4 @@
-package com.orbix.api.modules.finance;
+package com.orbix.api.api.vehicleandequipmentparking;
 
 import java.time.LocalDateTime;
 
@@ -17,31 +17,59 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import com.orbix.api.modules.adminunits.Branch;
 import com.orbix.api.modules.adminunits.Company;
+import com.orbix.api.modules.identityandaccess.User;
+
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "bill_receivables")
-public class BillReceivable {
+@Table(name = "vehicle_equipments")
+public class VehicleEquipment {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
+	
 	@Column(unique = true, nullable = false)
 	private String no;
+	/** Owner information*/
 	@Column(nullable = false)
-	double amount;
+	private String ownerFirstName;
+	private String ownerMiddleName;
 	@Column(nullable = false)
-	double paid;
-	@Column(nullable = false)
-	double due;
-	@Column(nullable = false)
-	private String status = "UNPAID";
+	private String ownerLastName;
+	private String ownerCompanyName;
+	private String ownerIdNo;
+	private String ownerIdType;
+	private String ownerPhoneNo;
+	private String ownerEmail;
+	private String ownerAddress;
 	
-	private String summary = "";
+	/**Vehicle or Equipment Information*/  ///Attention, change the boolean values to boolean instead of string, for database performance issues
+	private String registrationNo;
+	private String chasisNo;
+	private String cardNo;
+	private Byte[] image;
+	
+	
+	private boolean active = true;
+
+	@ManyToOne(targetEntity = VehicleEquipmentType.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "vehicle_equipment_type_id", nullable = false , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+    private VehicleEquipmentType vehicleEquipmentType;
+	
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "created_by_user_id", nullable = false , updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User createdByUser;
 		
 	private LocalDateTime createdDateTime = LocalDateTime.now();
 	

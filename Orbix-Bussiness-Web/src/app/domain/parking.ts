@@ -1,4 +1,6 @@
 export interface IParking {
+    vehicleEquipmentTypeName: string
+    vehicleEquipmentCategory: string
     id : any
     no : string
 
@@ -23,25 +25,26 @@ export interface IParking {
     // Vehicle or Equipment Information
     registrationNo: string
     chasisNo: string
-    leftFrontLamp: string
-    rightFrontLamp: string
-    leftRearLamp: string
-    rightRearLamp: string
-    leftSideMirror: string
-    rightSideMirror: string
-    leftWiper: string
-    rightWiper: string
-    backWiper: string
-    fuelCap: string
-    spareTire: string
-    battery: string
-    starter: string
-    aerial: string
-    wheelCap: string
-    roundMirror: string
-    tireIndicator: string
+    leftFrontLamp: boolean
+    rightFrontLamp: boolean
+    leftRearLamp: boolean
+    rightRearLamp: boolean
+    leftSideMirror: boolean
+    rightSideMirror: boolean
+    leftWiper: boolean
+    rightWiper: boolean 
+    backWiper: boolean
+    fuelCap: boolean
+    spareTire: boolean
+    battery: boolean
+    starter: boolean
+    aerial: boolean
+    wheelCap: boolean
+    roundMirror: boolean    
+    tireIndicator: boolean
+    
     //image: Byte[]
-    vehicleAndEquipmentCategory : string
+
 
     billingType : string
     billingAmount : number
@@ -50,14 +53,13 @@ export interface IParking {
 
     // Foreign keys
     parkingZoneId: any,
-    vehicleAndEquipmentTypeId: any,
+    vehicleEquipmentTypeId: any,
     branchId: any,
     companyId: any
 
 
     sn: number
 
-    vehicleAndEquipmentTypeName : string
 
     parkingZoneName : string
 

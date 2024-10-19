@@ -277,6 +277,10 @@ export const menuItems = [
             {
                 title: 'Vehicle Register',
                 routerLink: '/app/parking-management/vehicle-register'
+            },
+            {
+                title: 'Parking',
+                routerLink: '/app/parking-management/parking'
             }
         ]
     },

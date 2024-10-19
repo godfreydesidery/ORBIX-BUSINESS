@@ -3,7 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/auth.service';
-import { IVehicleAndEquipmentType } from 'src/app/domain/vehicle-and-equipment-type';
+import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
 
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
@@ -20,7 +20,7 @@ const API_URL = environment.apiUrl;
   templateUrl: './vehicle-and-equipment-type.component.html',
   styleUrl: './vehicle-and-equipment-type.component.scss'
 })
-export class VehicleAndEquipmentTypeComponent {
+export class VehicleEquipmentTypeComponent {
 
   /**Data */
   id : any = null
@@ -31,7 +31,7 @@ export class VehicleAndEquipmentTypeComponent {
   dailyPrice : number = 0;
 
   /**Collections */
-  vehicleAndEquipmentTypes : IVehicleAndEquipmentType[] = []
+  vehicleEquipmentTypes : IVehicleEquipmentType[] = []
 
   constructor(
     private http :HttpClient,
@@ -39,23 +39,23 @@ export class VehicleAndEquipmentTypeComponent {
   ) {}
 
   ngOnInit(){
-    this.getAllVehicleAndEquipmentTypes()
+    this.getAllVehicleEquipmentTypes()
   }
 
-  async getAllVehicleAndEquipmentTypes(){
+  async getAllVehicleEquipmentTypes(){
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    this.vehicleAndEquipmentTypes = []
+    this.vehicleEquipmentTypes = []
 
-    await this.http.get<IVehicleAndEquipmentType[]>(API_URL+'/vehicle_and_equipment_types', options)
+    await this.http.get<IVehicleEquipmentType[]>(API_URL+'/vehicle_equipment_types', options)
     .toPromise()
     .then(
       data => {
         var sn = 1
         data?.forEach(element => {
           element.sn = sn
-          this.vehicleAndEquipmentTypes.push(element)
+          this.vehicleEquipmentTypes.push(element)
           sn = sn + 1
         })
         console.log(data)
@@ -68,11 +68,11 @@ export class VehicleAndEquipmentTypeComponent {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    await this.http.get<IVehicleAndEquipmentType>(API_URL+'/vehicle_and_equipment_types/get?id=' + id, options)
+    await this.http.get<IVehicleEquipmentType>(API_URL+'/vehicle_equipment_tyeps/get?id=' + id, options)
     .toPromise()
     .then(
       data => {
-        this.showVehicleAndEquipmentTypeData(data!)
+        this.showVehicleEquipmentTypeData(data!)
         console.log(data)
       }
     )
@@ -85,7 +85,7 @@ export class VehicleAndEquipmentTypeComponent {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
 
-    var vehicleAndEquipmentType = {
+    var vehicleEquipmentType = {
       id: this.id,
       code: this.code,
       name: this.name,
@@ -100,17 +100,17 @@ export class VehicleAndEquipmentTypeComponent {
       sn : 0
     }
 
-    if(vehicleAndEquipmentType.id === null){
-      /**Create new vehicleAndEquipmentType */
-      await this.http.post<IVehicleAndEquipmentType>(API_URL+'/vehicle_and_equipment_types/create', vehicleAndEquipmentType, options)
+    if(vehicleEquipmentType.id === null){
+      /**Create new vehicleEquipmentType */
+      await this.http.post<IVehicleEquipmentType>(API_URL+'/vehicle_equipment_types/create', vehicleEquipmentType, options)
       .toPromise()
       .then(
         data => {
-          this.showVehicleAndEquipmentTypeData(data!)
+          this.showVehicleEquipmentTypeData(data!)
 
           console.log(data)
 
-          this.getAllVehicleAndEquipmentTypes()
+          this.getAllVehicleEquipmentTypes()
 
           alert('Type created successifully')
 
@@ -124,16 +124,16 @@ export class VehicleAndEquipmentTypeComponent {
         }
       )
     }else{
-      /**Update an exiisting vehicleAndEquipmentType */
-      await this.http.post<IVehicleAndEquipmentType>(API_URL+'/vehicle_and_equipment_types/update', vehicleAndEquipmentType, options)
+      /**Update an exiisting vehicleEquipmentType */
+      await this.http.post<IVehicleEquipmentType>(API_URL+'/vehicle_equipment_types/update', vehicleEquipmentType, options)
       .toPromise()
       .then(
         data => {
-          this.showVehicleAndEquipmentTypeData(data!)
+          this.showVehicleEquipmentTypeData(data!)
 
           console.log(data)
 
-          this.getAllVehicleAndEquipmentTypes()
+          this.getAllVehicleEquipmentTypes()
 
           alert('Type updated successifully')
         }
@@ -153,18 +153,18 @@ export class VehicleAndEquipmentTypeComponent {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
 
-    var vehicleAndEquipmentType = {
+    var vehicleEquipmentType = {
       id : id
     }
 
-    await this.http.post<String>(API_URL+'/vehicle_and_equipment_types/activate', vehicleAndEquipmentType, options)
+    await this.http.post<String>(API_URL+'/vehicle_equipment_types/activate', vehicleEquipmentType, options)
       .toPromise()
       .then(
         data => {
 
           console.log(data)
 
-          this.getAllVehicleAndEquipmentTypes()
+          this.getAllVehicleEquipmentTypes()
 
           alert('Type activated successifully')
 
@@ -184,20 +184,20 @@ export class VehicleAndEquipmentTypeComponent {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
 
-    var vehicleAndEquipmentType = {
+    var vehicleEquipmentType = {
       id : id
     }
 
-    await this.http.post<String>(API_URL+'/vehicle_and_equipment_types/deactivate', vehicleAndEquipmentType, options)
+    await this.http.post<String>(API_URL+'/vehicle_equipment_types/deactivate', vehicleEquipmentType, options)
       .toPromise()
       .then(
         data => {
 
           console.log(data)
 
-          this.getAllVehicleAndEquipmentTypes()
+          this.getAllVehicleEquipmentTypes()
 
-          alert('VehicleAndEquipmentType deactivated successifully')
+          alert('VehicleEquipmentType deactivated successifully')
 
         }
 
@@ -210,14 +210,14 @@ export class VehicleAndEquipmentTypeComponent {
       )
   }
 
-  showVehicleAndEquipmentTypeData(data : IVehicleAndEquipmentType){
+  showVehicleEquipmentTypeData(data : IVehicleEquipmentType){
     this.id = data?.id
     this.code = data!.code
     this.name = data!.name
     this.dailyPrice = data!.dailyPrice
   }
 
-  clearVehicleAndEquipmentTypeData(){
+  clearVehicleEquipmentTypeData(){
     this.id = null
     this.code = ''
     this.name = ''

@@ -1,0 +1,760 @@
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>Vehicle List</span>
+            </div>
+            <div class="card-body widget-body"> 
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="setNewMode()" style="margin: 3px;">New Vehicle</button>
+                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="setExistingMode()" style="margin: 3px;">Existing Vehicle</button>
+                        <hr>
+                    </div>
+                </div>
+                <!-- Start ofContent header for new vehicle -->
+                <div class="row" *ngIf="mode === 'new'">
+                    <div class="col-sm-12">
+                        <p><b>Owner Information</b></p><br>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>First Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerFirstName" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Middle Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerMiddleName" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Last Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerLastName" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Company Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>ID No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>ID Type*</label>
+                                    <select class="form-control" [(ngModel)]="ownerIdType">
+                                        <option></option>
+                                        <option>NATIONAL ID</option>
+                                        <option>VOTER ID</option>
+                                        <option>PASSPORT</option>
+                                        <option>DRIVING LICENCE</option>
+                                        <option>LETTER</option>
+                                    </select>
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Phone No</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Address</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerAddress" autocomplete="nope">
+                                </div>
+                            </div>
+                        </div>
+                        <p><b>Vehicle Information</b></p><br>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Registration No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="registrationNo" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Chasis No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Card No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="cardNo" autocomplete="nope">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Select Vehicle Type</label>
+                                    <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
+                                        <option></option>
+                                        <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <button class="btn btn-success btn-round-custom" (click)="save()">Register</button>
+                        </div>
+                    </div>
+                </div>
+                <!-- End of content header for new vehicle -->
+                <!-- Start of content header for existing vehicle -->
+                <div class="row" *ngIf="mode === 'existing'">
+                    <div class="col-lg-3">
+                        <span>Chasis No</span>
+                        <input class="form-control" type="text" [(ngModel)]="chasisNo">
+                    </div>
+                    <div class="col-lg-2">
+                        <br>
+                        <button class="btn btn-success btn-round-custom" (click)="searchVehicleEquipmentByChasisNo(chasisNo)">Search</button>
+                    </div>
+                   
+
+                </div>
+                <!-- End of content header for existing vehicle -->
+
+                <!-- Start of main page content, to be displayed only if a vehicle is registered and a parking is selected -->
+                <div class="row" *ngIf="showParking === true">
+                    <div class="col-sm-12">
+                        <hr>
+                        <h6>Driver/Owner Information</h6><hr>
+                        <div class="row">
+                            <input type="hidden" [(ngModel)]="parkingId">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>First Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerFirstName" autocomplete="nope">
+                                </div>
+                            </div>     
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Middle Name(s)</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerMiddleName" autocomplete="nope">
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Last Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerLastName" autocomplete="nope">
+                                </div>
+                            </div>   
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Company</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
+                                </div>
+                            </div>   
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>ID No</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>ID Type</label>
+                                    <select class="form-control" [(ngModel)]="ownerIdType">
+                                        <option></option>
+                                        <option>NATIONAL ID</option>
+                                        <option>VOTER ID</option>
+                                        <option>PASSPORT</option>
+                                        <option>DRIVING LICENCE</option>
+                                        <option>LETTER</option>
+                                    </select>
+                                </div>
+                            </div> 
+                            
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Phone No</label>
+                                    <input class="form-control" type="tel" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Email</label>
+                                    <input class="form-control" type="email" [(ngModel)]="ownerEmail" autocomplete="nope">
+                                </div>
+                            </div>                     
+                        </div>
+
+                        <h6>Agent Information</h6><hr>
+                        <div class="row">
+                            <input type="hidden" [(ngModel)]="id">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Agent Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="agentName" autocomplete="nope">
+                                </div>
+                            </div>     
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Agent Address</label>
+                                    <input class="form-control" type="text" [(ngModel)]="agentAddress" autocomplete="nope">
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Agent Phone</label>
+                                    <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo" autocomplete="nope">
+                                </div>
+                            </div>   
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Agent Email</label>
+                                    <input class="form-control" type="email" [(ngModel)]="agentEmail" autocomplete="nope">
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>T1 Number</label>
+                                    <input class="form-control" type="text" [(ngModel)]="tformNumber" autocomplete="nope">
+                                </div>
+                            </div> 
+                        </div>
+                        <h6>Vehicle Information</h6><hr>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Front Lamp</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><td>Left</td><td>Right</td></thead>
+                                        <tbody>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="leftFrontLamp">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="rightFrontLamp">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                        </tbody>    
+                                    </table>
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Rear Lamp</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><td>Left</td><td>Right</td></thead>
+                                        <tbody>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="leftRearLamp">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="rightRearLamp">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                        </tbody>    
+                                    </table>
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Side Mirror</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><td>Left</td><td>Right</td></thead>
+                                        <tbody>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="leftSideMirror">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="rightSideMirror">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                        </tbody>    
+                                    </table>
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Wipers</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><td>Left</td><td>Right</td></thead>
+                                        <tbody>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="leftWiper">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="rightWiper">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                        </tbody>    
+                                    </table>
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Back Wipers</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><td>|</td></thead>
+                                        <tbody>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="backWiper">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                        </tbody>    
+                                    </table>
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Fuel Cap</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><td>|</td></thead>
+                                        <tbody>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="fuelCap">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                        </tbody>    
+                                    </table>
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Spare Tires</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><td>|</td></thead>
+                                        <tbody>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="spareTire">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                        </tbody>    
+                                    </table>
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Battery</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><td>|</td></thead>
+                                        <tbody>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="battery">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                        </tbody>    
+                                    </table>
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Starter</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><td>|</td></thead>
+                                        <tbody>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="starter">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                        </tbody>    
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Aerial</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><td>|</td></thead>
+                                        <tbody>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="aerial">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                        </tbody>    
+                                    </table>
+                                </div>
+                            </div>  
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Wheel Cap</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><td>|</td></thead>
+                                        <tbody>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="wheelCap">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                        </tbody>    
+                                    </table>
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Round Mirror</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><td>|</td></thead>
+                                        <tbody>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="roundMirror">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                        </tbody>    
+                                    </table>
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Tire Indicator</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><td>|</td></thead>
+                                        <tbody>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="tireIndicator">
+                                                    <option>YES</option>
+                                                    <option>NO</option>
+                                                </select>
+                                            </td>
+                                        </tbody>    
+                                    </table>
+                                </div>
+                            </div> 
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Select Vehicle Type</label>
+                                    <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
+                                        <option></option>
+                                        <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Category</label>
+                                    <select class="form-control" [(ngModel)]="vehicleEquipmentCategory">
+                                        <option></option>
+                                        <option>IN TRANSIT</option>
+                                        <option>LOCAL</option>
+                                    </select>
+                                </div>
+                            </div> 
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Parking Zone</label>
+                                    <select class="form-control" [(ngModel)]="parkingZoneName">
+                                        <option></option>
+                                        <option>ZONE 1</option>
+                                        <option>ZONE 2</option>
+                                    </select>
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Select Billing Type</label>
+                                    <select class="form-control" [(ngModel)]="billingType">
+                                        <option>DAILY</option>
+                                    </select>
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Chasis No</label>
+                                    <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Card No</label>
+                                    <input class="form-control" type="text" [(ngModel)]="cardNo" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Vehicle Image</label>
+                                    <input class="form-control" type="file" autocomplete="nope">
+                                </div>
+                            </div>  
+                        </div>
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-primary" (click)="saveParking()">Update</button>
+                                <button type="button" class="btn-success pull-right">Send To Parking</button>
+                            </div>
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="new-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Add Vehicle</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <p><b>Owner Information</b></p><br>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>First Name*</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerFirstName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Middle Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerMiddleName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Last Name*</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerLastName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Company Name*</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>ID No*</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>ID Type*</label>
+                            <select class="form-control" [(ngModel)]="ownerIdType">
+                                <option></option>
+                                <option>NATIONAL ID</option>
+                                <option>VOTER ID</option>
+                                <option>PASSPORT</option>
+                                <option>DRIVING LICENCE</option>
+                                <option>LETTER</option>
+                            </select>
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Phone No</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerAddress" autocomplete="nope">
+                        </div>
+                    </div>
+                </div>
+                <p><b>Vehicle Information</b></p><br>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Registration No*</label>
+                            <input class="form-control" type="text" [(ngModel)]="registrationNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Chasis No*</label>
+                            <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Card No*</label>
+                            <input class="form-control" type="text" [(ngModel)]="cardNo" autocomplete="nope">
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Select Vehicle Type</label>
+                            <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
+                                <option></option>
+                                <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" (click)="save()">Register and Process Parking</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="edit-and-send-to-parking-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Edit Vehicle</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <p><b>Owner Information</b></p><br>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>First Name*</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerFirstName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Middle Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerMiddleName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Last Name*</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerLastName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Company Name*</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>ID No*</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>ID Type*</label>
+                            <select class="form-control" [(ngModel)]="ownerIdType">
+                                <option></option>
+                                <option>NATIONAL ID</option>
+                                <option>VOTER ID</option>
+                                <option>PASSPORT</option>
+                                <option>DRIVING LICENCE</option>
+                                <option>LETTER</option>
+                            </select>
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Phone No</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Address</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerAddress" autocomplete="nope">
+                        </div>
+                    </div>
+                </div>
+                <p><b>Vehicle Information</b></p><br>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Registration No*</label>
+                            <input class="form-control" type="text" [(ngModel)]="registrationNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Chasis No*</label>
+                            <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Card No*</label>
+                            <input class="form-control" type="text" [(ngModel)]="cardNo" autocomplete="nope">
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Select Vehicle Type</label>
+                            <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
+                                <option></option>
+                                <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" *ngIf='id != null' (click)="save()">Update</button>
+                <button type="button" class="btn btn-primary" *ngIf='id != null'>Send to Parking</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+

@@ -8,6 +8,7 @@ import com.orbix.api.api.commons.ApiCustomResponse;
 
 public interface ParkingService {
 	List<ParkingResponseDTO> getAllParkings(HttpServletRequest request);	
+	List<ParkingResponseDTO> getAllPendingOrCheckedInParkings(HttpServletRequest request);	
 	ParkingResponseDTO get(Long id, HttpServletRequest request);
 	ParkingResponseDTO createParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	ParkingResponseDTO updateParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);

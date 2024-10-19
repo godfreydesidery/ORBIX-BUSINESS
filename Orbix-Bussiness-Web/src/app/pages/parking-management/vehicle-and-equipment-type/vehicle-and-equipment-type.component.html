@@ -10,7 +10,7 @@
 
                 <div class="row">
                     <div class="col-sm-12">
-                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="clearVehicleAndEquipmentTypeData()" data-toggle="modal" data-target="#parkingZone-modal">New Type</button>
+                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="clearVehicleEquipmentTypeData()" data-toggle="modal" data-target="#parkingZone-modal">New Type</button>
                     <br><br>
                     </div>
                 </div>
@@ -29,7 +29,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @for (v of vehicleAndEquipmentTypes; track v.id) {
+                            @for (v of vehicleEquipmentTypes; track v.id) {
                                 <tr>
                                     <td>{{v.sn}}</td>
                                     <td>{{v.code}}</td>

@@ -106,6 +106,12 @@ export const routes: Routes = [
       /**Start of parking management */
       {
         path : 'parking-management/vehicle-register',
+        loadComponent: () => import('./parking-management/vehicle-and-equipment-register/vehicle-and-equipment-register.component').then(c => c.VehicleEquipmentRegisterComponent),
+        data : { breadcrumb : 'Parking Management/Vehicle Register'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'parking-management/parking',
         loadComponent: () => import('./parking-management/vehicle-register/vehicle-register.component').then(c => c.VehicleRegisterComponent),
         data : { breadcrumb : 'Parking Management/Vehicle Register'},
         canActivate : [AuthGuard]
@@ -124,7 +130,7 @@ export const routes: Routes = [
       },
       {
         path : 'parking-management/vehicle-and-equipment-type',
-        loadComponent: () => import('./parking-management/vehicle-and-equipment-type/vehicle-and-equipment-type.component').then(c => c.VehicleAndEquipmentTypeComponent),
+        loadComponent: () => import('./parking-management/vehicle-and-equipment-type/vehicle-and-equipment-type.component').then(c => c.VehicleEquipmentTypeComponent),
         data : { breadcrumb : 'Parking Management/Vehicle Type'},
         canActivate : [AuthGuard]
       },

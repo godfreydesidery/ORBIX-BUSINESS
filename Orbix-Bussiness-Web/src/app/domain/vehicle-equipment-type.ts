@@ -1,7 +1,7 @@
 import { IBranch } from "./branch"
 import { ICompany } from "./company"
 
-export interface IVehicleAndEquipmentType {
+export interface IVehicleEquipmentType {
     //Basic attributes
     id : any
     code : string

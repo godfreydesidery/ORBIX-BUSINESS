@@ -8,8 +8,7 @@
 
                 <div class="row">
                     <div class="col-sm-12">
-                        <!-- <button type="button" class="btn btn-outline-success btn-round-custom" (click)="clearVehicleAndEquipmentTypeData()" data-toggle="modal" data-target="#parkingZone-modal">New Type</button> -->
-                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="clearParkingData()" data-toggle="modal" data-target="#parkingZone-modal">New Vehicle</button>
+                        <!-- <button type="button" class="btn btn-outline-success btn-round-custom" (click)="clearParkingData()" data-toggle="modal" data-target="#parkingZone-modal">New Vehicle</button> -->
                         <br><br>
                     </div>
                 </div>
@@ -45,7 +44,7 @@
                                         <table>
                                             <tr>
                                                 <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(p.id)" data-toggle="modal" data-target="#parkingZone-modal" style="cursor: pointer;">Edit</button></td>
-                                                <td><button type="button" class="btn btn-success btn-round-custom" (click)="get(p.id)" data-toggle="modal" data-target="#complete-registration-modal" style="cursor: pointer; margin-left: 3px;">Complete Registration</button></td>
+                                                <td><button type="button" class="btn btn-success btn-round-custom" (click)="get(p.id)" data-toggle="modal" data-target="#complete-registration-modal" style="cursor: pointer; margin-left: 3px;">Go to Check In</button></td>
                                             </tr>
                                         </table>
                                         
@@ -410,9 +409,9 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Select Vehicle Type</label>
-                            <select class="form-control" [(ngModel)]="vehicleAndEquipmentTypeName">
+                            <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
                                 <option></option>
-                                <option *ngFor="let option of vehicleAndEquipmentTypes" [value]="option.name">{{ option.name }}</option>
+                                <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
                             </select>
                         </div>
                     </div>
@@ -420,7 +419,7 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Category</label>
-                            <select class="form-control" [(ngModel)]="vehicleAndEquipmentCategory">
+                            <select class="form-control" [(ngModel)]="vehicleEquipmentCategory">
                                 <option></option>
                                 <option>IN TRANSIT</option>
                                 <option>LOCAL</option>
@@ -462,7 +461,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" (click)="save()">Save/Register</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -482,7 +481,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary">Check In</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -551,7 +550,7 @@
                                 <tr><td><b>First Name</b></td><td>{{ownerFirstName}}</td></tr>
                                 <tr><td><b>Middle Name</b></td><td>{{ownerMiddleName}}</td></tr>
                                 <tr><td><b>Last Name</b></td><td>{{ownerLastName}}</td></tr> 
-                                <tr><td><b>ID Type</b></td><td>{{ownerIdType}}L</td></tr>
+                                <tr><td><b>ID Type</b></td><td>{{ownerIdType}}</td></tr>
                                 <tr><td><b>ID No</b></td><td>{{ownerIdNo}}</td></tr>   
                                 <tr><td><b>Phone No</b></td><td>{{ownerPhoneNo}}</td></tr>   
                                 <tr><td><b>Email</b></td><td>{{ownerEmail}}</td></tr>    
@@ -578,12 +577,12 @@
                                 <p><b>Parking Information</b></p>
                             </thead>
                             <tbody>
-                                <tr><td><b>Model/Type</b></td><td>{{vehicleAndEquipmentTypeName}}</td></tr>
+                                <tr><td><b>Model/Type</b></td><td>{{vehicleEquipmentTypeName}}</td></tr>
                                 <tr><td><b>Billing Type</b></td><td>{{billingType}}</td></tr>
                                 <tr><td><b>Billing Amount</b></td><td style="text-align: right;">{{billingAmount}}</td></tr> 
                                 <tr><td><b>Parking Zone</b></td><td></td></tr>   
                                 <tr><td><b>Parking No</b></td><td>{{no}}</td></tr>   
-                                <tr><td><b>Vhc/Eq Category</b></td><td>{{vehicleAndEquipmentCategory}}</td></tr>   
+                                <tr><td><b>Vhc/Eq Category</b></td><td>{{vehicleEquipmentCategory}}</td></tr>   
                                 <tr><td><b>Keys</b></td><td>YES</td></tr>  
                                 <tr><td><b>Card No</b></td><td>787575782883</td></tr>    
                             </tbody>
@@ -595,21 +594,21 @@
                                 <p><b>Check List</b></p>
                             </thead>
                             <tbody>
-                                <tr><td><b>Front Lamps</b></td><td><span>L: </span><span>R: </span></td></tr>
-                                <tr><td><b>Rear Lamps</b></td><td><span>L: </span><span>R: </span></td></tr>
-                                <tr><td><b>Front Indicators</b></td><td><span>L: </span><span>R: </span></td></tr>
-                                <tr><td><b>Rear Indicators</b></td><td><span>L: </span><span>R: </span></td></tr>
-                                <tr><td><b>Side Mirrors</b></td><td><span>L: </span><span>R: </span></td></tr>
-                                <tr><td><b>Wipers</b></td><td><span>L: </span><span>R: </span></td></tr> 
-                                <tr><td><b>Back Wipers</b></td><td></td></tr> 
-                                <tr><td><b>Fuel Cap</b></td><td></td></tr> 
-                                <tr><td><b>Spare Tyre</b></td><td></td></tr>  
-                                <tr><td><b>Battery</b></td><td></td></tr> 
-                                <tr><td><b>Starter</b></td><td></td></tr>  
-                                <tr><td><b>Aerial</b></td><td></td></tr> 
-                                <tr><td><b>Wheel Cap</b></td><td></td></tr> 
-                                <tr><td><b>Round Mirror</b></td><td></td></tr> 
-                                <tr><td><b>Tire Indicator</b></td><td></td></tr> 
+                                <tr><td><b>Front Lamps</b></td><td><span>L: {{leftFrontLamp}}</span><span> R: {{rightFrontLamp}}</span></td></tr>
+                                <tr><td><b>Rear Lamps</b></td><td><span>L: {{leftRearLamp}}</span><span> R: {{rightRearLamp}}</span></td></tr>
+                                <tr><td><b>Front Indicators</b></td><td><span>L: {{leftFrontLamp}}</span><span> R: {{rightFrontLamp}}</span></td></tr>
+                                <tr><td><b>Rear Indicators</b></td><td><span>L: {{leftRearLamp}}</span><span> R: {{rightRearLamp}}</span></td></tr>
+                                <tr><td><b>Side Mirrors</b></td><td><span>L: {{leftSideMirror}}</span><span> R: {{rightSideMirror}}</span></td></tr>
+                                <tr><td><b>Wipers</b></td><td><span>L: {{leftWiper}}</span><span> R: {{rightWiper}}</span></td></tr> 
+                                <tr><td><b>Back Wipers</b></td><td>{{backWiper}}</td></tr> 
+                                <tr><td><b>Fuel Cap</b></td><td>{{fuelCap}}</td></tr> 
+                                <tr><td><b>Spare Tyre</b></td><td>{{spareTire}}</td></tr>  
+                                <tr><td><b>Battery</b></td><td>{{battery}}</td></tr> 
+                                <tr><td><b>Starter</b></td><td>{{starter}}</td></tr>  
+                                <tr><td><b>Aerial</b></td><td>{{aerial}}</td></tr> 
+                                <tr><td><b>Wheel Cap</b></td><td>{{wheelCap}}</td></tr> 
+                                <tr><td><b>Round Mirror</b></td><td>{{roundMirror}}</td></tr> 
+                                <tr><td><b>Tire Indicator</b></td><td>{{tireIndicator}}</td></tr> 
                             </tbody>
                         </table>
                     </div>
@@ -620,7 +619,7 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" (click)="checkIn()">Complete and Check In</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

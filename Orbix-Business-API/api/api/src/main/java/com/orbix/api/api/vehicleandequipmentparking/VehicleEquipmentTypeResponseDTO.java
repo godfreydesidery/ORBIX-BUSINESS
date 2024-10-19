@@ -3,13 +3,16 @@ package com.orbix.api.api.vehicleandequipmentparking;
 import lombok.Data;
 
 @Data
-public class VehicleAndEquipmentTypeRequestDTO {
-	private Long id;
+public class VehicleEquipmentTypeResponseDTO {
+	private String id;
 	private String code;
 	private String name;
-
-	private Long companyId;
+	
+	private String active;
+	
+	private String companyId;
 	private String companyName;
 	
-	double dailyPrice;
+	private String dailyPrice;
+		
 }

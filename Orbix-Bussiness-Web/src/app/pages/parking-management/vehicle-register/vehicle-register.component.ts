@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/auth.service';
 import { IParking } from 'src/app/domain/parking';
 import { IParkingZone } from 'src/app/domain/parking-zone';
-import { IVehicleAndEquipmentType } from 'src/app/domain/vehicle-and-equipment-type';
+import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
 
@@ -67,7 +67,7 @@ export class VehicleRegisterComponent {
 
   cardNo : string = ''
 
-  vehicleAndEquipmentCategory : string = ''
+  vehicleEquipmentCategory : string = ''
 
   billingType : string = ''
   billingAmount : number = 0
@@ -77,8 +77,8 @@ export class VehicleRegisterComponent {
 
   // Foreign keys
   parkingId: any = ''
-  vehicleAndEquipmentTypeId: any = ''
-  vehicleAndEquipmentTypeName : string = ''
+  vehicleEquipmentTypeId: any = ''
+  vehicleEquipmentTypeName : string = ''
   branchId: any = ''
   companyId: any = ''
 
@@ -89,7 +89,7 @@ export class VehicleRegisterComponent {
   /**Collections */
   parkings : IParking[] = []
 
-  vehicleAndEquipmentTypes  : IVehicleAndEquipmentType[] = []
+  vehicleEquipmentTypes  : IVehicleEquipmentType[] = []
 
   parkingZones : IParkingZone[] = []
 
@@ -100,18 +100,18 @@ export class VehicleRegisterComponent {
   ) {}
 
   ngOnInit(){
-    this.getAllParkings()   
+    this.getAllPendingOrCheckedInParkings()   
     this.getAllCompanyActiveVehicleAndEquipmentTypes()
     this.getAllBranchActiveParkingZones();
   }
 
-  async getAllParkings(){
+  async getAllPendingOrCheckedInParkings(){
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
     this.parkings = []
 
-    await this.http.get<IParking[]>(API_URL+'/parkings', options)
+    await this.http.get<IParking[]>(API_URL+'/parkings/get_all_pending_or_checked_in', options)
     .toPromise()
     .then(
       data => {
@@ -147,16 +147,16 @@ export class VehicleRegisterComponent {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    this.vehicleAndEquipmentTypes = []
+    this.vehicleEquipmentTypes = []
 
-    await this.http.get<IVehicleAndEquipmentType[]>(API_URL+'/vehicle_and_equipment_types/get_all_company_active', options)
+    await this.http.get<IVehicleEquipmentType[]>(API_URL+'/vehicle_equipment_types/get_all_company_active', options)
     .toPromise()
     .then(
       data => {
         var sn = 1
         data?.forEach(element => {
           element.sn = sn
-          this.vehicleAndEquipmentTypes.push(element)
+          this.vehicleEquipmentTypes.push(element)
           sn = sn + 1
         })
         console.log(data)
@@ -220,26 +220,27 @@ export class VehicleRegisterComponent {
       // Vehicle or Equipment Information
       registrationNo: this.registrationNo,
       chasisNo: this.chasisNo,
-      leftFrontLamp: this.leftFrontLamp,
-      rightFrontLamp: this.rightFrontLamp,
-      leftRearLamp: this.leftRearLamp,
-      rightRearLamp: this.rightRearLamp,
-      leftSideMirror: this.leftSideMirror,
-      rightSideMirror: this.rightSideMirror,
-      leftWiper: this.leftWiper,
-      rightWiper: this.rightWiper,
-      backWiper: this.backWiper,
-      fuelCap: this.fuelCap,
-      spareTire: this.spareTire,
-      battery: this.battery,
-      starter: this.starter,
-      aerial: this.aerial,
-      wheelCap: this.wheelCap,
-      roundMirror: this.roundMirror,
-      tireIndicator: this.tireIndicator,
-      vehicleAndEquipmentTypeName : this.vehicleAndEquipmentTypeName,
 
-      vehicleAndEquipmentCategory : this.vehicleAndEquipmentCategory,
+      leftFrontLamp: this.leftFrontLamp === 'YES' ? 1 : 0,
+      rightFrontLamp: this.rightFrontLamp === 'YES' ? 1 : 0,
+      leftRearLamp: this.leftRearLamp === 'YES' ? 1 : 0,
+      rightRearLamp: this.rightRearLamp === 'YES' ? 1 : 0,
+      leftSideMirror: this.leftSideMirror === 'YES' ? 1 : 0,
+      rightSideMirror: this.rightSideMirror === 'YES' ? 1 : 0,
+      leftWiper: this.leftWiper === 'YES' ? 1 : 0,
+      rightWiper: this.rightWiper === 'YES' ? 1 : 0,
+      backWiper: this.backWiper === 'YES' ? 1 : 0,
+      fuelCap: this.fuelCap === 'YES' ? 1 : 0,
+      spareTire: this.spareTire === 'YES' ? 1 : 0,
+      battery: this.battery === 'YES' ? 1 : 0,
+      starter: this.starter === 'YES' ? 1 : 0,
+      aerial: this.aerial === 'YES' ? 1 : 0,
+      wheelCap: this.wheelCap === 'YES' ? 1 : 0,
+      roundMirror: this.roundMirror === 'YES' ? 1 : 0,
+      tireIndicator: this.tireIndicator === 'YES' ? 1 : 0,
+      vehicleEquipmentTypeName : this.vehicleEquipmentTypeName,
+
+      vehicleEquipmentCategory : this.vehicleEquipmentCategory,
 
       cardNo : this.cardNo,
 
@@ -258,7 +259,7 @@ export class VehicleRegisterComponent {
 
           console.log(data)
 
-          this.getAllParkings()
+          this.getAllPendingOrCheckedInParkings()
 
           alert('Parking created successifully')
 
@@ -281,7 +282,7 @@ export class VehicleRegisterComponent {
 
           console.log(data)
 
-          this.getAllParkings()
+          this.getAllPendingOrCheckedInParkings()
 
           alert('Parking updated successifully')
         }
@@ -312,7 +313,7 @@ export class VehicleRegisterComponent {
 
           console.log(data)
 
-          this.getAllParkings()
+          this.getAllPendingOrCheckedInParkings()
 
           alert('Parking activated successifully')
 
@@ -345,7 +346,7 @@ export class VehicleRegisterComponent {
 
           console.log(data)
 
-          this.getAllParkings()
+          this.getAllPendingOrCheckedInParkings()
 
           alert('Checked in Successifully')
 
@@ -376,7 +377,7 @@ export class VehicleRegisterComponent {
 
           console.log(data)
 
-          this.getAllParkings()
+          this.getAllPendingOrCheckedInParkings()
 
           alert('Parking deactivated successifully')
 
@@ -417,26 +418,26 @@ export class VehicleRegisterComponent {
     // Vehicle or Equipment Information
     this.registrationNo = data?.registrationNo;
     this.chasisNo = data?.chasisNo;
-    this.leftFrontLamp = data?.leftFrontLamp;
-    this.rightFrontLamp = data?.rightFrontLamp;
-    this.leftRearLamp = data?.leftRearLamp;
-    this.rightRearLamp = data?.rightRearLamp;
-    this.leftSideMirror = data?.leftSideMirror;
-    this.rightSideMirror = data?.rightSideMirror;
-    this.leftWiper = data?.leftWiper;
-    this.rightWiper = data?.rightWiper;
-    this.backWiper = data?.backWiper;
-    this.fuelCap = data?.fuelCap;
-    this.spareTire = data?.spareTire;
-    this.battery = data?.battery;
-    this.starter = data?.starter;
-    this.aerial = data?.aerial;
-    this.wheelCap = data?.wheelCap;
-    this.roundMirror = data?.roundMirror;
-    this.tireIndicator = data?.tireIndicator;
-    this.vehicleAndEquipmentTypeName = data!.vehicleAndEquipmentTypeName,
+    this.leftFrontLamp = data?.leftFrontLamp == true ? 'YES' : 'NO'
+    this.rightFrontLamp = data?.rightFrontLamp == true ? 'YES' : 'NO'
+    this.leftRearLamp = data?.leftRearLamp == true ? 'YES' : 'NO'
+    this.rightRearLamp = data?.rightRearLamp == true ? 'YES' : 'NO'
+    this.leftSideMirror = data?.leftSideMirror == true ? 'YES' : 'NO'
+    this.rightSideMirror = data?.rightSideMirror == true ? 'YES' : 'NO'
+    this.leftWiper = data?.leftWiper == true ? 'YES' : 'NO'
+    this.rightWiper = data?.rightWiper == true ? 'YES' : 'NO'
+    this.backWiper = data?.backWiper == true ? 'YES' : 'NO'
+    this.fuelCap = data?.fuelCap == true ? 'YES' : 'NO'
+    this.spareTire = data?.spareTire == true ? 'YES' : 'NO'
+    this.battery = data?.battery == true ? 'YES' : 'NO'
+    this.starter = data?.starter == true ? 'YES' : 'NO'
+    this.aerial = data?.aerial == true ? 'YES' : 'NO'
+    this.wheelCap = data?.wheelCap == true ? 'YES' : 'NO'
+    this.roundMirror = data?.roundMirror == true ? 'YES' : 'NO'
+    this.tireIndicator = data?.tireIndicator == true ? 'YES' : 'NO'
+    this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName,
 
-    this.vehicleAndEquipmentCategory = data!.vehicleAndEquipmentCategory
+    this.vehicleEquipmentCategory = data!.vehicleEquipmentCategory
 
     this.parkingZoneName = data!.parkingZoneName,
      this.cardNo = data!.cardNo
@@ -488,9 +489,9 @@ export class VehicleRegisterComponent {
     this.wheelCap = ''
     this.roundMirror = ''
     this.tireIndicator = ''
-    this.vehicleAndEquipmentTypeName = ''
+    this.vehicleEquipmentTypeName = ''
 
-    this.vehicleAndEquipmentCategory = ''
+    this.vehicleEquipmentCategory = ''
 
     this.parkingZoneName = ''
 

@@ -33,6 +33,11 @@ private final ParkingService parkingService;
 		return ResponseEntity.ok().body(parkingService.getAllParkings(request));
 	}
 	
+	@GetMapping("/parkings/get_all_pending_or_checked_in")
+	public ResponseEntity<List<ParkingResponseDTO>>getAllPendingAndCheckedIn(HttpServletRequest request){
+		return ResponseEntity.ok().body(parkingService.getAllPendingOrCheckedInParkings(request));
+	}
+	
 	
 	@GetMapping("/parkings/get")
 	public ResponseEntity<ParkingResponseDTO>get(
