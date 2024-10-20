@@ -99,6 +99,30 @@ public class InvoiceReceivableServiceController implements InvoiceReceivableServ
 		invoiceReceivableResponse.setStatus(invoiceReceivable.getStatus());
 		invoiceReceivableResponse.setSummary(invoiceReceivable.getSummary());
 		
+		List<InvoiceReceivableDetailResponseDTO> invoiceReceivableDetails = new ArrayList<>();
+		
+		for(InvoiceReceivableDetail detail : invoiceReceivable.getInvoiceReceivableDetails()) {
+			BillReceivableResponseDTO billReceivableResponse = new BillReceivableResponseDTO();
+			InvoiceReceivableDetailResponseDTO invoiceReceivableDetailResponse = new InvoiceReceivableDetailResponseDTO();
+			invoiceReceivableDetailResponse.setId(detail.getId().toString());
+			
+			invoiceReceivableDetailResponse.setAmount(String.valueOf(detail.getAmount()));
+			
+			billReceivableResponse.setId(detail.getBillReceivable().getId().toString());
+			billReceivableResponse.setAmount(String.valueOf(detail.getBillReceivable().getAmount()));
+			billReceivableResponse.setPaid(String.valueOf(detail.getBillReceivable().getPaid()));
+			billReceivableResponse.setDue(String.valueOf(detail.getBillReceivable().getDue()));
+			billReceivableResponse.setCreatedDateTime(String.valueOf(detail.getBillReceivable().getCreatedDateTime()));
+			billReceivableResponse.setSummary(detail.getBillReceivable().getSummary());
+			billReceivableResponse.setQty(String.valueOf(detail.getBillReceivable().getQty()));
+			billReceivableResponse.setStatus(detail.getBillReceivable().getStatus());
+			
+			invoiceReceivableDetailResponse.setBillReceivable(billReceivableResponse);
+			
+			invoiceReceivableDetails.add(invoiceReceivableDetailResponse);
+		}
+		
+		invoiceReceivableResponse.setInvoiceReceivableDetails(invoiceReceivableDetails);
 		
 		return invoiceReceivableResponse;
 	}

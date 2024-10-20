@@ -40,6 +40,7 @@ public class BillReceivable {
 	double due;
 	@Column(nullable = false)
 	private String status = "UNPAID";
+	double qty = 1;
 	
 	private String summary = "";
 		

@@ -1,3 +1,5 @@
+import { IBillReceivable } from "./bill-receivable"
+
 export interface IInvoiceReceivable {
     id : string
     no : string
@@ -31,5 +33,9 @@ export interface IInvoiceReceivableDetail {
     due : number
     status : string
     summary : string
+
+    checked : boolean
+
+    billReceivable : IBillReceivable
 
 }

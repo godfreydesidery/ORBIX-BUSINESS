@@ -1,5 +1,7 @@
 package com.orbix.api.modules.finance;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -25,5 +27,7 @@ public class InvoiceReceivableResponseDTO {
 	String chasisNo;
 	String cardNo;
 	String model;
+	
+	List<InvoiceReceivableDetailResponseDTO> invoiceReceivableDetails;
 	
 }

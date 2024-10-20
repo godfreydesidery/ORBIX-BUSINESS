@@ -373,7 +373,7 @@ public class ParkingServiceController implements ParkingService {
 		
 		billReceivable = billReceivableRepository.save(billReceivable);
 		billReceivable.setNo("BR" + billReceivable.getId().toString());
-		billReceivableRepository.save(billReceivable);
+		billReceivable = billReceivableRepository.save(billReceivable);
 		
 		
 		
@@ -410,6 +410,9 @@ public class ParkingServiceController implements ParkingService {
 		
 		InvoiceReceivableDetail invoiceReceivableDetail = new InvoiceReceivableDetail();
 		invoiceReceivableDetail.setInvoiceReceivable(invoiceReceivable);
+		
+		invoiceReceivableDetail.setBillReceivable(billReceivable);
+		
 		invoiceReceivableDetail.setAmount(parking.getBillingAmount());
 		invoiceReceivableDetail.setDue(parking.getBillingAmount());
 		invoiceReceivableDetail.setPaid(0);

@@ -128,7 +128,7 @@
                 <!-- End of content header for existing vehicle -->
 
                 <!-- Start of main page content, to be displayed only if a vehicle is registered and a parking is selected -->
-                <div class="row" *ngIf="showParking === true">
+                <div class="row" *ngIf="parkingId != null">
                     <div class="col-sm-12">
                         <hr>
                         <h6>Driver/Owner Information</h6><hr>

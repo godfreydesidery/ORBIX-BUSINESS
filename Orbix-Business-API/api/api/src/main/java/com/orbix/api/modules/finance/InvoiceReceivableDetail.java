@@ -48,4 +48,9 @@ public class InvoiceReceivableDetail {
     @JoinColumn(name = "invoice_receivable_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private InvoiceReceivable invoiceReceivable;
+	
+	@ManyToOne(targetEntity =BillReceivable.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "bill_receivable_id", nullable = false , updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+    private BillReceivable billReceivable;
 }

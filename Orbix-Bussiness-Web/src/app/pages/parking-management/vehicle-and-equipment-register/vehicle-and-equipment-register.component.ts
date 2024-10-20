@@ -362,6 +362,8 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.branchId = data.branchId
 
     this.parkingId = data!.parkingId
+
+    console.log(data)
   }
 
 

@@ -16,17 +16,18 @@
                     <div class="invoice p-5">
                         <div class="invoice-header row">
                             <div class="col-md-6">
-                                <h1>Invoice</h1>
-                                <p><strong>Invoice #: </strong>12345</p>
-                                <p><strong>Date: </strong>2024-10-17</p>
+                                <h1>Invoice <i><b>{{invoiceReceivable.no}}</b></i></h1>
+                                <!-- <p><strong>Invoice #: </strong>{{invoiceReceivable.no}} </p>
+                                <p><strong>Date: </strong>2024-10-17</p> -->
                             </div>
                             <div class="col-md-6 text-right">
-                                <h4>Company Name</h4>
-                                <p>123 Business Ave.<br>City, ST 12345<br>email&#64;example.com</p>
+                                <h4>{{invoiceReceivable.companyName}}</h4>
+                                <!-- <p>123 Business Ave.<br>City, ST 12345<br>email&#64;example.com</p> -->
+                                <h6>{{invoiceReceivable.branchName}}</h6>
                             </div>
                         </div>
             
-                        <div class="row mb-3">
+                        <!-- <div class="row mb-3">
                             <div class="col-md-6">
                                 <h5>Bill To:</h5>
                                 <p>
@@ -39,61 +40,95 @@
                                 <h5>Payment Due:</h5>
                                 <p>2024-10-31</p>
                             </div>
-                        </div>
+                        </div> -->
+                        
+                        <hr>
+                        <br>
+                        <br>
+
+                        <button class="btn btn-success btn-round-custom pull-right">Update Invoice</button> <br>
+                        
             
                         <table class="table table-striped invoice-table">
                             <thead>
                                 <tr>
-                                    <th>#</th>
-                                    <th>Description</th>
+                                    <th>Date-Time</th>
+                                    <th>Item</th>
                                     <th>Quantity</th>
-                                    <th>Unit Price</th>
-                                    <th>Total</th>
+                                    <th>Amount</th>
+                                    <th>Status</th>
+                                    <th>Check to Pay</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td>1</td>
-                                    <td>Item 1</td>
-                                    <td>2</td>
-                                    <td>$50.00</td>
-                                    <td>$100.00</td>
-                                </tr>
-                                <tr>
-                                    <td>2</td>
-                                    <td>Item 2</td>
-                                    <td>1</td>
-                                    <td>$150.00</td>
-                                    <td>$150.00</td>
-                                </tr>
-                                <tr>
-                                    <td>3</td>
-                                    <td>Item 3</td>
-                                    <td>3</td>
-                                    <td>$30.00</td>
-                                    <td>$90.00</td>
-                                </tr>
+                                <tr *ngFor="let detail of invoiceReceivable.invoiceReceivableDetails">
+                                    <td>{{detail.billReceivable.createdDateTime}}</td>
+                                    <td>{{detail?.billReceivable?.summary}}</td>
+                                    <td>{{detail?.billReceivable?.qty}}</td>
+                                    <td style="text-align: right;">{{detail?.billReceivable?.due | currency:'':''}}</td>
+                                    <td>{{detail?.billReceivable?.status}}</td>
+                                    <!-- <td><input type="checkbox" *ngIf="detail?.billReceivable?.status === 'VERIFIED'" [(ngModel)]="detail.checked" (ngModelChange)="listBill(detail)"></td> -->
+                                    <td><input type="checkbox" *ngIf="detail?.billReceivable?.status === 'UNPAID'" [(ngModel)]="detail.checked" (ngModelChange)="listBill(detail)" style="width: 5mm; height: 5mm; cursor: pointer;"></td>
+                                </tr>                                
                             </tbody>
-                            <tfoot>
+                            <!-- <tfoot>
                                 <tr>
-                                    <th colspan="4" class="text-right">Subtotal:</th>
-                                    <th>$340.00</th>
+                                    <th colspan="3" class="text-right">Subtotal:</th>
+                                    <th class="text-right">$340.00</th>
                                 </tr>
                                 <tr>
-                                    <th colspan="4" class="text-right">Tax (10%):</th>
-                                    <th>$34.00</th>
+                                    <th colspan="3" class="text-right">Tax (10%):</th>
+                                    <th class="text-right">$34.00</th>
                                 </tr>
                                 <tr>
-                                    <th colspan="4" class="text-right">Total:</th>
-                                    <th>$374.00</th>
+                                    <th colspan="3" class="text-right">Total:</th>
+                                    <th class="text-right">$374.00</th>
                                 </tr>
-                            </tfoot>
+                            </tfoot> -->
                         </table>
+
+
+                        <hr>
+                        <div class="row" *ngIf="billReceivables.length > 0">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4">
+                                <div>Selected Bills Summary</div>
+                                <table class="table table-small">
+                                    <thead>
+                                        <tr>
+                                            <th>Item</th>
+                                            <th>Amount</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let b of billReceivables">
+                                            <td>{{b?.summary}}</td>
+                                            <td style="text-align: right;">{{b?.amount | currency:'':''}}</td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Total</th>
+                                            <th style="text-align: right;">{{total | currency:'':''}}</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <button class="btn btn-success" data-toggle="modal" data-target="#confirm-payment-modal">Confirm Payment</button>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-sm-4"></div>
+                        </div>
+
+
+
             
-                        <div class="invoice-footer">
+                        <!-- <div class="invoice-footer">
                             <p><strong>Payment Terms:</strong> Please make the payment by the due date.</p>
                             <p>Thank you for your business!</p>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
 
