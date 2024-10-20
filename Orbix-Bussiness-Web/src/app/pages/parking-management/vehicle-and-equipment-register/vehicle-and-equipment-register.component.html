@@ -87,12 +87,12 @@
                                     <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
                                 </div>
                             </div>
-                            <div class="col-lg-3">
+                            <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Card No*</label>
                                     <input class="form-control" type="text" [(ngModel)]="cardNo" autocomplete="nope">
                                 </div>
-                            </div>
+                            </div> -->
 
                             <div class="col-lg-3">
                                 <div class="form-group">
@@ -116,7 +116,10 @@
                 <div class="row" *ngIf="mode === 'existing'">
                     <div class="col-lg-3">
                         <span>Chasis No</span>
-                        <input class="form-control" type="text" [(ngModel)]="chasisNo">
+                        <input class="form-control" type="text" list="nos" [(ngModel)]="chasisNo" (change)="searchVehicleEquipmentByChasisNo(chasisNo)"/>
+                        <datalist id="nos">
+                            <option *ngFor="let option of chasisNos" [value]="option">
+                        </datalist>
                     </div>
                     <div class="col-lg-2">
                         <br>
@@ -489,8 +492,7 @@
                                     <label>Parking Zone</label>
                                     <select class="form-control" [(ngModel)]="parkingZoneName">
                                         <option></option>
-                                        <option>ZONE 1</option>
-                                        <option>ZONE 2</option>
+                                        <option *ngFor="let option of parkingZones" [value]="option.name">{{ option.name }}</option>
                                     </select>
                                 </div>
                             </div> 
@@ -508,12 +510,12 @@
                                     <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
                                 </div>
                             </div>
-                            <div class="col-lg-3">
+                            <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Card No</label>
                                     <input class="form-control" type="text" [(ngModel)]="cardNo" autocomplete="nope">
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Vehicle Image</label>

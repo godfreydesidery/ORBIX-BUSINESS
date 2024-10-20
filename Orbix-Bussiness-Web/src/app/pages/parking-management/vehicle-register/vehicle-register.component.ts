@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/auth.service';
+import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { IParking } from 'src/app/domain/parking';
 import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
@@ -16,12 +17,15 @@ const API_URL = environment.apiUrl;
   standalone: true,
   imports: [
     FormsModule,
-    CommonModule
+    CommonModule,
+    SearchFilterPipe,
   ],
   templateUrl: './vehicle-register.component.html',
   styleUrl: './vehicle-register.component.scss'
 })
 export class VehicleRegisterComponent {
+
+  filterRecords : string = ''
 
   id : any = null
   no : string = ''

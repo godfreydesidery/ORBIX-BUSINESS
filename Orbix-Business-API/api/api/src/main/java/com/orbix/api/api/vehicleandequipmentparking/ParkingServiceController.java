@@ -201,28 +201,30 @@ public class ParkingServiceController implements ParkingService {
 	public ParkingResponseDTO updateParking(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
 		
 		Optional<Parking> parking_ = parkingRepository.findById(parkingRequest.getId());
-		if(parking_.isEmpty()) 
-			throw new NotFoundException("Parking not found in database");
-
-		if(!parking_.get().getStatus().equals("PENDING"))
-			throw new NotFoundException("Can not update, only pending parking can be updated");
-		
-		if(!validateParkingData(parkingRequest)) 
-			throw new InvalidEntryException("Could not validate data");
-
-		
+		if(parking_.isEmpty()) throw new NotFoundException("Parking not found in database");
+			
+		if(!parking_.get().getStatus().equals("PENDING")) throw new NotFoundException("Can not update, only pending parking can be updated");
+			
+		if(!validateParkingData(parkingRequest)) throw new InvalidEntryException("Could not validate data");
+			
 		Optional<Company> company_ = companyRepository.findById(userService.getUserCompany(request).getId());
-		if(company_.isEmpty()) {
-			throw new NotFoundException("Company not found");
-		}
+		if(company_.isEmpty()) throw new NotFoundException("Company not found");
+			
+		Optional<Branch> branch_ = branchRepository.findById(userService.getUserBranch(request).getId());
+		if(branch_.isEmpty()) throw new NotFoundException("Branch not found");
+			
+		
 		
 		Optional<VehicleEquipmentType> vehicleEquipmentType_ = vehicleEquipmentTypeRepository.findByNameAndCompany(parkingRequest.getVehicleEquipmentTypeName(), company_.get());
-		if(vehicleEquipmentType_.isEmpty()) {
-			throw new NotFoundException("Vehicle or b equipment type not found");
-		}
-		if(vehicleEquipmentType_.get().getCompany().getId() != company_.get().getId()) {
+		if(vehicleEquipmentType_.isEmpty()) throw new NotFoundException("Vehicle or equipment type not found");
+			
+		
+		if(vehicleEquipmentType_.get().getCompany().getId() != company_.get().getId()) 
 			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
-		}
+		
+		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), branch_.get());
+		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
+		
 		
 		Parking parking = parking_.get();
 		parking.setOwnerFirstName(parkingRequest.getOwnerFirstName());
@@ -262,12 +264,13 @@ public class ParkingServiceController implements ParkingService {
 		parking.setVehicleEquipmentType(vehicleEquipmentType_.get());
 		parking.setVehicleEquipmentCategory(parkingRequest.getVehicleEquipmentCategory());
 		
+		parking.setParkingZone(parkingZone_.get());
+		
 		parking.setBillingType(parkingRequest.getBillingType());
 				
 		parking = parkingRepository.save(parking);
 		
-		return parkingResponseDTOMapper(parking);	
-		
+		return parkingResponseDTOMapper(parking);			
 	}
 
 	private ParkingResponseDTO parkingResponseDTOMapper(Parking parking) {
@@ -319,6 +322,11 @@ public class ParkingServiceController implements ParkingService {
 		parkingResponse.setBillingAmount(String.valueOf(parking.getBillingAmount()));
 		
 		parkingResponse.setVehicleEquipmentTypeName(parking.getVehicleEquipmentType().getName());
+		
+		parkingResponse.setParkingZoneName(
+				parking.getParkingZone() != null && parking.getParkingZone().getName() != null
+		        ? parking.getParkingZone().getName() 
+		        : "");
 		
 		return parkingResponse;
 	}

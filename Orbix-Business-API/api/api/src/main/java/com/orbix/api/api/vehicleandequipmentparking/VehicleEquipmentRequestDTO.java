@@ -26,4 +26,6 @@ public class VehicleEquipmentRequestDTO {
 	private String companyName;
 	private String branchId;
 	private String branchName;
+	
+	private String parkingZoneName;
 }

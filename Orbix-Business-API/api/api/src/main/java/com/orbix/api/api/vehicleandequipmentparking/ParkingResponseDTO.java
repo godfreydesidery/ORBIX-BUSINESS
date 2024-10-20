@@ -54,6 +54,7 @@ public class ParkingResponseDTO {
 	String status = "PENDING";
 
     String parkingZoneId;
+    String parkingZoneName;
 	
     String vehicleAndEquipmentTypeId;	
     String branchId;

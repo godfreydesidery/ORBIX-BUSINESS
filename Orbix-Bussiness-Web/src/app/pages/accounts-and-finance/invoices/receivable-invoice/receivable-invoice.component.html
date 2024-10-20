@@ -143,3 +143,52 @@
         </div>
     </div>
 </div>
+
+
+
+
+<!-- Modal success -->
+<div class="modal fade modal-success" id="confirm-payment-modal" tabindex="-1" role="dialog">
+    <div class="modal-dialog modal-md" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2 class="modal-title">Confirm Payment</h2>
+                <button type="button" class="close pull-right" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-6" style="text-align: right;">
+                        <span>Total Amount</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="form-control" style="text-align: right;"><b>{{total | currency:'':''}}</b></span>
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-sm-6" style="text-align: right;">
+                        <span>Amount Received</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <input type="text" class="form-control" [(ngModel)]="amountReceived" style="text-align: center;">
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-sm-6" style="text-align: right;">
+                        <span>Change</span>
+                    </div>
+                    <div class="col-sm-6">
+                        <span class="form-control" style="text-align: right;"><b>{{amountReceived - total | currency:'':''}}</b></span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" *ngIf="amountReceived - total >= 0" (click)="confirmBillsPayment()" data-dismiss="modal">Confirm</button>
+                <!-- <button type="button" class="btn btn-success" *ngIf="amountReceived - total >= 0" (click)="printReceipt()" (click)="confirmBillsPayment()" data-dismiss="modal">Confirm</button> -->
+            </div>
+        </div><!-- /.modal-content -->
+    </div><!-- /.modal-dialog -->
+</div><!-- /.modal -->

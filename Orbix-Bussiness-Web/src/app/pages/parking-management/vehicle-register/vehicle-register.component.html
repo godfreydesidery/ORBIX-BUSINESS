@@ -13,6 +13,16 @@
                     </div>
                 </div>
 
+                <div class="row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                    </div>
+                </div>
+
+                <br>    
+
                 <div class="table-responsive table-sm">
                     <table class="table">
                         <thead>
@@ -29,8 +39,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @for (p of parkings; track p.id) {
-                                <tr>
+                                <tr *ngFor="let p of parkings | searchFilter : filterRecords">
                                     <td>{{p.sn}}</td>
                                     <td>{{p.ownerFirstName}} {{p.ownerMiddleName}} {{p.ownerLastName}}</td>
                                     <td>{{p.ownerIdNo}} | {{p.ownerIdType}}</td>
@@ -53,7 +62,6 @@
                                         <button type="button" class="btn btn-success btn-round-custom btn-sm" data-toggle="modal" data-target="#check-out-modal" style="cursor: pointer; margin-left: 3px;">Check Out</button> -->
                                     </td>
                                 </tr>
-                            }
                         </tbody> 
                     </table>
                 </div>

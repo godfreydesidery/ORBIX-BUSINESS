@@ -3,6 +3,7 @@ package com.orbix.api.api.vehicleandequipmentparking;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -49,6 +50,8 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 	
 	private final InvoiceReceivableRepository invoiceReceivableRepository;
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
+	
+	private final ParkingZoneRepository parkingZoneRepository;
 	
 	
 
@@ -105,6 +108,17 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		}
 		
 		return vehicleEquipmentResponseDTOMapper(vehicleEquipment_.get(), parkingResponse);	
+	}
+	
+	
+	@Override
+	public List<String> getChasisNos(HttpServletRequest request) {
+		List<String> chasisNos = vehicleEquipmentRepository.findAllByActiveTrue()
+			    .stream()
+			    .map(VehicleEquipment::getChasisNo)
+			    .collect(Collectors.toList());
+		
+			return chasisNos;		
 	}
 
 	@Override
@@ -166,6 +180,11 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		// After creating, save also to parking
 		
 		ParkingRequestDTO parkingRequest = new ParkingRequestDTO();
+		
+//		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(vehicleEquipmentRequest.getParkingZoneName(), branch_.get());
+//		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
+//		
+//		parkingRequest.setParkingZoneName(vehicleEquipmentRequest.getParkingZoneName());
 
 		parkingRequest.setOwnerFirstName(vehicleEquipment.getOwnerFirstName());
 		parkingRequest.setOwnerMiddleName(vehicleEquipment.getOwnerMiddleName());
@@ -178,6 +197,26 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		parkingRequest.setOwnerAddress(vehicleEquipment.getOwnerAddress());
 		parkingRequest.setVehicleEquipmentTypeName(vehicleEquipment.getVehicleEquipmentType().getName());
 		parkingRequest.setVehicleEquipmentId(vehicleEquipment.getId());
+		
+		parkingRequest.setChasisNo(vehicleEquipment.getChasisNo());
+			
+		parkingRequest.setLeftFrontLamp(true);
+		parkingRequest.setRightFrontLamp(true);
+		parkingRequest.setLeftRearLamp(true);
+		parkingRequest.setRightRearLamp(true);
+		parkingRequest.setLeftSideMirror(true);
+		parkingRequest.setRightSideMirror(true);
+		parkingRequest.setLeftWiper(true);
+		parkingRequest.setRightWiper(true);
+		parkingRequest.setBackWiper(true);
+		parkingRequest.setFuelCap(true);
+		parkingRequest.setSpareTire(true);
+		parkingRequest.setBattery(true);
+		parkingRequest.setStarter(true);
+		parkingRequest.setAerial(true);
+		parkingRequest.setWheelCap(true);
+		parkingRequest.setRoundMirror(true);
+		parkingRequest.setTireIndicator(true);
 		
 		ParkingResponseDTO parkingResponse = parkingService.createParking(parkingRequest, request);
 		
@@ -271,4 +310,6 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		
 		return true;
 	}
+
+	
 }

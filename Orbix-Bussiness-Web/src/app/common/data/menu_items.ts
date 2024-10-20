@@ -353,18 +353,18 @@ export const menuItems = [
                 title: 'Invoices',
                 url: '#',
                 subMenu: [
-                    {
-                        title: 'Receivable',
-                        routerLink: '/app/accounts-and-finance/invoices/receivable-invoice-list'
-                    },
+                    // {
+                    //     title: 'Receivable',
+                    //     routerLink: '/app/accounts-and-finance/invoices/receivable-invoice-list'
+                    // },
                     {
                         title: 'Receivable-Parking',
                         routerLink: '/app/accounts-and-finance/invoices/parking-receivable-invoice-list'
                     },
-                    {
-                        title: 'Payable',
-                        routerLink: '/app/blank'
-                    },
+                    // {
+                    //     title: 'Payable',
+                    //     routerLink: '/app/blank'
+                    // },
                 ]
             },
         ]

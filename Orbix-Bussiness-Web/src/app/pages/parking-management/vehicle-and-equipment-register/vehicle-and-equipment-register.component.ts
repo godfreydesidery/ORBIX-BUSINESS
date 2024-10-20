@@ -93,23 +93,23 @@ export class VehicleEquipmentRegisterComponent {
   // Vehicle or Equipment Information
   // registrationNo: string = ''
   // chasisNo: string = ''
-  leftFrontLamp: string = ''
-  rightFrontLamp: string = ''
-  leftRearLamp: string = ''
-  rightRearLamp: string = ''
-  leftSideMirror: string = ''
-  rightSideMirror: string = ''
-  leftWiper: string = ''
-  rightWiper: string = ''
-  backWiper: string = ''
-  fuelCap: string = ''
-  spareTire: string = ''
-  battery: string = ''
-  starter: string = ''
-  aerial: string = ''
-  wheelCap: string = ''
-  roundMirror: string = ''
-  tireIndicator: string = ''
+  leftFrontLamp: string = 'YES'
+  rightFrontLamp: string = 'YES'
+  leftRearLamp: string = 'YES'
+  rightRearLamp: string = 'YES'
+  leftSideMirror: string = 'YES'
+  rightSideMirror: string = 'YES'
+  leftWiper: string = 'YES'
+  rightWiper: string = 'YES'
+  backWiper: string = 'YES'
+  fuelCap: string = 'YES'
+  spareTire: string = 'YES'
+  battery: string = 'YES'
+  starter: string = 'YES'
+  aerial: string = 'YES'
+  wheelCap: string = 'YES'
+  roundMirror: string = 'YES'
+  tireIndicator: string = 'YES'
 
   // cardNo : string = ''
 
@@ -160,6 +160,8 @@ export class VehicleEquipmentRegisterComponent {
   ngOnInit(): void {
     this.getAllActiveVehicleEquipments()
     this.getAllCompanyActiveVehicleEquipmentTypes()
+    this.getAllBranchActiveParkingZones()
+    this.getAllVehicleEquipmentChasisNos()
   }
 
 
@@ -219,6 +221,23 @@ export class VehicleEquipmentRegisterComponent {
         }else{
           this.showParking = false
         }
+      }
+    )
+  }
+
+
+  chasisNos : String[] = []
+  async getAllVehicleEquipmentChasisNos(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    this.chasisNos = []
+    await this.http.get<string[]>(API_URL+'/vehicle_equipments/get_chasis_nos', options)
+    .toPromise()
+    .then(
+      data => {
+        this.chasisNos = data!
+        console.log(data)        
       }
     )
   }
@@ -508,23 +527,23 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     // Vehicle or Equipment Information
     this.registrationNo = ''
     this.chasisNo = ''
-    this.leftFrontLamp = ''
-    this.rightFrontLamp = ''
-    this.leftRearLamp = ''
-    this.rightRearLamp = ''
-    this.leftSideMirror = ''
-    this.rightSideMirror = ''
-    this.leftWiper = ''
-    this.rightWiper = ''
-    this.backWiper = ''
-    this.fuelCap = ''
-    this.spareTire = ''
-    this.battery = ''
-    this.starter = ''
-    this.aerial = ''
-    this.wheelCap = ''
-    this.roundMirror = ''
-    this.tireIndicator = ''
+    this.leftFrontLamp = 'YES'
+    this.rightFrontLamp = 'YES'
+    this.leftRearLamp = 'YES'
+    this.rightRearLamp = 'YES'
+    this.leftSideMirror = 'YES'
+    this.rightSideMirror = 'YES'
+    this.leftWiper = 'YES'
+    this.rightWiper = 'YES'
+    this.backWiper = 'YES'
+    this.fuelCap = 'YES'
+    this.spareTire = 'YES'
+    this.battery = 'YES'
+    this.starter = 'YES'
+    this.aerial = 'YES'
+    this.wheelCap = 'YES'
+    this.roundMirror = 'YES'
+    this.tireIndicator = 'YES'
     this.vehicleEquipmentTypeName = ''
 
     this.vehicleEquipmentCategory = ''
@@ -554,6 +573,8 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
       ownerPhoneNo: this.ownerPhoneNo,
       ownerEmail: this.ownerEmail,
       ownerAddress: this.ownerAddress,
+
+      parkingZoneName : this.parkingZoneName,
 
       // Agent Information
       agentName: this.agentName,
@@ -647,7 +668,33 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
   }
 
 
+  async getAllBranchActiveParkingZones(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    this.parkingZones = []
+
+    await this.http.get<IParkingZone[]>(API_URL+'/parking_zones/get_all_branch_active', options)
+    .toPromise()
+    .then(
+      data => {
+        var sn = 1
+        data?.forEach(element => {
+          element.sn = sn
+          this.parkingZones.push(element)
+          sn = sn + 1
+        })
+        console.log(data)
+      }
+    )
+  }
+
+
 
 
 
 }
+function then(arg0: (data: any) => void): PromiseConstructor {
+  throw new Error('Function not implemented.');
+}
+

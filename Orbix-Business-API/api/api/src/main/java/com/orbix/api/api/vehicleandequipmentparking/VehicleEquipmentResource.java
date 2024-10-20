@@ -46,6 +46,12 @@ public class VehicleEquipmentResource {
 		return ResponseEntity.ok().body(vehicleEquipmentService.getByChasisNo(chasisNo, request));
 	}
 	
+	@GetMapping("/vehicle_equipments/get_chasis_nos")
+	public ResponseEntity<List<String>>getChasisNos(
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(vehicleEquipmentService.getChasisNos(request));
+	}
+	
 	
 	@GetMapping("/vehicle_equipments/get")
 	public ResponseEntity<VehicleEquipmentResponseDTO>get(
