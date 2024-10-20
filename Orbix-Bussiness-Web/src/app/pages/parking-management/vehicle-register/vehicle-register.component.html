@@ -39,7 +39,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                                <tr *ngFor="let p of parkings | searchFilter : filterRecords">
+                                <tr *ngFor="let p of parkings | searchFilter : filterRecords | paginate: { itemsPerPage: 5, currentPage: page }">
                                     <td>{{p.sn}}</td>
                                     <td>{{p.ownerFirstName}} {{p.ownerMiddleName}} {{p.ownerLastName}}</td>
                                     <td>{{p.ownerIdNo}} | {{p.ownerIdType}}</td>
@@ -64,14 +64,13 @@
                                 </tr>
                         </tbody> 
                     </table>
+                    <pagination-controls (pageChange)="page = $event"></pagination-controls>
                 </div>
 
             </div>
         </div>
     </div>
 </div>
-
-
 
 
 <div class="modal fade" id="parkingZone-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">

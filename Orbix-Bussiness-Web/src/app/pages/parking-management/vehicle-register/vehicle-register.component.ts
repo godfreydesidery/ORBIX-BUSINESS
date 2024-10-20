@@ -4,11 +4,14 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/auth.service';
 import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
+import { NgxPaginationModule } from 'ngx-pagination';
 import { IParking } from 'src/app/domain/parking';
 import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
+
+
 
 const API_URL = environment.apiUrl;
 
@@ -19,11 +22,14 @@ const API_URL = environment.apiUrl;
     FormsModule,
     CommonModule,
     SearchFilterPipe,
+    NgxPaginationModule
   ],
   templateUrl: './vehicle-register.component.html',
   styleUrl: './vehicle-register.component.scss'
 })
 export class VehicleRegisterComponent {
+
+  page: number = 1; // Initialize the current page to 1
 
   filterRecords : string = ''
 
