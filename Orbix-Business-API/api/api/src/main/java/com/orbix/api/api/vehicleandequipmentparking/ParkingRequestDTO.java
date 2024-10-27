@@ -85,4 +85,6 @@ public class ParkingRequestDTO {
     
     String billingType;
     double billingAmount;
+    
+    String startBillingAt;
 }

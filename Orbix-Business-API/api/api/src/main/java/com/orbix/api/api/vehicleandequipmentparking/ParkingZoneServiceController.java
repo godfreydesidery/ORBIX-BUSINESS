@@ -97,7 +97,7 @@ public class ParkingZoneServiceController implements ParkingZoneService {
 		parkingZone.setCode(String.valueOf(Math.random()));
 		parkingZone.setName(parkingZoneRequest.getName());
 		parkingZone.setNoOfSlots(parkingZoneRequest.getNoOfSlots());
-		parkingZone.setCompany(_company.get());
+		//parkingZone.setCompany(_company.get());
 		parkingZone.setBranch(_branch.get());
 		
 		parkingZone.setCreatedByUser(userService.getUser(request));
@@ -169,7 +169,7 @@ public class ParkingZoneServiceController implements ParkingZoneService {
 		parkingZoneResponse.setCode(parkingZone.getCode());
 		parkingZoneResponse.setName(parkingZone.getName());
 		parkingZoneResponse.setNoOfSlots(String.valueOf(parkingZone.getNoOfSlots()));
-		parkingZoneResponse.setCompanyName(parkingZone.getCompany().getName());
+		//parkingZoneResponse.setCompanyName(parkingZone.getCompany().getName());
 		parkingZoneResponse.setBranchName(parkingZone.getBranch().getName());
 	
 		if(parkingZone.isActive()) {

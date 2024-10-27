@@ -166,7 +166,7 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		
 		vehicleEquipment.setVehicleEquipmentType(vehicleEquipmentType_.get());		
 		
-		vehicleEquipment.setCompany(company_.get());
+		//vehicleEquipment.setCompany(company_.get());
 		vehicleEquipment.setBranch(branch_.get());
 		
 		vehicleEquipment.setCreatedByUser(userService.getUser(request));
@@ -291,7 +291,7 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		//vehicleEquipment.setImage(vehicleEquipmentRequest.getImage());
 
 		vehicleEquipmentResponse.setActive(vehicleEquipment.isActive() == true ? "Active" : "Inactive");
-		vehicleEquipmentResponse.setCompanyId(vehicleEquipment.getCompany().getId().toString());
+		//vehicleEquipmentResponse.setCompanyId(vehicleEquipment.getCompany().getId().toString());
 		vehicleEquipmentResponse.setBranchId(vehicleEquipment.getBranch().getId().toString());
 		
 		vehicleEquipmentResponse.setVehicleEquipmentTypeName(vehicleEquipment.getVehicleEquipmentType().getName());

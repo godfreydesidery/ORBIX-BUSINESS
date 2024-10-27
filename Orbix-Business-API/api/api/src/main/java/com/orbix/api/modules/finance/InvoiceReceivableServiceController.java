@@ -94,7 +94,7 @@ public class InvoiceReceivableServiceController implements InvoiceReceivableServ
 		
 		invoiceReceivableResponse.setId(String.valueOf(invoiceReceivable.getId()));
 		invoiceReceivableResponse.setNo(invoiceReceivable.getNo());
-		invoiceReceivableResponse.setCompanyName(invoiceReceivable.getCompany().getName());
+		//invoiceReceivableResponse.setCompanyName(invoiceReceivable.getCompany().getName());
 		invoiceReceivableResponse.setBranchName(invoiceReceivable.getBranch().getName());
 		invoiceReceivableResponse.setStatus(invoiceReceivable.getStatus());
 		invoiceReceivableResponse.setSummary(invoiceReceivable.getSummary());

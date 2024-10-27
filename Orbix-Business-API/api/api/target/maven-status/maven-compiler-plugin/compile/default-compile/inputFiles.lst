@@ -8,6 +8,7 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\MissingInformationException.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneSlotServiceController.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleEquipmentTypeService.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingBillReceivableResponseDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleEquipmentServiceController.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\NegativeStockReport.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\InvalidOperationException.java
@@ -142,6 +143,7 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleEquipmentRequestDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\BillReceivableServiceController.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\MaterialUsageReport.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingBillReceivableRequestDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingServiceController.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\InvoiceReceivableDetail.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\User.java

@@ -2,6 +2,7 @@ package com.orbix.api.api.vehicleandequipmentparking;
 
 import java.time.LocalDateTime;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -35,6 +36,17 @@ public class ParkingBillReceivable {
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	
+	private LocalDateTime startedAt;
+	private LocalDateTime endedAt;
+	
+	private String billingType = "";
+	@Column(nullable = false)
+	private double qty;
+	@Column(nullable = false)
+	private double price;
+	
+	private double discount = 0;
+	
 	@ManyToOne(targetEntity = Parking.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "parking_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
@@ -45,8 +57,8 @@ public class ParkingBillReceivable {
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private BillReceivable billReceivable;
 	
-	@ManyToOne(targetEntity = InvoiceReceivableDetail.class, fetch = FetchType.EAGER,  optional = false)
-    @JoinColumn(name = "invoice_receivable_detail_id", nullable = false , updatable = false)
-    @OnDelete(action = OnDeleteAction.NO_ACTION)
-    private InvoiceReceivableDetail invoiceReceivableDetail;
+//	@ManyToOne(targetEntity = InvoiceReceivableDetail.class, fetch = FetchType.EAGER,  optional = false)
+//    @JoinColumn(name = "invoice_receivable_detail_id", nullable = false , updatable = false)
+//    @OnDelete(action = OnDeleteAction.NO_ACTION)
+//    private InvoiceReceivableDetail invoiceReceivableDetail;
 }

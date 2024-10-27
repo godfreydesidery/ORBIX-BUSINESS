@@ -22,8 +22,8 @@ public class VehicleEquipmentRequestDTO {
 		
 	private String vehicleEquipmentTypeName;
 	
-	private String companyId;
-	private String companyName;
+	private String companyId; //optional
+	private String companyName; // optional, to use in validation
 	private String branchId;
 	private String branchName;
 	

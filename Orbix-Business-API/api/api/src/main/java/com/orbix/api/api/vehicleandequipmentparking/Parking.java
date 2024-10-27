@@ -84,6 +84,8 @@ public class Parking {
 	
 	private String vehicleEquipmentCategory;
 	
+	private LocalDateTime startBillingAt = LocalDateTime.now();
+	
 	@NotBlank
 	private String status = "PENDING";
 	
@@ -101,8 +103,8 @@ public class Parking {
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private VehicleEquipmentType vehicleEquipmentType;
 	
-	@ManyToOne(targetEntity = VehicleEquipment.class, fetch = FetchType.EAGER,  optional = false)
-    @JoinColumn(name = "vehicle_equipment_id", nullable = false , updatable = false)
+	@ManyToOne(targetEntity = VehicleEquipment.class, fetch = FetchType.EAGER,  optional = true)
+    @JoinColumn(name = "vehicle_equipment_id", nullable = true , updatable = true)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private VehicleEquipment vehicleEquipment;
 	
@@ -147,8 +149,8 @@ public class Parking {
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Branch branch;
 	
-	@ManyToOne(targetEntity = Company.class, fetch = FetchType.EAGER,  optional = false)
-    @JoinColumn(name = "company_id", nullable = false , updatable = false)
-    @OnDelete(action = OnDeleteAction.NO_ACTION)
-    private Company company;
+//	@ManyToOne(targetEntity = Company.class, fetch = FetchType.EAGER,  optional = false)
+//    @JoinColumn(name = "company_id", nullable = false , updatable = false)
+//    @OnDelete(action = OnDeleteAction.NO_ACTION)
+//    private Company company;
 }

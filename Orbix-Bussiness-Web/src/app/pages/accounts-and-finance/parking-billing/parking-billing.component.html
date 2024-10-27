@@ -1,0 +1,239 @@
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>Checked In Parking List</span>
+            </div>
+            <div class="card-body widget-body"> 
+
+                <div class="row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                    </div>
+                </div>
+                <br>    
+                <div class="table-responsive table-sm">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>SN</th>
+                                <th>Owner/Driver Name</th>
+                                <th>Owner ID</th>
+                                <th>Owner ID Type</th>
+                                <th>Owner Contacts</th>
+                                <th>Agent Name</th>
+                                <th>Agent Contacts</th>
+                                <th>Billing Type</th>
+                                <th>Price</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let p of parkings | searchFilter : filterRecords | paginate: { itemsPerPage: 5, currentPage: page }">
+                                <td>{{p.sn}}</td>
+                                <td>{{p.ownerFirstName}} {{p.ownerMiddleName}} {{p.ownerLastName}}</td>
+                                <td>{{p.ownerIdNo}}</td>
+                                <td>{{p.ownerIdType}}</td>
+                                <td>{{p.ownerPhoneNo}}</td>
+                                <td>{{p.agentName}}</td>
+                                <td>{{p.agentAddress}} {{p.agentPhoneNo}} {{p.agentEmail}}</td>
+                                <td>{{p.billingType}}</td>
+                                <td style="text-align: right;">{{p.billingAmount | currency:'':''}}</td>
+                                
+                                <td>
+                                    <table>
+                                        <tr>
+                                            <td><button class="btn btn-success btn-round-custom" (click)="getParkingBillReceivables(p.id)" data-toggle="modal" data-target="#parking-billing-modal">Parking</button></td>
+                                            <td><button class="btn btn-success btn-round-custom" data-toggle="modal" data-target="#service-billing-modal">Service</button></td>
+                                        </tr>
+                                    </table>
+                                </td>
+                            </tr>
+                        </tbody> 
+                    </table>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <pagination-controls class="pull-right" (pageChange)="page = $event"></pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="parking-billing-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Create Parking Bills</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-primary btn-round-custom" (click)="doCustomBilling()">New Custom Bill</button>
+                        <button type="button" class="btn btn-primary btn-round-custom" (click)="doAutoBilling()">New Auto Bill</button>
+                    </div>
+                </div>
+                <hr>
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Starting Date</label>
+                            <input type="date" class="form-control" [(ngModel)]="startedAt">
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Ending Date</label>
+                            <input type="date" class="form-control" [(ngModel)]="endedAt">
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Billing Type</label>
+                            <span class="form-control">{{billingType}}</span>
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Qty</label>
+                            <input type="number" class="form-control" [(ngModel)]="qty" (ngModelChange)="refreshParkingAmounts()">
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Unit Price</label>
+                            <input type="number" class="form-control" [(ngModel)]="price" (ngModelChange)="refreshParkingAmounts()" style="text-align: right;">
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Total Discount</label>
+                            <input type="number" class="form-control" [(ngModel)]="discount" (ngModelChange)="refreshParkingAmounts()" style="text-align: right;">
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Bill Amount</label>
+                            <span class="form-control" style="text-align: right;">{{parkingAmount | currency:'':''}}</span>
+                        </div>
+                    </div> 
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-primary btn-round-custom pull-right" (click)="createParkingBillReceivable()">Save</button>
+                    </div>
+                </div>
+            </div>
+            
+            <br>
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <td>#</td>
+                                <td>Start</td>
+                                <td>End</td>
+                                <td>Type</td>
+                                <td>Qty</td>
+                                <td>Price</td>
+                                <td>Total Discount</td>
+                                <td>Amount</td>
+                                <td>Status</td>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let p of parkingBillReceivables">
+                                <td>{{p.sn}}</td>
+                                <td>{{p.startedAt}}</td>
+                                <td>{{p.endedAt}}</td>
+                                <td>{{p.billingType}}</td>
+                                <td>{{p.qty}}</td>
+                                <td style="text-align: right;">{{p.price | currency:'':''}}</td>
+                                <td style="text-align: right;">{{p.discount | currency:'':''}}</td>
+                                <td style="text-align: right;">{{p.amount | currency:'':''}}</td>
+                                <td>{{p.status}}</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="service-billing-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Create Service Bills</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-primary btn-round-custom">New Service</button>
+                    </div>
+                </div>
+                <hr>
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Date</label>
+                            <input type="date" class="form-control">
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Service Description</label>
+                            <input type="text" class="form-control">
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Amount</label>
+                            <input type="number" class="form-control">
+                        </div>
+                    </div> 
+                </div>
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-primary btn-round-custom pull-right">Save</button>
+                    </div>
+                </div>
+            </div>
+            
+            <br>
+            <div class="row">
+                <div class="col-sm-12">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <td>#</td>
+                                <td>Service Date</td>
+                                <td>Service Description</td>
+                                <td>Amount</td>
+                                <td>Status</td>
+                            </tr>
+                        </thead>
+                    </table>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+

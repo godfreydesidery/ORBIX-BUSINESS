@@ -1,5 +1,7 @@
 package com.orbix.api.api.vehicleandequipmentparking;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -55,6 +57,7 @@ public class ParkingServiceController implements ParkingService {
 	private final InvoiceReceivableRepository invoiceReceivableRepository;
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
 	
+		
 	
 
 	@Override
@@ -83,6 +86,21 @@ public class ParkingServiceController implements ParkingService {
 		}		
 		return parkingResponses;
 	}
+	
+	@Override
+	public List<ParkingResponseDTO> getAllCheckedInParkings(HttpServletRequest request) {
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+		
+		List<Parking> parkings = parkingRepository.findAllByStatusIn(statuses);
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+
+		for(Parking parking : parkings) {
+			parkingResponses.add(parkingResponseDTOMapper(parking));					
+		}		
+		return parkingResponses;
+	}
 
 	@Override
 	public ParkingResponseDTO get(Long id, HttpServletRequest request) {		
@@ -91,6 +109,25 @@ public class ParkingServiceController implements ParkingService {
 		throw new NotFoundException("Parking not found");
 	}		
 	return parkingResponseDTOMapper(parking_.get());	
+	}
+	
+	@Override
+	public List<ParkingBillReceivableResponseDTO> getParkingBillReceivables(Long id, HttpServletRequest request) {		
+		Optional<Parking> parking_ = parkingRepository.findById(id);
+		if(parking_.isEmpty()) {
+			throw new NotFoundException("Parking not found");
+		}
+		
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		
+		List<ParkingBillReceivableResponseDTO> parkingBillReceivableResponses = new ArrayList<>();
+		
+		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
+			parkingBillReceivableResponses.add(parkingBillReceivableDTOMapper(parkingBillReceivable));
+		}
+		if (parkingBillReceivableResponses.isEmpty()) return null;	
+		
+		return parkingBillReceivableResponses;
 	}
 
 	@Override
@@ -120,6 +157,9 @@ public class ParkingServiceController implements ParkingService {
 		
 		Optional<VehicleEquipment> vehicleEquipment_ = vehicleEquipmentRepository.findById(parkingRequest.getVehicleEquipmentId());
 		if(vehicleEquipment_.isEmpty()) throw new NotFoundException("Vehicle and equipment not found");
+		
+		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), branch_.get());
+		
 		
 		Parking parking = new Parking();
 		parking.setNo(String.valueOf(Math.random()));
@@ -164,9 +204,10 @@ public class ParkingServiceController implements ParkingService {
 		parking.setVehicleEquipmentCategory(parkingRequest.getVehicleEquipmentCategory());
 		parking.setVehicleEquipment(vehicleEquipment_.get());
 		
-		parking.setCompany(company_.get());
 		parking.setBranch(branch_.get());
 		
+		if(!parkingZone_.isEmpty()) parking.setParkingZone(parkingZone_.get());
+
 		parking.setCreatedByUser(userService.getUser(request));
 		parking.setCreatedDateTime(dayService.getTimeStamp());
 		
@@ -315,7 +356,7 @@ public class ParkingServiceController implements ParkingService {
 		parkingResponse.setVehicleEquipmentCategory(parking.getVehicleEquipmentCategory());
 		//parking.setImage(parkingRequest.getImage());
 		parkingResponse.setStatus(parking.getStatus());
-		parkingResponse.setCompanyId(parking.getCompany().getId().toString());
+		//parkingResponse.setCompanyId(parking.getCompany().getId().toString());
 		parkingResponse.setBranchId(parking.getBranch().getId().toString());
 		
 		parkingResponse.setBillingType(parking.getBillingType());
@@ -363,85 +404,257 @@ public class ParkingServiceController implements ParkingService {
 		parking.setCheckedInByUser(userService.getUser(request));
 		parking.setCheckedInDateTime(dayService.getTimeStamp());
 		
+		if(parkingRequest.startBillingAt == null) {
+			parking.setStartBillingAt(dayService.getTimeStamp()); // You can change this depending on user billing preferences
+		}else {
+			
+			//String dateString = "2024-10-26 15:30:45" ;
+			String dateString = parkingRequest.getStartBillingAt() + " 00:00:00";
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+			parking.setStartBillingAt(dateTime);
+		}		
 		parking = parkingRepository.save(parking);
 		
-		//generate bill, for day 1 depending on billing type
-		
-		BillReceivable billReceivable = new BillReceivable();
-		billReceivable.setNo(String.valueOf(Math.random()));
-		billReceivable.setAmount(parking.getBillingAmount());
-		billReceivable.setPaid(0);
-		billReceivable.setDue(parking.getBillingAmount());
-		billReceivable.setCompany(parking.getCompany());
-		billReceivable.setBranch(parking.getBranch());
-		billReceivable.setCreatedDateTime(dayService.getTimeStamp());
-		
-		billReceivable.setStatus("UNPAID");
-		billReceivable.setSummary("Parking bill for parking#: " + parking.getNo());
-		
-		billReceivable = billReceivableRepository.save(billReceivable);
-		billReceivable.setNo("BR" + billReceivable.getId().toString());
-		billReceivable = billReceivableRepository.save(billReceivable);
-		
-		
-		
-		InvoiceReceivable invoiceReceivable = null;
-		ParkingInvoiceReceivable parkingInvoiceReceivable = null;
-		
-		List<ParkingInvoiceReceivable> parkingInvoiceReceivables = parkingInvoiceReceivableRepository.findAllByParking(parking);
-		for(ParkingInvoiceReceivable pInvoiceReceivable : parkingInvoiceReceivables) {
-			if(pInvoiceReceivable.getInvoiceReceivable().getStatus()
-					.equals("OPEN")) {
-				invoiceReceivable = pInvoiceReceivable.getInvoiceReceivable();
-				break;
-			}
-		}
-		if(invoiceReceivable == null) {
-			invoiceReceivable = new InvoiceReceivable();
-			invoiceReceivable.setNo(String.valueOf(Math.random()));
-			invoiceReceivable.setCompany(parking.getCompany());
-			invoiceReceivable.setBranch(parking.getBranch());
-			invoiceReceivable.setStatus("OPEN");
-			invoiceReceivable.setSummary("Auto invoice, for parking# " + parking.getNo());
-			
-			invoiceReceivable = invoiceReceivableRepository.save(invoiceReceivable);
-			invoiceReceivable.setNo("RINV" + invoiceReceivable.getId().toString());
-			
-			invoiceReceivable = invoiceReceivableRepository.save(invoiceReceivable);
-			
-			parkingInvoiceReceivable = new ParkingInvoiceReceivable();
-			parkingInvoiceReceivable.setParking(parking);
-			parkingInvoiceReceivable.setInvoiceReceivable(invoiceReceivable);
-			
-			parkingInvoiceReceivableRepository.save(parkingInvoiceReceivable);
-		}
-		
-		InvoiceReceivableDetail invoiceReceivableDetail = new InvoiceReceivableDetail();
-		invoiceReceivableDetail.setInvoiceReceivable(invoiceReceivable);
-		
-		invoiceReceivableDetail.setBillReceivable(billReceivable);
-		
-		invoiceReceivableDetail.setAmount(parking.getBillingAmount());
-		invoiceReceivableDetail.setDue(parking.getBillingAmount());
-		invoiceReceivableDetail.setPaid(0);
-		invoiceReceivableDetail.setSummary("Payment for parking# " + parking.getNo());
-		
-		invoiceReceivableDetail = invoiceReceivableDetailRepository.save(invoiceReceivableDetail);
-		
-		ParkingBillReceivable parkingBillReceivable = new ParkingBillReceivable();
-		parkingBillReceivable.setBillReceivable(billReceivable);
-		parkingBillReceivable.setParking(parking);
-		parkingBillReceivable.setInvoiceReceivableDetail(invoiceReceivableDetail);
-		
-		parkingBillReceivableRepository.save(parkingBillReceivable);
+//		//generate bill, for day 1 depending on billing type
+//		
+//		BillReceivable billReceivable = new BillReceivable();
+//		billReceivable.setNo(String.valueOf(Math.random()));
+//		billReceivable.setAmount(parking.getBillingAmount());
+//		billReceivable.setPaid(0);
+//		billReceivable.setDue(parking.getBillingAmount());
+//		//billReceivable.setCompany(parking.getCompany());
+//		billReceivable.setBranch(parking.getBranch());
+//		billReceivable.setCreatedDateTime(dayService.getTimeStamp());
+//		
+//		billReceivable.setStatus("UNPAID");
+//		billReceivable.setSummary("Parking bill for parking#: " + parking.getNo());
+//		
+//		billReceivable = billReceivableRepository.save(billReceivable);
+//		billReceivable.setNo("BR" + billReceivable.getId().toString());
+//		billReceivable = billReceivableRepository.save(billReceivable);
+//		
+//		
+//		
+//		InvoiceReceivable invoiceReceivable = null;
+//		ParkingInvoiceReceivable parkingInvoiceReceivable = null;
+//		
+//		List<ParkingInvoiceReceivable> parkingInvoiceReceivables = parkingInvoiceReceivableRepository.findAllByParking(parking);
+//		for(ParkingInvoiceReceivable pInvoiceReceivable : parkingInvoiceReceivables) {
+//			if(pInvoiceReceivable.getInvoiceReceivable().getStatus()
+//					.equals("OPEN")) {
+//				invoiceReceivable = pInvoiceReceivable.getInvoiceReceivable();
+//				break;
+//			}
+//		}
+//		if(invoiceReceivable == null) {
+//			invoiceReceivable = new InvoiceReceivable();
+//			invoiceReceivable.setNo(String.valueOf(Math.random()));
+//			//invoiceReceivable.setCompany(parking.getCompany());
+//			invoiceReceivable.setBranch(parking.getBranch());
+//			invoiceReceivable.setStatus("OPEN");
+//			invoiceReceivable.setSummary("Auto invoice, for parking# " + parking.getNo());
+//			
+//			invoiceReceivable = invoiceReceivableRepository.save(invoiceReceivable);
+//			invoiceReceivable.setNo("RINV" + invoiceReceivable.getId().toString());
+//			
+//			invoiceReceivable = invoiceReceivableRepository.save(invoiceReceivable);
+//			
+//			parkingInvoiceReceivable = new ParkingInvoiceReceivable();
+//			parkingInvoiceReceivable.setParking(parking);
+//			parkingInvoiceReceivable.setInvoiceReceivable(invoiceReceivable);
+//			
+//			parkingInvoiceReceivableRepository.save(parkingInvoiceReceivable);
+//		}
+//		
+//		InvoiceReceivableDetail invoiceReceivableDetail = new InvoiceReceivableDetail();
+//		invoiceReceivableDetail.setInvoiceReceivable(invoiceReceivable);
+//		
+//		invoiceReceivableDetail.setBillReceivable(billReceivable);
+//		
+//		invoiceReceivableDetail.setAmount(parking.getBillingAmount());
+//		invoiceReceivableDetail.setDue(parking.getBillingAmount());
+//		invoiceReceivableDetail.setPaid(0);
+//		invoiceReceivableDetail.setSummary("Payment for parking# " + parking.getNo());
+//		
+//		invoiceReceivableDetail = invoiceReceivableDetailRepository.save(invoiceReceivableDetail);
+//		
+//		ParkingBillReceivable parkingBillReceivable = new ParkingBillReceivable();
+//		parkingBillReceivable.setBillReceivable(billReceivable);
+//		parkingBillReceivable.setStartedAt(LocalDateTime.now());
+//		parkingBillReceivable.setEndedAt(LocalDateTime.now().plusDays(1));
+//		parkingBillReceivable.setBillingType("DAILY");
+//		parkingBillReceivable.setQty(1);
+//		parkingBillReceivable.setPrice(parking.getBillingAmount());
+//		parkingBillReceivable.setParking(parking);
+//		//parkingBillReceivable.setInvoiceReceivableDetail(invoiceReceivableDetail);
+//		
+//		parkingBillReceivableRepository.save(parkingBillReceivable);
 	
-		
 		return parkingResponseDTOMapper(parking);
 	}
 
 	@Override
 	public ParkingResponseDTO checkOut(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
 		// TODO Auto-generated method stub
+		return null;
+	}
+	
+	private ParkingBillReceivableResponseDTO parkingBillReceivableDTOMapper(ParkingBillReceivable parkingBillReceivable) {
+		
+		ParkingBillReceivableResponseDTO parkingBillReceivableResponseDTO = new ParkingBillReceivableResponseDTO();
+		
+		parkingBillReceivableResponseDTO.setId(parkingBillReceivable.getId().toString());
+		parkingBillReceivableResponseDTO.setStartedAt(parkingBillReceivable.getStartedAt().toString());
+		parkingBillReceivableResponseDTO.setEndedAt(parkingBillReceivable.getEndedAt().toString());
+		parkingBillReceivableResponseDTO.setQty(String.valueOf(parkingBillReceivable.getQty()));
+		parkingBillReceivableResponseDTO.setPrice(String.valueOf(parkingBillReceivable.getPrice()));
+		parkingBillReceivableResponseDTO.setBillingType(parkingBillReceivable.getBillingType());
+		parkingBillReceivableResponseDTO.setDiscount(String.valueOf(parkingBillReceivable.getDiscount()));
+		parkingBillReceivableResponseDTO.setParkingId(parkingBillReceivable.getParking().getId().toString());
+		parkingBillReceivableResponseDTO.setAmount(String.valueOf(((parkingBillReceivable.getPrice() * parkingBillReceivable.getQty()) - parkingBillReceivable.getDiscount())));
+		parkingBillReceivableResponseDTO.setStatus(parkingBillReceivable.getBillReceivable().getStatus());
+		
+		return parkingBillReceivableResponseDTO;
+		
+	}
+
+	@Override
+	public ParkingBillReceivableResponseDTO createParkingBillReceivable(Long parkingId, LocalDateTime startedAt,
+			LocalDateTime endedAt, String billingType, double qty, double price, double discount, int autoBilling, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		
+		/**
+		 * Here, get the parking, check for parking billing start datetime, if the billing start datetime is more
+		 * than current datetime if the bill is less than current date time, invalidate the bill, ignore previous date time
+		 * if billstart datetime is b4 current date time, check if there are previous bills, if yes, check the last datetime
+		 * if last date time is beyond bill, invalidate bill
+		 * 
+		 */
+		
+		if (autoBilling != 1 && autoBilling != 0) {
+		    throw new InvalidOperationException("Invalid billing mode selected. Accepts 1: Autobilling, 0: Manual billing");
+		}
+		Parking parking = parkingRepository.findById(parkingId)
+		        .orElseThrow(() -> new NotFoundException("Parking not found"));
+		
+		if(!parking.getStatus().equals("CHECKED-IN")) throw new InvalidOperationException("Only allowed for checked in parkings");
+		
+		if(autoBilling == 0) {
+			/**
+			 * Here, do manual billing
+			 */
+			if(parking.getStartBillingAt().isBefore(startedAt)) {
+				
+				List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findByParking(parking);
+				// Now check for intersection
+				for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
+					if(startedAt.isAfter(parkingBillReceivable.getStartedAt()) && startedAt.isBefore(parkingBillReceivable.getEndedAt().plusDays(1))) {
+						throw new InvalidOperationException("Bill starting date intersects with current bills");
+					}
+				}
+				
+			}
+			
+			
+			
+			
+			
+			
+			BillReceivable billReceivable = new BillReceivable();
+			billReceivable.setNo(String.valueOf(Math.random()));
+			billReceivable.setAmount(parking.getBillingAmount());
+			billReceivable.setPaid(0);
+			billReceivable.setDue(parking.getBillingAmount());
+			//billReceivable.setCompany(parking.getCompany());
+			billReceivable.setBranch(parking.getBranch());
+			billReceivable.setCreatedDateTime(dayService.getTimeStamp());
+			
+			billReceivable.setStatus("UNPAID");
+			billReceivable.setSummary("Parking bill for parking#: " + parking.getNo());
+			
+			billReceivable = billReceivableRepository.save(billReceivable);
+			billReceivable.setNo("BR" + billReceivable.getId().toString());
+			billReceivable = billReceivableRepository.save(billReceivable);
+			
+			
+			
+			InvoiceReceivable invoiceReceivable = null;
+			ParkingInvoiceReceivable parkingInvoiceReceivable = null;
+			
+			List<ParkingInvoiceReceivable> parkingInvoiceReceivables = parkingInvoiceReceivableRepository.findAllByParking(parking);
+			for(ParkingInvoiceReceivable pInvoiceReceivable : parkingInvoiceReceivables) {
+				if(pInvoiceReceivable.getInvoiceReceivable().getStatus()
+						.equals("OPEN")) {
+					invoiceReceivable = pInvoiceReceivable.getInvoiceReceivable();
+					break;
+				}
+			}
+			if(invoiceReceivable == null) {
+				invoiceReceivable = new InvoiceReceivable();
+				invoiceReceivable.setNo(String.valueOf(Math.random()));
+				//invoiceReceivable.setCompany(parking.getCompany());
+				invoiceReceivable.setBranch(parking.getBranch());
+				invoiceReceivable.setStatus("OPEN");
+				invoiceReceivable.setSummary("Auto invoice, for parking# " + parking.getNo());
+				
+				invoiceReceivable = invoiceReceivableRepository.save(invoiceReceivable);
+				invoiceReceivable.setNo("RINV" + invoiceReceivable.getId().toString());
+				
+				invoiceReceivable = invoiceReceivableRepository.save(invoiceReceivable);
+				
+				parkingInvoiceReceivable = new ParkingInvoiceReceivable();
+				parkingInvoiceReceivable.setParking(parking);
+				parkingInvoiceReceivable.setInvoiceReceivable(invoiceReceivable);
+				
+				parkingInvoiceReceivableRepository.save(parkingInvoiceReceivable);
+			}
+			
+			InvoiceReceivableDetail invoiceReceivableDetail = new InvoiceReceivableDetail();
+			invoiceReceivableDetail.setInvoiceReceivable(invoiceReceivable);
+			
+			invoiceReceivableDetail.setBillReceivable(billReceivable);
+			
+			invoiceReceivableDetail.setAmount(parking.getBillingAmount());
+			invoiceReceivableDetail.setDue(parking.getBillingAmount());
+			invoiceReceivableDetail.setPaid(0);
+			invoiceReceivableDetail.setSummary("Payment for parking# " + parking.getNo());
+			
+			invoiceReceivableDetail = invoiceReceivableDetailRepository.save(invoiceReceivableDetail);
+			
+			ParkingBillReceivable parkingBillReceivable = new ParkingBillReceivable();
+			parkingBillReceivable.setBillReceivable(billReceivable);
+			parkingBillReceivable.setStartedAt(startedAt);
+			parkingBillReceivable.setEndedAt(endedAt.plusDays(1));
+			parkingBillReceivable.setBillingType("DAILY");
+			parkingBillReceivable.setQty(1);
+			parkingBillReceivable.setPrice(parking.getBillingAmount());
+			parkingBillReceivable.setParking(parking);
+			//parkingBillReceivable.setInvoiceReceivableDetail(invoiceReceivableDetail);
+			
+			parkingBillReceivableRepository.save(parkingBillReceivable);
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+			
+		}else if(autoBilling == 1) {
+			// Find last billing date
+			
+		}
+		
+		
+		
+		
+		
+		
+		
 		return null;
 	}
 

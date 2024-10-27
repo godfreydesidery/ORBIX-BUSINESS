@@ -34,7 +34,7 @@ import lombok.ToString;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "parking_zones", uniqueConstraints = { @UniqueConstraint(columnNames = {"id", "code"}), @UniqueConstraint(columnNames = {"id", "name"})})
+@Table(name = "parking_zones", uniqueConstraints = { @UniqueConstraint(columnNames = {"code", "branch_id"}), @UniqueConstraint(columnNames = {"name", "branch_id"})})
 public class ParkingZone {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -54,10 +54,10 @@ public class ParkingZone {
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Branch branch;
 	
-	@ManyToOne(targetEntity = Company.class, fetch = FetchType.EAGER,  optional = false)
-    @JoinColumn(name = "company_id", nullable = false , updatable = false)
-    @OnDelete(action = OnDeleteAction.NO_ACTION)
-    private Company company;
+//	@ManyToOne(targetEntity = Company.class, fetch = FetchType.EAGER,  optional = false)
+//    @JoinColumn(name = "company_id", nullable = false , updatable = false)
+//    @OnDelete(action = OnDeleteAction.NO_ACTION)
+//    private Company company;
 		
 	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "created_by_user_id", nullable = false , updatable = false)

@@ -29,11 +29,13 @@
                             <tr>
                                 <th>SN</th>
                                 <th>Owner/Driver Name</th>
-                                <th>Owner ID | Type</th>
+                                <th>Owner ID</th>
+                                <th>Owner ID Type</th>
                                 <th>Owner Contacts</th>
                                 <th>Agent Name</th>
                                 <th>Agent Contacts</th>
-                                <th>Price | Billing Type</th>
+                                <th>Billing Type</th>
+                                <th>Price</th>
                                 <th>Check Status</th>
                                 <th>Action</th>
                             </tr>
@@ -42,18 +44,21 @@
                                 <tr *ngFor="let p of parkings | searchFilter : filterRecords | paginate: { itemsPerPage: 5, currentPage: page }">
                                     <td>{{p.sn}}</td>
                                     <td>{{p.ownerFirstName}} {{p.ownerMiddleName}} {{p.ownerLastName}}</td>
-                                    <td>{{p.ownerIdNo}} | {{p.ownerIdType}}</td>
+                                    <td>{{p.ownerIdNo}}</td>
+                                    <td>{{p.ownerIdType}}</td>
                                     <td>{{p.ownerPhoneNo}}</td>
                                     <td>{{p.agentName}}</td>
                                     <td>{{p.agentAddress}} {{p.agentPhoneNo}} {{p.agentEmail}}</td>
+                                    <td>{{p.billingType}}</td>
                                     <td style="text-align: right;">{{p.billingAmount | currency:'':''}}</td>
                                     <td>{{p.status}}</td>
                                     
                                     <td>
                                         <table>
                                             <tr>
-                                                <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(p.id)" data-toggle="modal" data-target="#parkingZone-modal" style="cursor: pointer;">Edit</button></td>
-                                                <td><button type="button" class="btn btn-success btn-round-custom" (click)="get(p.id)" data-toggle="modal" data-target="#complete-registration-modal" style="cursor: pointer; margin-left: 3px;">Go to Check In</button></td>
+                                                <td><button type="button" class="btn btn-primary btn-round-custom" *ngIf="p.status === 'PENDING'" (click)="get(p.id)" data-toggle="modal" data-target="#edit-modal" style="cursor: pointer;">Edit</button></td>
+                                                <td><button type="button" class="btn btn-success btn-round-custom" *ngIf="p.status === 'PENDING'" (click)="get(p.id)" data-toggle="modal" data-target="#check-in-modal" style="cursor: pointer; margin-left: 3px;">Go to Check In</button></td>
+                                                <td><button type="button" class="btn btn-danger btn-round-custom" *ngIf="p.status === 'CHECKED-IN'" (click)="get(p.id)" data-toggle="modal" data-target="#check-out-modal" style="cursor: pointer; margin-left: 3px;">Go to Check Out</button></td>
                                             </tr>
                                         </table>
                                         
@@ -73,7 +78,7 @@
 </div>
 
 
-<div class="modal fade" id="parkingZone-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+<div class="modal fade" id="edit-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
     <div class="modal-dialog modal-xl" role="document" style="top: 0;">
         <div class="modal-content">
             <div class="modal-header state modal-default">                                    
@@ -437,10 +442,9 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Parking Zone</label>
-                            <select class="form-control" [(ngModel)]="ownerFirstName">
+                            <select class="form-control" [(ngModel)]="parkingZoneName">
                                 <option></option>
-                                <option>ZONE 1</option>
-                                <option>ZONE 2</option>
+                                <option *ngFor="let option of parkingZones" [value]="option.name">{{ option.name }}</option>
                             </select>
                         </div>
                     </div> 
@@ -474,26 +478,6 @@
     </div>
 </div>
 
-
-
-<div class="modal fade" id="check-in-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
-    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
-        <div class="modal-content">
-            <div class="modal-header state modal-default">                                    
-                <h4 class="modal-title" id="modal-large-label">Vehicle Check In</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
-            </div>
-            <div class="modal-body">
-                
-            </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-primary">Check In</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
-            </div>
-        </div>
-    </div>
-</div>
-
 <div class="modal fade" id="check-out-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
     <div class="modal-dialog modal-xl" role="document" style="top: 0;">
         <div class="modal-content">
@@ -512,7 +496,7 @@
     </div>
 </div>
 
-<div class="modal fade" id="complete-registration-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+<div class="modal fade" id="check-in-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
     <div class="modal-dialog modal-xl" role="document" style="top: 0;">
         <div class="modal-content">
             <div class="modal-header state modal-default">                                    
@@ -536,13 +520,19 @@
                             <input class="form-control" type="tel" [(ngModel)]="cardNo" autocomplete="nope">
                         </div>
                     </div> 
-                    <div class="col-lg-3">
+                    <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label>Parking Zone</label>
                             <select class="form-control" [(ngModel)]="parkingZoneName">
                                 <option></option>
                                 <option *ngFor="let option of parkingZones" [value]="option.name">{{ option.name }}</option>
                             </select>
+                        </div>
+                    </div> -->
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Select Billing Start Date</label>
+                            <input type="date" class="form-control" [(ngModel)]="startBillingAt">
                         </div>
                     </div>
                 </div>
@@ -626,6 +616,33 @@
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" (click)="checkIn()">Complete and Check In</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="checkout-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Create Service Bills</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-primary btn-round-custom">Checkout</button>
+                    </div>
+                </div>
+                <hr>
+
+            </div>
+            
+            <br>
+            
+            <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>

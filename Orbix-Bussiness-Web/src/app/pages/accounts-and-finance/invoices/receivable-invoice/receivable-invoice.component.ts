@@ -26,6 +26,8 @@ const API_URL = environment.apiUrl;
 export class ReceivableInvoiceComponent {
   id : any
 
+  no : string = ''
+
   invoiceReceivable : IInvoiceReceivable
   
   constructor(
@@ -53,6 +55,7 @@ export class ReceivableInvoiceComponent {
       data => {
         this.invoiceReceivable = data! 
         this.id = data!.id 
+        this.no = data!.no
         
         console.log(data)      
       }
@@ -96,7 +99,7 @@ export class ReceivableInvoiceComponent {
         this.billReceivables.forEach(e => {
           if(e.id === element.billReceivable.id){
             element.checked = true
-            this.total = this.total + element.billReceivable.amount
+            this.total = this.total + (+element.billReceivable.amount)
           }
         })
       }else{

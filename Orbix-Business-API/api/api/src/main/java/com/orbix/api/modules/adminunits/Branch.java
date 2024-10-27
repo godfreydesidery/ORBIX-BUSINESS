@@ -16,6 +16,7 @@ import javax.persistence.JoinColumn;
 import javax.persistence.ManyToMany;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.NotBlank;
 
 import org.hibernate.annotations.Fetch;
@@ -37,16 +38,14 @@ import lombok.ToString;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "branches")
+@Table(name = "branches", uniqueConstraints = { @UniqueConstraint(columnNames = {"code", "company_id"}), @UniqueConstraint(columnNames = {"name", "company_id"})})
 public class Branch {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
 	@NotBlank
-	@Column(unique = true)
 	private String code; 		
 	@NotBlank
-	@Column(unique = true)
 	private String name; 	
 	private String level;	
 	private String type;
@@ -97,13 +96,6 @@ public class Branch {
 	@ToString.Exclude
     @EqualsAndHashCode.Exclude
     private User createdByUser;
-	
-	@ManyToOne(targetEntity = Day.class, fetch = FetchType.EAGER,  optional = false)
-    @JoinColumn(name = "created_on_day_id", nullable = false , updatable = false)
-    @OnDelete(action = OnDeleteAction.NO_ACTION)
-	@ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Day createdOnDay;
 	
 	private LocalDateTime createdDateTime = LocalDateTime.now();
 

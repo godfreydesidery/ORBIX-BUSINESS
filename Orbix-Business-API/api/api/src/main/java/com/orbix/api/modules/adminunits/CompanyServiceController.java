@@ -106,7 +106,7 @@ public class CompanyServiceController implements CompanyService {
 		branch.setParentBranch(null);
 		
 		branch.setCreatedByUser(userService.getUser(request));
-		branch.setCreatedOnDay(dayService.getDay());
+		//branch.setCreatedOnDay(dayService.getDay());
 		branch.setCreatedDateTime(dayService.getTimeStamp());
 		
 		

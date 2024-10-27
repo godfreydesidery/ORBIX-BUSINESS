@@ -85,6 +85,8 @@ export class VehicleRegisterComponent {
 
   status: string = "PENDING"
 
+  startBillingAt : Date | null
+
   // Foreign keys
   parkingId: any = ''
   vehicleEquipmentTypeId: any = ''
@@ -147,6 +149,7 @@ export class VehicleRegisterComponent {
     .toPromise()
     .then(
       data => {
+        this.startBillingAt = null
         this.showParkingData(data!)
         console.log(data)
       }
@@ -254,7 +257,9 @@ export class VehicleRegisterComponent {
 
       cardNo : this.cardNo,
 
-      billintType : this.billingType
+      billintType : this.billingType,
+
+      parkingZoneName : this.parkingZoneName
     }
 
     console.log(parking)
@@ -307,6 +312,8 @@ export class VehicleRegisterComponent {
     }
   }
 
+  
+
   async activate(id : any){
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
@@ -346,7 +353,8 @@ export class VehicleRegisterComponent {
     var parking = {
       id : this.id,
       cardNo : this.cardNo,
-      parkingZoneName : this.parkingZoneName
+      parkingZoneName : this.parkingZoneName,
+      startBillingAt : this.startBillingAt
     }
 
     await this.http.post<IParking>(API_URL+'/parkings/check_in', parking, options)

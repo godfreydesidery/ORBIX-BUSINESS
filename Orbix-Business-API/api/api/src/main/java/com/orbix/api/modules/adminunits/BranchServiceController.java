@@ -106,7 +106,7 @@ public class BranchServiceController implements BranchService {
 		branch.setNotes(branchRequest.getNotes());
 		
 		branch.setCreatedByUser(userService.getUser(request));
-		branch.setCreatedOnDay(dayService.getDay());
+		//branch.setCreatedOnDay(dayService.getDay());
 		branch.setCreatedDateTime(dayService.getTimeStamp());
 		
 		branch = branchRepository.save(branch);
