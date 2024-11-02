@@ -45,8 +45,9 @@
                                 <td>
                                     <table>
                                         <tr>
-                                            <td><button class="btn btn-success btn-round-custom" (click)="getParkingBillReceivables(p.id)" data-toggle="modal" data-target="#parking-billing-modal">Parking</button></td>
-                                            <td><button class="btn btn-success btn-round-custom" data-toggle="modal" data-target="#service-billing-modal">Service</button></td>
+                                            <!-- <td><button class="btn btn-success btn-round-custom" (click)="getParkingBillReceivables(p.id)" data-toggle="modal" data-target="#parking-billing-modal">Parking</button></td>
+                                            <td><button class="btn btn-success btn-round-custom" data-toggle="modal" data-target="#service-billing-modal">Service</button></td> -->
+                                            <td><button class="btn btn-success btn-round-custom" [routerLink]="['/app/accounts-and-finance/vehicle-equipment-billing']" >Billing</button></td>
                                         </tr>
                                     </table>
                                 </td>

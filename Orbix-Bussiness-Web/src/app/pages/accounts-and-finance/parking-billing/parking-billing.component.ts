@@ -11,6 +11,8 @@ import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
 import { IParkingBillReceivable } from 'src/app/domain/bill-receivable';
+import { BrowserModule } from '@angular/platform-browser';
+import { RouterModule } from '@angular/router';
 
 const API_URL = environment.apiUrl;
 
@@ -22,7 +24,8 @@ const API_URL = environment.apiUrl;
     FormsModule,
     CommonModule,
     SearchFilterPipe,
-    NgxPaginationModule
+    NgxPaginationModule,
+    RouterModule
   ],
   templateUrl: './parking-billing.component.html',
   styleUrl: './parking-billing.component.scss'
