@@ -13,4 +13,5 @@ public interface CompanyService {
 	CompanyResponseDTO updateCompany(CompanyRequestDTO company, HttpServletRequest request);
 	ApiCustomResponse activateCompany(CompanyRequestDTO company, HttpServletRequest request);
 	ApiCustomResponse deactivateCompany(CompanyRequestDTO company, HttpServletRequest request);
+	
 }

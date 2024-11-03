@@ -23,6 +23,9 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class SystemProfileServiceController implements SystemProfileService {
 	private final SystemProfileRepository systemProfileRepository;
+	
+	private final TimeZoneRepository timeZoneRepository;
+	private final CurrencyRepository currencyRepository;
 
 	@Override
 	public SystemProfile saveSystemProfile(SystemProfile systemProfile) {
@@ -102,5 +105,69 @@ public class SystemProfileServiceController implements SystemProfileService {
 	@Override
 	public boolean hasData() {
 		return systemProfileRepository.hasData();
+	}
+
+	@Override
+	public TimeZone getDefaultTimeZone() {
+		List<TimeZone> timeZones = timeZoneRepository.findAllByIsDefault(true);
+		if (!timeZones.isEmpty()) {
+		    return timeZones.get(0);
+		    // Use firstTimeZone as needed
+		} else {
+		    // Handle the case where no time zones are found
+		}
+		return null;
+	}
+	
+	@Override
+	public Currency getDefaultCurrency() {
+		List<Currency> currencies = currencyRepository.findAllByDefaultCurrency(true);
+		if (!currencies.isEmpty()) {
+		    return currencies.get(0);
+		    // Use firstTimeZone as needed
+		} else {
+		    // Handle the case where no time zones are found
+		}
+		return null;
+	}
+
+	@Override
+	public void createDefaultTimeZone() {
+		// To create a default time zone
+		
+		if(timeZoneRepository.existsBy()) return;
+		
+		TimeZone timeZone = new TimeZone();
+		timeZone.setName("Nairobi Time");
+		timeZone.setAbbreviation("EAT");
+		timeZone.setUtcOffset("+03:00");
+		timeZone.setCountryRegion("East Africa");
+		timeZone.setIsStandardTime(true);
+		timeZone.setIanaCode("Africa/Nairobi");
+		timeZone.setDstOffset(null); // Nairobi does not observe Daylight Saving Time (DST)
+		timeZone.setDstStart(null);   // DST start date (null because DST is not observed)
+		timeZone.setDstEnd(null);     // DST end date (null because DST is not observed)
+		timeZone.setIsDefault(true);
+		
+		timeZoneRepository.save(timeZone);
+		
+	}
+
+	@Override
+	public void createDefaultCurrency() {
+		// To create a default currency
+		
+		if(currencyRepository.existsBy()) return;
+		
+		Currency currency = new Currency();
+		currency.setCode("TZS");        // ISO code for Kenyan Shilling
+		currency.setName("Tanzanian Shilling");    // Full name of the currency
+		currency.setSymbol("TSh");              // Symbol for the currency
+		currency.setCountry("Tanzania");           // Country where the currency is used
+		currency.setDecimalPlaces(2);           // Number of decimal places (usually 2 for most currencies)
+		currency.setExchangeRateToUsd(0.0073);  // Example exchange rate to USD, adjust based on latest data
+		currency.setDefaultCurrency(true);
+		
+		currencyRepository.save(currency);
 	}
 }

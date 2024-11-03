@@ -32,6 +32,7 @@ public class CompanyServiceController implements CompanyService {
 	private final SystemProfileRepository systemProfileRepository;
 	private final UserService userService;
 	private final DayService dayService;
+	private final SystemProfileService systemProfileService;
 	
 	@Override
 	public List<CompanyResponseDTO> getAllCompanies(HttpServletRequest request) {		
@@ -72,7 +73,7 @@ public class CompanyServiceController implements CompanyService {
 		company.setLegalType(companyRequest.getLegalType());
 		company.setIndustry(companyRequest.getIndustry());
 		company.setCountry(companyRequest.getCountry());
-		company.setTimeZone(companyRequest.getTimeZone());
+		//company.setTimeZone(companyRequest.getTimeZone());
 		company.setFoundingDate(companyRequest.getFoundingDate());
 		company.setTin(companyRequest.getTin());
 		company.setVrn(companyRequest.getVrn());
@@ -84,8 +85,10 @@ public class CompanyServiceController implements CompanyService {
 		company.setEmail(companyRequest.getEmail());
 		company.setFax(companyRequest.getFax());
 		
+		company.setTimeZone(systemProfileService.getDefaultTimeZone());
+		company.setCurrency(systemProfileService.getDefaultCurrency());
+		
 		company.setCreatedByUser(userService.getUser(request));
-		company.setCreatedOnDay(dayService.getDay());
 		company.setCreatedDateTime(dayService.getTimeStamp());
 		
 		company = companyRepository.save(company);
@@ -106,8 +109,10 @@ public class CompanyServiceController implements CompanyService {
 		branch.setParentBranch(null);
 		
 		branch.setCreatedByUser(userService.getUser(request));
-		//branch.setCreatedOnDay(dayService.getDay());
 		branch.setCreatedDateTime(dayService.getTimeStamp());
+		
+		branch.setTimeZone(systemProfileService.getDefaultTimeZone());
+		branch.setCurrency(systemProfileService.getDefaultCurrency());
 		
 		
 		branch = branchRepository.save(branch);
@@ -141,7 +146,7 @@ public class CompanyServiceController implements CompanyService {
 		company.setLegalType(companyRequest.getLegalType());
 		company.setIndustry(companyRequest.getIndustry());
 		company.setCountry(companyRequest.getCountry());
-		company.setTimeZone(companyRequest.getTimeZone());
+		//company.setTimeZone(companyRequest.getTimeZone());
 		company.setFoundingDate(companyRequest.getFoundingDate());
 		company.setTin(companyRequest.getTin());
 		company.setVrn(companyRequest.getVrn());
@@ -208,7 +213,7 @@ public class CompanyServiceController implements CompanyService {
 		companyResponse.setLegalType(company.getLegalType());
 		companyResponse.setIndustry(company.getIndustry());
 		companyResponse.setCountry(company.getCountry());
-		companyResponse.setTimeZone(company.getTimeZone());
+		//companyResponse.setTimeZone(company.getTimeZone());
 		companyResponse.setFoundingDate(company.getFoundingDate());
 		companyResponse.setTin(company.getTin());
 		companyResponse.setVrn(company.getVrn());

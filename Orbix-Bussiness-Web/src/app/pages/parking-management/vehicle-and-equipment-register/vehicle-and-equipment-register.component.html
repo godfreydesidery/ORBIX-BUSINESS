@@ -57,6 +57,8 @@
                                         <option>PASSPORT</option>
                                         <option>DRIVING LICENCE</option>
                                         <option>LETTER</option>
+                                        <option>VISA</option>
+                                        <option>NONE</option>
                                     </select>
                                 </div>
                             </div> 
@@ -87,12 +89,12 @@
                                     <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
                                 </div>
                             </div>
-                            <!-- <div class="col-lg-3">
+                            <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>Card No*</label>
-                                    <input class="form-control" type="text" [(ngModel)]="cardNo" autocomplete="nope">
+                                    <label>Vehicle Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="vehicleEquipmentName" autocomplete="nope">
                                 </div>
-                            </div> -->
+                            </div>
 
                             <div class="col-lg-3">
                                 <div class="form-group">
@@ -100,6 +102,31 @@
                                     <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
                                         <option></option>
                                         <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Select Vehicle Color</label>
+                                    <select class="form-control" [(ngModel)]="vehicleEquipmentColor">
+                                        <option></option>
+                                        <option value="black">Black</option>
+                                        <option value="white">White</option>
+                                        <option value="red">Red</option>
+                                        <option value="dark-blue">Dark Blue</option>
+                                        <option value="yellow">Yellow</option>
+                                        <option value="brown">Brown</option>
+                                        <option value="blue">Blue</option>
+                                        <option value="green">Green</option>
+                                        <option value="gray">Gray</option>
+                                        <option value="purple">Purple</option>
+                                        <option value="pink">Pink</option>
+                                        <option value="snow">Snow</option>
+                                        <option value="gold">Gold</option>
+                                        <option value="orange">Orange</option>
+                                        <option value="azul">Azul</option>
+                                        <option value="tomato">Tomato</option>
+                                        <option value="multicolour">Multicolour</option>
                                     </select>
                                 </div>
                             </div>
@@ -177,6 +204,8 @@
                                         <option>PASSPORT</option>
                                         <option>DRIVING LICENCE</option>
                                         <option>LETTER</option>
+                                        <option>VISA</option>
+                                        <option>NONE</option>
                                     </select>
                                 </div>
                             </div> 
@@ -480,7 +509,7 @@
                                 <div class="form-group">
                                     <label>Category</label>
                                     <select class="form-control" [(ngModel)]="vehicleEquipmentCategory">
-                                        <option></option>
+                                        <!-- <option></option> -->
                                         <option>IN TRANSIT</option>
                                         <option>LOCAL</option>
                                     </select>
@@ -510,12 +539,43 @@
                                     <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
                                 </div>
                             </div>
-                            <!-- <div class="col-lg-3">
+
+
+                            <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>Card No</label>
-                                    <input class="form-control" type="text" [(ngModel)]="cardNo" autocomplete="nope">
+                                    <label>Vehicle Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="vehicleEquipmentName" autocomplete="nope">
                                 </div>
-                            </div> -->
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Select Vehicle Color</label>
+                                    <select class="form-control" [(ngModel)]="vehicleEquipmentColor">
+                                        <option></option>
+                                        <option value="black">Black</option>
+                                        <option value="white">White</option>
+                                        <option value="red">Red</option>
+                                        <option value="dark-blue">Dark Blue</option>
+                                        <option value="yellow">Yellow</option>
+                                        <option value="brown">Brown</option>
+                                        <option value="blue">Blue</option>
+                                        <option value="green">Green</option>
+                                        <option value="gray">Gray</option>
+                                        <option value="purple">Purple</option>
+                                        <option value="pink">Pink</option>
+                                        <option value="snow">Snow</option>
+                                        <option value="gold">Gold</option>
+                                        <option value="orange">Orange</option>
+                                        <option value="azul">Azul</option>
+                                        <option value="tomato">Tomato</option>
+                                        <option value="multicolour">Multicolour</option>
+                                    </select>
+                                </div>
+                            </div>
+
+
+                            
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Vehicle Image</label>
@@ -526,8 +586,7 @@
 
                         <div class="row">
                             <div class="col-sm-12">
-                                <button type="button" class="btn btn-primary" (click)="saveParking()">Update</button>
-                                <button type="button" class="btn-success pull-right">Send To Parking</button>
+                                <button type="button" class="btn btn-primary pull-right" (click)="saveParking()">Update</button>
                             </div>
                         </div>
                     </div>                    
@@ -587,6 +646,8 @@
                                 <option>PASSPORT</option>
                                 <option>DRIVING LICENCE</option>
                                 <option>LETTER</option>
+                                <option>VISA</option>
+                                <option>NONE</option>
                             </select>
                         </div>
                     </div> 
@@ -633,6 +694,40 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Vehicle Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="vehicleEquipmentName" autocomplete="nope">
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Select Vehicle Color</label>
+                            <select class="form-control" [(ngModel)]="vehicleEquipmentColor">
+                                <option></option>
+                                <option value="black">Black</option>
+                                <option value="white">White</option>
+                                <option value="red">Red</option>
+                                <option value="dark-blue">Dark Blue</option>
+                                <option value="yellow">Yellow</option>
+                                <option value="brown">Brown</option>
+                                <option value="blue">Blue</option>
+                                <option value="green">Green</option>
+                                <option value="gray">Gray</option>
+                                <option value="purple">Purple</option>
+                                <option value="pink">Pink</option>
+                                <option value="snow">Snow</option>
+                                <option value="gold">Gold</option>
+                                <option value="orange">Orange</option>
+                                <option value="azul">Azul</option>
+                                <option value="tomato">Tomato</option>
+                                <option value="multicolour">Multicolour</option>
+                            </select>
+                        </div>
+                    </div>
+
                 </div>
             </div>
             <div class="modal-footer">
@@ -695,6 +790,8 @@
                                 <option>PASSPORT</option>
                                 <option>DRIVING LICENCE</option>
                                 <option>LETTER</option>
+                                <option>VISA</option>
+                                <option>NONE</option>
                             </select>
                         </div>
                     </div> 
@@ -741,6 +838,50 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Vehicle Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="vehicleEquipmentName" autocomplete="nope">
+                        </div>
+                    </div>
+
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Select Vehicle Type</label>
+                            <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
+                                <option></option>
+                                <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Select Vehicle Color</label>
+                            <select class="form-control" [(ngModel)]="vehicleEquipmentColor">
+                                <option></option>
+                                <option value="black">Black</option>
+                                <option value="white">White</option>
+                                <option value="red">Red</option>
+                                <option value="dark-blue">Dark Blue</option>
+                                <option value="yellow">Yellow</option>
+                                <option value="brown">Brown</option>
+                                <option value="blue">Blue</option>
+                                <option value="green">Green</option>
+                                <option value="gray">Gray</option>
+                                <option value="purple">Purple</option>
+                                <option value="pink">Pink</option>
+                                <option value="snow">Snow</option>
+                                <option value="gold">Gold</option>
+                                <option value="orange">Orange</option>
+                                <option value="azul">Azul</option>
+                                <option value="tomato">Tomato</option>
+                                <option value="multicolour">Multicolour</option>
+                            </select>
+                        </div>
+                    </div>
+
+                
                 </div>
             </div>
             <div class="modal-footer">

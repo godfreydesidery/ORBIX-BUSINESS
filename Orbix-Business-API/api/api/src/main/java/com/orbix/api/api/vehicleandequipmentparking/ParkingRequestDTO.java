@@ -68,6 +68,8 @@ public class ParkingRequestDTO {
 	
 	String cardNo;
 	
+	String hasKeys;
+	
 	String vehicleEquipmentCategory;
 	
 	String status = "PENDING";
@@ -80,6 +82,8 @@ public class ParkingRequestDTO {
     Long companyId;
     
     String vehicleEquipmentTypeName;
+    String vehicleEquipmentName;
+	String vehicleEquipmentColor;
     
     Long vehicleEquipmentId;
     

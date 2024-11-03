@@ -18,6 +18,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.orbix.api.modules.adminunits.Currency;
 import com.orbix.api.modules.identityandaccess.User;
 
 import lombok.AllArgsConstructor;
@@ -45,7 +46,7 @@ public class ParkingZoneSlot {
     @JoinColumn(name = "parking_zone_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private ParkingZone parkingZone;
-	
+		
 	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "created_by_user_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)

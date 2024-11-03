@@ -1,5 +1,7 @@
 export interface IParking {
     vehicleEquipmentTypeName: string
+    vehicleEquipmentName: string
+    vehicleEquipmentColor: string
     vehicleEquipmentCategory: string
     id : any
     no : string
@@ -50,6 +52,8 @@ export interface IParking {
     billingAmount : number
 
     status: "PENDING",
+
+    hasKeys: string
 
     // Foreign keys
     parkingZoneId: any,

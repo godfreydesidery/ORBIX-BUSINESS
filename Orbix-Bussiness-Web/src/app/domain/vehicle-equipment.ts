@@ -18,6 +18,7 @@ export interface IVehicleEquipment {
     image : any
     active : string
     vehicleEquipmentName : string
+    vehicleEquipmentColor : string
     vehicleEquipmentTypeName : string
 
     companyId : string

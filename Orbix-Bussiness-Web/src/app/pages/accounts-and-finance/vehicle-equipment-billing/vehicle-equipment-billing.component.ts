@@ -110,6 +110,8 @@ export class VehicleEquipmentBillingComponent {
 
 
   async saveParkingBill() { 
+    if(confirm('Are you sure?')) 
+     
     // If parking bill receivable id is null, create new parking bill receivable
     // If parking bill receivable id is not null, update parking bill receivable
     if(this.parkingId != null) {
@@ -402,7 +404,13 @@ export class VehicleEquipmentBillingComponent {
     }
   }
 
+  toPrintReceipt : boolean = false
+
+  receiptData : IBillReceivable [] = []
+
   async confirmBillsPayment(){
+
+    this.toPrintReceipt = false
 
     if(!confirm('Are you sure?')){
       return
@@ -411,6 +419,8 @@ export class VehicleEquipmentBillingComponent {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
+
+    this.receiptData = this.billReceivables
 
     //this.spinner.show()
     await this.http.post<IBillReceivable>(API_URL+'/bill_receivables/confirm_bills_payment?total_amount='+this.totalBillReceivable, this.billReceivables, options)
@@ -421,16 +431,19 @@ export class VehicleEquipmentBillingComponent {
         console.log(data)
         //this.msgBox.showSuccessMessage('Payment successiful')
         alert('Payment successiful')
-        this.printReceipt()
+        //this.printReceipt()
+
         this.getParkingBillReceivables(this.parkingId)
         this.getParkingServiceBillReceivables(this.parkingId)
         this.refreshBillReceivables()
+        this.toPrintReceipt = true
       }
     )
     .catch(
       error => {
         console.log(error)
         //this.msgBox.showErrorMessage(error, 'Could not confirm payment')
+        this.receiptData = []
         alert('An error occured')
       }
     )
@@ -449,10 +462,20 @@ export class VehicleEquipmentBillingComponent {
 
 
   printReceipt(){
+
+    if(this.toPrintReceipt == false){
+      return
+    }
+
+    if(this.receiptData.length == 0){
+      alert('No data to print')
+      return
+    }
+
     var items : ReceiptItem[] = []
     var item : ReceiptItem
 
-    this.billReceivables.forEach(element => {
+    this.receiptData.forEach(element => {
       item = new ReceiptItem()
       item.code = element.id
       item.name = element.summary
@@ -462,6 +485,11 @@ export class VehicleEquipmentBillingComponent {
     })
 
     this.printer.print(items, 'NA', 0)
+    this.toPrintReceipt = false
+  }
+
+  clearReceipt(){
+    this.receiptData = []
   }
 
 

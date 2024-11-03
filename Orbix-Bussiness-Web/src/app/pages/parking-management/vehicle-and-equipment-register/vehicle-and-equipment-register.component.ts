@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 import { AuthService } from 'src/app/auth.service';
 import { IParking } from 'src/app/domain/parking';
 import { IParkingZone } from 'src/app/domain/parking-zone';
@@ -46,6 +47,7 @@ export class VehicleEquipmentRegisterComponent {
 
   vehicleEquipmentTypeName : string = ''
   vehicleEquipmentName : string = ''
+  vehicleEquipmentColor : string = ''
   active : string = 'Inactive'
 
   companyId : string = ''
@@ -113,7 +115,7 @@ export class VehicleEquipmentRegisterComponent {
 
   // cardNo : string = ''
 
-  vehicleEquipmentCategory : string = ''
+  vehicleEquipmentCategory : string = 'IN TRANSIT'
 
   billingType : string = ''
   billingAmount : number = 0
@@ -154,7 +156,8 @@ export class VehicleEquipmentRegisterComponent {
 
   constructor(
     private http :HttpClient,
-    private auth : AuthService
+    private auth : AuthService,
+    private router : Router
   ) {}
 
   ngOnInit(): void {
@@ -275,6 +278,7 @@ export class VehicleEquipmentRegisterComponent {
       chasisNo : this.chasisNo,
       cardNo : this.cardNo,
       vehicleEquipmentTypeName : this.vehicleEquipmentTypeName,
+      vehicleEquipmentColor : this.vehicleEquipmentColor,
       vehicleEquipmentName : this.vehicleEquipmentName,
       active : this.active,
       companyId : this.companyId,
@@ -374,6 +378,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.chasisNo = data.chasisNo
     this.cardNo = data.cardNo
     this.vehicleEquipmentName = data.vehicleEquipmentName
+    this.vehicleEquipmentColor = data.vehicleEquipmentColor
     this.vehicleEquipmentTypeName = data.vehicleEquipmentTypeName
     this.active = data.active
     this.companyId = data.companyId
@@ -403,6 +408,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.chasisNo = ''
     this.cardNo = ''
     this.vehicleEquipmentName = ''
+    this.vehicleEquipmentColor = ''
     this.vehicleEquipmentTypeName = ''
     this.active = ''
 
@@ -489,6 +495,9 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.roundMirror = data?.roundMirror == true ? 'YES' : 'NO'
     this.tireIndicator = data?.tireIndicator == true ? 'YES' : 'NO'
     this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName,
+    this.vehicleEquipmentColor = data!.vehicleEquipmentColor,
+
+    this.vehicleEquipmentName = data!.vehicleEquipmentName,
 
     this.vehicleEquipmentCategory = data!.vehicleEquipmentCategory
 
@@ -547,6 +556,9 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.vehicleEquipmentTypeName = ''
 
     this.vehicleEquipmentCategory = ''
+
+    this.vehicleEquipmentName = ''
+    this.vehicleEquipmentColor = ''
 
     this.parkingZoneName = ''
 
@@ -612,6 +624,10 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
       vehicleEquipmentCategory : this.vehicleEquipmentCategory,
 
+      vehicleEquipmentName : this.vehicleEquipmentName,
+
+      vehicleEquipmentColor : this.vehicleEquipmentColor,
+
       cardNo : this.cardNo,
 
       billintType : this.billingType
@@ -654,7 +670,8 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
           // this.getAllPendingOrCheckedInParkings()
 
-          alert('Parking updated successifully')
+          alert('Parking updated successifully. Vehicle available for check in')
+          this.setNewMode()
         }
 
       )

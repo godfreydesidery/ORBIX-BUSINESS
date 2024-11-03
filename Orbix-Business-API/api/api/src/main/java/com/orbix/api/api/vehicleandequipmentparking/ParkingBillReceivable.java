@@ -15,8 +15,10 @@ import javax.persistence.Table;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.orbix.api.modules.adminunits.Branch;
 import com.orbix.api.modules.adminunits.Company;
+import com.orbix.api.modules.adminunits.Currency;
 import com.orbix.api.modules.finance.BillReceivable;
 import com.orbix.api.modules.finance.InvoiceReceivable;
 import com.orbix.api.modules.finance.InvoiceReceivableDetail;
@@ -56,7 +58,7 @@ public class ParkingBillReceivable {
     @JoinColumn(name = "bill_receivable_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private BillReceivable billReceivable;
-	
+		
 //	@ManyToOne(targetEntity = InvoiceReceivableDetail.class, fetch = FetchType.EAGER,  optional = false)
 //    @JoinColumn(name = "invoice_receivable_detail_id", nullable = false , updatable = false)
 //    @OnDelete(action = OnDeleteAction.NO_ACTION)

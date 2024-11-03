@@ -49,12 +49,17 @@ public class ParkingResponseDTO {
 	String tireIndicator;
 	Byte[] image;
 	
+	String hasKeys;
+	
 	String vehicleEquipmentCategory;
 
 	String status = "PENDING";
 
     String parkingZoneId;
     String parkingZoneName;
+    
+    String vehicleEquipmentName;
+	String vehicleEquipmentColor;
 	
     String vehicleAndEquipmentTypeId;	
     String branchId;

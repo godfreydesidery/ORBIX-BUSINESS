@@ -10,6 +10,7 @@ import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
+import * as pdfMake from 'pdfmake/build/pdfmake';
 
 
 
@@ -84,6 +85,8 @@ export class VehicleRegisterComponent {
   //image: Byte[]
 
   status: string = "PENDING"
+
+  hasKeys : string = 'YES'
 
   startBillingAt : Date | null
 
@@ -257,6 +260,8 @@ export class VehicleRegisterComponent {
 
       cardNo : this.cardNo,
 
+      hasKeys : this.hasKeys,
+
       billintType : this.billingType,
 
       parkingZoneName : this.parkingZoneName
@@ -353,6 +358,7 @@ export class VehicleRegisterComponent {
     var parking = {
       id : this.id,
       cardNo : this.cardNo,
+      hasKeys : this.hasKeys,
       parkingZoneName : this.parkingZoneName,
       startBillingAt : this.startBillingAt
     }
@@ -370,6 +376,43 @@ export class VehicleRegisterComponent {
 
         }
 
+      )
+      .catch(
+        error => {
+          console.log(error)
+          alert('An error has occured')
+        }
+      )
+  }
+
+  async checkOut(){
+    if(!confirm('Are you sure you want to check out?')){
+      return
+    }
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    var parking = {
+      id : this.id,
+      cardNo : this.cardNo,
+      parkingZoneName : this.parkingZoneName,
+      startBillingAt : this.startBillingAt
+    }
+
+    await this.http.post<IParking>(API_URL+'/parkings/check_out', parking, options)
+      .toPromise()
+      .then(
+        data => {
+
+          console.log(data)
+
+          this.getAllPendingOrCheckedInParkings()
+
+          alert('Checked out Successifully')
+          this.printGatePass()
+        }
       )
       .catch(
         error => {
@@ -432,6 +475,8 @@ export class VehicleRegisterComponent {
 
     this.billingType = data?.billingType
     this.billingAmount = data?.billingAmount
+
+    this.hasKeys = data?.hasKeys
 
     // Vehicle or Equipment Information
     this.registrationNo = data?.registrationNo;
@@ -513,6 +558,32 @@ export class VehicleRegisterComponent {
 
     this.parkingZoneName = ''
 
+    this.hasKeys = ''
+
     this.billingType = ''
   }
+
+
+  printGatePass() {
+    const documentDefinition = {
+      content: [
+        { text: 'Davagan', fontSize: 18, bold: true },
+        { text: 'Gate Pass', fontSize: 18, bold: true },
+        { text: 'Vehicle Name', fontSize: 18, bold: true },
+        { text: 'Color', fontSize: 18, bold: true },
+        { text: 'Chasis No', fontSize: 18, bold: true },
+        { text: 'Reg No', fontSize: 18, bold: true },
+
+        { text: 'Payments: OK', fontSize: 18, bold: true },
+        { text: 'Cashier Coments: OK', fontSize: 18, bold: true },
+
+        { text: 'Issue Date: ', fontSize: 18, bold: true },
+
+        { text: 'Gate Pass issued By:', fontSize: 18, bold: true },
+
+      ]
+    };
+    pdfMake.createPdf(documentDefinition).open();
+  }
+
 }

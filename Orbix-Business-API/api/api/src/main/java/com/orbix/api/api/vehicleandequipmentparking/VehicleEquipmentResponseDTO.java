@@ -24,6 +24,9 @@ public class VehicleEquipmentResponseDTO {
 	private String active;
 	
 	private String vehicleEquipmentTypeName;
+	
+	String vehicleEquipmentName;
+	String vehicleEquipmentColor;
 
 	private String companyId;
 	private String companyName;

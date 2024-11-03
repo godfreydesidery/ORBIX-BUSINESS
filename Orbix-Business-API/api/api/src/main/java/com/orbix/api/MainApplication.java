@@ -149,6 +149,13 @@ public class MainApplication {
 	CommandLineRunner run(SystemProfileService systemProfileService, UserService userService, DayService dayService) {
 		return args -> {
 			if(!systemProfileService.hasData()) {
+				
+				log.info("Creating a default time zone");
+				systemProfileService.createDefaultTimeZone();
+				
+				log.info("Creating a default currency");
+				systemProfileService.createDefaultCurrency();
+				
 				log.info("Creating the system instance");
 				SystemProfile system = new SystemProfile(
 						null,

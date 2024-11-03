@@ -16,8 +16,10 @@ import javax.persistence.UniqueConstraint;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.orbix.api.modules.adminunits.Branch;
 import com.orbix.api.modules.adminunits.Company;
+import com.orbix.api.modules.adminunits.Currency;
 import com.orbix.api.modules.identityandaccess.User;
 
 import lombok.AllArgsConstructor;

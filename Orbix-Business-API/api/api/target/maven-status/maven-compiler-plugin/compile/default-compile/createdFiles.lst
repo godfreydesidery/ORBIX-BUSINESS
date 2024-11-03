@@ -1,5 +1,4 @@
 com\orbix\api\exceptions\DuplicateEntryException.class
-com\orbix\api\modules\adminunits\DayRepository.class
 com\orbix\api\modules\identityandaccess\Role.class
 com\orbix\api\modules\identityandaccess\User.class
 com\orbix\api\modules\identityandaccess\Privilege.class

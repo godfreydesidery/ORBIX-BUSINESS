@@ -69,7 +69,7 @@ public class Company {
 	private String legalType;
 	private String industry;
 	private String country;
-	private String timeZone;
+//	private String timeZone;
 	
 	private LocalDate foundingDate;
 	
@@ -88,20 +88,25 @@ public class Company {
 	
 	private boolean active = false;
 	
+	@ManyToOne(targetEntity = Currency.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "currency_id", nullable = false , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@JsonIgnoreProperties("currencies")
+    private Currency currency;
+	
+	@ManyToOne(targetEntity = TimeZone.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "time_zone_id", nullable = false , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@JsonIgnoreProperties("timeZones")
+    private TimeZone timeZone;
+	
 	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "created_by_user_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
 	@ToString.Exclude
     @EqualsAndHashCode.Exclude
     private User createdByUser;
-	
-	@ManyToOne(targetEntity = Day.class, fetch = FetchType.EAGER,  optional = false)
-    @JoinColumn(name = "created_on_day_id", nullable = false , updatable = false)
-    @OnDelete(action = OnDeleteAction.NO_ACTION)
-	@ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private Day createdOnDay;
-	
+		
 	private LocalDateTime createdDateTime = LocalDateTime.now();
 	
 	@ManyToMany(fetch = FetchType.EAGER)
@@ -109,14 +114,6 @@ public class Company {
 	@ToString.Exclude
     @EqualsAndHashCode.Exclude
 	private Collection<Branch> branches = new ArrayList<>();
-	
-	
-	
-	
-	
-	
-	
-	
 	
 
 }

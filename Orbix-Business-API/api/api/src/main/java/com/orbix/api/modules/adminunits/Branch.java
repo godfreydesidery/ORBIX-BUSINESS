@@ -85,6 +85,18 @@ public class Branch {
 	@JsonIgnoreProperties("branches")
     private Branch parentBranch;
 	
+	@ManyToOne(targetEntity = Currency.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "currency_id", nullable = false , updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@JsonIgnoreProperties("currencies")
+    private Currency currency;
+	
+	@ManyToOne(targetEntity = TimeZone.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "time_zone_id", nullable = false , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@JsonIgnoreProperties("timeZones")
+    private TimeZone timeZone;
+	
 	@ManyToMany(fetch = FetchType.EAGER)
 	@Fetch(FetchMode.SUBSELECT)
 	private Collection<Branch> childBranches = new ArrayList<>();

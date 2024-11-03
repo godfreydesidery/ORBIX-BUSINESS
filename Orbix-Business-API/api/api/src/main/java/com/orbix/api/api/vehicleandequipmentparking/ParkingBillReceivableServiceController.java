@@ -116,7 +116,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 			
 			if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is before bill starting date");
 			
-			long dayCount = ChronoUnit.DAYS.between(fromDate, toDate) + 1;
+			long dayCount = ChronoUnit.DAYS.between(fromDate, toDate);
 			
 			qty = dayCount;
 			

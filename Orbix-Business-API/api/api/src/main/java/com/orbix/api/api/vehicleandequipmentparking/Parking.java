@@ -59,6 +59,8 @@ public class Parking {
 	private String agentEmail;
 	private String tformNumber;
 	
+	private String hasKeys;
+	
 	/**Vehicle or Equipment Information*/  ///Attention, change the boolean values to boolean instead of string, for database performance issues
 	private String registrationNo;
 	private String chasisNo;
@@ -83,6 +85,8 @@ public class Parking {
 	private String cardNo;
 	
 	private String vehicleEquipmentCategory;
+	private String vehicleEquipmentName;
+	private String vehicleEquipmentColor;
 	
 	private LocalDateTime startBillingAt = LocalDateTime.now();
 	

@@ -85,6 +85,8 @@ public class BranchServiceController implements BranchService {
 		branch.setName(branchRequest.getName());
 		branch.setType(branchRequest.getType());		
 		branch.setCompany(company_.get());
+		
+		
 		branch.setLevel(branchRequest.getLevel());
 		branch.setType(branchRequest.getType());
 		branch.setPhysicalAddress(branchRequest.getPhysicalAddress());
@@ -104,6 +106,9 @@ public class BranchServiceController implements BranchService {
 		branch.setSalesTargets(branchRequest.getSalesTargets());
 		branch.setDateEstablished(branchRequest.getDateEstablished());
 		branch.setNotes(branchRequest.getNotes());
+		
+		branch.setTimeZone(company_.get().getTimeZone());
+		branch.setCurrency(company_.get().getCurrency());
 		
 		branch.setCreatedByUser(userService.getUser(request));
 		//branch.setCreatedOnDay(dayService.getDay());

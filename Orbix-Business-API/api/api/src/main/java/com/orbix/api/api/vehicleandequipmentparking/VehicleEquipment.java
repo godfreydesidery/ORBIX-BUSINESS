@@ -56,6 +56,9 @@ public class VehicleEquipment {
 	private String cardNo;
 	private Byte[] image;
 	
+	private String vehicleEquipmentName;
+	private String vehicleEquipmentColor;
+	
 	
 	private boolean active = true;
 

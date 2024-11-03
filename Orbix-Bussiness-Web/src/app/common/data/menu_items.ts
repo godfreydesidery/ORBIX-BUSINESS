@@ -349,24 +349,24 @@ export const menuItems = [
         expanded: false,
         order: 100,
         subMenu: [
-            {
-                title: 'Invoices',
-                url: '#',
-                subMenu: [
-                    // {
-                    //     title: 'Receivable',
-                    //     routerLink: '/app/accounts-and-finance/invoices/receivable-invoice-list'
-                    // },
-                    {
-                        title: 'Receivable-Parking',
-                        routerLink: '/app/accounts-and-finance/invoices/parking-receivable-invoice-list'
-                    },
-                    // {
-                    //     title: 'Payable',
-                    //     routerLink: '/app/blank'
-                    // },
-                ]
-            },
+            // {
+            //     title: 'Invoices',
+            //     url: '#',
+            //     subMenu: [
+            //         // {
+            //         //     title: 'Receivable',
+            //         //     routerLink: '/app/accounts-and-finance/invoices/receivable-invoice-list'
+            //         // },
+            //         // {
+            //         //     title: 'Receivable-Parking',
+            //         //     routerLink: '/app/accounts-and-finance/invoices/parking-receivable-invoice-list'
+            //         // },
+            //         // {
+            //         //     title: 'Payable',
+            //         //     routerLink: '/app/blank'
+            //         // },
+            //     ]
+            // },
             {
                 title: 'Parking Billing',
                 routerLink: '/app/accounts-and-finance/parking-billing'

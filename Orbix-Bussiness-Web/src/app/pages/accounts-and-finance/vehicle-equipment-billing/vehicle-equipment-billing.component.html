@@ -17,7 +17,7 @@
                         <div><h4>Parking billing</h4></div>
                         <div class="row">
                             <div class="col-sm-12">
-                                <button type="button" class="btn btn-primary btn-round-custom" (click)="clearParkingBill()" data-toggle="modal" data-target="#parking-bill-to-current-modal">Bill to Current Date</button>
+                                <button type="button" class="btn btn-primary btn-round-custom" (click)="clearParkingBill()" (click)="saveParkingBill()">Bill to Current Date</button>
                                 <button type="button" class="btn btn-primary btn-round-custom" (click)="clearParkingBill()" data-toggle="modal" data-target="#parking-bill-to-future-modal">Bill to Future Date</button>
                             </div>
                         </div>
@@ -101,7 +101,7 @@
             <hr>
             <div class="row">
                 <div class="col-sm-12" style="text-align: center;">
-                    <button class="btn btn-success btn-round-custom" (click)="refreshBillReceivables()" data-toggle="modal" data-target="#pay-bill-modal">Go to Payment</button>
+                    <button class="btn btn-success btn-round-custom" (click)="refreshBillReceivables()" (click)="clearReceipt()" data-toggle="modal" data-target="#pay-bill-modal">Go to Payment</button>
                 </div>
             </div>
             <hr>
@@ -134,7 +134,7 @@
                                     <td>Check</td>
                                 </tr>
                             </thead>
-                            <tbody *ngIf="billReceivables.length > 0">
+                            <tbody>
                                 <tr *ngFor="let b of billReceivables">
                                     <td>{{b.sn}}</td>
                                     <td>{{b.summary}}</td>
@@ -145,7 +145,7 @@
                                     <!-- <td style="text-align: center;"><input type="checkbox"></td> -->
                                 </tr>
                                 
-                                <tr style="font-weight: bold;">
+                                <tr *ngIf="billReceivables.length > 0" style="font-weight: bold;">
                                     <td></td>
                                     <td></td>
                                     <td></td>
@@ -153,33 +153,33 @@
                                     <td style="text-align: right;"><b>{{totalBillReceivable | currency:'':''}}</b></td>
                                     <td></td>
                                 </tr>
-                                <tr>
+                                <!-- <tr>
                                     <td></td>
                                     <td></td>
                                     <td></td>
                                     <td style="text-align: right;">Tender Amount</td>
                                     <td><input type="number" class="form-control" [(ngModel)]="tender" min="0" (input)="onInput($event)" (ngModelChange)="refreshAmounts()"></td>
                                     <td></td>
-                                </tr>
-                                <tr>
+                                </tr> -->
+                                <!-- <tr>
                                     <td></td>
                                     <td></td>
                                     <td></td>
                                     <td style="text-align: right;">Balance</td>
                                     <td><span class="form-control" style="text-align: right;">{{balance | currency:'':''}}</span></td>
                                     <td></td>
-                                </tr>
+                                </tr> -->
                                 <tr>
                                     <td></td>
                                     <td></td>
                                     <td></td>
                                     <td></td>
-                                    <td></td>
-                                    <td style="text-align: center;"><button class="btn btn-success btn-round-custom" *ngIf="balance >= 0 && billReceivables.length > 0" (click)="confirmBillsPayment()">Confirm Payment</button></td>
+                                    <td><button class="btn btn-success btn-round-custom" (click)="printReceipt()">Print Receipt</button></td>
+                                    <td style="text-align: center;"><button class="btn btn-success btn-round-custom" *ngIf="billReceivables.length > 0" (click)="confirmBillsPayment()">Confirm Payment</button></td>
                                 </tr>
                             </tbody>
                         </table>
-                        <div class="alert alert-primary" *ngIf="billReceivables.length == 0">No bill receivable found</div>
+                        <div class="alert alert-primary" *ngIf="billReceivables.length == 0">No Data</div>
                     </div>
                 </div>
                 
