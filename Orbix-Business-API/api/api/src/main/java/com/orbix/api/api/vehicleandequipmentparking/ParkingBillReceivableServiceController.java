@@ -2,6 +2,7 @@ package com.orbix.api.api.vehicleandequipmentparking;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -91,13 +92,53 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		Parking parking = parkingRepository.findById(parkingBillReceivableRequest.getParkingId())
                 .orElseThrow(() -> new NotFoundException("Parking not found."));
 		
-		if(!validateParkingBill(parkingBillReceivableRequest)) throw new InvalidOperationException("Invalid entries");
+		// if(!validateParkingBill(parkingBillReceivableRequest)) throw new InvalidOperationException("Invalid entries");
 		
+		// Check if is first bill
+		
+		List<ParkingBillReceivable> rcvs = parkingBillReceivableRepository.findAllByParking(parking);
+		
+		LocalDateTime fromDate = null;
+		LocalDateTime toDate = null;
+		double qty = 0;
+		
+		if(parkingBillReceivableRequest.getEndedAt() != null) {
+			String dateString = parkingBillReceivableRequest.getEndedAt() + " 00:00:00";
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			toDate = LocalDateTime.parse(dateString, formatter).plusDays(1).toLocalDate().atStartOfDay();
+		}
+		
+		if(rcvs.isEmpty()) {			
+			// Check for first billing date		
+			fromDate = parking.getStartBillingAt().toLocalDate().atStartOfDay();
+			
+			if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();	
+			
+			if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is before bill starting date");
+			
+			long dayCount = ChronoUnit.DAYS.between(fromDate, toDate) + 1;
+			
+			qty = dayCount;
+			
+		}else {
+			// Take the last bill
+			fromDate = rcvs.get(rcvs.size() - 1).getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
+			
+			if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
+			
+			if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is invalid" + toDate.toString() + fromDate.toString());
+			
+			long dayCount = ChronoUnit.DAYS.between(fromDate, toDate) + 1;
+			
+			qty = dayCount;
+			
+		}
+				
 		BillReceivable billReceivable = new BillReceivable();
 		billReceivable.setNo(String.valueOf(Math.random()));
-		billReceivable.setAmount(parking.getBillingAmount() * parkingBillReceivableRequest.getQty() - parkingBillReceivableRequest.getDiscount());
+		billReceivable.setAmount((parking.getBillingAmount() * qty) - parkingBillReceivableRequest.getDiscount());
 		billReceivable.setPaid(0);
-		billReceivable.setDue(parking.getBillingAmount() * parkingBillReceivableRequest.getQty() - parkingBillReceivableRequest.getDiscount());
+		billReceivable.setDue((parking.getBillingAmount() * qty) - parkingBillReceivableRequest.getDiscount());
 		billReceivable.setBranch(parking.getBranch());
 		billReceivable.setCreatedDateTime(dayService.getTimeStamp());
 		
@@ -110,28 +151,31 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		
 		ParkingBillReceivable parkingBillReceivable = new ParkingBillReceivable();
 		
-		if(parkingBillReceivableRequest.getStartedAt() == null) {
-			parkingBillReceivable.setStartedAt(dayService.getTimeStamp()); // You can change this depending on user billing preferences
-		}else {
-			//String dateString = "2024-10-26 15:30:45" ;
-			String dateString = parkingBillReceivableRequest.getStartedAt() + " 00:00:00";
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
-			parkingBillReceivable.setStartedAt(dateTime);
-		}
+		parkingBillReceivable.setStartedAt(fromDate);
+		parkingBillReceivable.setEndedAt(toDate);
 		
-		if(parkingBillReceivableRequest.getEndedAt() == null) {
-			parkingBillReceivable.setEndedAt(dayService.getTimeStamp()); // You can change this depending on user billing preferences
-		}else {
-			//String dateString = "2024-10-26 15:30:45" ;
-			String dateString = parkingBillReceivableRequest.getEndedAt() + " 00:00:00";
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
-			parkingBillReceivable.setEndedAt(dateTime);
-		}
+//		if(parkingBillReceivableRequest.getStartedAt() == null) {
+//			parkingBillReceivable.setStartedAt(dayService.getTimeStamp().toLocalDate().atStartOfDay()); // You can change this depending on user billing preferences
+//		}else {
+//			//String dateString = "2024-10-26 15:30:45" ;
+//			String dateString = parkingBillReceivableRequest.getStartedAt() + " 00:00:00";
+//			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+//			parkingBillReceivable.setStartedAt(dateTime);
+//		}
+		
+//		if(parkingBillReceivableRequest.getEndedAt() == null) {
+//			parkingBillReceivable.setEndedAt(dayService.getTimeStamp().toLocalDate().atStartOfDay()); // You can change this depending on user billing preferences
+//		}else {
+//			//String dateString = "2024-10-26 15:30:45" ;
+//			String dateString = parkingBillReceivableRequest.getEndedAt() + " 00:00:00";
+//			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+//			parkingBillReceivable.setEndedAt(dateTime);
+//		}
 		
 		parkingBillReceivable.setPrice(parking.getBillingAmount());
-		parkingBillReceivable.setQty(parkingBillReceivableRequest.getQty());
+		parkingBillReceivable.setQty(qty);
 		parkingBillReceivable.setDiscount(parkingBillReceivableRequest.getDiscount());
 		parkingBillReceivable.setBillReceivable(billReceivable);
 		parkingBillReceivable.setParking(parking);
@@ -270,6 +314,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		ParkingBillReceivableResponseDTO parkingBillReceivableResponseDTO = new ParkingBillReceivableResponseDTO();
 		
 		parkingBillReceivableResponseDTO.setId(parkingBillReceivable.getId().toString());
+		parkingBillReceivableResponseDTO.setDescription("Parking bill " + parkingBillReceivable.getStartedAt().toString() + " to "  + parkingBillReceivable.getEndedAt().toString());
 		parkingBillReceivableResponseDTO.setPrice(String.valueOf(parkingBillReceivable.getPrice()));
 		parkingBillReceivableResponseDTO.setQty(String.valueOf(parkingBillReceivable.getQty()));
 		parkingBillReceivableResponseDTO.setStartedAt(String.valueOf(parkingBillReceivable.getStartedAt()));

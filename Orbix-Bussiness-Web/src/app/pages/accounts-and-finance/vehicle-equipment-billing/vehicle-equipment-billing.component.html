@@ -5,14 +5,20 @@
                 <span>Vehicle & Equipment Billing</span>
             </div>
             <div class="card-body widget-body"> 
+                <div class="row">
+                    <div class="col-lg-12">
+                        <button type="button" class="btn btn-success btn-round-custom" (click)="refresh()">Refresh</button>
+                    </div>
+                </div>
+                <hr>
 
                 <div class="row">
                     <div class="col-lg-6">
                         <div><h4>Parking billing</h4></div>
                         <div class="row">
                             <div class="col-sm-12">
-                                <button type="button" class="btn btn-primary btn-round-custom" data-toggle="modal" data-target="#parking-bill-modal">Add Bill</button>
-                                <button type="button" class="btn btn-primary btn-round-custom">Refresh Bills</button>
+                                <button type="button" class="btn btn-primary btn-round-custom" (click)="clearParkingBill()" data-toggle="modal" data-target="#parking-bill-to-current-modal">Bill to Current Date</button>
+                                <button type="button" class="btn btn-primary btn-round-custom" (click)="clearParkingBill()" data-toggle="modal" data-target="#parking-bill-to-future-modal">Bill to Future Date</button>
                             </div>
                         </div>
                         <div class="row">
@@ -52,7 +58,6 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <button type="button" class="btn btn-primary btn-round-custom" data-toggle="modal" data-target="#service-bill-modal">Add Bill</button>
-                                <button type="button" class="btn btn-primary btn-round-custom">Refresh Bills</button>
                             </div>
                         </div>
                         <div class="row">
@@ -95,11 +100,9 @@
             </div>
             <hr>
             <div class="row">
-                <div class="col-sm-4"></div>
-                <div class="col-sm-4">
+                <div class="col-sm-12" style="text-align: center;">
                     <button class="btn btn-success btn-round-custom" (click)="refreshBillReceivables()" data-toggle="modal" data-target="#pay-bill-modal">Go to Payment</button>
                 </div>
-                <div class="col-sm-4"></div>
             </div>
             <hr>
         </div>
@@ -265,9 +268,11 @@
             </div>
             <div class="modal-body">
 
+                <input type="hidden" [(ngModel)]="parkingBillReceivableId">
+
                 <div class="row">
-                    <div class="col-lg-3">
-                        <input type="hidden" [(ngModel)]="parkingBillReceivableId">
+                    <!-- <div class="col-lg-3">
+                        
                         <div class="form-group">
                             <label>Starting Date</label>
                             <input class="form-control" type="date" [(ngModel)]="parkingBillReceivableStartingDate"  autocomplete="nope">
@@ -278,35 +283,91 @@
                             <label>Ending Date</label>
                             <input class="form-control" type="date" [(ngModel)]="parkingBillReceivableEndingDate"  autocomplete="nope">
                         </div>
-                    </div>
+                    </div> -->
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Description</label>
+                            <span class="form-control">{{parkingBillReceivableDescription}}</span>
+                        </div>
+                    </div> 
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Unit Price</label>
-                            <input class="form-control" type="text" [(ngModel)]="parkingBillReceivablePrice" autocomplete="nope" style="text-align: right;">
+                            <span class="form-control" style="text-align: right;">{{parkingBillReceivablePrice | currency:'':''}}</span>
                         </div>
                     </div>   
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Qty</label>
-                            <input class="form-control" type="number" [(ngModel)]="parkingBillReceivableQty" autocomplete="nope" style="text-align: right;">
+                            <input class="form-control" type="number" [(ngModel)]="parkingBillReceivableQty" autocomplete="nope" style="text-align: center;">
                         </div>
                     </div> 
                     <div class="col-lg-3">
                         <div class="form-group">
-                            <label>Discount</label>
-                            <input class="form-control" type="text" [(ngModel)]="parkingBillReceivableDiscount" autocomplete="nope" style="text-align: right;">
+                            <label>Discount Allowable</label>
+                            <input class="form-control" type="number" min="0" [(ngModel)]="parkingBillReceivableDiscount" autocomplete="nope" style="text-align: center;">
                         </div>
                     </div> 
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Amount</label>
-                            <input class="form-control" type="text" [(ngModel)]="parkingBillReceivableAmount" autocomplete="nope" style="text-align: right;">
+                            <span class="form-control" style="text-align: right;">{{parkingBillReceivableAmount | currency:'':''}}</span>
                         </div>
                     </div>             
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
                         <button type="button" class="btn btn-primary btn-round-custom" (click)="saveParkingBill()">Save</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="parking-bill-to-current-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Bill to Current Date</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                
+                <div class="row">
+                    <div class="col-lg-12">
+                        <button type="button" class="btn btn-primary btn-round-custom" (click)="saveParkingBill()">Generate Bill(s)</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="parking-bill-to-future-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Bill to Future Date</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-lg-3">
+                    <div class="form-group">
+                        <label>Select a future Date (If not selected, it will take current date)</label>
+                        <input class="form-control" type="date" [(ngModel)]="parkingBillReceivableEndingDate"  autocomplete="nope">
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-12">
+                        <button type="button" class="btn btn-primary btn-round-custom" (click)="saveParkingBill()">Generate Bill(s)</button>
                     </div>
                 </div>
             </div>

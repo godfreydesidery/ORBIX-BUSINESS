@@ -2,11 +2,13 @@ import { Injectable } from '@angular/core';
 import { DatePipe } from '@angular/common';
 
 import * as pdfMake from 'pdfmake/build/pdfmake';
-import { ReceiptItem } from '../domain/receipt-item';
+import { ReceiptItem } from 'src/app/domain/receipt-item';
 import { DataService } from './data.service';
-import { IPatient } from '../domain/patient';
+//import { IPatient } from '../domain/patient';
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
-const fs = require('file-saver');
+
+
+//const fs = require('file-saver');
 
 @Injectable({
   providedIn: 'root'
@@ -16,7 +18,8 @@ export class PosReceiptPrinterService {
   constructor(private datePipe : DatePipe,
     private data : DataService) {}
 
-  print = async (items : ReceiptItem[], receiptNo :string, cash : number, patient : IPatient) => {
+  //print = async (items : ReceiptItem[], receiptNo :string, cash : number, patient : IPatient) => {
+    print = async (items : ReceiptItem[], receiptNo :string, cash : number) => {
 
     var companyName = localStorage.getItem('company-name')!
 
@@ -41,7 +44,7 @@ export class PosReceiptPrinterService {
     var sn = 0
 
     items.forEach((element) => {
-      total = total + element.amount
+      total = total + (+element.amount)
       sn = sn + 1
       var item = [
         {text : sn.toString(), fontSize : 8, bold : false}, 
@@ -82,20 +85,20 @@ export class PosReceiptPrinterService {
               ]
             }
           }, 
-          {
-            layout : 'noBorders',
-            table : {
-              headerRows : 0,
-              widths : [200],
-              body : [
-                [{text : patient?.firstName + ' '+ patient?.middleName + ' '+ patient?.lastName , fontSize : 8}],
-                [{text : patient?.no, fontSize : 8}],
-                [{text : patient?.address, fontSize : 8}],
-                [{text : patient?.phoneNo, fontSize : 8}],
-                [{text : '________________________________',alignment : 'center',}],
-              ]
-            }
-          },  
+          // {
+          //   layout : 'noBorders',
+          //   table : {
+          //     headerRows : 0,
+          //     widths : [200],
+          //     body : [
+          //       [{text : patient?.firstName + ' '+ patient?.middleName + ' '+ patient?.lastName , fontSize : 8}],
+          //       [{text : patient?.no, fontSize : 8}],
+          //       [{text : patient?.address, fontSize : 8}],
+          //       [{text : patient?.phoneNo, fontSize : 8}],
+          //       [{text : '________________________________',alignment : 'center',}],
+          //     ]
+          //   }
+          // },  
           {
             layout : 'noBorders',
             table : {

@@ -6,6 +6,7 @@ import lombok.Data;
 public class ParkingBillReceivableResponseDTO {
 
 	String id;
+	String description;
 	String startedAt;
 	String endedAt;
 	String billingType;

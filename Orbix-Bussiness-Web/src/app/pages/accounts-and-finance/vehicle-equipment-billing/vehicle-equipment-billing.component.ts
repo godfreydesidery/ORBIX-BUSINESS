@@ -11,6 +11,8 @@ import { IParking } from 'src/app/domain/parking';
 import { environment } from 'src/environments/environment';
 
 import * as pdfMake from 'pdfmake/build/pdfmake';
+import { PosReceiptPrinterService } from '@services/custom/pos-receipt-printer.service';
+import { ReceiptItem } from 'src/app/domain/receipt-item';
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
@@ -67,7 +69,8 @@ export class VehicleEquipmentBillingComponent {
     private http :HttpClient,
     private auth : AuthService,
     private route: ActivatedRoute,
-    private router : Router
+    private router : Router,
+    private printer : PosReceiptPrinterService
     ){} //{(window as any).pdfMake.vfs = pdfFonts.pdfMake.vfs;}
 
   ngOnInit() {
@@ -117,8 +120,8 @@ export class VehicleEquipmentBillingComponent {
       var parkingBill = {
         id: this.parkingBillReceivableId,
         description: this.parkingBillReceivableDescription,
-        startingDate: this.parkingBillReceivableStartingDate,
-        endingDate: this.parkingBillReceivableEndingDate,
+        startedAt: this.parkingBillReceivableStartingDate,
+        endedAt: this.parkingBillReceivableEndingDate,
         price: this.parkingBillReceivablePrice,
         qty: this.parkingBillReceivableQty,
         discount: this.parkingBillReceivableDiscount,
@@ -371,6 +374,11 @@ export class VehicleEquipmentBillingComponent {
 
   }
 
+  refresh(){
+    this.getParkingBillReceivables(this.parkingId)
+    this.getParkingServiceBillReceivables(this.parkingId)
+  }
+
   
 
   getUnpaidBills() { }  
@@ -413,7 +421,7 @@ export class VehicleEquipmentBillingComponent {
         console.log(data)
         //this.msgBox.showSuccessMessage('Payment successiful')
         alert('Payment successiful')
-        this.print('',0)
+        this.printReceipt()
         this.getParkingBillReceivables(this.parkingId)
         this.getParkingServiceBillReceivables(this.parkingId)
         this.refreshBillReceivables()
@@ -426,6 +434,34 @@ export class VehicleEquipmentBillingComponent {
         alert('An error occured')
       }
     )
+  }
+
+  clearParkingBill(){
+    this.parkingBillReceivableId = null
+    this.parkingBillReceivableDescription = ''
+    this.parkingBillReceivableAmount = 0
+    this.parkingBillReceivableQty = 0
+    this.parkingBillReceivableDiscount = 0
+    this.parkingBillReceivableStartingDate = null
+    this.parkingBillReceivableEndingDate = null
+  }
+
+
+
+  printReceipt(){
+    var items : ReceiptItem[] = []
+    var item : ReceiptItem
+
+    this.billReceivables.forEach(element => {
+      item = new ReceiptItem()
+      item.code = element.id
+      item.name = element.summary
+      item.amount = element.amount
+      item.qty = parseFloat(element.qty)
+      items.push(item)
+    })
+
+    this.printer.print(items, 'NA', 0)
   }
 
 
