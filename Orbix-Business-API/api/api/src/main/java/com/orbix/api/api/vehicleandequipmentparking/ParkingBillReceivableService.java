@@ -1,0 +1,21 @@
+package com.orbix.api.api.vehicleandequipmentparking;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+public interface ParkingBillReceivableService {
+	
+	public List<ParkingBillReceivableResponseDTO> getAllByParking(Long parkingId, HttpServletRequest request);
+	public List<ParkingServiceBillReceivableResponseDTO> getAllServiceByParking(Long parkingId, HttpServletRequest request);
+	public ParkingServiceBillReceivableResponseDTO createServiceBillReceivable(ParkingServiceBillReceivableRequestDTO parkingServiceBillReceivableRequestDTO, HttpServletRequest request);
+	public ParkingServiceBillReceivableResponseDTO updateServiceBillReceivable(ParkingServiceBillReceivableRequestDTO parkingServiceBillReceivableRequestDTO, HttpServletRequest request);
+	public boolean deleteServiceBillReceivable(ParkingServiceBillReceivableRequestDTO parkingServiceBillReceivableRequestDTO, HttpServletRequest request);
+	
+	public ParkingBillReceivableResponseDTO createParkingBillReceivable(ParkingBillReceivableRequestDTO parkingBillReceivableRequestDTO, HttpServletRequest request);
+	public ParkingBillReceivableResponseDTO updateParkingBillReceivable(ParkingBillReceivableRequestDTO parkingBillReceivableRequestDTO, HttpServletRequest request);
+	
+	public ParkingBillReceivableResponseDTO getParkingBillReceivable(Long id, HttpServletRequest request);
+	public ParkingServiceBillReceivableResponseDTO getServiceBillReceivable(Long id, HttpServletRequest request);
+	
+}

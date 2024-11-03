@@ -10,4 +10,8 @@ public interface BillReceivableService {
 			List<BillReceivableRequestDTO> billRequests, 
 			double totalAmount,
 			HttpServletRequest request);
+	
+	List<BillReceivableResponseDTO> getAllByParking( 
+			Long parkingId,
+			HttpServletRequest request);
 }

@@ -12,7 +12,7 @@ import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
 import { IParkingBillReceivable } from 'src/app/domain/bill-receivable';
 import { BrowserModule } from '@angular/platform-browser';
-import { RouterModule } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 
 const API_URL = environment.apiUrl;
 
@@ -57,7 +57,8 @@ export class ParkingBillingComponent {
 
   constructor(
     private http :HttpClient,
-    private auth : AuthService
+    private auth : AuthService,
+    private router : Router
   ) {}
 
 
@@ -181,6 +182,18 @@ export class ParkingBillingComponent {
 
   refreshParkingAmounts(){
     this.parkingAmount = (this.price * this.qty) - this.discount
+  }
+
+
+  async vehicleEquipmentBilling(parkingId : any){
+
+    localStorage.setItem('parking-id', '');
+    localStorage.setItem('parking-id', parkingId);
+
+    await this.router.navigate(['app/accounts-and-finance/vehicle-equipment-billing'], { 
+      queryParams: { parking_id: parkingId}
+    });
+
   }
 
 }

@@ -7,6 +7,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -34,6 +35,12 @@ public class BillReceivableResource {
 	}
 	
 	
+	@GetMapping("/bill_receivables/get_all_by_parking")
+	public ResponseEntity<List<BillReceivableResponseDTO>>getAllByParking(
+			@RequestParam(name = "parking_id") Long parkingId,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(billReceivableService.getAllByParking(parkingId, request));
+	}
 	
 	
 	
