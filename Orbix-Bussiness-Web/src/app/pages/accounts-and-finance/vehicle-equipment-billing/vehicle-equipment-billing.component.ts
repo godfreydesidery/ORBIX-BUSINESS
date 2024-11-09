@@ -13,6 +13,7 @@ import { environment } from 'src/environments/environment';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import { PosReceiptPrinterService } from '@services/custom/pos-receipt-printer.service';
 import { ReceiptItem } from 'src/app/domain/receipt-item';
+import { MsgBoxService } from '@services/custom/msg-box.service';
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
@@ -70,7 +71,8 @@ export class VehicleEquipmentBillingComponent {
     private auth : AuthService,
     private route: ActivatedRoute,
     private router : Router,
-    private printer : PosReceiptPrinterService
+    private printer : PosReceiptPrinterService,
+    private msg : MsgBoxService
     ){} //{(window as any).pdfMake.vfs = pdfFonts.pdfMake.vfs;}
 
   ngOnInit() {
@@ -110,7 +112,9 @@ export class VehicleEquipmentBillingComponent {
 
 
   async saveParkingBill() { 
-    if(confirm('Are you sure?')) 
+      if(await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to save this parking bill?', 'question', 'Yes', 'No') == false){
+        return
+      }
      
     // If parking bill receivable id is null, create new parking bill receivable
     // If parking bill receivable id is not null, update parking bill receivable
@@ -136,14 +140,14 @@ export class VehicleEquipmentBillingComponent {
         .toPromise()
         .then(
           data => {
-            alert('Parking bill created successfully')
+            this.msg.showSuccessMessage('Parking bill created successfully')
             this.getParkingBillReceivables(this.parkingId)
             console.log(data)
           }
         )
         .catch(
           error => {
-            alert('An error has occured')
+            this.msg.showErrorMessage(error, 'Error')
             this.getParkingBillReceivables(this.parkingId)
             console.log(error)
           }
@@ -153,21 +157,21 @@ export class VehicleEquipmentBillingComponent {
         .toPromise()
         .then(
           data => {        
-            alert('Parking bill updated successfully')
+            this.msg.showSuccessMessage('Parking bill updated successfully')
             this.getParkingBillReceivables(this.parkingId)
             console.log(data)
           }
         )
         .catch(
           error => {
-            alert('An error has occured')
+            this.msg.showErrorMessage(error, 'Error')
             this.getParkingBillReceivables(this.parkingId)
             console.log(error)
           }
         )
       }  
     }else{
-      alert('No parking available')
+      this.msg.showErrorMessage3('No parking available')
     }
   }
 
@@ -195,14 +199,14 @@ export class VehicleEquipmentBillingComponent {
         .toPromise()
         .then(
           data => {
-            alert('Service bill created successfully')
+            this.msg.showSuccessMessage('Service bill created successfully')
             this.getParkingServiceBillReceivables(this.parkingId)
             console.log(data)
           }
         )
         .catch(
           error => {
-            alert('An error has occured')
+            this.msg.showErrorMessage(error, 'Error')
             this.getParkingServiceBillReceivables(this.parkingId)
             console.log(error)
           }
@@ -213,14 +217,14 @@ export class VehicleEquipmentBillingComponent {
         .toPromise()
         .then(
           data => {        
-            alert('Service bill updated successfully')
+            this.msg.showSuccessMessage('Service bill updated successfully')
             this.getParkingServiceBillReceivables(this.parkingId)
             console.log(data)
           }
         )
         .catch(
           error => {
-            alert('An error has occured')
+            this.msg.showErrorMessage(error, 'Error')
             this.getParkingServiceBillReceivables(this.parkingId)
             console.log(error)
           }
@@ -228,13 +232,16 @@ export class VehicleEquipmentBillingComponent {
       }
       
     }else{
-      alert('No parking available')
+      this.msg.showErrorMessage3('No parking available')
     }
   }
 
 
   async deleteServiceBill(id : any) {
-    if(confirm("Are you sure?")) 
+      if(await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to delete this service bill?', 'question', 'Yes', 'No') == false){
+        return
+      }
+
     if(this.parkingId != null) {
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
@@ -249,20 +256,20 @@ export class VehicleEquipmentBillingComponent {
       .toPromise()
       .then(
         data => {
-          alert('Deleted successfully')
+          this.msg.showSuccessMessage('Service bill deleted successfully')
           this.getParkingServiceBillReceivables(this.parkingId)
           console.log(data)
         }
       )
       .catch(
         error => {
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
           this.getParkingServiceBillReceivables(this.parkingId)
           console.log(error)
         }
       )
     }else{
-      alert('No parking available')
+      this.msg.showErrorMessage3('No parking available')
     }
   }
 
@@ -412,7 +419,8 @@ export class VehicleEquipmentBillingComponent {
 
     this.toPrintReceipt = false
 
-    if(!confirm('Are you sure?')){
+   
+    if(await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to confirm this payment?', 'question', 'Yes', 'No') == false){
       return
     }
     
@@ -430,7 +438,7 @@ export class VehicleEquipmentBillingComponent {
       data => {
         console.log(data)
         //this.msgBox.showSuccessMessage('Payment successiful')
-        alert('Payment successiful')
+        this.msg.showSuccessMessage('Payment successiful')
         //this.printReceipt()
 
         this.getParkingBillReceivables(this.parkingId)
@@ -444,7 +452,7 @@ export class VehicleEquipmentBillingComponent {
         console.log(error)
         //this.msgBox.showErrorMessage(error, 'Could not confirm payment')
         this.receiptData = []
-        alert('An error occured')
+        this.msg.showErrorMessage(error, 'Could not confirm payment')
       }
     )
   }
@@ -468,7 +476,7 @@ export class VehicleEquipmentBillingComponent {
     }
 
     if(this.receiptData.length == 0){
-      alert('No data to print')
+      this.msg.showErrorMessage3('No data to print')
       return
     }
 

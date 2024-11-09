@@ -14,6 +14,12 @@ import { environment } from 'src/environments/environment';
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
+
+import * as pdfMake from 'pdfmake/build/pdfmake';
+import { DataService } from '@services/custom/data.service';
+import { MsgBoxService } from '@services/custom/msg-box.service';
+
+
 const API_URL = environment.apiUrl;
 
 @Component({
@@ -41,13 +47,17 @@ export class ManagementBoardComponent {
   currentUnpaid : string = ''
   currentTotalInYards : string = ''
 
+  documentHeader! : any
+
 
   constructor(
     private http :HttpClient,
     private auth : AuthService,
     private route: ActivatedRoute,
     private router : Router,
-    private printer : PosReceiptPrinterService
+    private printer : PosReceiptPrinterService,
+    private data : DataService,
+    private msg : MsgBoxService
     ){} //{(window as any).pdfMake.vfs = pdfFonts.pdfMake.vfs;}
 
   ngOnInit() {
@@ -92,7 +102,7 @@ export class ManagementBoardComponent {
         )
         .catch(
           error => {
-            alert('An error has occured')
+            this.msg.showErrorMessage(error, 'Error')
             
             console.log(error)
           }
@@ -101,6 +111,108 @@ export class ManagementBoardComponent {
 
     return 0; 
   }
+
+
+  
+
+
+
+
+
+
+
+
+  exportToPdf = async () => {
+    this.documentHeader = await this.data.getDocumentHeader()
+    var header = ''
+    var footer = ''
+    var title  = 'Report Template'
+    var logo : any = ''
+    var total : number = 0
+    var discount : number = 0
+    var tax : number = 0
+    
+    /*this.report.forEach((element) => {
+      total = total + element.amount
+      discount = discount + element.discount
+      tax = tax + element.tax
+      var detail = [
+        {text : formatDate(element.date, 'yyyy-MM-dd', 'en-US'), fontSize : 9, fillColor : '#ffffff'}, 
+        {text : element.amount.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#ffffff'},
+        {text : element.discount.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#ffffff'},  
+        {text : element.tax.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#ffffff'},
+      ]
+      report.push(detail)
+    })*/
+    /*var detailSummary = [
+      {text : 'Total', fontSize : 9, fillColor : '#CCCCCC'}, 
+      {text : total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#CCCCCC'},
+      {text : discount.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#CCCCCC'},  
+      {text : tax.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#CCCCCC'},        
+    ]
+    report.push(detailSummary)*/
+    const docDefinition : any = {
+      header: '',
+      footer: function (currentPage: { toString: () => string; }, pageCount: string) {
+        return currentPage.toString() + " of " + pageCount;
+      },
+      //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
+        content : [
+          {
+            columns : 
+            [
+              this.documentHeader
+            ]
+          },
+          '  ',
+          '  ',
+          {text : title, fontSize : 14, bold : true, alignment : 'center'},
+          this.data.getHorizontalLine(),
+          '  ',
+          '  ',
+          '  ',
+          {text : title, fontSize : 12, bold : true},
+          '  ',
+          {
+            layout : 'noBorders',
+            table : {
+              widths : [75, 300],
+              body : [
+                [
+                  {text : 'From', fontSize : 9}, 
+                  {text : '', fontSize : 9} 
+                ],
+                [
+                  {text : 'To', fontSize : 9}, 
+                  {text : '', fontSize : 9} 
+                ],
+                [
+                  {text : 'Agent/Route', fontSize : 9}, 
+                  {text : "", fontSize : 9} 
+                ],
+              ]
+            },
+          },
+          '  ',
+          //{
+            //layout : 'noBorders',
+            //table : {
+                //headerRows : 1,
+                //widths : [100, 100, 100, 100, 100],
+                //body : report
+            //}
+        //},                   
+      ]     
+    };
+    pdfMake.createPdf(docDefinition).print()
+  }
+
+
+
+
+
+
+
 
 }
 

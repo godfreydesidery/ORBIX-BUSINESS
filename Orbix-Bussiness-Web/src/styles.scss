@@ -219,3 +219,13 @@ ng-scrollbar {
 .modal {
     top: 0 !important; /* Force modal to be at the top */
   }
+
+  /* Assuming your modal has this z-index */
+.modal {
+    z-index: 1050 !important;
+}
+  
+/* SweetAlert2 will now appear above this modal */
+.swal2-container {
+z-index: 2000 !important;
+}

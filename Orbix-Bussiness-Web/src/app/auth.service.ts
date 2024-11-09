@@ -169,7 +169,7 @@ export class AuthService {
         console.log(error)
       }
     )
-    alert('Logged in as ' + localStorage.getItem('user-type'))
+    //alert('Logged in as ' + localStorage.getItem('user-type'))
 
    //localStorage.setItem('system-date', '2021-12-02')
   }

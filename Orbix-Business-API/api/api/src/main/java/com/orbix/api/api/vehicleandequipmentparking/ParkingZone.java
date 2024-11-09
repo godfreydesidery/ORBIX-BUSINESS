@@ -53,11 +53,6 @@ public class ParkingZone {
     @JoinColumn(name = "branch_id", nullable = false , updatable = true)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Branch branch;
-	
-//	@ManyToOne(targetEntity = Company.class, fetch = FetchType.EAGER,  optional = false)
-//    @JoinColumn(name = "company_id", nullable = false , updatable = false)
-//    @OnDelete(action = OnDeleteAction.NO_ACTION)
-//    private Company company;
 		
 	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "created_by_user_id", nullable = false , updatable = false)
@@ -66,7 +61,5 @@ public class ParkingZone {
     @EqualsAndHashCode.Exclude
     private User createdByUser;
 		
-	private LocalDateTime createdDateTime = LocalDateTime.now();
-	
-	
+	private LocalDateTime createdDateTime = LocalDateTime.now();	
 }

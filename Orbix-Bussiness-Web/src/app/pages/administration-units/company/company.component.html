@@ -126,7 +126,18 @@
                     <div class="col-lg-3">   
                         <div class="form-group">
                             <label>Logo</label>
-                            <input class="form-control" type="file" [(ngModel)]="logo" autocomplete="nope">
+                            <!-- <input class="form-control" type="file" [(ngModel)]="logo" autocomplete="nope"> -->
+
+
+                            <div *ngIf="retrievedImage" style="height: 3cm; width: 3cm;">
+                                <img class="img-fluid img-thumbnail" [src]="retrievedImage">
+                            </div>
+                            <input type="file" (change)="onFileChanged($event)" [(ngModel)]="logo">
+                            <hr>
+                            <input type="button" *ngIf="logo != null" (click)="onUpload()" value="Upload Logo">
+
+
+
                         </div>
                         <div class="form-group">
                             <label>TIN</label>

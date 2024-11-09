@@ -31,8 +31,11 @@ export class DashboardComponent {
   public date = new Date();
   public weatherData: any;
 
+  public userName : string = ''
+
   constructor(private _settingsService: SettingsService, private _dashboardService: DashboardService) {
     this.settings = this._settingsService.settings; 
     this.weatherData = _dashboardService.getWeatherData();
+    this.userName = localStorage.getItem('user-name')!;
   }
 }

@@ -13,6 +13,7 @@ import { BrowserModule } from '@angular/platform-browser';
 //import { SearchFilterPipe } from 'src/app/pipes/search-filter-pipe';
 import { RouterLink } from '@angular/router';
 import { IPrivilege } from 'src/app/domain/priviledge';
+import { MsgBoxService } from '@services/custom/msg-box.service';
 
 const API_URL = environment.apiUrl;
 
@@ -48,7 +49,9 @@ export class RoleAccessComponent {
 
   constructor(
       private http : HttpClient,
-      private auth :AuthService) {
+      private auth :AuthService,
+      private msg : MsgBoxService
+    ) {
     this.object       = ''
     this.operation    = ''
     this.objects      = []
@@ -184,7 +187,7 @@ export class RoleAccessComponent {
 
   addOrRemovePrivilege(action : any, object : string, operation : string){
     if(this.selectedRole == ''){
-      alert('Please select role')
+      this.msg.showErrorMessage3('Please select role')
       return
     }
     if(action.target.checked == true){
@@ -248,7 +251,7 @@ export class RoleAccessComponent {
 
   async addPrivilegeToRole(role : string){
     if(role == null || role == ''){
-      alert('Please select Role')
+      this.msg.showErrorMessage3('Please select role')
       return
     }
     var accessForm : AccessForm = new AccessForm
@@ -273,13 +276,13 @@ export class RoleAccessComponent {
     .then(
       data => {
         console.log(data)
-        alert('Updated successifully')
+        this.msg.showSuccessMessage('Updated successifully')
       }
     )
     .catch(
       error => {
         console.log(error);
-        alert('Could not update role')
+        this.msg.showErrorMessage(error, 'Error')
       }
     )   
   }

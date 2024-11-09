@@ -12,6 +12,8 @@ import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 
+import { DataService } from '@services/custom/data.service';
+import { MsgBoxService } from '@services/custom/msg-box.service';
 
 
 const API_URL = environment.apiUrl;
@@ -29,6 +31,8 @@ const API_URL = environment.apiUrl;
   styleUrl: './vehicle-register.component.scss'
 })
 export class VehicleRegisterComponent {
+
+  documentHeader! : any
 
   page: number = 1; // Initialize the current page to 1
 
@@ -77,6 +81,10 @@ export class VehicleRegisterComponent {
   tireIndicator: string = ''
   hasKeys : string = ''
 
+  color : string = ''
+
+  comments : string = ''
+
   cardNo : string = ''
 
   vehicleEquipmentCategory : string = ''
@@ -112,7 +120,9 @@ export class VehicleRegisterComponent {
   
   constructor(
     private http :HttpClient,
-    private auth : AuthService
+    private auth : AuthService,
+    private data : DataService,
+    private msg : MsgBoxService
   ) {}
 
   ngOnInit(){
@@ -281,15 +291,14 @@ export class VehicleRegisterComponent {
 
           this.getAllPendingOrCheckedInParkings()
 
-          alert('Parking created successifully')
-
+          this.msg.showSuccessMessage('Parking created successifully')
         }
 
       )
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
     }else{
@@ -304,14 +313,15 @@ export class VehicleRegisterComponent {
 
           this.getAllPendingOrCheckedInParkings()
 
-          alert('Parking updated successifully')
+          this.msg.showSuccessMessage('Parking updated successifully')
+
         }
 
       )
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
     }
@@ -337,7 +347,7 @@ export class VehicleRegisterComponent {
 
           this.getAllPendingOrCheckedInParkings()
 
-          alert('Parking activated successifully')
+          this.msg.showSuccessMessage('Parking activated successifully')
 
         }
 
@@ -345,7 +355,7 @@ export class VehicleRegisterComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
   }
@@ -372,7 +382,7 @@ export class VehicleRegisterComponent {
 
           this.getAllPendingOrCheckedInParkings()
 
-          alert('Checked in Successifully')
+          this.msg.showSuccessMessage('Checked in Successifully')
 
         }
 
@@ -380,13 +390,14 @@ export class VehicleRegisterComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
   }
 
   async checkOut(){
-    if(!confirm('Are you sure you want to check out?')){
+
+    if(await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to check out?', 'question', 'Yes', 'No') == false){
       return
     }
 
@@ -410,14 +421,14 @@ export class VehicleRegisterComponent {
 
           this.getAllPendingOrCheckedInParkings()
 
-          alert('Checked out Successifully')
+          this.msg.showSuccessMessage('Checked out Successifully')
           this.printGatePass()
         }
       )
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
   }
@@ -440,7 +451,7 @@ export class VehicleRegisterComponent {
 
           this.getAllPendingOrCheckedInParkings()
 
-          alert('Parking deactivated successifully')
+          this.msg.showSuccessMessage('Parking deactivated successifully')
 
         }
 
@@ -448,7 +459,7 @@ export class VehicleRegisterComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
   }
@@ -563,7 +574,7 @@ export class VehicleRegisterComponent {
   }
 
 
-  printGatePass() {
+  printGatePass1() {
     const documentDefinition = {
       content: [
         { text: 'Davagan', fontSize: 18, bold: true },
@@ -583,6 +594,116 @@ export class VehicleRegisterComponent {
       ]
     };
     pdfMake.createPdf(documentDefinition).open();
+  }
+
+  printGatePass = async () => {
+    this.documentHeader = await this.data.getDocumentHeader()
+    var header = ''
+    var footer = ''
+    var title  = 'Gate Pass'
+    var logo : any = ''
+    var total : number = 0
+    var discount : number = 0
+    var tax : number = 0
+    
+    /*this.report.forEach((element) => {
+      total = total + element.amount
+      discount = discount + element.discount
+      tax = tax + element.tax
+      var detail = [
+        {text : formatDate(element.date, 'yyyy-MM-dd', 'en-US'), fontSize : 9, fillColor : '#ffffff'}, 
+        {text : element.amount.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#ffffff'},
+        {text : element.discount.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#ffffff'},  
+        {text : element.tax.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#ffffff'},
+      ]
+      report.push(detail)
+    })*/
+    /*var detailSummary = [
+      {text : 'Total', fontSize : 9, fillColor : '#CCCCCC'}, 
+      {text : total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#CCCCCC'},
+      {text : discount.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#CCCCCC'},  
+      {text : tax.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#CCCCCC'},        
+    ]
+    report.push(detailSummary)*/
+    const docDefinition : any = {
+      header: '',
+      footer: function (currentPage: { toString: () => string; }, pageCount: string) {
+        return currentPage.toString() + " of " + pageCount;
+      },
+      //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
+        content : [
+          {
+            columns : 
+            [
+              this.documentHeader
+            ]
+          },
+          '  ',
+          '  ',
+          {text : title, fontSize : 14, bold : true, alignment : 'center'},
+          this.data.getHorizontalLine(),
+         
+          // {text : title, fontSize : 12, bold : true},
+          '  ',
+          {
+            layout : 'noBorders',
+            table : {
+              widths : [75, 300],
+              body : [
+                [
+                  {text : 'Vehicle Name', fontSize : 9}, 
+                  {text : this.vehicleEquipmentTypeName, fontSize : 9} 
+                ],
+                [
+                  {text : 'Parking Ref No', fontSize : 9}, 
+                  {text : this.no, fontSize : 9} 
+                ],
+                [
+                  {text : 'Color', fontSize : 9}, 
+                  {text : this.color, fontSize : 9} 
+                ],
+                [
+                  {text : 'Chasis No', fontSize : 9}, 
+                  {text :this.chasisNo, fontSize : 9} 
+                ],
+                [
+                  {text : 'Reg No', fontSize : 9}, 
+                  {text : this.registrationNo, fontSize : 9} 
+                ],
+
+                [
+                  {text : '', fontSize : 9}, 
+                  {text : '', fontSize : 9} 
+                ],
+
+                [
+                  {text : 'Cashier Comments', fontSize : 9}, 
+                  {text : this.comments, fontSize : 9} 
+                ],
+                [
+                  {text : '', fontSize : 9}, 
+                  {text : '', fontSize : 9} 
+                ],
+
+                [
+                  {text : 'Gate Pass Issued By', fontSize : 9}, 
+                  {text : '...............................', fontSize : 9} 
+                ],
+              ]
+            },
+          },
+          '  ',
+          //{
+            //layout : 'noBorders',
+            //table : {
+                //headerRows : 1,
+                //widths : [100, 100, 100, 100, 100],
+                //body : report
+            //}
+        //},                   
+      ]     
+    };
+    pdfMake.createPdf(docDefinition).print()
   }
 
 }

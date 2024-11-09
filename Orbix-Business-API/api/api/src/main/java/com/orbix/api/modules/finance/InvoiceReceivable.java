@@ -43,6 +43,8 @@ public class InvoiceReceivable {
 	private String status = "UNPAID";
 	
 	private String summary = "";
+	
+	// Add created by, approved by etc before using
 		
 	private LocalDateTime createdDateTime = LocalDateTime.now();
 	
@@ -50,18 +52,10 @@ public class InvoiceReceivable {
     @JoinColumn(name = "branch_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Branch branch;
-	
-//	@ManyToOne(targetEntity = Company.class, fetch = FetchType.EAGER,  optional = false)
-//    @JoinColumn(name = "company_id", nullable = false , updatable = false)
-//    @OnDelete(action = OnDeleteAction.NO_ACTION)
-//    private Company company;
-	
-	
+
 	@OneToMany(targetEntity = InvoiceReceivableDetail.class, mappedBy = "invoiceReceivable", fetch = FetchType.EAGER, orphanRemoval = true)
     @Valid
     @JsonIgnoreProperties("invoiceReceivable")
 	@Fetch(value = FetchMode.SUBSELECT)
     private List<InvoiceReceivableDetail> invoiceReceivableDetails;
-	
-	
 }

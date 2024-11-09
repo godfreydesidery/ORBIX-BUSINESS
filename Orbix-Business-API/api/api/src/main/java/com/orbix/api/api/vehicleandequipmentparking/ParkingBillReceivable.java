@@ -58,9 +58,4 @@ public class ParkingBillReceivable {
     @JoinColumn(name = "bill_receivable_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private BillReceivable billReceivable;
-		
-//	@ManyToOne(targetEntity = InvoiceReceivableDetail.class, fetch = FetchType.EAGER,  optional = false)
-//    @JoinColumn(name = "invoice_receivable_detail_id", nullable = false , updatable = false)
-//    @OnDelete(action = OnDeleteAction.NO_ACTION)
-//    private InvoiceReceivableDetail invoiceReceivableDetail;
 }

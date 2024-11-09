@@ -13,6 +13,7 @@ import { environment } from 'src/environments/environment';
 import { IParkingBillReceivable } from 'src/app/domain/bill-receivable';
 import { BrowserModule } from '@angular/platform-browser';
 import { Router, RouterModule } from '@angular/router';
+import { MsgBoxService } from '@services/custom/msg-box.service';
 
 const API_URL = environment.apiUrl;
 
@@ -58,7 +59,8 @@ export class ParkingBillingComponent {
   constructor(
     private http :HttpClient,
     private auth : AuthService,
-    private router : Router
+    private router : Router,
+    private msg : MsgBoxService
   ) {}
 
 
@@ -154,6 +156,7 @@ export class ParkingBillingComponent {
     )
     .catch(
       error => {
+        this.msg.showErrorMessage(error, 'Error')
         console.log(error)
       }
     )

@@ -3,6 +3,8 @@ import { Injectable } from '@angular/core';
 import swal, { SweetAlertIcon } from 'sweetalert2';
 
 
+
+
 @Injectable({
   providedIn: 'root'
 })
@@ -45,7 +47,10 @@ export class MsgBoxService {
       confirmButtonText : confirmButtonText,
       confirmButtonColor : '#009688',
       cancelButtonText : cancelButtonText,
-      cancelButtonColor : '#e5343d'
+      cancelButtonColor : '#e5343d',
+      customClass: {
+        popup: 'swal2-custom-z-index'
+      }
     }).then(async (result) => {
       if(result.value) {
         confirmed = true

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MsgBoxService } from '@services/custom/msg-box.service';
 import { AuthService } from 'src/app/auth.service';
 import { IBranch } from 'src/app/domain/branch';
 import { ICompany } from 'src/app/domain/company';
@@ -60,7 +61,8 @@ export class BranchComponent {
 
   constructor(
     private http :HttpClient,
-    private auth : AuthService
+    private auth : AuthService,
+    private msg : MsgBoxService
   ) {}
 
   ngOnInit(){
@@ -147,7 +149,7 @@ export class BranchComponent {
 
           this.getAllBranches()
 
-          alert('Branch created successifully')
+          this.msg.showSuccessMessage('Branch created successifully')
 
         }
 
@@ -155,7 +157,7 @@ export class BranchComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
     }else{
@@ -170,14 +172,14 @@ export class BranchComponent {
 
           this.getAllBranches()
 
-          alert('Branch updated successifully')
+          this.msg.showSuccessMessage('Branch updated successifully')
         }
 
       )
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
     }
@@ -201,7 +203,7 @@ export class BranchComponent {
 
           this.getAllBranches()
 
-          alert('Branch activated successifully')
+          this.msg.showSuccessMessage('Branch activated successifully')
 
         }
 
@@ -209,7 +211,7 @@ export class BranchComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
   }
@@ -231,8 +233,8 @@ export class BranchComponent {
           console.log(data)
 
           this.getAllBranches()
+          this.msg.showSuccessMessage('Branch deactivated successifully')
 
-          alert('Branch deactivated successifully')
 
         }
 
@@ -240,7 +242,7 @@ export class BranchComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
   }

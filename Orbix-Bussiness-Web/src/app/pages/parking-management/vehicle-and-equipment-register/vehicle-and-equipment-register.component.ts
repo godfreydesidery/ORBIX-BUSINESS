@@ -3,6 +3,7 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { MsgBoxService } from '@services/custom/msg-box.service';
 import { AuthService } from 'src/app/auth.service';
 import { IParking } from 'src/app/domain/parking';
 import { IParkingZone } from 'src/app/domain/parking-zone';
@@ -157,7 +158,8 @@ export class VehicleEquipmentRegisterComponent {
   constructor(
     private http :HttpClient,
     private auth : AuthService,
-    private router : Router
+    private router : Router,
+    private msg : MsgBoxService
   ) {}
 
   ngOnInit(): void {
@@ -298,7 +300,7 @@ export class VehicleEquipmentRegisterComponent {
         this.showVehicleEquipmentData(data!)
         // this.getAllActiveVehicleEquipments()
 
-        alert('Saved Successfully')
+        this.msg.showSuccessMessage('Saved Successfully')
 
         this.getParking(data!.parkingId)
         this.mode = ''
@@ -309,7 +311,7 @@ export class VehicleEquipmentRegisterComponent {
     .catch(
       error => {
         console.log(error)
-        alert('An error has occured')
+        this.msg.showErrorMessage(error, 'Error')
       }
     )
 
@@ -321,8 +323,7 @@ export class VehicleEquipmentRegisterComponent {
       data => {
         console.log(data)
         this.showVehicleEquipmentData(data!)
-        // this.getAllActiveVehicleEquipments()
-        alert('Updated Successfully')
+        this.msg.showSuccessMessage('Updated Successfully')
 
         this.getParking(data!.parkingId)
 
@@ -332,7 +333,7 @@ export class VehicleEquipmentRegisterComponent {
     .catch(
       error => {
         console.log(error)
-        alert('An error has occured')
+        this.msg.showErrorMessage(error, 'Error')
       }
     )
   }
@@ -647,7 +648,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
           // this.getAllPendingOrCheckedInParkings()
 
-          alert('Parking created successifully')
+          this.msg.showSuccessMessage('Parking created successifully')
 
         }
 
@@ -655,7 +656,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
     }else{
@@ -670,7 +671,8 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
           // this.getAllPendingOrCheckedInParkings()
 
-          alert('Parking updated successifully. Vehicle available for check in')
+          this.msg.showSuccessMessage('Parking updated successifully, Vehicle available for check in')
+
           this.setNewMode()
         }
 
@@ -678,7 +680,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
     }

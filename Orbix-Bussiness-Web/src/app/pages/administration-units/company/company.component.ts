@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MsgBoxService } from '@services/custom/msg-box.service';
 import { AuthService } from 'src/app/auth.service';
 import { ICompany } from 'src/app/domain/company';
 import { Byte } from 'src/custom-packages/util';
@@ -53,7 +54,8 @@ export class CompanyComponent {
 
   constructor(
     private http :HttpClient,
-    private auth : AuthService
+    private auth : AuthService,
+    private msg : MsgBoxService
   ) {}
 
   ngOnInit(){
@@ -144,7 +146,7 @@ export class CompanyComponent {
 
           this.getAllCompanies()
 
-          alert('Company created successifully')
+          this.msg.showSuccessMessage('Company created successifully')
 
         }
 
@@ -152,7 +154,7 @@ export class CompanyComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
     }else{
@@ -167,14 +169,14 @@ export class CompanyComponent {
 
           this.getAllCompanies()
 
-          alert('Company updated successifully')
+          this.msg.showSuccessMessage('Company updated successifully')
         }
 
       )
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
     }
@@ -198,7 +200,7 @@ export class CompanyComponent {
 
           this.getAllCompanies()
 
-          alert('Company activated successifully')
+          this.msg.showSuccessMessage('Company activated successifully')
 
         }
 
@@ -206,7 +208,7 @@ export class CompanyComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
   }
@@ -229,7 +231,7 @@ export class CompanyComponent {
 
           this.getAllCompanies()
 
-          alert('Company deactivated successifully')
+          this.msg.showSuccessMessage('Company deactivated successifully')
 
         }
 
@@ -237,7 +239,7 @@ export class CompanyComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
   }
@@ -266,6 +268,8 @@ export class CompanyComponent {
     this.email = data!.email
     this.website = data!.website
     this.fax = data!.fax
+
+    this.getLogo()
   }
 
   clearCompanyData(){
@@ -292,4 +296,68 @@ export class CompanyComponent {
     this.website = ''
     this.fax = ''
   }
+
+
+
+
+  selectedFile!: File;
+retrievedImage!: any;
+base64Data: any;
+retrieveResponse: any;
+message!: string;
+imageName: any;
+//Gets called when the user selects an image
+public onFileChanged(event : any) {
+  //Select File
+  this.selectedFile = event.target.files[0];
+}
+//Gets called when the user clicks on submit to upload the image
+onUpload() {   
+  let options = {
+    headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+  }
+  console.log(this.selectedFile);
+  //FormData API provides methods and properties to allow us easily prepare form data to be sent with POST HTTP requests.
+  const uploadImageData = new FormData();
+  uploadImageData.append('logo', this.selectedFile, this.selectedFile.name);
+  //Make a call to the Spring Boot Application to save the image
+  //this.spinner.show()
+  this.http.post(API_URL+'/company_profile/save_logo', uploadImageData, options)
+  //.pipe(finalize(() => this.spinner.hide()))
+    .subscribe(() => {
+      
+      //this.getCompanyProfile()
+      this.msg.showSuccessMessage('Upload successiful')
+      this.getLogo()
+    },
+    error =>{
+      this.msg.showErrorMessage(error, 'Upload failed')
+    });
+    
+}
+  //Gets called when the user clicks on retieve image button to get the image from back end
+  async getLogo() {
+  //Make a call to Sprinf Boot to get the Image Bytes.
+  //this.spinner.show()
+  await this.http.get(API_URL+'/company_profile/get_logo')
+  //.pipe(finalize(() => this.spinner.hide()))
+  .toPromise()
+    .then(
+      res => {
+        this.retrieveResponse = res
+        this.base64Data = this.retrieveResponse.logo
+        this.retrievedImage = 'data:image/png;base64,'+this.base64Data
+        console.log(this.retrievedImage)
+      }
+    )
+    .catch(error => {
+      console.log(error)
+    })  
+    
+  }
+
+
+
+
+
 }

@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MsgBoxService } from '@services/custom/msg-box.service';
 import { AuthService } from 'src/app/auth.service';
 import { IParkingZone } from 'src/app/domain/parking-zone';
 
@@ -34,7 +35,8 @@ export class ParkingZoneComponent {
 
   constructor(
     private http :HttpClient,
-    private auth : AuthService
+    private auth : AuthService,
+    private msg : MsgBoxService
   ) {}
 
   ngOnInit(){
@@ -111,7 +113,7 @@ export class ParkingZoneComponent {
 
           this.getAllParkingZones()
 
-          alert('ParkingZone created successifully')
+          this.msg.showSuccessMessage('ParkingZone created successifully')
 
         }
 
@@ -119,7 +121,7 @@ export class ParkingZoneComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
     }else{
@@ -134,14 +136,14 @@ export class ParkingZoneComponent {
 
           this.getAllParkingZones()
 
-          alert('ParkingZone updated successifully')
+          this.msg.showSuccessMessage('ParkingZone updated successifully')
         }
 
       )
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
     }
@@ -165,7 +167,8 @@ export class ParkingZoneComponent {
 
           this.getAllParkingZones()
 
-          alert('ParkingZone activated successifully')
+          this.msg.showSuccessMessage('ParkingZone activated successifully')
+
 
         }
 
@@ -173,7 +176,7 @@ export class ParkingZoneComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
   }
@@ -196,7 +199,7 @@ export class ParkingZoneComponent {
 
           this.getAllParkingZones()
 
-          alert('ParkingZone deactivated successifully')
+          this.msg.showSuccessMessage('ParkingZone deactivated successifully')
 
         }
 
@@ -204,7 +207,7 @@ export class ParkingZoneComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
   }

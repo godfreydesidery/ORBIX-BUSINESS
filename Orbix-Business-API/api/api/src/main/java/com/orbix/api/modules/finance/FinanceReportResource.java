@@ -42,23 +42,49 @@ public class FinanceReportResource {
 			HttpServletRequest request){
 		
 		List<ICashCollection> cashCollections;
-
-	    if (nickname == null || nickname.isEmpty()) {
-	        cashCollections = cashCollectionRepository.findTotalCollectionByDateRange(
-	                dateRange.getFrom().atStartOfDay(),
-	                dateRange.getTo().atStartOfDay().plusDays(1)
-	        );
-	    } else {
-	        cashCollections = cashCollectionRepository.findTotalCollectionByDateRangeAndCashier(
-	                dateRange.getFrom().atStartOfDay(),
-	                dateRange.getTo().atStartOfDay().plusDays(1),
-	                nickname
-	        );
-	    }
+		
+		cashCollections = cashCollectionRepository.findTotalCollectionByDateRangeAndCashier(
+                dateRange.getFrom().atStartOfDay(),
+                dateRange.getTo().atStartOfDay().plusDays(1),
+                nickname
+        );
 
 	    return ResponseEntity.ok().body(cashCollections);
 
 	}
+	
+	
+	@PostMapping("/finance_reports/get_parking_detailed_collections_by_dates")
+	public ResponseEntity<List<IParkingCashCollection>>getParkingDetailedCollectionByDates(
+			@RequestBody DateRange dateRange,
+	        @RequestParam(name = "nickname", required = false) String nickname,
+			HttpServletRequest request){
+		
+		List<IParkingCashCollection> cashCollections;
+		
+		cashCollections = cashCollectionRepository.findCashCollectionsBetweenDates(
+				dateRange.getFrom().atStartOfDay(),
+                dateRange.getTo().atStartOfDay().plusDays(1)
+				);
+	    return ResponseEntity.ok().body(cashCollections);
+
+	}
+	
+	@PostMapping("/finance_reports/get_parking_service_detailed_collections_by_dates")
+	public ResponseEntity<List<IParkingServiceCashCollection>>getParkingServiceDetailedCollectionByDates(
+			@RequestBody DateRange dateRange,
+	        @RequestParam(name = "nickname", required = false) String nickname,
+			HttpServletRequest request){
+		
+		List<IParkingServiceCashCollection> cashCollections;
+		
+		cashCollections = cashCollectionRepository.findParkingServiceCashCollectionsBetweenDates(
+				dateRange.getFrom().atStartOfDay(),
+                dateRange.getTo().atStartOfDay().plusDays(1)
+				);
+	    return ResponseEntity.ok().body(cashCollections);
+	}
+	
 }
 
 @Data
@@ -75,9 +101,3 @@ class DateRange {
 	LocalDate to;
 }
 
-interface ICashCollection {
-	String getReason();
-	double getAmount();
-	String getPaymentType();
-	String getCashierName();
-}

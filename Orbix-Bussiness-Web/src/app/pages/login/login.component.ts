@@ -3,6 +3,7 @@ import { FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators } 
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from 'src/app/auth.service';
 import { first } from 'rxjs';
+import { MsgBoxService } from '@services/custom/msg-box.service';
 
 @Component({
   selector: 'az-login',
@@ -28,7 +29,9 @@ export class LoginComponent {
   constructor(
     private auth : AuthService,
     router: Router, 
-    fb: FormBuilder) {
+    fb: FormBuilder,
+    private msg : MsgBoxService
+  ) {
     this.router = router;
     this.form = fb.group({
       'username': ['', Validators.compose([Validators.required])],
@@ -52,7 +55,7 @@ export class LoginComponent {
     localStorage.removeItem('system-date')
 
     if(this.username.value == '' || this.password.value == ''){ 
-      alert('Please fill in your username and password')
+      this.msg.showErrorMessage3('Please fill in your username and password')
       //this.msgBox.showErrorMessage3('Please fill in your username and password')
       return
     }
@@ -71,7 +74,7 @@ export class LoginComponent {
       .catch(error => {
         this.status = ''
         localStorage.removeItem('current-user')
-        alert(error['statusText'] + ' | Could ')
+        this.msg.showErrorMessage(error, 'Invalid login')
         //this.msgBox.showErrorMessage(error, 'Invalid username and password')
         console.log(error)
         return

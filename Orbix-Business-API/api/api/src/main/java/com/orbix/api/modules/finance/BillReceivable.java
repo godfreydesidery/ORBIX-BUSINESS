@@ -51,9 +51,4 @@ public class BillReceivable {
     @JoinColumn(name = "branch_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Branch branch;
-	
-//	@ManyToOne(targetEntity = Company.class, fetch = FetchType.EAGER,  optional = false)
-//    @JoinColumn(name = "company_id", nullable = false , updatable = false)
-//    @OnDelete(action = OnDeleteAction.NO_ACTION)
-//    private Company company;
 }

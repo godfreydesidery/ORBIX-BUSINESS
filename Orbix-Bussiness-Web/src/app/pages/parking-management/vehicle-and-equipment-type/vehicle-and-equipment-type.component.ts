@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MsgBoxService } from '@services/custom/msg-box.service';
 import { AuthService } from 'src/app/auth.service';
 import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
 
@@ -35,7 +36,8 @@ export class VehicleEquipmentTypeComponent {
 
   constructor(
     private http :HttpClient,
-    private auth : AuthService
+    private auth : AuthService,
+    private msg : MsgBoxService
   ) {}
 
   ngOnInit(){
@@ -112,7 +114,7 @@ export class VehicleEquipmentTypeComponent {
 
           this.getAllVehicleEquipmentTypes()
 
-          alert('Type created successifully')
+          this.msg.showSuccessMessage('Type created successifully')
 
         }
 
@@ -120,7 +122,7 @@ export class VehicleEquipmentTypeComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
     }else{
@@ -135,14 +137,14 @@ export class VehicleEquipmentTypeComponent {
 
           this.getAllVehicleEquipmentTypes()
 
-          alert('Type updated successifully')
+          this.msg.showSuccessMessage('Type updated successifully')
         }
 
       )
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
     }
@@ -165,8 +167,8 @@ export class VehicleEquipmentTypeComponent {
           console.log(data)
 
           this.getAllVehicleEquipmentTypes()
+          this.msg.showSuccessMessage('Type activated successifully')
 
-          alert('Type activated successifully')
 
         }
 
@@ -174,7 +176,7 @@ export class VehicleEquipmentTypeComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
   }
@@ -196,8 +198,7 @@ export class VehicleEquipmentTypeComponent {
           console.log(data)
 
           this.getAllVehicleEquipmentTypes()
-
-          alert('VehicleEquipmentType deactivated successifully')
+          this.msg.showSuccessMessage('Type deactivated successifully')
 
         }
 
@@ -205,7 +206,7 @@ export class VehicleEquipmentTypeComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
   }

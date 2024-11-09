@@ -28,6 +28,7 @@
                         <thead>
                             <tr>
                                 <th>SN</th>
+                                <th>No</th>
                                 <th>Owner/Driver Name</th>
                                 <th>Owner ID</th>
                                 <th>Owner ID Type</th>
@@ -43,6 +44,7 @@
                         <tbody>
                                 <tr *ngFor="let p of parkings | searchFilter : filterRecords | paginate: { itemsPerPage: 5, currentPage: page }">
                                     <td>{{p.sn}}</td>
+                                    <td>{{p.no}}</td>
                                     <td>{{p.ownerFirstName}} {{p.ownerMiddleName}} {{p.ownerLastName}}</td>
                                     <td>{{p.ownerIdNo}}</td>
                                     <td>{{p.ownerIdType}}</td>
@@ -541,6 +543,7 @@
                                 <p><b>Parking Information</b></p>
                             </thead>
                             <tbody>
+                                <tr><td><b>Parking No</b></td><td>{{no}}</td></tr>
                                 <tr><td><b>Model/Type</b></td><td>{{vehicleEquipmentTypeName}}</td></tr>
                                 <tr><td><b>Billing Type</b></td><td>{{billingType}}</td></tr>
                                 <tr><td><b>Billing Amount</b></td><td style="text-align: right;">{{billingAmount}}</td></tr> 

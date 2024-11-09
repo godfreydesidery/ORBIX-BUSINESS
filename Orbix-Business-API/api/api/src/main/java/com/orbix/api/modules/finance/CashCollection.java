@@ -20,7 +20,9 @@ import com.orbix.api.modules.identityandaccess.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data 
@@ -48,5 +50,7 @@ public class CashCollection {
 	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "collected_by_user_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private User collectedByUser;
 }

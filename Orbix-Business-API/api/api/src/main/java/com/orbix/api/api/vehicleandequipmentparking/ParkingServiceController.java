@@ -533,14 +533,14 @@ public class ParkingServiceController implements ParkingService {
 		
 		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
 		LocalDateTime lastDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
-		LocalDateTime lastBillDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
+		LocalDateTime lastBillDate = LocalDateTime.now().toLocalDate().atStartOfDay();
 		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
 			if(parkingBillReceivable.getBillReceivable().getStatus().equals("UNPAID")) {
 				throw new InvalidOperationException("Can not check out, bills  not cleared");
 			}
 			lastBillDate = parkingBillReceivable.getEndedAt();
 		}
-		if(lastBillDate.isBefore(lastDate.plusDays(1))) {
+		if(lastBillDate.isBefore(lastDate)) {
 			throw new InvalidOperationException("Could not checkout. Some parking days have not been billed. Please generate and clear bills");
 		}
 		

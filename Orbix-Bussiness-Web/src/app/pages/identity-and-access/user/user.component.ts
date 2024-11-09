@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component, ViewEncapsulation, ViewChild, NgModule } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { MsgBoxService } from '@services/custom/msg-box.service';
 //import { ICompany } from '@services/custom/data.service';
 import { DatatableComponent, NgxDatatableModule, SelectionType } from '@swimlane/ngx-datatable';
 import { AuthService } from 'src/app/auth.service';
@@ -72,6 +73,7 @@ export class UserComponent {
 
   constructor(private auth : AuthService,
     private http :HttpClient,
+    private msg : MsgBoxService
     //private spinner : NgxSpinnerService,
     ) {
 
@@ -153,16 +155,14 @@ export class UserComponent {
       .then(
         data => {
           this.showUser(data)
-          //this.msgBox.showSuccessMessage('User created successifuly')
-          alert('success')
+          this.msg.showSuccessMessage('User created successifuly')
           this.getUsers()
         }
       )
       .catch(
         error => {
           console.log(error)
-          //this.msgBox.showErrorMessage(error, 'Could not create user')
-          alert('error')
+          this.msg.showErrorMessage(error, 'Could not create user')
         }
       )   
     }else{
@@ -176,14 +176,14 @@ export class UserComponent {
           console.log(data)
           //this.msgBox.showSuccessMessage('User updated successifuly')
           this.getUsers()
-          alert('success')
+          this.msg.showSuccessMessage('User updated successifuly')
         }
       )
       .catch(
         error => {
           console.log(error);
           //this.msgBox.showErrorMessage(error, 'Could not update user')
-          alert('error')
+          this.msg.showErrorMessage(error, 'Could not update user')
         }
       )  
     }
@@ -232,8 +232,7 @@ export class UserComponent {
       }
     )
     .catch(error => {
-      //this.msgBox.showErrorMessage(error, 'Could not load users')
-      alert('error')
+      this.msg.showErrorMessage(error, 'Could not load users')
     })
     return 
   }
@@ -259,8 +258,7 @@ export class UserComponent {
     .catch(
       error=>{
         console.log(error)   
-        //this.msgBox.showErrorMessage(error, 'User not found')
-        alert('error')     
+        this.msg.showErrorMessage(error, 'User not found')   
       }
     )
   }
@@ -283,20 +281,20 @@ export class UserComponent {
     .catch(
       error=>{
         console.log(error)   
-        //this.msgBox.showErrorMessage(error, 'User not found')
-        alert('error')     
+        this.msg.showErrorMessage(error, 'User not found')
       }
     )
   }
 
   async deleteUser(){
     if(this.id == null){
-      alert('No user selected, please select a user to delete')
+      this.msg.showErrorMessage3('No user selected, please select a user to delete')
       return
     }
-    if(!confirm('Confirm delete the selected user. This action can not be undone')){
+    if(await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to delete this user?', 'question', 'Yes', 'No') == false){
       return
     }
+    
     let options = {
       headers : new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
@@ -307,7 +305,7 @@ export class UserComponent {
     .then(
       () => {
         this.clearFields()
-        alert('User deleted succesifully')
+        this.msg.showSuccessMessage('User deleted successfully')
         return true
       }
     )
@@ -315,7 +313,7 @@ export class UserComponent {
       error => {
         console.log(error)
         //this.msgBox.showErrorMessage(error, 'Could not delete user')
-        error('error')
+        this.msg.showErrorMessage(error, 'Could not delete user')
         return false
       }
     )
@@ -366,28 +364,28 @@ export class UserComponent {
     let valid : boolean = true
     /**Validate username */
     if(this.username == ''){
-      alert('Empty username not allowed, please fill in the username field')
+      this.msg.showErrorMessage3('Empty username not allowed, please fill in the username field')
       return false
     }
 
     /**Validate Password */
     if(this.id == null){
       if(this.password == ''){
-        alert('Empty password not allowed for new user')
+        this.msg.showErrorMessage3('Empty password not allowed for new user')
         return false
       }
       if(this.password != this.confirmPassword){
-        alert('Password and Password confirmation do not match')
+        this.msg.showErrorMessage3('Password and Password confirmation do not match')
         return false
       }
     }else{
       if(this.password != this.confirmPassword && (this.password != '' || this.confirmPassword != '')){
-        alert('Password and Password confirmation do not match')
+        this.msg.showErrorMessage3('Password and Password confirmation do not match')
         return false
       }
     }
     if(this.firstName == '' || this.lastName == ''){
-      alert('First name, last name and nickname are required fields')
+      this.msg.showErrorMessage3('First name, last name and nickname are required fields')
       return false
     }
     return valid
@@ -412,7 +410,7 @@ export class UserComponent {
 
           this.getUsers()
 
-          alert('User activated successifully')
+          this.msg.showSuccessMessage('User activated successifully')
 
         }
 
@@ -420,7 +418,7 @@ export class UserComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
   }
@@ -443,7 +441,7 @@ export class UserComponent {
 
           this.getUsers()
 
-          alert('User deactivated successifully')
+          this.msg.showSuccessMessage('User deactivated successifully')
 
         }
 
@@ -451,7 +449,7 @@ export class UserComponent {
       .catch(
         error => {
           console.log(error)
-          alert('An error has occured')
+          this.msg.showErrorMessage(error, 'Error')
         }
       )
   }
