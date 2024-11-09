@@ -440,8 +440,8 @@ export const menuItems = [
                 routerLink: '/app/management/management-board'
             },
             {
-                title: 'Collection Report',
-                routerLink: '/app/blank'
+                title: 'Cash Collections',
+                routerLink: '/app/management/cash-collections'
             },
             {
                 title: 'Revenue Report',

@@ -186,6 +186,13 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
 
+      {
+        path : 'management/cash-collections',
+        loadComponent: () => import('./management/cash-collection/cash-collection.component').then(c => c.CashCollectionComponent),
+        data : { breadcrumb : 'Management/Cash Collections'},
+        canActivate : [AuthGuard]
+      },
+
 
       // End of Management
 
