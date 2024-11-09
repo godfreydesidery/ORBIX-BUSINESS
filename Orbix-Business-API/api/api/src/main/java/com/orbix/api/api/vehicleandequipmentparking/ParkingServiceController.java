@@ -198,6 +198,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setWheelCap(parkingRequest.isWheelCap());
 		parking.setRoundMirror(parkingRequest.isRoundMirror());
 		parking.setTireIndicator(parkingRequest.isTireIndicator());
+		parking.setHasKeys(parkingRequest.isHasKeys());
 		//parking.setImage(parkingRequest.getImage());
 		parking.setStatus("PENDING");
 		parking.setVehicleEquipmentType(vehicleEquipmentType_.get());
@@ -208,7 +209,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setVehicleEquipmentCategory(parkingRequest.getVehicleEquipmentCategory());
 		parking.setVehicleEquipment(vehicleEquipment_.get());
 		
-		parking.setHasKeys(parkingRequest.getHasKeys());
+		
 		
 		parking.setBranch(branch_.get());
 		
@@ -308,13 +309,14 @@ public class ParkingServiceController implements ParkingService {
 		parking.setWheelCap(parkingRequest.isWheelCap());
 		parking.setRoundMirror(parkingRequest.isRoundMirror());
 		parking.setTireIndicator(parkingRequest.isTireIndicator());
+		parking.setHasKeys(parkingRequest.isHasKeys());
 		parking.setVehicleEquipmentType(vehicleEquipmentType_.get());
 		parking.setVehicleEquipmentCategory(parkingRequest.getVehicleEquipmentCategory());
 		
 		parking.setVehicleEquipmentName(parkingRequest.getVehicleEquipmentName());
 		parking.setVehicleEquipmentColor(parkingRequest.getVehicleEquipmentColor());
 		
-		parking.setHasKeys(parkingRequest.getHasKeys());
+		
 		
 		parking.setParkingZone(parkingZone_.get());
 		
@@ -364,10 +366,10 @@ public class ParkingServiceController implements ParkingService {
 		parkingResponse.setWheelCap(parking.isWheelCap() ? "1" : "0");
 		parkingResponse.setRoundMirror(parking.isRoundMirror() ? "1" : "0");
 		parkingResponse.setTireIndicator(parking.isTireIndicator() ? "1" : "0");
+		parkingResponse.setHasKeys(parking.isHasKeys() ? "1" : "0");
 		parkingResponse.setVehicleEquipmentCategory(parking.getVehicleEquipmentCategory());
 		parkingResponse.setVehicleEquipmentName(parking.getVehicleEquipmentName());
 		parkingResponse.setVehicleEquipmentColor(parking.getVehicleEquipmentColor());
-		parkingResponse.setHasKeys(parking.getHasKeys());
 		//parking.setImage(parkingRequest.getImage());
 		parkingResponse.setStatus(parking.getStatus());
 		//parkingResponse.setCompanyId(parking.getCompany().getId().toString());
@@ -415,7 +417,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setParkingZone(parkingZone_.get());
 		parking.setStatus("CHECKED-IN");
 		parking.setCardNo(parkingRequest.getCardNo());
-		parking.setHasKeys(parkingRequest.getHasKeys());
+		parking.setHasKeys(parkingRequest.isHasKeys());
 		parking.setCheckedInByUser(userService.getUser(request));
 		parking.setCheckedInDateTime(dayService.getTimeStamp());
 		

@@ -1,0 +1,102 @@
+
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>Management Board</span>                       
+            </div>
+            <div class="card-body widget-body text-white"> 
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="form-control">From</label>
+                            <input type="date" class="form-control" [(ngModel)]="from">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="form-control">To</label>
+                            <input type="date" class="form-control" [(ngModel)]="to">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <br><br>
+                            <button class="btn btn-success" (click)="getTotalsByDates(from, to)">Update</button>
+                        </div>
+                    </div>
+                </div>
+                <hr>
+
+                <div class="row">
+                    <div class="col-lg-3" style="padding: 2px;">
+                        <div class="card-deck-wrapper">
+                            <div class="card-deck">
+                                <div class="card card-info">
+                                    <div class="card-body" style="text-align: center;">
+                                        <h4 class="card-title">Registered Vehicles</h4>
+                                        <h1 class="card-title">{{registered}}</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3" style="padding: 2px;">
+                        <div class="card-deck-wrapper">
+                            <div class="card-deck">
+                                <div class="card card-info">
+                                    <div class="card-body" style="text-align: center;">
+                                        <h4 class="card-title">Paid Vehicles</h4>
+                                        <h1 class="card-title">{{paid}}</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3" style="padding: 2px;">
+                        <div class="card-deck-wrapper">
+                            <div class="card-deck">
+                                <div class="card card-info">
+                                    <div class="card-body" style="text-align: center;">
+                                        <h4 class="card-title">Checked Out Vehicles</h4>
+                                        <h1 class="card-title">{{checkedOut}}</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-lg-3" style="padding: 2px;">
+                        <div class="card-deck-wrapper">
+                            <div class="card-deck">
+                                <div class="card card-info">
+                                    <div class="card-body" style="text-align: center;">
+                                        <h4 class="card-title">Current Unpaid Vehicles</h4>
+                                        <h1 class="card-title">{{currentUnpaid}}</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-3" style="padding: 2px;">
+                        <div class="card-deck-wrapper">
+                            <div class="card-deck">
+                                <div class="card card-info">
+                                    <div class="card-body" style="text-align: center;">
+                                        <h4 class="card-title">Current Vehicles in Yards</h4>
+                                        <h1 class="card-title">{{currentTotalInYards}}</h1>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

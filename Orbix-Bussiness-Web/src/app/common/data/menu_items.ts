@@ -437,7 +437,7 @@ export const menuItems = [
         subMenu: [
             {
                 title: 'Management Board',
-                routerLink: '/app/blank'
+                routerLink: '/app/management/management-board'
             },
             {
                 title: 'Collection Report',

@@ -64,11 +64,12 @@ public class ParkingRequestDTO {
 	boolean wheelCap;
 	boolean roundMirror;
 	boolean tireIndicator;
+	boolean hasKeys;
 	Byte[] image;
 	
 	String cardNo;
 	
-	String hasKeys;
+	
 	
 	String vehicleEquipmentCategory;
 	

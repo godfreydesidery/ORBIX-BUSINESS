@@ -1,7 +1,9 @@
 package com.orbix.api.modules.finance;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -17,6 +19,8 @@ import com.orbix.api.api.vehicleandequipmentparking.ParkingServiceBillReceivable
 import com.orbix.api.api.vehicleandequipmentparking.ParkingServiceBillReceivableRepository;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
+import com.orbix.api.modules.adminunits.DayService;
+import com.orbix.api.modules.identityandaccess.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,12 +37,18 @@ public class BillReceivableServiceController implements BillReceivableService {
 	private final ParkingServiceBillReceivableRepository parkingServiceBillReceivableRepository;
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
 	
+	private final CashCollectionRepository cashCollectionRepository;
+	private final UserService userService;
+	
+	private final DayService dayService;
+	
 	@Override
 	public List<BillReceivableResponseDTO> confirmBillPayment(List<BillReceivableRequestDTO> billRequests,
 			double totalAmount, HttpServletRequest request) {
 	
 		
 		double total = 0;
+		LocalDateTime dateTime = dayService.getTimeStamp();
 		for(BillReceivableRequestDTO bl : billRequests) {
 			BillReceivable billReceivable = billReceivableRepository.findById(bl.getId()).get();
 			total = total + billReceivable.getDue();
@@ -46,8 +56,24 @@ public class BillReceivableServiceController implements BillReceivableService {
 			billReceivable.setPaid(bl.getAmount());
 			billReceivable.setDue(0);
 			billReceivable.setStatus("PAID");
+			billReceivable.setPaidDateTime(dateTime);
 			
 			billReceivable = billReceivableRepository.save(billReceivable);
+			
+			CashCollection cashCollection = new CashCollection();
+			cashCollection.setAmount(bl.getAmount());
+			cashCollection.setPaymentType("CASH");
+			cashCollection.setReason("General Payment");
+			cashCollection.setCollectionDateTime(dateTime);
+			cashCollection.setCollectedByUser(userService.getUser(request));
+			cashCollection.setBillReceivable(billReceivable);
+			
+			Optional<ParkingBillReceivable> parkingBillReceivable = parkingBillReceivableRepository.findByBillReceivable(billReceivable);
+			if(parkingBillReceivable.isPresent()) cashCollection.setReason("Vehicle and Equipment/Parking");
+			Optional<ParkingServiceBillReceivable> parkingServiceBillReceivable = parkingServiceBillReceivableRepository.findByBillReceivable(billReceivable);
+			if(parkingServiceBillReceivable.isPresent()) cashCollection.setReason("Vehicle and Equipment/Service");
+			
+			cashCollectionRepository.save(cashCollection);
 			
 //			InvoiceReceivableDetail invoiceReceivableDetail = invoiceReceivableDetailRepository.findByBillReceivable(billReceivable);
 //			invoiceReceivableDetail.setPaid(bl.getAmount());

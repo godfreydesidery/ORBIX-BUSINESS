@@ -44,7 +44,7 @@ export interface IParking {
     wheelCap: boolean
     roundMirror: boolean    
     tireIndicator: boolean
-    
+    hasKeys: boolean
     //image: Byte[]
 
 
@@ -53,7 +53,7 @@ export interface IParking {
 
     status: "PENDING",
 
-    hasKeys: string
+    
 
     // Foreign keys
     parkingZoneId: any,

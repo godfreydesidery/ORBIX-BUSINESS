@@ -177,6 +177,18 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
 
+      // Management
+
+      {
+        path : 'management/management-board',
+        loadComponent: () => import('./management/management-board/management-board.component').then(c => c.ManagementBoardComponent),
+        data : { breadcrumb : 'Management/Management Board'},
+        canActivate : [AuthGuard]
+      },
+
+
+      // End of Management
+
 
 
       { 

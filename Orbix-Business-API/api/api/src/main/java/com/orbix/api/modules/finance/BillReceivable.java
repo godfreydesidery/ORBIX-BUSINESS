@@ -45,6 +45,7 @@ public class BillReceivable {
 	private String summary = "";
 		
 	private LocalDateTime createdDateTime = LocalDateTime.now();
+	private LocalDateTime paidDateTime;
 	
 	@ManyToOne(targetEntity = Branch.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "branch_id", nullable = false , updatable = false)

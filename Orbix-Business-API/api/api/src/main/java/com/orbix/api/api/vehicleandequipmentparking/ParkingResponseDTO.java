@@ -47,9 +47,10 @@ public class ParkingResponseDTO {
 	String wheelCap;
 	String roundMirror;
 	String tireIndicator;
+	String hasKeys;
 	Byte[] image;
 	
-	String hasKeys;
+	
 	
 	String vehicleEquipmentCategory;
 

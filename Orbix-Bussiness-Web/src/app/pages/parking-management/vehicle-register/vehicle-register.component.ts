@@ -75,6 +75,7 @@ export class VehicleRegisterComponent {
   wheelCap: string = ''
   roundMirror: string = ''
   tireIndicator: string = ''
+  hasKeys : string = ''
 
   cardNo : string = ''
 
@@ -86,7 +87,7 @@ export class VehicleRegisterComponent {
 
   status: string = "PENDING"
 
-  hasKeys : string = 'YES'
+  
 
   startBillingAt : Date | null
 
@@ -254,13 +255,12 @@ export class VehicleRegisterComponent {
       wheelCap: this.wheelCap === 'YES' ? 1 : 0,
       roundMirror: this.roundMirror === 'YES' ? 1 : 0,
       tireIndicator: this.tireIndicator === 'YES' ? 1 : 0,
+      hasKeys : this.hasKeys === 'YES' ? 1 : 0,
       vehicleEquipmentTypeName : this.vehicleEquipmentTypeName,
 
       vehicleEquipmentCategory : this.vehicleEquipmentCategory,
 
       cardNo : this.cardNo,
-
-      hasKeys : this.hasKeys,
 
       billintType : this.billingType,
 
@@ -358,7 +358,7 @@ export class VehicleRegisterComponent {
     var parking = {
       id : this.id,
       cardNo : this.cardNo,
-      hasKeys : this.hasKeys,
+      hasKeys : this.hasKeys === 'YES' ? 1 : 0,
       parkingZoneName : this.parkingZoneName,
       startBillingAt : this.startBillingAt
     }
@@ -476,8 +476,6 @@ export class VehicleRegisterComponent {
     this.billingType = data?.billingType
     this.billingAmount = data?.billingAmount
 
-    this.hasKeys = data?.hasKeys
-
     // Vehicle or Equipment Information
     this.registrationNo = data?.registrationNo;
     this.chasisNo = data?.chasisNo;
@@ -498,6 +496,7 @@ export class VehicleRegisterComponent {
     this.wheelCap = data?.wheelCap == true ? 'YES' : 'NO'
     this.roundMirror = data?.roundMirror == true ? 'YES' : 'NO'
     this.tireIndicator = data?.tireIndicator == true ? 'YES' : 'NO'
+    this.hasKeys = data?.hasKeys == true ? 'YES' : 'NO'
     this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName,
 
     this.vehicleEquipmentCategory = data!.vehicleEquipmentCategory
