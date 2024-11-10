@@ -45,7 +45,10 @@ export interface IParking {
     roundMirror: boolean    
     tireIndicator: boolean
     hasKeys: boolean
+    deviceStatus: boolean
     //image: Byte[]
+
+    comments : string
 
 
     billingType : string

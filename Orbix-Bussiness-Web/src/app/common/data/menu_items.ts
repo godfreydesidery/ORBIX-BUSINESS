@@ -371,6 +371,10 @@ export const menuItems = [
                 title: 'Parking Billing',
                 routerLink: '/app/accounts-and-finance/parking-billing'
             },
+            {
+                title: 'Release Vehicles',
+                routerLink: '/app/accounts-and-finance/release-vehicle-equipment'
+            },
         ]
     },
 

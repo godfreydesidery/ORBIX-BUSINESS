@@ -23,30 +23,25 @@
                                     <input class="form-control" type="text" [(ngModel)]="ownerFirstName" autocomplete="nope">
                                 </div>
                             </div>
-                            <div class="col-lg-3">
+                            <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Middle Name</label>
                                     <input class="form-control" type="text" [(ngModel)]="ownerMiddleName" autocomplete="nope">
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Last Name*</label>
                                     <input class="form-control" type="text" [(ngModel)]="ownerLastName" autocomplete="nope">
                                 </div>
                             </div>
-                            <div class="col-lg-3">
+                            <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Company Name*</label>
                                     <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>ID No*</label>
-                                    <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
-                                </div>
-                            </div> 
+                            </div> -->
+                            
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>ID Type*</label>
@@ -64,37 +59,44 @@
                             </div> 
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>Phone No</label>
-                                    <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
+                                    <label>ID No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
                                 </div>
                             </div> 
                             <div class="col-lg-3">
                                 <div class="form-group">
+                                    <label>Phone No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
+                                </div>
+                            </div> 
+                            <!-- <div class="col-lg-3">
+                                <div class="form-group">
                                     <label>Address</label>
                                     <input class="form-control" type="text" [(ngModel)]="ownerAddress" autocomplete="nope">
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                         <p><b>Vehicle Information</b></p><br>
                         <div class="row">
-                            <div class="col-lg-3">
+                            <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Registration No*</label>
                                     <input class="form-control" type="text" [(ngModel)]="registrationNo" autocomplete="nope">
                                 </div>
-                            </div>
+                            </div> -->
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>Chasis No*</label>
+                                    <label>Chasis No/ Reg No*</label>
                                     <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
                                 </div>
                             </div>
+                            
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>Vehicle Name</label>
-                                    <input class="form-control" type="text" [(ngModel)]="vehicleEquipmentName" autocomplete="nope">
+                                    <label>T1 Number</label>
+                                    <input class="form-control" type="text" [(ngModel)]="tformNumber" autocomplete="nope">
                                 </div>
-                            </div>
+                            </div> 
 
                             <div class="col-lg-3">
                                 <div class="form-group">
@@ -130,6 +132,13 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Comments</label>
+                                    <textarea class="form-control" [(ngModel)]="comments" autocomplete="nope"></textarea>
+                                    <!-- <input class="form-control" type="text" [(ngModel)]="comments" autocomplete="nope"> -->
+                                </div>
+                            </div>
                         </div>
                     </div>
                     <div class="row">
@@ -142,7 +151,7 @@
                 <!-- Start of content header for existing vehicle -->
                 <div class="row" *ngIf="mode === 'existing'">
                     <div class="col-lg-3">
-                        <span>Chasis No</span>
+                        <span>Chasis No/ Reg No</span>
                         <input class="form-control" type="text" list="nos" [(ngModel)]="chasisNo" (change)="searchVehicleEquipmentByChasisNo(chasisNo)"/>
                         <datalist id="nos">
                             <option *ngFor="let option of chasisNos" [value]="option">
@@ -158,7 +167,7 @@
                 <!-- End of content header for existing vehicle -->
 
                 <!-- Start of main page content, to be displayed only if a vehicle is registered and a parking is selected -->
-                <div class="row" *ngIf="parkingId != null">
+                <div class="row" *ngIf="id != null">
                     <div class="col-sm-12">
                         <hr>
                         <h6>Driver/Owner Information</h6><hr>
@@ -170,30 +179,25 @@
                                     <input class="form-control" type="text" [(ngModel)]="ownerFirstName" autocomplete="nope">
                                 </div>
                             </div>     
-                            <div class="col-lg-3">
+                            <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Middle Name(s)</label>
                                     <input class="form-control" type="text" [(ngModel)]="ownerMiddleName" autocomplete="nope">
                                 </div>
-                            </div> 
+                            </div>  -->
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Last Name</label>
                                     <input class="form-control" type="text" [(ngModel)]="ownerLastName" autocomplete="nope">
                                 </div>
                             </div>   
-                            <div class="col-lg-3">
+                            <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Company</label>
                                     <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
                                 </div>
-                            </div>   
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>ID No</label>
-                                    <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
-                                </div>
-                            </div> 
+                            </div>    -->
+                            
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>ID Type</label>
@@ -207,6 +211,13 @@
                                         <option>VISA</option>
                                         <option>NONE</option>
                                     </select>
+                                </div>
+                            </div> 
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>ID No</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
                                 </div>
                             </div> 
                             
@@ -233,12 +244,12 @@
                                     <input class="form-control" type="text" [(ngModel)]="agentName" autocomplete="nope">
                                 </div>
                             </div>     
-                            <div class="col-lg-3">
+                            <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Agent Address</label>
                                     <input class="form-control" type="text" [(ngModel)]="agentAddress" autocomplete="nope">
                                 </div>
-                            </div> 
+                            </div>  -->
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Agent Phone</label>
@@ -251,15 +262,11 @@
                                     <input class="form-control" type="email" [(ngModel)]="agentEmail" autocomplete="nope">
                                 </div>
                             </div> 
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>T1 Number</label>
-                                    <input class="form-control" type="text" [(ngModel)]="tformNumber" autocomplete="nope">
-                                </div>
-                            </div> 
+                            
                         </div>
                         <h6>Vehicle Information</h6><hr>
                         <div class="row">
+                            
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Front Lamp</label>
@@ -510,7 +517,7 @@
                                     <label>Category</label>
                                     <select class="form-control" [(ngModel)]="vehicleEquipmentCategory">
                                         <!-- <option></option> -->
-                                        <option>IN TRANSIT</option>
+                                        <option>IN-TRANSIT</option>
                                         <option>LOCAL</option>
                                     </select>
                                 </div>
@@ -535,18 +542,18 @@
                             </div> 
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>Chasis No</label>
+                                    <label>Chasis No/ Reg No</label>
                                     <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
                                 </div>
                             </div>
 
 
-                            <div class="col-lg-3">
+                            <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Vehicle Name</label>
                                     <input class="form-control" type="text" [(ngModel)]="vehicleEquipmentName" autocomplete="nope">
                                 </div>
-                            </div>
+                            </div> -->
 
                             <div class="col-lg-3">
                                 <div class="form-group">
@@ -612,30 +619,25 @@
                             <input class="form-control" type="text" [(ngModel)]="ownerFirstName" autocomplete="nope">
                         </div>
                     </div>
-                    <div class="col-lg-3">
+                    <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label>Middle Name</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerMiddleName" autocomplete="nope">
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Last Name*</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerLastName" autocomplete="nope">
                         </div>
                     </div>
-                    <div class="col-lg-3">
+                    <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label>Company Name*</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
                         </div>
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="form-group">
-                            <label>ID No*</label>
-                            <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
-                        </div>
-                    </div> 
+                    </div> -->
+                    
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>ID Type*</label>
@@ -653,28 +655,34 @@
                     </div> 
                     <div class="col-lg-3">
                         <div class="form-group">
-                            <label>Phone No</label>
-                            <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
+                            <label>ID No*</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
                         </div>
                     </div> 
                     <div class="col-lg-3">
                         <div class="form-group">
+                            <label>Phone No</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
+                        </div>
+                    </div> 
+                    <!-- <div class="col-lg-3">
+                        <div class="form-group">
                             <label>Address</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerAddress" autocomplete="nope">
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <p><b>Vehicle Information</b></p><br>
                 <div class="row">
-                    <div class="col-lg-3">
+                    <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label>Registration No*</label>
                             <input class="form-control" type="text" [(ngModel)]="registrationNo" autocomplete="nope">
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-lg-3">
                         <div class="form-group">
-                            <label>Chasis No*</label>
+                            <label>Chasis No/ Reg No*</label>
                             <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
                         </div>
                     </div>
@@ -756,24 +764,24 @@
                             <input class="form-control" type="text" [(ngModel)]="ownerFirstName" autocomplete="nope">
                         </div>
                     </div>
-                    <div class="col-lg-3">
+                    <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label>Middle Name</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerMiddleName" autocomplete="nope">
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Last Name*</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerLastName" autocomplete="nope">
                         </div>
                     </div>
-                    <div class="col-lg-3">
+                    <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label>Company Name*</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>ID No*</label>
@@ -801,24 +809,24 @@
                             <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
                         </div>
                     </div> 
-                    <div class="col-lg-3">
+                    <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label>Address</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerAddress" autocomplete="nope">
                         </div>
-                    </div>
+                    </div> -->
                 </div>
                 <p><b>Vehicle Information</b></p><br>
                 <div class="row">
-                    <div class="col-lg-3">
+                    <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label>Registration No*</label>
                             <input class="form-control" type="text" [(ngModel)]="registrationNo" autocomplete="nope">
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-lg-3">
                         <div class="form-group">
-                            <label>Chasis No*</label>
+                            <label>Chasis No/ Reg No*</label>
                             <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
                         </div>
                     </div>

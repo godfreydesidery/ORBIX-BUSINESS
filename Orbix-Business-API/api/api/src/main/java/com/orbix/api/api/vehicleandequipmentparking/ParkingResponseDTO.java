@@ -48,7 +48,10 @@ public class ParkingResponseDTO {
 	String roundMirror;
 	String tireIndicator;
 	String hasKeys;
+	String deviceStatus;
 	Byte[] image;
+	
+	String comments;
 	
 	
 	

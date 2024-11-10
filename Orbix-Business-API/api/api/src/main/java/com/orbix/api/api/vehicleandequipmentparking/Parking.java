@@ -80,8 +80,11 @@ public class Parking {
 	private boolean roundMirror = true;
 	private boolean tireIndicator = true;
 	private boolean hasKeys = true;
+	private boolean deviceStatus = true;
 	private Byte[] image;
 	private String cardNo;
+	
+	private String comments;
 	
 	private String vehicleEquipmentCategory;
 	private String vehicleEquipmentName;

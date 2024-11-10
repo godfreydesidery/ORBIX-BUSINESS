@@ -45,6 +45,8 @@ export class VehicleEquipmentRegisterComponent {
   cardNo: string = ''
   image : any = null
 
+  comments : string = ''
+
 
   vehicleEquipmentTypeName : string = ''
   vehicleEquipmentName : string = ''
@@ -113,12 +115,13 @@ export class VehicleEquipmentRegisterComponent {
   wheelCap: string = 'YES'
   roundMirror: string = 'YES'
   tireIndicator: string = 'YES'
+  deviceStatus: string = 'YES'
 
   // cardNo : string = ''
 
-  vehicleEquipmentCategory : string = 'IN TRANSIT'
+  vehicleEquipmentCategory : string = 'IN-TRANSIT'
 
-  billingType : string = ''
+  billingType : string = 'DAILY'
   billingAmount : number = 0
   //image: Byte[]
 
@@ -286,8 +289,16 @@ export class VehicleEquipmentRegisterComponent {
       companyId : this.companyId,
       companyName : this.companyName,
       branchId : this.branchId,
+      comments : this.comments,
 
       
+  }
+
+  if(this.ownerIdType != 'NONE' && this.ownerIdType === ''){
+    this.msg.showErrorMessage3('ID No is required')
+  }
+  if(this.ownerPhoneNo === ''){
+    this.msg.showErrorMessage3('Phone No is required')
   }
 
   if(this.id == null){
@@ -386,6 +397,8 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.companyName = data.companyName
     this.branchId = data.branchId
 
+    this.comments = data.comments
+
     this.parkingId = data!.parkingId
 
     console.log(data)
@@ -417,6 +430,8 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.companyName = ''
     this.branchId = ''
     this.branchName = ''
+
+    this.comments = ''
   }
 
   setNewMode(){
@@ -495,6 +510,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.wheelCap = data?.wheelCap == true ? 'YES' : 'NO'
     this.roundMirror = data?.roundMirror == true ? 'YES' : 'NO'
     this.tireIndicator = data?.tireIndicator == true ? 'YES' : 'NO'
+    this.deviceStatus = data?.deviceStatus == true ? 'ATTACHED' : 'NOT-ATTACHED'
     this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName,
     this.vehicleEquipmentColor = data!.vehicleEquipmentColor,
 
@@ -504,6 +520,8 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
     this.parkingZoneName = data!.parkingZoneName,
     this.cardNo = data!.cardNo
+
+    this.comments = data!.comments
 
     this.billingType = data!.billingType
 
@@ -531,7 +549,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.agentEmail = ''
     this.tformNumber = ''
 
-    this.billingType = ''
+    this.billingType = 'DAILY'
     this.billingAmount = 0
 
     // Vehicle or Equipment Information
@@ -554,7 +572,12 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.wheelCap = 'YES'
     this.roundMirror = 'YES'
     this.tireIndicator = 'YES'
+    this.deviceStatus = 'ATTACHED'
     this.vehicleEquipmentTypeName = ''
+
+    this.comments = ''
+
+
 
     this.vehicleEquipmentCategory = ''
 
@@ -563,7 +586,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
     this.parkingZoneName = ''
 
-    this.billingType = ''
+    this.billingType = 'DAILY'
   }
 
 
@@ -621,7 +644,10 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
       wheelCap: this.wheelCap === 'YES' ? 1 : 0,
       roundMirror: this.roundMirror === 'YES' ? 1 : 0,
       tireIndicator: this.tireIndicator === 'YES' ? 1 : 0,
+      deviceStatus: this.deviceStatus === 'ATTACHED' ? 1 : 0,
       vehicleEquipmentTypeName : this.vehicleEquipmentTypeName,
+
+      comments : this.comments,
 
       vehicleEquipmentCategory : this.vehicleEquipmentCategory,
 

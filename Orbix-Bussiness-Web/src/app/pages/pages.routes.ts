@@ -176,6 +176,12 @@ export const routes: Routes = [
         data : { breadcrumb : 'Accounts & Finance | Vehicle & Equipment Billing'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'accounts-and-finance/release-vehicle-equipment',
+        loadComponent: () => import('./accounts-and-finance/release-vehicle-equipment/release-vehicle-equipment.component').then(c => c.ReleaseVehicleEquipmentComponent),
+        data : { breadcrumb : 'Accounts & Finance | Release Vehicle & Equipment'},
+        canActivate : [AuthGuard]
+      },
 
       // Management
 

@@ -105,7 +105,7 @@ export class PosReceiptPrinterService {
               headerRows : 0,
               widths : [200],
               body : [
-                [{text : 'Service Receipt', alignment : 'center', fontSize : 9, bold : true}],
+                [{text : 'Payment Receipt', alignment : 'center', fontSize : 9, bold : true}],
               ]
             }
           },      
@@ -125,7 +125,7 @@ export class PosReceiptPrinterService {
               body : [
                 [{text : '=============================='}],
                 [{text : 'Served By : '+ localStorage.getItem('user-name'), fontSize : 9, alignment : 'left'}],
-                [{text : 'Developed By @Zana Systems', fontSize : 10, bold : true, alignment : 'center'}],
+                [{text : 'Developed By @Orbix Systems', fontSize : 10, bold : true, alignment : 'center'}],
                 [{text : '***End of Receipt***', fontSize : 9, alignment : 'center'}]
               ]
             }

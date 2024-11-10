@@ -535,7 +535,7 @@ export class VehicleEquipmentBillingComponent {
     var discount : number = 0
     var tax : number = 0
 
-    // var address : any = await this.data.getReceiptHeader(receiptNo)
+    var address : any = await this.data.getReceiptHeader(receiptNo)
    
     var receipt = [
       [
@@ -573,11 +573,11 @@ export class VehicleEquipmentBillingComponent {
       
       //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
         content : [
-          // {
-          //   layout : 'noBorders',
-          //   table :  address
+          {
+            layout : 'noBorders',
+            table :  address
 
-          // }, 
+          }, 
           
           
           
@@ -616,7 +616,7 @@ export class VehicleEquipmentBillingComponent {
               headerRows : 0,
               widths : [200],
               body : [
-                [{text : 'Service Receipt', alignment : 'center', fontSize : 9, bold : true}],
+                [{text : 'Receipt', alignment : 'center', fontSize : 9, bold : true}],
               ]
             }
           },      

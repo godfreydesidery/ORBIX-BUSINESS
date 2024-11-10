@@ -251,7 +251,7 @@ export class DataService {
     this.tin              = 'NA'
     this.vrn              = 'NA'
     this.physicalAddress  = 'Dar es Salaam, TZ'
-    this.postCode         = ''
+    this.postCode         = 'DSM'
     this.postAddress      = 'Dar es Salaam, TZ'
     this.telephone        = ''
     this.mobile           = ''
@@ -302,9 +302,9 @@ export class DataService {
         [{text : cPhysicalAddress, fontSize : 9, alignment : 'center'}],
         [{text : cTelephone, fontSize : 9, alignment : 'center'}],
         [{text : cEmail, fontSize : 9, italic : true, alignment : 'center'}],
-        //[{text : cWebsite, fontSize : 9, italic : true, alignment : 'center'}],
-        //[{text : tin, fontSize : 9, italic : true, alignment : 'center'}],
-        //[{text : vrn, fontSize : 9, italic : true, alignment : 'center'}]
+        [{text : cWebsite, fontSize : 9, italic : true, alignment : 'center'}],
+        [{text : tin, fontSize : 9, italic : true, alignment : 'center'}],
+        [{text : vrn, fontSize : 9, italic : true, alignment : 'center'}]
       ]
     }
     return address

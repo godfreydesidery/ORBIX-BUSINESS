@@ -89,6 +89,46 @@ public class ParkingServiceController implements ParkingService {
 	}
 	
 	@Override
+	public List<ParkingResponseDTO> getAllCleared(HttpServletRequest request) {
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+		
+		List<Parking> parkings = parkingRepository.findAllByStatusIn(statuses);
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+
+		for(Parking parking : parkings) {
+			
+			boolean cleared = true;
+			
+			List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
+			if(!parkingBillReceivables.isEmpty() && cleared == true) {
+				for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
+					if(!parkingBillReceivable.getBillReceivable().getStatus().equals("PAID")) {
+						cleared = false;
+						break;
+					}
+				}
+			}
+			
+			List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking);
+			if(!parkingServiceBillReceivables.isEmpty() && cleared == true) {
+				for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
+					if(!parkingServiceBillReceivable.getBillReceivable().getStatus().equals("PAID")) {
+						cleared = false;
+						break;
+					}
+				}
+			}
+			
+			
+			if(cleared) parkingResponses.add(parkingResponseDTOMapper(parking));	
+							
+		}		
+		return parkingResponses;
+	}
+	
+	@Override
 	public List<ParkingResponseDTO> getAllCheckedInParkings(HttpServletRequest request) {
 		
 		List<String> statuses = new ArrayList<>();
@@ -199,6 +239,10 @@ public class ParkingServiceController implements ParkingService {
 		parking.setRoundMirror(parkingRequest.isRoundMirror());
 		parking.setTireIndicator(parkingRequest.isTireIndicator());
 		parking.setHasKeys(parkingRequest.isHasKeys());
+		parking.setDeviceStatus(parkingRequest.isDeviceStatus());
+		
+		parking.setComments(parkingRequest.getComments());
+		
 		//parking.setImage(parkingRequest.getImage());
 		parking.setStatus("PENDING");
 		parking.setVehicleEquipmentType(vehicleEquipmentType_.get());
@@ -224,7 +268,7 @@ public class ParkingServiceController implements ParkingService {
 		parking = parkingRepository.save(parking);
 		
 		
-		//parking.setStatus(parkingRequest.getStatus() != null ? parkingRequest.getStatus() : "PENDING");
+		//parking.setParkingStatus(parkingRequest.getParkingStatus() != null ? parkingRequest.getParkingStatus() : "PENDING");
 
 //		
 //		parking.setParkingZone(parkingRequest.getParkingZone());
@@ -310,11 +354,14 @@ public class ParkingServiceController implements ParkingService {
 		parking.setRoundMirror(parkingRequest.isRoundMirror());
 		parking.setTireIndicator(parkingRequest.isTireIndicator());
 		parking.setHasKeys(parkingRequest.isHasKeys());
+		parking.setDeviceStatus(parkingRequest.isDeviceStatus());
 		parking.setVehicleEquipmentType(vehicleEquipmentType_.get());
 		parking.setVehicleEquipmentCategory(parkingRequest.getVehicleEquipmentCategory());
 		
 		parking.setVehicleEquipmentName(parkingRequest.getVehicleEquipmentName());
 		parking.setVehicleEquipmentColor(parkingRequest.getVehicleEquipmentColor());
+		
+		parking.setComments(parkingRequest.getComments());
 		
 		
 		
@@ -367,9 +414,12 @@ public class ParkingServiceController implements ParkingService {
 		parkingResponse.setRoundMirror(parking.isRoundMirror() ? "1" : "0");
 		parkingResponse.setTireIndicator(parking.isTireIndicator() ? "1" : "0");
 		parkingResponse.setHasKeys(parking.isHasKeys() ? "1" : "0");
+		parkingResponse.setDeviceStatus(parking.isDeviceStatus() ? "1" : "0");
 		parkingResponse.setVehicleEquipmentCategory(parking.getVehicleEquipmentCategory());
 		parkingResponse.setVehicleEquipmentName(parking.getVehicleEquipmentName());
 		parkingResponse.setVehicleEquipmentColor(parking.getVehicleEquipmentColor());
+		
+		parkingResponse.setComments(parking.getComments());
 		//parking.setImage(parkingRequest.getImage());
 		parkingResponse.setStatus(parking.getStatus());
 		//parkingResponse.setCompanyId(parking.getCompany().getId().toString());
@@ -444,7 +494,7 @@ public class ParkingServiceController implements ParkingService {
 //		billReceivable.setBranch(parking.getBranch());
 //		billReceivable.setCreatedDateTime(dayService.getTimeStamp());
 //		
-//		billReceivable.setStatus("UNPAID");
+//		billReceivable.setParkingStatus("UNPAID");
 //		billReceivable.setSummary("Parking bill for parking#: " + parking.getNo());
 //		
 //		billReceivable = billReceivableRepository.save(billReceivable);
@@ -458,7 +508,7 @@ public class ParkingServiceController implements ParkingService {
 //		
 //		List<ParkingInvoiceReceivable> parkingInvoiceReceivables = parkingInvoiceReceivableRepository.findAllByParking(parking);
 //		for(ParkingInvoiceReceivable pInvoiceReceivable : parkingInvoiceReceivables) {
-//			if(pInvoiceReceivable.getInvoiceReceivable().getStatus()
+//			if(pInvoiceReceivable.getInvoiceReceivable().getParkingStatus()
 //					.equals("OPEN")) {
 //				invoiceReceivable = pInvoiceReceivable.getInvoiceReceivable();
 //				break;
@@ -469,7 +519,7 @@ public class ParkingServiceController implements ParkingService {
 //			invoiceReceivable.setNo(String.valueOf(Math.random()));
 //			//invoiceReceivable.setCompany(parking.getCompany());
 //			invoiceReceivable.setBranch(parking.getBranch());
-//			invoiceReceivable.setStatus("OPEN");
+//			invoiceReceivable.setParkingStatus("OPEN");
 //			invoiceReceivable.setSummary("Auto invoice, for parking# " + parking.getNo());
 //			
 //			invoiceReceivable = invoiceReceivableRepository.save(invoiceReceivable);

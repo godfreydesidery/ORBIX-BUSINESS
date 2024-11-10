@@ -45,7 +45,7 @@
                                 <tr *ngFor="let p of parkings | searchFilter : filterRecords | paginate: { itemsPerPage: 5, currentPage: page }">
                                     <td>{{p.sn}}</td>
                                     <td>{{p.no}}</td>
-                                    <td>{{p.ownerFirstName}} {{p.ownerMiddleName}} {{p.ownerLastName}}</td>
+                                    <td>{{p.ownerFirstName}} {{p.ownerLastName}}</td>
                                     <td>{{p.ownerIdNo}}</td>
                                     <td>{{p.ownerIdType}}</td>
                                     <td>{{p.ownerPhoneNo}}</td>
@@ -60,7 +60,7 @@
                                             <tr>
                                                 <td><button type="button" class="btn btn-primary btn-round-custom" *ngIf="p.status === 'PENDING'" (click)="get(p.id)" data-toggle="modal" data-target="#edit-modal" style="cursor: pointer;">Edit</button></td>
                                                 <td><button type="button" class="btn btn-success btn-round-custom" *ngIf="p.status === 'PENDING'" (click)="get(p.id)" data-toggle="modal" data-target="#check-in-modal" style="cursor: pointer; margin-left: 3px;">Check In</button></td>
-                                                <td><button type="button" class="btn btn-danger btn-round-custom" *ngIf="p.status === 'CHECKED-IN'" (click)="get(p.id)" data-toggle="modal" data-target="#check-out-modal" style="cursor: pointer; margin-left: 3px;">Check Out</button></td>
+                                                <!-- <td><button type="button" class="btn btn-danger btn-round-custom" *ngIf="p.status === 'CHECKED-IN'" (click)="get(p.id)" data-toggle="modal" data-target="#check-out-modal" style="cursor: pointer; margin-left: 3px;">Check Out</button></td> -->
                                             </tr>
                                         </table>
                                     </td>
@@ -96,24 +96,24 @@
                             <input class="form-control" type="text" [(ngModel)]="ownerFirstName" autocomplete="nope">
                         </div>
                     </div>     
-                    <div class="col-lg-3">
+                    <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label>Middle Name(s)</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerMiddleName" autocomplete="nope">
                         </div>
-                    </div> 
+                    </div>  -->
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Last Name</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerLastName" autocomplete="nope">
                         </div>
                     </div>   
-                    <div class="col-lg-3">
+                    <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label>Company</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
                         </div>
-                    </div>   
+                    </div>    -->
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>ID No</label>
@@ -424,8 +424,8 @@
                                 <tbody>
                                     <td>
                                         <select class="form-control">
-                                            <option>YES</option>
-                                            <option>NO</option>
+                                            <option>ATTACHED</option>
+                                            <option>NOT-ATTACHED</option>
                                         </select>
                                     </td>
                                 </tbody>    
@@ -449,8 +449,7 @@
                         <div class="form-group">
                             <label>Category</label>
                             <select class="form-control" [(ngModel)]="vehicleEquipmentCategory">
-                                <option></option>
-                                <option>IN TRANSIT</option>
+                                <option>IN-TRANSIT</option>
                                 <option>LOCAL</option>
                             </select>
                         </div>
@@ -514,7 +513,7 @@
                             </thead>
                             <tbody>
                                 <tr><td><b>First Name</b></td><td>{{ownerFirstName}}</td></tr>
-                                <tr><td><b>Middle Name</b></td><td>{{ownerMiddleName}}</td></tr>
+                                <!-- <tr><td><b>Middle Name</b></td><td>{{ownerMiddleName}}</td></tr> -->
                                 <tr><td><b>Last Name</b></td><td>{{ownerLastName}}</td></tr> 
                                 <tr><td><b>ID Type</b></td><td>{{ownerIdType}}</td></tr>
                                 <tr><td><b>ID No</b></td><td>{{ownerIdNo}}</td></tr>   
@@ -641,7 +640,7 @@
                             </thead>
                             <tbody>
                                 <tr><td><b>First Name</b></td><td>{{ownerFirstName}}</td></tr>
-                                <tr><td><b>Middle Name</b></td><td>{{ownerMiddleName}}</td></tr>
+                                <!-- <tr><td><b>Middle Name</b></td><td>{{ownerMiddleName}}</td></tr> -->
                                 <tr><td><b>Last Name</b></td><td>{{ownerLastName}}</td></tr> 
                                 <tr><td><b>ID Type</b></td><td>{{ownerIdType}}</td></tr>
                                 <tr><td><b>ID No</b></td><td>{{ownerIdNo}}</td></tr>   

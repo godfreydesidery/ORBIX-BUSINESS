@@ -20,7 +20,7 @@
                             <tr>
                                 <th>SN</th>
                                 <th>Chasis No</th>
-                                <th>Keys</th>
+                                <!-- <th>Keys</th> -->
                                 <th>Owner/Driver Name</th>
                                 <th>Owner ID</th>
                                 <th>Owner ID Type</th>
@@ -36,8 +36,8 @@
                             <tr *ngFor="let p of parkings | searchFilter : filterRecords | paginate: { itemsPerPage: 5, currentPage: page }">
                                 <td>{{p.sn}}</td>
                                 <td>{{p.chasisNo}}</td>
-                                <td>{{p.hasKeys}}</td>
-                                <td>{{p.ownerFirstName}} {{p.ownerMiddleName}} {{p.ownerLastName}}</td>
+                                <!-- <td>{{p.hasKeys}}</td> -->
+                                <td>{{p.ownerFirstName}} {{p.ownerLastName}}</td>
                                 <td>{{p.ownerIdNo}}</td>
                                 <td>{{p.ownerIdType}}</td>
                                 <td>{{p.ownerPhoneNo}}</td>

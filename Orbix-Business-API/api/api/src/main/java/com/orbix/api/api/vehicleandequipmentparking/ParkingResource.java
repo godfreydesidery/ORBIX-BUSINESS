@@ -46,6 +46,11 @@ private final ParkingService parkingService;
 		return ResponseEntity.ok().body(parkingService.getAllCheckedInParkings(request));
 	}
 	
+	@GetMapping("/parkings/get_all_cleared")
+	public ResponseEntity<List<ParkingResponseDTO>>getAllCleared(HttpServletRequest request){
+		return ResponseEntity.ok().body(parkingService.getAllCleared(request));
+	}
+	
 	
 	@GetMapping("/parkings/get")
 	public ResponseEntity<ParkingResponseDTO>get(

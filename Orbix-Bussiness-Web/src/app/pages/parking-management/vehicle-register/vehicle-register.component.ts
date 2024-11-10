@@ -81,13 +81,17 @@ export class VehicleRegisterComponent {
   tireIndicator: string = ''
   hasKeys : string = ''
 
+
+
+  deviceStatus : string = ''
+
   color : string = ''
 
   comments : string = ''
 
   cardNo : string = ''
 
-  vehicleEquipmentCategory : string = ''
+  vehicleEquipmentCategory : string = 'IN-TRANSIT'
 
   billingType : string = ''
   billingAmount : number = 0
@@ -242,6 +246,8 @@ export class VehicleRegisterComponent {
 
       billingType : this.billingType,
 
+      comments : this.comments,
+
       billingAmount : this.billingAmount,
 
       // Vehicle or Equipment Information
@@ -267,6 +273,8 @@ export class VehicleRegisterComponent {
       tireIndicator: this.tireIndicator === 'YES' ? 1 : 0,
       hasKeys : this.hasKeys === 'YES' ? 1 : 0,
       vehicleEquipmentTypeName : this.vehicleEquipmentTypeName,
+
+      deviceStatus : this.deviceStatus === 'ATTACHED' ? 1 : 0,
 
       vehicleEquipmentCategory : this.vehicleEquipmentCategory,
 
@@ -509,6 +517,10 @@ export class VehicleRegisterComponent {
     this.tireIndicator = data?.tireIndicator == true ? 'YES' : 'NO'
     this.hasKeys = data?.hasKeys == true ? 'YES' : 'NO'
     this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName,
+    this.deviceStatus = data!.deviceStatus == true ? 'ATTACHED' : 'NOT-ATTACHED',
+
+    this.comments = data!.comments,
+
 
     this.vehicleEquipmentCategory = data!.vehicleEquipmentCategory
 
@@ -563,6 +575,10 @@ export class VehicleRegisterComponent {
     this.roundMirror = ''
     this.tireIndicator = ''
     this.vehicleEquipmentTypeName = ''
+
+    this.comments = ''
+
+    this.deviceStatus = ''
 
     this.vehicleEquipmentCategory = ''
 

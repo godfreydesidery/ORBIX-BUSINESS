@@ -70,12 +70,18 @@ export class VehicleEquipmentTypeComponent {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    await this.http.get<IVehicleEquipmentType>(API_URL+'/vehicle_equipment_tyeps/get?id=' + id, options)
+    await this.http.get<IVehicleEquipmentType>(API_URL+'/vehicle_equipment_types/get?id=' + id, options)
     .toPromise()
     .then(
       data => {
         this.showVehicleEquipmentTypeData(data!)
         console.log(data)
+      }
+    )
+    .catch(
+      error => {
+        console.log(error)
+        this.msg.showErrorMessage(error, 'Error')
       }
     )
   }

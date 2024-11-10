@@ -28,5 +28,7 @@ export interface IVehicleEquipment {
 
     parkingId : string
 
+    comments : string
+
     sn : number
 }
