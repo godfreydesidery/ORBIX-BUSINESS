@@ -467,6 +467,15 @@ export class VehicleEquipmentBillingComponent {
     this.parkingBillReceivableEndingDate = null
   }
 
+  clearServiceBill(){
+    this.serviceBillReceivableId = null
+    this.serviceBillReceivableDate = null
+    this.serviceBillReceivableDescription = ''
+    this.serviceBillReceivableAmount = 0
+    this.serviceBillReceivableQty = 0
+    this.serviceBillReceivableDiscount = 0
+  }
+
 
 
   printReceipt(){

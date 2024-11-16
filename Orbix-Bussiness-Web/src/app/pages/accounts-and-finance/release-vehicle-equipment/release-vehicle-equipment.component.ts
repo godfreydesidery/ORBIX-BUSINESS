@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/auth.service';
 import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { IParking } from 'src/app/domain/parking';
+import { IParking, IServiceBillItem } from 'src/app/domain/parking';
 import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
 import { Byte } from 'src/custom-packages/util';
@@ -14,6 +14,7 @@ import * as pdfMake from 'pdfmake/build/pdfmake';
 
 import { DataService } from '@services/custom/data.service';
 import { MsgBoxService } from '@services/custom/msg-box.service';
+import { ReceiptItem } from 'src/app/domain/receipt-item';
 
 
 const API_URL = environment.apiUrl;
@@ -396,6 +397,11 @@ export class ReleaseVehicleEquipmentComponent {
 
   async checkOut(){
 
+    if(this.comments == null || this.comments == ''){
+      this.msg.showErrorMessage3('Please enter comments')
+      return
+    }
+
     if(await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to check out?', 'question', 'Yes', 'No') == false){
       return
     }
@@ -421,7 +427,7 @@ export class ReleaseVehicleEquipmentComponent {
           this.getAllClearedParkings()
 
           this.msg.showSuccessMessage('Checked out Successifully')
-          this.printGatePass()
+          this.printGatePassRcpt(data!.serviceBillItems, '', 0);
         }
       )
       .catch(
@@ -518,6 +524,8 @@ export class ReleaseVehicleEquipmentComponent {
 
      this.status = data!.status
 
+     this.color = data!.vehicleEquipmentColor
+
   }
 
   clearParkingData(){
@@ -572,6 +580,8 @@ export class ReleaseVehicleEquipmentComponent {
     this.hasKeys = ''
 
     this.billingType = ''
+
+    this.color = ''
   }
 
 
@@ -705,6 +715,131 @@ export class ReleaseVehicleEquipmentComponent {
       ]     
     };
     pdfMake.createPdf(docDefinition).print()
+  }
+
+
+
+  printGatePassRcpt = async (billItems : IServiceBillItem[], receiptNo :string, cash : number) => {
+
+    var companyName = localStorage.getItem('company-name')!
+
+    var header = ''
+    var footer = ''
+    var title  = 'Gate Pass'
+    var total : number = 0
+    var discount : number = 0
+    var tax : number = 0
+
+    var address : any = await this.data.getReceiptHeader(receiptNo)
+   
+    var receipt = [
+      [
+        {text : 'SN', fontSize : 8, bold : true}, 
+        {text : 'Item', fontSize : 8, bold : true},
+        {text : 'Qty', fontSize : 8, bold : true},
+        {text : 'Amount', fontSize : 8, bold : true},
+      ]
+    ] 
+    
+    var sn = 0
+
+    billItems.forEach((element) => {
+      total = total + (+element.amount)
+      sn = sn + 1
+      var item = [
+        {text : sn.toString(), fontSize : 8, bold : false}, 
+        {text : element.item, fontSize : 8, bold : false},
+        {text : element.qty.toString(), fontSize : 8, bold : false},
+        {text : (element.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 8, alignment : 'right', bold : false},
+      ]
+      receipt.push(item)
+    })
+    var detailSummary = [
+      {text : ' ', fontSize : 8, bold : false},
+      {text : 'Total', fontSize : 9, bold : true},
+      {text : ' ', fontSize : 8, bold : false},
+      {text : total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', bold : true},
+    ]
+    receipt.push(detailSummary)
+    
+
+    const docDefinition = {
+      header: '',
+      
+      //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
+        content : [
+          {
+            layout : 'noBorders',
+            table : address
+          }, 
+          
+          
+          
+          {
+            layout : 'noBorders',
+            table : {
+              headerRows : 0,
+              widths : [210],
+              body : [
+                [{text : '=============================='}],
+              ]
+            }
+          },          
+          {
+            layout : 'noBorders',
+            table : {
+              headerRows : 0,
+              widths : [200],
+              body : [
+                [{text : 'Gate Pass', alignment : 'center', fontSize : 9, bold : true}],
+                [{text : 'Vehicle Name: ' + this.vehicleEquipmentTypeName, alignment : 'left', fontSize : 9, bold : false}],
+                [{text : 'Vehicle Color: ' + this.color, alignment : 'left', fontSize : 9, bold : false}],
+                [{text : 'Chassis No: ' + this.chasisNo, alignment : 'left', fontSize : 9, bold : false}],
+                [{text : '________________________________'}],
+                [{text : 'Payment Details', alignment : 'center', fontSize : 9, bold : true}],
+                [{text : ' ', alignment : 'center', fontSize : 9, bold : true}],
+              ]
+            }
+          },   
+          {
+            layout : 'noBorders',
+            table : {
+                headerRows : 1,
+                widths : [15, 100, 15, 50],
+                body : receipt
+            }
+          },
+          {
+            layout : 'noBorders',
+            table : {
+              headerRows : 0,
+              widths : [200],
+              body : [
+                [{text : ' '}],
+                [{text : 'Cashier Comments', alignment : 'left', fontSize : 9, bold : true}],
+                [{text : this.comments, alignment : 'left', fontSize : 9, bold : false}],
+              ]
+            }
+          },   
+          {
+            layout : 'noBorders',
+            table : {
+              headerRows : 0,
+              widths : [210],
+              body : [
+                [{text : '=============================='}],
+                [{text : 'Served By : '+ localStorage.getItem('user-name'), fontSize : 9, alignment : 'left'}],
+                [{text : 'Developed By @Orbix Systems', fontSize : 10, bold : true, alignment : 'center'}],
+                [{text : '***End of Document***', fontSize : 9, alignment : 'center'}]
+              ]
+            }
+          },
+        ],
+        pageMargins: 10,
+      }
+      const win = window.open('', "tempWinForPdf")
+      pdfMake.createPdf(docDefinition).print({}, win)
+      //win!.onfocus = function () { setTimeout(function () { win!.close(); }, 10000); } //set to 10 seconds
   }
 
 }

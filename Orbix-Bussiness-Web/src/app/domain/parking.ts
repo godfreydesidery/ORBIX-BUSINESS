@@ -72,4 +72,13 @@ export interface IParking {
 
     cardNo : string
 
+    serviceBillItems : IServiceBillItem[]
+}
+
+export interface IServiceBillItem{
+    sn : number
+    item : string
+    qty : number
+    payStatus : string
+    amount : number
 }

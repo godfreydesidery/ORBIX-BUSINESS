@@ -28,6 +28,7 @@ import com.orbix.api.modules.finance.InvoiceReceivableDetailRepository;
 import com.orbix.api.modules.finance.InvoiceReceivableRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -435,6 +436,36 @@ public class ParkingServiceController implements ParkingService {
 		        ? parking.getParkingZone().getName() 
 		        : "");
 		
+		if(parking.getStatus().equals("CHECKED-OUT")) {
+			List<ServiceBillItem> items = new ArrayList<>();
+		
+			List<ParkingBillReceivable> pbs = parkingBillReceivableRepository.findAllByParking(parking);
+			List<ParkingServiceBillReceivable> psbs = parkingServiceBillReceivableRepository.findAllByParking(parking);
+			int sn = 1;
+			for(ParkingBillReceivable pbr : pbs) {
+				ServiceBillItem sbi = new ServiceBillItem();
+				sbi.setSn(sn);
+				sbi.setItem(pbr.getBillReceivable().getSummary());
+				sbi.setQty(pbr.getQty());
+				sbi.setAmount(pbr.getBillReceivable().getAmount());
+				sbi.setPayStatus(pbr.getBillReceivable().getStatus());
+				items.add(sbi);
+			}
+			
+			sn = 1;
+			for(ParkingServiceBillReceivable psbr : psbs) {
+				ServiceBillItem sbi = new ServiceBillItem();
+				sbi.setSn(sn);
+				sbi.setItem(psbr.getDescription());
+				sbi.setQty(psbr.getQty());
+				sbi.setAmount(psbr.getBillReceivable().getAmount());
+				sbi.setPayStatus(psbr.getBillReceivable().getStatus());
+				items.add(sbi);
+			}
+			
+			parkingResponse.setServiceBillItems(items);
+		}
+			
 		return parkingResponse;
 	}
 	
@@ -754,4 +785,13 @@ public class ParkingServiceController implements ParkingService {
 		return null;
 	}
 
+}
+
+@Data
+class ServiceBillItem {
+	int sn;
+	String item;
+	double qty;
+	String payStatus;
+	double amount;
 }

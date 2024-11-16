@@ -20,7 +20,7 @@ export class MsgBoxService {
     })
   }
 
-  public showErrorMessage3(message : string){
+  public showErrorMessage3(message: string){
     swal.fire({
       icon: 'error',
       title: 'Error',

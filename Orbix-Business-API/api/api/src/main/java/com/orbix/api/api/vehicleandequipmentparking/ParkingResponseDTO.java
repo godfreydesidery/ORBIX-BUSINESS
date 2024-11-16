@@ -1,5 +1,7 @@
 package com.orbix.api.api.vehicleandequipmentparking;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -82,4 +84,6 @@ public class ParkingResponseDTO {
     
     String billingType;
     String billingAmount;
+    
+    List<ServiceBillItem> serviceBillItems;
 }

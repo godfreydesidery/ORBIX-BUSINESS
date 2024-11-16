@@ -295,7 +295,7 @@ export class DataService {
       headerRows : 0,
       widths : [200],
       body : [
-        [{text : 'Receipt#: '+receiptNo, fontSize : 12, bold : true, alignment : 'right'}],
+        [{text : 'Document #: '+receiptNo, fontSize : 12, bold : true, alignment : 'right'}],
         [{text : ' ', fontSize : 7, bold : true, alignment : 'center'}],
         [{text : cName, fontSize : 12, bold : true, alignment : 'center'}],
         [{text : cPostalAddress, fontSize : 9, alignment : 'center'}],
