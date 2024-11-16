@@ -78,6 +78,7 @@ export class ParkingBillingComponent {
     .toPromise()
     .then(
       data => {
+        data?.reverse()
         var sn = 1
         data?.forEach(element => {
           element.sn = sn

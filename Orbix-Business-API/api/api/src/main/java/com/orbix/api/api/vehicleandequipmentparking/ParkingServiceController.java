@@ -239,19 +239,21 @@ public class ParkingServiceController implements ParkingService {
 		parking.setWheelCap(parkingRequest.isWheelCap());
 		parking.setRoundMirror(parkingRequest.isRoundMirror());
 		parking.setTireIndicator(parkingRequest.isTireIndicator());
-		parking.setHasKeys(parkingRequest.isHasKeys());
-		parking.setDeviceStatus(parkingRequest.isDeviceStatus());
+		parking.setHasKeys(true);
+		parking.setDeviceStatus(true);
 		
 		parking.setComments(parkingRequest.getComments());
+		
+		parking.setBillingType("DAILY");
 		
 		//parking.setImage(parkingRequest.getImage());
 		parking.setStatus("PENDING");
 		parking.setVehicleEquipmentType(vehicleEquipmentType_.get());
 		
-		parking.setVehicleEquipmentName(parkingRequest.getVehicleEquipmentName());
+		parking.setVehicleEquipmentName(vehicleEquipmentType_.get().getName()); // Look here later
 		parking.setVehicleEquipmentColor(parkingRequest.getVehicleEquipmentColor());
 		
-		parking.setVehicleEquipmentCategory(parkingRequest.getVehicleEquipmentCategory());
+		parking.setVehicleEquipmentCategory("IN-TRANSIT");
 		parking.setVehicleEquipment(vehicleEquipment_.get());
 		
 		
@@ -359,7 +361,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setVehicleEquipmentType(vehicleEquipmentType_.get());
 		parking.setVehicleEquipmentCategory(parkingRequest.getVehicleEquipmentCategory());
 		
-		parking.setVehicleEquipmentName(parkingRequest.getVehicleEquipmentName());
+		parking.setVehicleEquipmentName(vehicleEquipmentType_.get().getName()); // Look here later
 		parking.setVehicleEquipmentColor(parkingRequest.getVehicleEquipmentColor());
 		
 		parking.setComments(parkingRequest.getComments());
@@ -419,6 +421,12 @@ public class ParkingServiceController implements ParkingService {
 		parkingResponse.setVehicleEquipmentCategory(parking.getVehicleEquipmentCategory());
 		parkingResponse.setVehicleEquipmentName(parking.getVehicleEquipmentName());
 		parkingResponse.setVehicleEquipmentColor(parking.getVehicleEquipmentColor());
+		
+		parkingResponse.setParkingZoneName(
+			    Optional.ofNullable(parking.getParkingZone())
+			            .map(ParkingZone::getName)
+			            .orElse("")
+			);
 		
 		parkingResponse.setComments(parking.getComments());
 		//parking.setImage(parkingRequest.getImage());

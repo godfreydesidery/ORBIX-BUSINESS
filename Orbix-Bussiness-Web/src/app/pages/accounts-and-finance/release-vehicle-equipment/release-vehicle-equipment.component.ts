@@ -83,6 +83,8 @@ export class ReleaseVehicleEquipmentComponent {
 
   color : string = ''
 
+  validUntilDate : Date | null = new Date()
+
   comments : string = ''
 
   cardNo : string = ''
@@ -395,7 +397,16 @@ export class ReleaseVehicleEquipmentComponent {
       )
   }
 
+/**
+ * Check out the vehicle/equipment
+ * @returns {Promise<void>}
+ */
   async checkOut(){
+
+    if (!this.validUntilDate || new Date(this.validUntilDate) < new Date(new Date().setDate(new Date().getDate() - 1))) { 
+      this.msg.showErrorMessage3('Please enter a valid Valid Until date');
+      return;
+    }
 
     if(this.comments == null || this.comments == ''){
       this.msg.showErrorMessage3('Please enter comments')
@@ -525,6 +536,10 @@ export class ReleaseVehicleEquipmentComponent {
      this.status = data!.status
 
      this.color = data!.vehicleEquipmentColor
+
+     this.validUntilDate = null
+
+     this.comments = '' // check this
 
   }
 
@@ -818,6 +833,15 @@ export class ReleaseVehicleEquipmentComponent {
                 [{text : ' '}],
                 [{text : 'Cashier Comments', alignment : 'left', fontSize : 9, bold : true}],
                 [{text : this.comments, alignment : 'left', fontSize : 9, bold : false}],
+                [{text : ' '}],
+                [{text : ' '}],
+                [{text : 'Issued At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
+                [{text : 'Checkout At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
+                [{text : 'Valid Until: ' + this.validUntilDate!.toString(), alignment : 'left', fontSize : 9, bold : true}],
+                [{text : ' '}],
+                [{text : 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment : 'left', fontSize : 9, bold : true}],
+                [{text : ' '}],
+                [{text : 'Signature: ......................'}],
               ]
             }
           },   
@@ -828,8 +852,7 @@ export class ReleaseVehicleEquipmentComponent {
               widths : [210],
               body : [
                 [{text : '=============================='}],
-                [{text : 'Served By : '+ localStorage.getItem('user-name'), fontSize : 9, alignment : 'left'}],
-                [{text : 'Developed By @Orbix Systems', fontSize : 10, bold : true, alignment : 'center'}],
+                [{text : 'Developed By @Davaghana', fontSize : 10, bold : true, alignment : 'center'}],
                 [{text : '***End of Document***', fontSize : 9, alignment : 'center'}]
               ]
             }

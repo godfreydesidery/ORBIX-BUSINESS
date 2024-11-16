@@ -53,6 +53,7 @@ import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidOperationException;
+import com.orbix.api.modules.adminunits.Branch;
 import com.orbix.api.modules.adminunits.CompanyRequestDTO;
 import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.utilities.Shortcut;
@@ -594,7 +595,24 @@ public class UserResource {
 		return ResponseEntity.created(uri).body(userService.deactivateUser(userRequest, request));
 	}
 	
-	
+	@GetMapping("/users/get_branch_user_names")
+	public List<String> getBranchUsernames(
+			HttpServletRequest request
+			){
+		List<String> nicknames = new ArrayList<>();
+		try {
+			Branch branch = null;
+			branch = userService.getUser(request).getBranch();
+			
+			List<User> users = userRepository.findAllByBranch(branch);
+			for(User user : users) {
+				nicknames.add(user.getNickname());
+			}	
+		}catch(Exception e) {
+			return nicknames;
+		}
+		return nicknames;		
+	}	
 }
 
 

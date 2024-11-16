@@ -100,6 +100,16 @@
 
                             <div class="col-lg-3">
                                 <div class="form-group">
+                                    <label>Device Status*</label>
+                                    <select class="form-control" [(ngModel)]="deviceStatus">
+                                        <option>ATTACHED</option>
+                                        <option>NOT-ATTACHED</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
                                     <label>Select Vehicle Type</label>
                                     <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
                                         <option></option>
@@ -493,6 +503,22 @@
                                                 <select class="form-control" [(ngModel)]="tireIndicator">
                                                     <option>YES</option>
                                                     <option>NO</option>
+                                                </select>
+                                            </td>
+                                        </tbody>    
+                                    </table>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Device Status</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead><td>|</td></thead>
+                                        <tbody>
+                                            <td>
+                                                <select class="form-control" [(ngModel)]="deviceStatus">
+                                                    <option>ATTACHED</option>
+                                                    <option>NOT-ATTACHED</option>
                                                 </select>
                                             </td>
                                         </tbody>    

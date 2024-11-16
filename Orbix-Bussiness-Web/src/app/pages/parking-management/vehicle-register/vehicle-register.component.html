@@ -423,7 +423,7 @@
                                 <thead><td>|</td></thead>
                                 <tbody>
                                     <td>
-                                        <select class="form-control">
+                                        <select class="form-control" [(ngModel)]="deviceStatus">
                                             <option>ATTACHED</option>
                                             <option>NOT-ATTACHED</option>
                                         </select>
@@ -672,7 +672,7 @@
                                 <tr><td><b>Model/Type</b></td><td>{{vehicleEquipmentTypeName}}</td></tr>
                                 <tr><td><b>Billing Type</b></td><td>{{billingType}}</td></tr>
                                 <tr><td><b>Billing Amount</b></td><td style="text-align: right;">{{billingAmount}}</td></tr> 
-                                <tr><td><b>Parking Zone</b></td><td></td></tr>   
+                                <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}</td></tr>   
                                 <tr><td><b>Parking No</b></td><td>{{no}}</td></tr>   
                                 <tr><td><b>Vhc/Eq Category</b></td><td>{{vehicleEquipmentCategory}}</td></tr>   
                                 <tr><td><b>Keys</b></td><td>{{hasKeys}}</td></tr>  

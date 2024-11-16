@@ -83,7 +83,7 @@ export class VehicleRegisterComponent {
 
 
 
-  deviceStatus : string = ''
+  deviceStatus : string = 'ATTACHED'
 
   color : string = ''
 
@@ -93,7 +93,7 @@ export class VehicleRegisterComponent {
 
   vehicleEquipmentCategory : string = 'IN-TRANSIT'
 
-  billingType : string = ''
+  billingType : string = 'DAILY'
   billingAmount : number = 0
   //image: Byte[]
 
@@ -146,7 +146,7 @@ export class VehicleRegisterComponent {
     .then(
       data => {
         var sn = 1
-        data?.forEach(element => {
+        data?.reverse().forEach(element => {
           element.sn = sn
           this.parkings.push(element)
           sn = sn + 1
@@ -518,6 +518,7 @@ export class VehicleRegisterComponent {
     this.hasKeys = data?.hasKeys == true ? 'YES' : 'NO'
     this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName,
     this.deviceStatus = data!.deviceStatus == true ? 'ATTACHED' : 'NOT-ATTACHED',
+    this.parkingZoneName = data!.parkingZoneName,
 
     this.comments = data!.comments,
 
@@ -551,7 +552,7 @@ export class VehicleRegisterComponent {
     this.agentEmail = ''
     this.tformNumber = ''
 
-    this.billingType = ''
+    this.billingType = 'DAILY'
     this.billingAmount = 0
 
     // Vehicle or Equipment Information
@@ -578,15 +579,15 @@ export class VehicleRegisterComponent {
 
     this.comments = ''
 
-    this.deviceStatus = ''
+    this.deviceStatus = 'ATTACHED'
 
-    this.vehicleEquipmentCategory = ''
+    this.vehicleEquipmentCategory = 'IN-TRANSIT'
 
     this.parkingZoneName = ''
 
-    this.hasKeys = ''
+    this.hasKeys = 'YES'
 
-    this.billingType = ''
+    this.billingType = 'DAILY'
   }
 
 

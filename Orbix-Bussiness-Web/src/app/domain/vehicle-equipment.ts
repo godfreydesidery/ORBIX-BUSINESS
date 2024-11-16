@@ -28,6 +28,8 @@ export interface IVehicleEquipment {
 
     parkingId : string
 
+    deviceStatus : string
+
     comments : string
 
     sn : number

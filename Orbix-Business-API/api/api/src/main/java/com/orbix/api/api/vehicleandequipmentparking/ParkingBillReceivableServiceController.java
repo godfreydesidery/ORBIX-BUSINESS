@@ -133,7 +133,9 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 			qty = dayCount;
 			
 		}
-				
+		
+		if(qty > 1) qty = qty - 1;
+			
 		BillReceivable billReceivable = new BillReceivable();
 		billReceivable.setNo(String.valueOf(Math.random()));
 		billReceivable.setAmount((parking.getBillingAmount() * qty) - parkingBillReceivableRequest.getDiscount());

@@ -303,8 +303,8 @@ export class DataService {
         [{text : cTelephone, fontSize : 9, alignment : 'center'}],
         [{text : cEmail, fontSize : 9, italic : true, alignment : 'center'}],
         [{text : cWebsite, fontSize : 9, italic : true, alignment : 'center'}],
-        [{text : tin, fontSize : 9, italic : true, alignment : 'center'}],
-        [{text : vrn, fontSize : 9, italic : true, alignment : 'center'}]
+        // [{text : tin, fontSize : 9, italic : true, alignment : 'center'}],
+        // [{text : vrn, fontSize : 9, italic : true, alignment : 'center'}]
       ]
     }
     return address
@@ -338,6 +338,55 @@ export class DataService {
       {table : {
         headerRows : 0,
         widths: ['100%'],
+        body : [[{text : '.', fontSize : 9, fillColor : '#546f9c', height : 30}]]
+      },
+      layout : 'headerLineOnly'},
+      {text : cPhysicalAddress + ' ' + cPostalAddress + ' ' + cTelephone + ' ' + cEmail + ' ' + cWebsite, fontSize : 9,  alignment : 'center'},
+    ]
+
+    var header : any = {
+      columns : 
+      [
+        logo,
+        {width : 10, columns : [[]]},
+        {
+          width : 400,
+          columns : [
+            address
+          ]
+        },
+      ]
+    }
+
+    return header
+  }
+
+  async getDocumentHeaderLandScape(){
+    await this.getCompanyProfile()
+    var cName = this.companyName
+    var cPostalAddress = 'P.O. Box '+this.postCode
+    var cPhysicalAddress = this.physicalAddress
+    var cTelephone = 'Tel: '+this.telephone
+    var cMobile = 'Mob: '+this.mobile
+    var cFax = 'Fax: '+this.fax
+    var cEmail = 'Email: '+this.email
+    var cWebsite = this.website
+    var tin = 'TIN: '+this.tin
+    var vrn = 'VRN: '+this.vrn
+
+    var logo : any = await this.getLogo()
+
+    if(logo == ''){
+      logo = { text : '', width : 70, height : 70, absolutePosition : {x : 40, y : 40}}
+    }else{
+      logo = {image : logo, width : 70, absolutePosition : {x : 40, y : 40}}
+    }
+
+    var address = [
+      {text : cName, fontSize : 18, bold : true, alignment : 'center'},
+      {table : {
+        headerRows : 0,
+        widths: ['160%'],
         body : [[{text : '.', fontSize : 9, fillColor : '#546f9c', height : 30}]]
       },
       layout : 'headerLineOnly'},

@@ -115,7 +115,7 @@ export class VehicleEquipmentRegisterComponent {
   wheelCap: string = 'YES'
   roundMirror: string = 'YES'
   tireIndicator: string = 'YES'
-  deviceStatus: string = 'YES'
+  deviceStatus: string = 'ATTACHED'
 
   // cardNo : string = ''
 
@@ -144,8 +144,6 @@ export class VehicleEquipmentRegisterComponent {
   // vehicleEquipmentTypes  : IVehicleEquipmentType[] = []
 
   parkingZones : IParkingZone[] = []
-
-
 
 
 
@@ -392,6 +390,8 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.vehicleEquipmentName = data.vehicleEquipmentName
     this.vehicleEquipmentColor = data.vehicleEquipmentColor
     this.vehicleEquipmentTypeName = data.vehicleEquipmentTypeName
+
+    this.deviceStatus = data.deviceStatus
     this.active = data.active
     this.companyId = data.companyId
     this.companyName = data.companyName
@@ -432,6 +432,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.branchName = ''
 
     this.comments = ''
+    this.deviceStatus = 'ATTACHED'
   }
 
   setNewMode(){
@@ -579,7 +580,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
 
 
-    this.vehicleEquipmentCategory = ''
+    this.vehicleEquipmentCategory = 'IN-TRANSIT'
 
     this.vehicleEquipmentName = ''
     this.vehicleEquipmentColor = ''
