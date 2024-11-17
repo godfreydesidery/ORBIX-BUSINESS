@@ -4,6 +4,7 @@ import java.net.URI;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -20,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -30,6 +32,10 @@ import lombok.RequiredArgsConstructor;
 public class ParkingResource {
 	
 private final ParkingService parkingService;
+
+private final ParkingBillReceivableRepository parkingBillReceivableRepository;
+
+private final ParkingRepository parkingRepository;
 	
 	@GetMapping("/parkings")
 	public ResponseEntity<List<ParkingResponseDTO>>getAll(HttpServletRequest request){
@@ -99,6 +105,25 @@ private final ParkingService parkingService;
 	}
 	
 	
+	@GetMapping("/parkings/get_last_parking_bill_date")
+	public Model getLastParkingBillDate(
+			@RequestParam Long id,
+			HttpServletRequest request){
+		
+		Model model = new Model();
+		
+		Optional<Parking> p = parkingRepository.findById(id);
+		
+		try {
+			List<ParkingBillReceivable> rcs = parkingBillReceivableRepository.findAllByParking(p.get());
+			model.setStringData(rcs.get(rcs.size() - 1).getEndedAt().toString());
+		}catch(Exception e) {
+			model.setStringData("");
+		}
+		
+		return model;	
+	}
+	
 	@PostMapping("/parkings/create_parking_bill_receivable")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ParkingBillReceivableResponseDTO>createParkingBillReceivable(
@@ -140,4 +165,9 @@ private final ParkingService parkingService;
 //		return ResponseEntity.created(uri).body(parkingService.deactivateParking(parkingRequest, request));
 //	}
 	
+}
+
+@Data
+class Model{
+	String stringData = "";
 }

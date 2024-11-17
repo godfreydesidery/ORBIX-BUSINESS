@@ -397,21 +397,38 @@ export class ReleaseVehicleEquipmentComponent {
       )
   }
 
+  lastBillingDate : string = ''
+  async getLastBillingDate(parkingId : any){
+    // this.lastBillingDate = ''
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    await this.http.get<IModel>(API_URL+'/parkings/get_last_parking_bill_date?id=' + parkingId, options)
+      .toPromise()
+      .then(
+        data => {
+          console.log(data)
+          // this.lastBillingDate = data!.stringData
+          this.lastBillingDate = data!.stringData
+        }
+      )
+      .catch(
+        error => {
+          console.log(error)
+          // this.lastBillingDate = ''
+          // this.msg.showErrorMessage(error, 'Error')
+          this.lastBillingDate = ''
+        }
+      )
+  }
+
 /**
  * Check out the vehicle/equipment
  * @returns {Promise<void>}
  */
-  async checkOut(){
+  async checkOut(): Promise<void>{
 
-    if (!this.validUntilDate || new Date(this.validUntilDate) < new Date(new Date().setDate(new Date().getDate() - 1))) { 
-      this.msg.showErrorMessage3('Please enter a valid Valid Until date');
-      return;
-    }
-
-    if(this.comments == null || this.comments == ''){
-      this.msg.showErrorMessage3('Please enter comments')
-      return
-    }
 
     if(await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to check out?', 'question', 'Yes', 'No') == false){
       return
@@ -436,8 +453,8 @@ export class ReleaseVehicleEquipmentComponent {
           console.log(data)
 
           this.getAllClearedParkings()
-
           this.msg.showSuccessMessage('Checked out Successifully')
+          
           this.printGatePassRcpt(data!.serviceBillItems, '', 0);
         }
       )
@@ -837,7 +854,7 @@ export class ReleaseVehicleEquipmentComponent {
                 [{text : ' '}],
                 [{text : 'Issued At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
                 [{text : 'Checkout At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
-                [{text : 'Valid Until: ' + this.validUntilDate!.toString(), alignment : 'left', fontSize : 9, bold : true}],
+                [{text : 'Valid Until: ' + this.lastBillingDate, alignment : 'left', fontSize : 9, bold : true}],
                 [{text : ' '}],
                 [{text : 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment : 'left', fontSize : 9, bold : true}],
                 [{text : ' '}],
@@ -865,4 +882,9 @@ export class ReleaseVehicleEquipmentComponent {
       //win!.onfocus = function () { setTimeout(function () { win!.close(); }, 10000); } //set to 10 seconds
   }
 
+}
+
+
+interface IModel{
+  stringData : string
 }

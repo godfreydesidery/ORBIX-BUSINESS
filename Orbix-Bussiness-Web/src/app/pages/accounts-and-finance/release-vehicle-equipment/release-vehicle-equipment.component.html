@@ -60,7 +60,7 @@
                                             <tr>
                                                 <td><button type="button" class="btn btn-primary btn-round-custom" *ngIf="p.status === 'PENDING'" (click)="get(p.id)" data-toggle="modal" data-target="#edit-modal" style="cursor: pointer;">Edit</button></td>
                                                 <td><button type="button" class="btn btn-success btn-round-custom" *ngIf="p.status === 'PENDING'" (click)="get(p.id)" data-toggle="modal" data-target="#check-in-modal" style="cursor: pointer; margin-left: 3px;">Check In</button></td>
-                                                <td><button type="button" class="btn btn-danger btn-round-custom" *ngIf="p.status === 'CHECKED-IN'" (click)="get(p.id)" data-toggle="modal" data-target="#check-out-modal" style="cursor: pointer; margin-left: 3px;">Check Out</button></td>
+                                                <td><button type="button" class="btn btn-danger btn-round-custom" *ngIf="p.status === 'CHECKED-IN'" (click)="get(p.id)" (click)="getLastBillingDate(p.id)" data-toggle="modal" data-target="#check-out-modal" style="cursor: pointer; margin-left: 3px;">Check Out</button></td>
                                             </tr>
                                         </table>
                                     </td>
@@ -514,7 +514,7 @@
                             </thead>
                             <tbody>
                                 <tr><td><b>First Name</b></td><td>{{ownerFirstName}}</td></tr>
-                                <tr><td><b>Middle Name</b></td><td>{{ownerMiddleName}}</td></tr>
+                                <!-- <tr><td><b>Middle Name</b></td><td>{{ownerMiddleName}}</td></tr> -->
                                 <tr><td><b>Last Name</b></td><td>{{ownerLastName}}</td></tr> 
                                 <tr><td><b>ID Type</b></td><td>{{ownerIdType}}</td></tr>
                                 <tr><td><b>ID No</b></td><td>{{ownerIdNo}}</td></tr>   
@@ -546,8 +546,8 @@
                                 <tr><td><b>Parking No</b></td><td>{{no}}</td></tr>
                                 <tr><td><b>Model/Type</b></td><td>{{vehicleEquipmentTypeName}}</td></tr>
                                 <tr><td><b>Billing Type</b></td><td>{{billingType}}</td></tr>
-                                <tr><td><b>Billing Amount</b></td><td style="text-align: right;">{{billingAmount}}</td></tr> 
-                                <tr><td><b>Parking Zone</b></td><td></td></tr>   
+                                <!-- <tr><td><b>Billing Amount</b></td><td style="text-align: right;">{{billingAmount}}</td></tr>  -->
+                                <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}</td></tr>   
                                 <tr><td><b>Parking No</b></td><td>{{no}}</td></tr>   
                                 <tr><td><b>Vhc/Eq Category</b></td><td>{{vehicleEquipmentCategory}}</td></tr>   
                                 <tr><td><b>Keys</b></td><td>{{hasKeys}}</td></tr>  
@@ -580,11 +580,11 @@
                             </tbody>
                         </table>
                     </div>
-                    <div class="col-lg-12">
+                    <!-- <div class="col-lg-12">
                         <p><b>Gate Pass Valid Until</b></p>
                         <input type="date" class="form-control" [(ngModel)]="validUntilDate">
                         
-                    </div>
+                    </div> -->
                     <div class="col-lg-12">
                         <p><b>Remarks</b></p>
                         <input type="text" class="form-control" placeholder="Remarks" [(ngModel)]="comments">

@@ -163,6 +163,7 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		vehicleEquipment.setCardNo(vehicleEquipmentRequest.getCardNo());
 		//vehicleEquipment.setImage(vehicleEquipmentRequest.getImage());
 		vehicleEquipment.setActive(true);
+		vehicleEquipment.setVehicleEquipmentColor(vehicleEquipmentRequest.getVehicleEquipmentColor());
 		
 		vehicleEquipment.setVehicleEquipmentType(vehicleEquipmentType_.get());		
 		
@@ -199,6 +200,8 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		parkingRequest.setVehicleEquipmentId(vehicleEquipment.getId());
 		
 		parkingRequest.setChasisNo(vehicleEquipment.getChasisNo());
+		
+		parkingRequest.setVehicleEquipmentColor(vehicleEquipment.getVehicleEquipmentColor());
 			
 		parkingRequest.setLeftFrontLamp(true);
 		parkingRequest.setRightFrontLamp(true);
@@ -217,6 +220,7 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		parkingRequest.setWheelCap(true);
 		parkingRequest.setRoundMirror(true);
 		parkingRequest.setTireIndicator(true);
+		parkingRequest.setHasKeys(true);
 		
 		ParkingResponseDTO parkingResponse = parkingService.createParking(parkingRequest, request);
 		
@@ -287,6 +291,7 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		vehicleEquipmentResponse.setRegistrationNo(vehicleEquipment.getRegistrationNo());
 		vehicleEquipmentResponse.setChasisNo(vehicleEquipment.getChasisNo());
 		vehicleEquipmentResponse.setCardNo(vehicleEquipment.getCardNo());
+		vehicleEquipmentResponse.setVehicleEquipmentColor(vehicleEquipment.getVehicleEquipmentColor());
 		
 		//vehicleEquipment.setImage(vehicleEquipmentRequest.getImage());
 

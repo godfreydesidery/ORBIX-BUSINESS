@@ -85,7 +85,7 @@ export class VehicleRegisterComponent {
 
   deviceStatus : string = 'ATTACHED'
 
-  color : string = ''
+  vehicleEquipmentColor : string = ''
 
   comments : string = ''
 
@@ -277,6 +277,8 @@ export class VehicleRegisterComponent {
       deviceStatus : this.deviceStatus === 'ATTACHED' ? 1 : 0,
 
       vehicleEquipmentCategory : this.vehicleEquipmentCategory,
+
+      vehicleEquipmentColor : this.vehicleEquipmentColor,
 
       cardNo : this.cardNo,
 
@@ -517,15 +519,17 @@ export class VehicleRegisterComponent {
     this.tireIndicator = data?.tireIndicator == true ? 'YES' : 'NO'
     this.hasKeys = data?.hasKeys == true ? 'YES' : 'NO'
     this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName,
-    this.deviceStatus = data!.deviceStatus == true ? 'ATTACHED' : 'NOT-ATTACHED',
-    this.parkingZoneName = data!.parkingZoneName,
+    this.deviceStatus = data!.deviceStatus == true ? 'ATTACHED' : 'NOT-ATTACHED'
+    this.parkingZoneName = data!.parkingZoneName
 
     this.comments = data!.comments,
 
 
     this.vehicleEquipmentCategory = data!.vehicleEquipmentCategory
 
-    this.parkingZoneName = data!.parkingZoneName,
+    this.vehicleEquipmentColor = data!.vehicleEquipmentColor
+
+    this.parkingZoneName = data!.parkingZoneName
      this.cardNo = data!.cardNo
 
      this.billingType = data!.billingType
@@ -582,6 +586,7 @@ export class VehicleRegisterComponent {
     this.deviceStatus = 'ATTACHED'
 
     this.vehicleEquipmentCategory = 'IN-TRANSIT'
+    this.vehicleEquipmentColor = ''
 
     this.parkingZoneName = ''
 
@@ -677,7 +682,7 @@ export class VehicleRegisterComponent {
                 ],
                 [
                   {text : 'Color', fontSize : 9}, 
-                  {text : this.color, fontSize : 9} 
+                  {text : this.vehicleEquipmentColor, fontSize : 9} 
                 ],
                 [
                   {text : 'Chasis No', fontSize : 9}, 

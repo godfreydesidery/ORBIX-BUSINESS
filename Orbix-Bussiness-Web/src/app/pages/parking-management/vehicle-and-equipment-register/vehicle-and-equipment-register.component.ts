@@ -136,6 +136,8 @@ export class VehicleEquipmentRegisterComponent {
 
   parkingZoneName : string = ''
 
+  hasKeys : string = 'YES'
+
   
 
   /**Collections */
@@ -288,6 +290,7 @@ export class VehicleEquipmentRegisterComponent {
       companyName : this.companyName,
       branchId : this.branchId,
       comments : this.comments,
+      hasKeys : this.hasKeys === 'YES' ? 1 : 0,
 
       
   }
@@ -401,6 +404,8 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
     this.parkingId = data!.parkingId
 
+    
+
     console.log(data)
   }
 
@@ -430,6 +435,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.companyName = ''
     this.branchId = ''
     this.branchName = ''
+    this.hasKeys = 'YES'
 
     this.comments = ''
     this.deviceStatus = 'ATTACHED'
@@ -514,6 +520,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.deviceStatus = data?.deviceStatus == true ? 'ATTACHED' : 'NOT-ATTACHED'
     this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName,
     this.vehicleEquipmentColor = data!.vehicleEquipmentColor,
+    this.hasKeys = data!.hasKeys == true ? 'YES' : 'NO'
 
     this.vehicleEquipmentName = data!.vehicleEquipmentName,
 
@@ -575,6 +582,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.tireIndicator = 'YES'
     this.deviceStatus = 'ATTACHED'
     this.vehicleEquipmentTypeName = ''
+    this.hasKeys = 'YES'
 
     this.comments = ''
 
@@ -647,6 +655,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
       tireIndicator: this.tireIndicator === 'YES' ? 1 : 0,
       deviceStatus: this.deviceStatus === 'ATTACHED' ? 1 : 0,
       vehicleEquipmentTypeName : this.vehicleEquipmentTypeName,
+      hasKeys : this.hasKeys === 'YES' ? 1 : 0,
 
       comments : this.comments,
 

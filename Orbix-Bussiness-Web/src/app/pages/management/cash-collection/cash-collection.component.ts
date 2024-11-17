@@ -261,6 +261,8 @@ export class CashCollectionComponent {
     var header = ''
     var footer = ''
     var title  = 'Parking Collection Report'
+    const from = this.from?.toString();
+    const to = this.to?.toString();
     var logo : any = ''
     var total : number = 0
     var discount : number = 0
@@ -333,10 +335,12 @@ export class CashCollectionComponent {
               this.documentHeader
             //]
           },
-          '  ',
-          '  ',
-          {text : title, fontSize : 14, bold : true, alignment : 'center'},
-          this.data.getHorizontalLine(),
+          {text : ' '},
+        {text : ' '},
+        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {text: from , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {text: to , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+
           
          
           // {text : title, fontSize : 12, bold : true},
@@ -368,6 +372,7 @@ export class CashCollectionComponent {
   printParkingCollectionReport = async () => {
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Parking Collection Report';
+    const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;
     let discount: number = 0;
   
@@ -436,9 +441,8 @@ export class CashCollectionComponent {
           ],
         },
         {text : ' '},
-        {text : ' '},
-        { text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-        {text : ' '},
+        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         {
           table: {
             widths: [25, 75, 100, 100, 100, 60, 50, 80, 80],
@@ -456,6 +460,7 @@ export class CashCollectionComponent {
   printParkingServiceCollectionReport = async () => {
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Vehicle Services Collection Report';
+    const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;
     let discount: number = 0;
   
@@ -527,9 +532,8 @@ export class CashCollectionComponent {
           ],
         },
         {text : ' '},
-        {text : ' '},
-        { text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-        {text : ' '},
+        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         {
           table: {
             widths: [25, 70, 100, 100, 100, 60, 60, 30, 65, 80],
