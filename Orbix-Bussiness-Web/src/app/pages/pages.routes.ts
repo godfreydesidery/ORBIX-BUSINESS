@@ -198,6 +198,12 @@ export const routes: Routes = [
         data : { breadcrumb : 'Management/Cash Collections'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'management/vehicle-registration-report',
+        loadComponent: () => import('./management/vehicle-registration-report/vehicle-registration-report.component').then(c => c.VehicleRegistrationReportComponent),
+        data : { breadcrumb : 'Management/Vehicle Registration Report'}, 
+        canActivate : [AuthGuard]
+      },
 
 
       // End of Management

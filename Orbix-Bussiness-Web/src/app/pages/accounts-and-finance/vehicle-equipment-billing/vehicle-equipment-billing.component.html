@@ -131,7 +131,6 @@
                                     <td>Amount</td>
                                     <td>Paid</td>
                                     <td>Due</td>
-                                    <td>Check</td>
                                 </tr>
                             </thead>
                             <tbody>
@@ -141,7 +140,7 @@
                                     <td style="text-align: right;">{{b.amount | currency:'':''}}</td>
                                     <td style="text-align: right;">{{b.paid | currency:'':''}}</td>
                                     <td style="text-align: right;">{{b.due | currency:'':''}}</td>
-                                    <td></td>
+                                    
                                     <!-- <td style="text-align: center;"><input type="checkbox"></td> -->
                                 </tr>
                                 
@@ -151,7 +150,7 @@
                                     <td></td>
                                     <td style="text-align: right;"><b>Total</b></td>
                                     <td style="text-align: right;"><b>{{totalBillReceivable | currency:'':''}}</b></td>
-                                    <td></td>
+                                    
                                 </tr>
                                 <!-- <tr>
                                     <td></td>
@@ -170,26 +169,25 @@
                                     <td></td>
                                 </tr> -->
                                 <tr>
-                                    <td></td>
-                                    <td></td>
+                                    
                                     <td></td>
                                     <td></td>
                                     <td>Select Payment Method</td>
-                                    <td style="text-align: center;">
-                                        <select class="form-control">
+                                    <td style="text-align: right;">
+                                        <select class="form-control" style="max-width: 30mm;">
                                             <option>CASH</option>
                                             <option>MOBILE</option>
                                             <option>BANK</option>
                                         </select>
                                     </td>
+                                    <td></td>
                                 </tr>
                                 <tr>
                                     <td></td>
                                     <td></td>
-                                    <td></td>
-                                    <td></td>
                                     <td><button class="btn btn-success btn-round-custom" (click)="printReceipt()">Print Receipt</button></td>
                                     <td style="text-align: center;"><button class="btn btn-success btn-round-custom" *ngIf="billReceivables.length > 0" (click)="confirmBillsPayment()">Confirm Payment</button></td>
+                                    <td></td>
                                 </tr>
                             </tbody>
                         </table>

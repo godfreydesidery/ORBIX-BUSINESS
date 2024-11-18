@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.orbix.api.modules.identityandaccess.User;
+
 public interface ParkingRepository extends JpaRepository<Parking, Long> {
 
 	List<Parking> findAllByStatusIn(List<String> statuses);
@@ -23,5 +25,13 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
 	
 	@Query("SELECT COUNT(p) FROM Parking p WHERE p.status = 'CHECKED-IN'")
     long countRegistered();
+
+	List<Parking> findAllByCreatedByUserAndCreatedDateTimeBetweenAndStatusIn(User user, LocalDateTime atStartOfDay,
+			LocalDateTime plusDays, List<String> statuses);
+
+	List<Parking> findAllByCreatedDateTimeBetweenAndStatusIn(LocalDateTime atStartOfDay, LocalDateTime plusDays,
+			List<String> statuses);
+
+	
 
 }

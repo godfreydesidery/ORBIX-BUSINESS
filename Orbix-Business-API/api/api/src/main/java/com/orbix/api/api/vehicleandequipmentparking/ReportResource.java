@@ -4,6 +4,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -19,6 +20,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.orbix.api.exceptions.NotFoundException;
+import com.orbix.api.modules.identityandaccess.User;
+import com.orbix.api.modules.identityandaccess.UserRepository;
+import com.orbix.api.modules.identityandaccess.UserService;
+
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +37,8 @@ public class ReportResource {
 	
 	private final ParkingRepository parkingRepository;
 	private final ParkingBillReceivableRepository parkingBillReceivableRepository;
+	private final UserService userService;
+	private final UserRepository userRepository;
 	
 	
 	@PostMapping("/parking_reports/get_totals_by_dates")
@@ -73,6 +81,62 @@ public class ReportResource {
 		
 		return ResponseEntity.ok().body(parkingTotalsResponse);
 	}
+	
+	@PostMapping("/parking_reports/get_registration_report")
+	public ResponseEntity<List<RegistrationResponseDTO>>getRegistrationReportByDateAndReceptionist(
+			@RequestBody DateRange dateRange,
+			@RequestParam(name = "nickname") String cashierName,
+			HttpServletRequest request){
+		
+		User user = null;
+		if(!cashierName.equals("")) {
+			Optional<User> user_ = userRepository.findByNickname(cashierName);
+			if(user_.isPresent()) {
+				user = user_.get();
+			}else {
+				throw new NotFoundException("User not found");
+			}
+		}
+		
+		List<Parking> parkings = new ArrayList<>();
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+		statuses.add("CHECKED-OUT");
+		if(user != null) {
+			
+			parkings = parkingRepository.findAllByCreatedByUserAndCreatedDateTimeBetweenAndStatusIn(
+			        user, 
+			        dateRange.getFrom().atStartOfDay(),
+			        dateRange.getTo().atStartOfDay().plusDays(1),
+			        statuses
+			    );		
+					
+		}else {
+			parkings = parkingRepository.findAllByCreatedDateTimeBetweenAndStatusIn(
+			        dateRange.getFrom().atStartOfDay(),
+			        dateRange.getTo().atStartOfDay().plusDays(1),
+			        statuses
+			    );	
+		}
+		
+		List<RegistrationResponseDTO> registrationResponses = new ArrayList<>();
+		int sn = 1;
+		for(Parking parking : parkings) {
+			RegistrationResponseDTO registrationResponse = new RegistrationResponseDTO();
+			registrationResponse.setChassisNo(parking.getChasisNo());
+			registrationResponse.setVehicleType(parking.getVehicleEquipmentType().getName());
+			registrationResponse.setRegisteredDate(parking.getCreatedDateTime().toString());
+			registrationResponse.setRegisteredBy(parking.getCreatedByUser().getNickname());
+			registrationResponse.setKeyStatus(parking.isHasKeys() ? "YES" : "NO");
+			registrationResponse.setSn(String.valueOf(sn));
+			registrationResponses.add(registrationResponse);
+			sn++;
+		}
+		return ResponseEntity.ok().body(registrationResponses);
+		
+	}
+
+	
 }
 
 @Data
@@ -90,4 +154,14 @@ class ParkingTotalsResponseDTO{
 class DateRange {
 	LocalDate from;
 	LocalDate to;
+}
+
+@Data
+class RegistrationResponseDTO{
+	String sn;
+	String chassisNo;
+	String vehicleType;
+	String keyStatus;
+	String registeredDate;
+	String registeredBy;	
 }
