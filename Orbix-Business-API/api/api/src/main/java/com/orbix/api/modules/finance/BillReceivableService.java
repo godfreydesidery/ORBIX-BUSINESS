@@ -4,10 +4,14 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.orbix.api.api.commons.PayCode;
+
 public interface BillReceivableService {
 	
 	List<BillReceivableResponseDTO> confirmBillPayment(
-			BillReceivableSummaryDTO billReceivableSummary, 
+			List<BillReceivableRequestDTO> billReceivableRequests, 
+			PayCode payCode,
+			String payRefNo,
 			double totalAmount,
 			HttpServletRequest request);
 	

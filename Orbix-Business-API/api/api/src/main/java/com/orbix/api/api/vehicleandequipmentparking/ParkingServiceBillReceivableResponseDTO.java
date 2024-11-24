@@ -17,5 +17,5 @@ public class ParkingServiceBillReceivableResponseDTO {
 	
 	String parkingId;
 	
-	String status;
+	String payStatus;
 }

@@ -11,6 +11,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
@@ -144,7 +145,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		billReceivable.setBranch(parking.getBranch());
 		billReceivable.setCreatedDateTime(dayService.getTimeStamp());
 		
-		billReceivable.setStatus("UNPAID");
+		billReceivable.setPayStatus(PayStatus.UNPAID);
 		billReceivable.setSummary("Parking bill for parking#: " + parking.getNo());
 		
 		billReceivable = billReceivableRepository.save(billReceivable);
@@ -199,7 +200,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		
 		BillReceivable billReceivable = parkingBillReceivable.getBillReceivable();
 		
-		if(!billReceivable.getStatus().equals("UNPAID")) throw new InvalidOperationException("Only unpaid bill can be edited");
+		if(!billReceivable.getPayStatus().equals(PayStatus.UNPAID)) throw new InvalidOperationException("Only unpaid bill can be edited");
 		
 		billReceivable.setAmount(parkingBillReceivableRequest.getPrice() * parkingBillReceivableRequest.getQty() - parkingBillReceivableRequest.getDiscount());
 		billReceivable.setDue(parkingBillReceivableRequest.getPrice() * parkingBillReceivableRequest.getQty() - parkingBillReceivableRequest.getDiscount());
@@ -231,7 +232,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		billReceivable.setBranch(parking.getBranch());
 		billReceivable.setCreatedDateTime(dayService.getTimeStamp());
 		
-		billReceivable.setStatus("UNPAID");
+		billReceivable.setPayStatus(PayStatus.UNPAID);
 		billReceivable.setSummary("Service bill for parking#: " + parking.getNo());
 		
 		billReceivable = billReceivableRepository.save(billReceivable);
@@ -277,7 +278,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		
 		BillReceivable billReceivable = parkingServiceBillReceivable.getBillReceivable();
 		
-		if(!billReceivable.getStatus().equals("UNPAID")) throw new InvalidOperationException("Only unpaid bill can be edited");
+		if(!billReceivable.getPayStatus().equals(PayStatus.UNPAID)) throw new InvalidOperationException("Only unpaid bill can be edited");
 		
 		billReceivable.setAmount(parkingServiceBillReceivableRequest.getPrice() * parkingServiceBillReceivableRequest.getQty() - parkingServiceBillReceivableRequest.getDiscount());
 		billReceivable.setDue(parkingServiceBillReceivableRequest.getPrice() * parkingServiceBillReceivableRequest.getQty() - parkingServiceBillReceivableRequest.getDiscount());
@@ -302,7 +303,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 				
 		BillReceivable billReceivable = parkingServiceBillReceivable.getBillReceivable();
 		
-		if(!billReceivable.getStatus().equals("UNPAID")) throw new InvalidOperationException("Only unpaid bill can be deleted");
+		if(!billReceivable.getPayStatus().equals(PayStatus.UNPAID)) throw new InvalidOperationException("Only unpaid bill can be deleted");
 		
 		parkingServiceBillReceivableRepository.delete(parkingServiceBillReceivable);
 		
@@ -321,7 +322,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		parkingBillReceivableResponseDTO.setQty(String.valueOf(parkingBillReceivable.getQty()));
 		parkingBillReceivableResponseDTO.setStartedAt(String.valueOf(parkingBillReceivable.getStartedAt()));
 		parkingBillReceivableResponseDTO.setEndedAt(String.valueOf(parkingBillReceivable.getEndedAt()));
-		parkingBillReceivableResponseDTO.setStatus(parkingBillReceivable.getBillReceivable().getStatus());
+		parkingBillReceivableResponseDTO.setPayStatus(parkingBillReceivable.getBillReceivable().getPayStatus().toString());
 		parkingBillReceivableResponseDTO.setParkingId(String.valueOf(parkingBillReceivable.getParking().getId()));
 		parkingBillReceivableResponseDTO.setDiscount(String.valueOf(parkingBillReceivable.getDiscount()));
 		parkingBillReceivableResponseDTO.setAmount(String.valueOf(parkingBillReceivable.getBillReceivable().getAmount()));
@@ -343,7 +344,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		    parkingServiceBillReceivableResponseDTO.setServiceDate(""); // or provide a default value
 		}
 		parkingServiceBillReceivableResponseDTO.setDescription(String.valueOf(parkingServiceBillReceivable.getDescription()));
-		parkingServiceBillReceivableResponseDTO.setStatus(parkingServiceBillReceivable.getBillReceivable().getStatus());
+		parkingServiceBillReceivableResponseDTO.setPayStatus(parkingServiceBillReceivable.getBillReceivable().getPayStatus().toString());
 		parkingServiceBillReceivableResponseDTO.setParkingId(String.valueOf(parkingServiceBillReceivable.getParking().getId()));
 		parkingServiceBillReceivableResponseDTO.setDiscount(String.valueOf(parkingServiceBillReceivable.getDiscount()));
 		parkingServiceBillReceivableResponseDTO.setAmount(String.valueOf(parkingServiceBillReceivable.getBillReceivable().getAmount()));

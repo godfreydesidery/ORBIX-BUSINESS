@@ -12,6 +12,7 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
@@ -105,7 +106,7 @@ public class ParkingServiceController implements ParkingService {
 			List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
 			if(!parkingBillReceivables.isEmpty() && cleared == true) {
 				for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
-					if(!parkingBillReceivable.getBillReceivable().getStatus().equals("PAID")) {
+					if(!parkingBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
 						cleared = false;
 						break;
 					}
@@ -115,7 +116,7 @@ public class ParkingServiceController implements ParkingService {
 			List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking);
 			if(!parkingServiceBillReceivables.isEmpty() && cleared == true) {
 				for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
-					if(!parkingServiceBillReceivable.getBillReceivable().getStatus().equals("PAID")) {
+					if(!parkingServiceBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
 						cleared = false;
 						break;
 					}
@@ -457,7 +458,7 @@ public class ParkingServiceController implements ParkingService {
 				sbi.setItem(pbr.getBillReceivable().getSummary());
 				sbi.setQty(pbr.getQty());
 				sbi.setAmount(pbr.getBillReceivable().getAmount());
-				sbi.setPayStatus(pbr.getBillReceivable().getStatus());
+				sbi.setPayStatus(pbr.getBillReceivable().getPayStatus().toString());
 				items.add(sbi);
 			}
 			
@@ -468,7 +469,7 @@ public class ParkingServiceController implements ParkingService {
 				sbi.setItem(psbr.getDescription());
 				sbi.setQty(psbr.getQty());
 				sbi.setAmount(psbr.getBillReceivable().getAmount());
-				sbi.setPayStatus(psbr.getBillReceivable().getStatus());
+				sbi.setPayStatus(psbr.getBillReceivable().getPayStatus().toString());
 				items.add(sbi);
 			}
 			
@@ -625,7 +626,7 @@ public class ParkingServiceController implements ParkingService {
 		LocalDateTime lastDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
 		LocalDateTime lastBillDate = LocalDateTime.now().toLocalDate().atStartOfDay();
 		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
-			if(parkingBillReceivable.getBillReceivable().getStatus().equals("UNPAID")) {
+			if(parkingBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.UNPAID)) {
 				throw new InvalidOperationException("Can not check out, bills  not cleared");
 			}
 			lastBillDate = parkingBillReceivable.getEndedAt();
@@ -636,7 +637,7 @@ public class ParkingServiceController implements ParkingService {
 		
 		List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking_.get());
 		for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
-			if(parkingServiceBillReceivable.getBillReceivable().getStatus().equals("UNPAID")) {
+			if(parkingServiceBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.UNPAID)) {
 				throw new InvalidOperationException("Can not check out, bills  not cleared");
 			}
 		}
@@ -665,7 +666,7 @@ public class ParkingServiceController implements ParkingService {
 		parkingBillReceivableResponseDTO.setDiscount(String.valueOf(parkingBillReceivable.getDiscount()));
 		parkingBillReceivableResponseDTO.setParkingId(parkingBillReceivable.getParking().getId().toString());
 		parkingBillReceivableResponseDTO.setAmount(String.valueOf(((parkingBillReceivable.getPrice() * parkingBillReceivable.getQty()) - parkingBillReceivable.getDiscount())));
-		parkingBillReceivableResponseDTO.setStatus(parkingBillReceivable.getBillReceivable().getStatus());
+		parkingBillReceivableResponseDTO.setPayStatus(parkingBillReceivable.getBillReceivable().getPayStatus().toString());
 				
 		return parkingBillReceivableResponseDTO;
 		
@@ -722,7 +723,7 @@ public class ParkingServiceController implements ParkingService {
 			billReceivable.setBranch(parking.getBranch());
 			billReceivable.setCreatedDateTime(dayService.getTimeStamp());
 			
-			billReceivable.setStatus("UNPAID");
+			billReceivable.setPayStatus(PayStatus.UNPAID);
 			billReceivable.setSummary("Parking bill for parking#: " + parking.getNo());
 			
 			billReceivable = billReceivableRepository.save(billReceivable);

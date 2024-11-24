@@ -3,7 +3,7 @@ export interface IBillReceivable {
     amount : number
     paid : number
     due : number
-    status : string
+    payStatus : string
     summary : string
 
     qty : string
@@ -29,7 +29,7 @@ export interface IParkingBillReceivable {
     parkingId : string
     billReceivableId : string
 
-    status : string
+    payStatus : string
 
     sn : number
 
@@ -50,7 +50,7 @@ export interface IServiceBillReceivable {
     parkingId : string
     billReceivableId : string
 
-    status : string
+    payStatus : string
 
     sn : number
 

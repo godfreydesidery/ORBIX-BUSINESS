@@ -66,9 +66,9 @@
                                     <td>{{detail?.billReceivable?.summary}}</td>
                                     <td>{{detail?.billReceivable?.qty}}</td>
                                     <td style="text-align: right;">{{detail?.billReceivable?.due | currency:'':''}}</td>
-                                    <td>{{detail?.billReceivable?.status}}</td>
+                                    <td>{{detail?.billReceivable?.payStatus}}</td>
                                     <!-- <td><input type="checkbox" *ngIf="detail?.billReceivable?.status === 'VERIFIED'" [(ngModel)]="detail.checked" (ngModelChange)="listBill(detail)"></td> -->
-                                    <td><input type="checkbox" *ngIf="detail?.billReceivable?.status === 'UNPAID'" [(ngModel)]="detail.checked" (ngModelChange)="listBill(detail)" style="width: 5mm; height: 5mm; cursor: pointer;"></td>
+                                    <td><input type="checkbox" *ngIf="detail?.billReceivable?.payStatus === 'UNPAID'" [(ngModel)]="detail.checked" (ngModelChange)="listBill(detail)" style="width: 5mm; height: 5mm; cursor: pointer;"></td>
                                 </tr>                                
                             </tbody>
                             <!-- <tfoot>

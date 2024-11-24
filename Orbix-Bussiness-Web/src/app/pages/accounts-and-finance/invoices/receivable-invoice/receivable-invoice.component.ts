@@ -95,7 +95,7 @@ export class ReceivableInvoiceComponent {
     this.total = 0
     this.amountReceived = 0
     this.invoiceReceivable.invoiceReceivableDetails.forEach(element => {
-      if(element.billReceivable.status === 'UNPAID'){
+      if(element.billReceivable.payStatus === 'UNPAID'){
         this.billReceivables.forEach(e => {
           if(e.id === element.billReceivable.id){
             element.checked = true

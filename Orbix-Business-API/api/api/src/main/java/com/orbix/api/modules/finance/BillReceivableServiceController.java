@@ -11,6 +11,8 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.orbix.api.api.commons.PayCode;
+import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.api.vehicleandequipmentparking.Parking;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingBillReceivable;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingBillReceivableRepository;
@@ -40,120 +42,65 @@ public class BillReceivableServiceController implements BillReceivableService {
 	
 	private final BillReceivableCollectionRepository billReceivableCollectionRepository;
 	
-	private final CashCollectionRepository cashCollectionRepository;
+	private final CollectionRepository collectionRepository;
 	private final UserService userService;
 	
 	private final DayService dayService;
 	
 	@Override
-	public List<BillReceivableResponseDTO> confirmBillPayment(BillReceivableSummaryDTO billReceivableSummary,
-			double totalAmount, HttpServletRequest request) {
-		 double t = 0;
-		for( BillReceivableCollectionRequestDTO c : billReceivableSummary.getBillReceivableCollections()) {
-			t = t + c.getAmount();
-		}
-		if(t != totalAmount) {
-			throw new InvalidOperationException("Could not process. Total amount mismatch");
-		}
-	
+	public List<BillReceivableResponseDTO> confirmBillPayment(
+			List<BillReceivableRequestDTO> billReceivableRequests, 
+			PayCode payCode,
+			String payRefNo,
+			double totalAmount,
+			HttpServletRequest request) {
+		
+		
+		LocalDateTime dateTime = dayService.getTimeStamp();
+		
+		Collection collection = new Collection();
+		collection.setPayCode(payCode);
+		collection.setCollectionDateTime(dateTime);
+		collection.setCollectedByUser(userService.getUser(request));
+		
+		collection = collectionRepository.save(collection);
 		
 		double total = 0;
-		LocalDateTime dateTime = dayService.getTimeStamp();
-		List<BillReceivable> billsToConsider = new ArrayList<>();
-		for(BillReceivableRequestDTO bl : billReceivableSummary.getBillReceivables()) {
+		
+		for(BillReceivableRequestDTO bl : billReceivableRequests) {
 			BillReceivable billReceivable = billReceivableRepository.findById(bl.getId()).get();
 			total = total + billReceivable.getDue();
 			if(bl.getAmount() != billReceivable.getDue()) throw new InvalidOperationException("Can not accept partial bill payment");
-			billReceivable.setPaid(bl.getAmount());
+			double blAmt = billReceivable.getDue();
+			billReceivable.setPaid(blAmt);
 			billReceivable.setDue(0);
-			billReceivable.setStatus("PAID");
+			billReceivable.setPayStatus(PayStatus.PAID);
 			billReceivable.setPaidDateTime(dateTime);
 			
 			billReceivable = billReceivableRepository.save(billReceivable);
-			billsToConsider.add(billReceivable);
 			
-			CashCollection cashCollection = new CashCollection();
+			BillReceivableCollection billReceivableCollection = new BillReceivableCollection();
+			billReceivableCollection.setAmount(blAmt);
+			billReceivableCollection.setPartial(false);
+			billReceivableCollection.setReason("General Payment");
+			billReceivableCollection.setBillReceivable(billReceivable);
+			billReceivableCollection.setCollection(collection);
 			
-			cashCollection.setAmount(bl.getAmount());
-			cashCollection.setPaymentType("CASH");
-			cashCollection.setReason("General Payment");
-			cashCollection.setCollectionDateTime(dateTime);
-			cashCollection.setCollectedByUser(userService.getUser(request));
-			cashCollection.setBillReceivable(billReceivable);
 			
+
 			Optional<ParkingBillReceivable> parkingBillReceivable = parkingBillReceivableRepository.findByBillReceivable(billReceivable);
-			if(parkingBillReceivable.isPresent()) cashCollection.setReason("Vehicle and Equipment/Parking");
+			if(parkingBillReceivable.isPresent()) billReceivableCollection.setReason("Vehicle and Equipment/Parking");
 			Optional<ParkingServiceBillReceivable> parkingServiceBillReceivable = parkingServiceBillReceivableRepository.findByBillReceivable(billReceivable);
-			if(parkingServiceBillReceivable.isPresent()) cashCollection.setReason("Vehicle and Equipment/Service");
+			if(parkingServiceBillReceivable.isPresent()) billReceivableCollection.setReason("Vehicle and Equipment/Service");
 			
-			cashCollectionRepository.save(cashCollection);
+			billReceivableCollection = billReceivableCollectionRepository.save(billReceivableCollection);
 			
-//			InvoiceReceivableDetail invoiceReceivableDetail = invoiceReceivableDetailRepository.findByBillReceivable(billReceivable);
-//			invoiceReceivableDetail.setPaid(bl.getAmount());
-//			invoiceReceivableDetail.setDue(0);
-//			
-//			invoiceReceivableDetail = invoiceReceivableDetailRepository.save(invoiceReceivableDetail);
 		}
-		if(total != totalAmount) throw new InvalidOperationException("Amounts do not match");	
 		
-		
-			List<BillReceivableCollectionRequestDTO> billReceivableCollections = billReceivableSummary.getBillReceivableCollections();
-
-			double billNewAmount = 0;
-			for (BillReceivableCollectionRequestDTO billReceivableCollectionRequest : billReceivableCollections) {
-			    
-				
-				
-			double summaryAmount = billReceivableCollectionRequest.getAmount();
-		    
-		    Iterator<BillReceivable> iterator = billsToConsider.iterator();
-		    while (iterator.hasNext()) {
-		        BillReceivable billReceivable = iterator.next();
-		        double billAmount;
-		        if(billNewAmount <= 0) {
-		        	billAmount  = billReceivable.getAmount();
-		        }else {
-		        	billAmount = billNewAmount;
-		        }
-		        
-		        
-		        if (summaryAmount >= billAmount) {
-		            BillReceivableCollection billReceivableCollection = new BillReceivableCollection();
-		            double amountToClear = billAmount;
-		            billReceivableCollection.setAmount(amountToClear);
-		            summaryAmount = summaryAmount - billAmount;
-		            billNewAmount = 0;
-		            
-		            billReceivableCollection.setPayCode(billReceivableCollectionRequest.getPayCode());
-		            billReceivableCollection.setReason("General Payment");
-		            billReceivableCollection.setPartial(false);
-		            billReceivableCollection.setRefNo(billReceivableCollectionRequest.getRefNo());
-		            billReceivableCollection.setCollectionDateTime(dateTime);
-		            billReceivableCollection.setCollectedByUser(userService.getUser(request));
-		            billReceivableCollection.setBillReceivable(billReceivable);
-		            billReceivableCollectionRepository.save(billReceivableCollection);
-
-		            iterator.remove(); // Safe removal
-		        } else if (summaryAmount < billAmount && summaryAmount > 0) {
-		            BillReceivableCollection billReceivableCollection = new BillReceivableCollection();
-		            double amountToClear = summaryAmount;
-		            billReceivableCollection.setAmount(amountToClear);
-		            
-		            billNewAmount = billAmount - summaryAmount;
-		            
-        			summaryAmount = 0;
-        			
-		            billReceivableCollection.setPayCode(billReceivableCollectionRequest.getPayCode());
-		            billReceivableCollection.setReason("General Payment");
-		            billReceivableCollection.setPartial(true);
-		            billReceivableCollection.setRefNo(billReceivableCollectionRequest.getRefNo());
-		            billReceivableCollection.setCollectionDateTime(dateTime);
-		            billReceivableCollection.setCollectedByUser(userService.getUser(request));
-		            billReceivableCollection.setBillReceivable(billReceivable);
-		            billReceivableCollectionRepository.save(billReceivableCollection);
-		        }
-		    }
+		if(total != totalAmount) {
+			throw new InvalidOperationException("Amount mismatch");
 		}
+	
 	return null;
 	}
 
@@ -184,7 +131,8 @@ public class BillReceivableServiceController implements BillReceivableService {
 		billReceivableResponse.setCreatedDateTime(billReceivable.getCreatedDateTime().toString());
 		billReceivableResponse.setNo(billReceivable.getNo());
 		billReceivableResponse.setQty(String.valueOf(billReceivable.getQty()));
-		billReceivableResponse.setStatus(billReceivable.getStatus());
+		billReceivableResponse.setPayStatus(billReceivable.getPayStatus().toString());
+
 		billReceivableResponse.setSummary(billReceivable.getSummary());
 		billReceivableResponse.setDue(String.valueOf(billReceivable.getDue()));
 		billReceivableResponse.setPaid(String.valueOf(billReceivable.getPaid()));

@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.orbix.api.api.commons.PayCode;
+
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -28,10 +30,12 @@ public class BillReceivableResource {
 	@PostMapping("/bill_receivables/confirm_bills_payment")
 	//@PreAuthorize("hasAnyAuthority('BILL-A')")
 	public ResponseEntity<List<BillReceivableResponseDTO>> confirmBillPayment(
-			@RequestBody BillReceivableSummaryDTO billReceivableSummary,
+			@RequestBody List<BillReceivableRequestDTO> billReceivableRequests,
 			@RequestParam(name = "total_amount") double totalAmount,
+			@RequestParam(name = "pay_code") PayCode payCode,
+			@RequestParam(name = "pay_ref_no") String payRefNo,
 			HttpServletRequest request){		
-		return ResponseEntity.ok().body(billReceivableService.confirmBillPayment(billReceivableSummary, totalAmount, request));		
+		return ResponseEntity.ok().body(billReceivableService.confirmBillPayment(billReceivableRequests, payCode, payRefNo, totalAmount, request));		
 	}
 	
 	

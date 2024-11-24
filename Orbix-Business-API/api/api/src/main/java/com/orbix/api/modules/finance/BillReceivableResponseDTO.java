@@ -13,6 +13,7 @@ import javax.persistence.ManyToOne;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.modules.adminunits.Branch;
 import com.orbix.api.modules.adminunits.Company;
 
@@ -25,7 +26,7 @@ public class BillReceivableResponseDTO {
 	String amount;
 	String paid;
 	String due;
-	String status;
+	String payStatus;
 	String summary;
 	String createdDateTime;
 	String companyId;

@@ -39,23 +39,14 @@ public class BillReceivableCollection {
 	double amount = 0;
 	boolean partial = false;
 	String reason;
-	String refNo;
-	
-	@Enumerated(EnumType.STRING)
-    @Column(nullable = false)
-	PayCode payCode = PayCode.CASH;
-	
-	LocalDateTime collectionDateTime = LocalDateTime.now();
 	
 	@ManyToOne(targetEntity = BillReceivable.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "bill_receivable_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private BillReceivable billReceivable;
 	
-	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = false)
-    @JoinColumn(name = "collected_by_user_id", nullable = false , updatable = false)
+	@ManyToOne(targetEntity = Collection.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "collection_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
-	@ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private User collectedByUser;
+    private Collection collection;
 }

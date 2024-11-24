@@ -32,63 +32,63 @@ public class FinanceReportResource {
 	private final ParkingRepository parkingRepository;
 	private final ParkingBillReceivableRepository parkingBillReceivableRepository;
 	
-	private final CashCollectionRepository cashCollectionRepository;
+	private final CollectionRepository collectionRepository;
 	
 	
 	@PostMapping("/finance_reports/get_cash_collections_by_dates")
-	public ResponseEntity<List<ICashCollection>>getCollectionByDates(
+	public ResponseEntity<List<IBillReceivableCollection>>getCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,
 			HttpServletRequest request){
 		
-		List<ICashCollection> cashCollections;
+		List<IBillReceivableCollection> collections;
 		
-		cashCollections = cashCollectionRepository.findTotalCollectionByDateRangeAndCashier(
+		collections = collectionRepository.findTotalCollectionByDateRangeAndCashier(
                 dateRange.getFrom().atStartOfDay(),
                 dateRange.getTo().atStartOfDay().plusDays(1),
                 nickname
         );
 
-	    return ResponseEntity.ok().body(cashCollections);
+	    return ResponseEntity.ok().body(collections);
 
 	}
 	
 	
 	@PostMapping("/finance_reports/get_parking_detailed_collections_by_dates")
-	public ResponseEntity<List<IParkingCashCollection>>getParkingDetailedCollectionByDates(
+	public ResponseEntity<List<IParkingCollection>>getParkingDetailedCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,
 			HttpServletRequest request){
 		
-		List<IParkingCashCollection> cashCollections;
+		List<IParkingCollection> collections;
 		
-		cashCollections = cashCollectionRepository.findCashCollectionsBetweenDates(
+		collections = collectionRepository.findParkingCollectionsBetweenDates(
 				dateRange.getFrom().atStartOfDay(),
                 dateRange.getTo().atStartOfDay().plusDays(1)
 				);
-	    return ResponseEntity.ok().body(cashCollections);
+	    return ResponseEntity.ok().body(collections);
 
 	}
 	
 	@PostMapping("/finance_reports/get_parking_service_detailed_collections_by_dates")
-	public ResponseEntity<List<IParkingServiceCashCollection>>getParkingServiceDetailedCollectionByDates(
+	public ResponseEntity<List<IParkingServiceCollection>>getParkingServiceDetailedCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,
 			HttpServletRequest request){
 		
-		List<IParkingServiceCashCollection> cashCollections;
+		List<IParkingServiceCollection> collections;
 		
-		cashCollections = cashCollectionRepository.findParkingServiceCashCollectionsBetweenDates(
+		collections = collectionRepository.findParkingServiceCollectionsBetweenDates(
 				dateRange.getFrom().atStartOfDay(),
                 dateRange.getTo().atStartOfDay().plusDays(1)
 				);
-	    return ResponseEntity.ok().body(cashCollections);
+	    return ResponseEntity.ok().body(collections);
 	}
 	
 }
 
 @Data
-class CashCollectionResponseDTO{
+class CollectionResponseDTO{
 	String reason;
 	String amount;
 	String paymentType;

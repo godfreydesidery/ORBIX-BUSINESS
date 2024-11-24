@@ -115,7 +115,7 @@ public class InvoiceReceivableServiceController implements InvoiceReceivableServ
 			billReceivableResponse.setCreatedDateTime(String.valueOf(detail.getBillReceivable().getCreatedDateTime()));
 			billReceivableResponse.setSummary(detail.getBillReceivable().getSummary());
 			billReceivableResponse.setQty(String.valueOf(detail.getBillReceivable().getQty()));
-			billReceivableResponse.setStatus(detail.getBillReceivable().getStatus());
+			billReceivableResponse.setPayStatus(detail.getBillReceivable().getPayStatus().toString());
 			
 			invoiceReceivableDetailResponse.setBillReceivable(billReceivableResponse);
 			

@@ -44,7 +44,7 @@
                                             <td>{{p.qty}}</td>
                                             <td style="text-align: right;">{{p.discount | currency:'':''}}</td>
                                             <td style="text-align: right;">{{p.amount | currency:'':''}}</td>
-                                            <td>{{p.status}}</td>
+                                            <td>{{p.payStatus}}</td>
                                             <td><button class="btn btn-success btn-round-custom" (click)="getParkingBill(p.id)" data-toggle="modal" data-target="#parking-bill-modal">Edit</button></td>
                                         </tr>
                                     </tbody>
@@ -85,7 +85,7 @@
                                             <td>{{p.qty}}</td>
                                             <td style="text-align: right;">{{p.discount | currency:'':''}}</td>
                                             <td style="text-align: right;">{{p.amount | currency:'':''}}</td>
-                                            <td>{{p.status}}</td>
+                                            <td>{{p.payStatus}}</td>
                                             <td>
                                                 <button class="btn btn-success btn-round-custom" (click)="getServiceBill(p.id)" data-toggle="modal" data-target="#service-bill-modal">Edit</button>
                                                 <button class="btn btn-danger btn-round-custom" (click)="deleteServiceBill(p.id)">Delete</button>
@@ -101,10 +101,117 @@
             <hr>
             <div class="row">
                 <div class="col-sm-12" style="text-align: center;">
-                    <button class="btn btn-success btn-round-custom" (click)="refreshBillReceivables()" (click)="clearReceipt()" data-toggle="modal" data-target="#pay-bill-modal">Go to Payment</button>
+                    <button class="btn btn-success btn-round-custom" (click)="refreshBillReceivables()" (click)="clearReceipt()" (click)="get(parkingId)">Go to Payment</button>
                 </div>
             </div>
+
             <hr>
+
+            <div class="row" *ngIf="billReceivables.length > 0">
+                <div class="col-sm-6">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <td>#</td>
+                                        <td>Descr</td>
+                                        <td>Amount</td>
+                                        <td>Paid</td>
+                                        <td>Due</td>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let b of billReceivables">
+                                        <td>{{b.sn}}</td>
+                                        <td>{{b.summary}}</td>
+                                        <td style="text-align: right;">{{b.amount | currency:'':''}}</td>
+                                        <td style="text-align: right;">{{b.paid | currency:'':''}}</td>
+                                        <td style="text-align: right;">{{b.due | currency:'':''}}</td>
+                                        
+                                        <!-- <td style="text-align: center;"><input type="checkbox"></td> -->
+                                    </tr>
+                                    
+                                    <tr *ngIf="billReceivables.length > 0" style="font-weight: bold;">
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td style="text-align: right;"><b>Total</b></td>
+                                        <td style="text-align: right;"><b>{{totalBillReceivable | currency:'':''}}</b></td>
+                                        
+                                    </tr>
+                                    
+                                </tbody>
+                            </table>
+                            <div class="alert alert-primary" *ngIf="billReceivables.length == 0">No Data</div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+                <div class="col-sm-6">
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <table class="table">
+                                
+                                <tbody>
+                                    
+                                    <tr>
+                                        
+                                        <td></td>
+                                        <td></td>
+                                        <td>Select Payment Method</td>                                   
+                                        <td style="text-align: right;">
+                                            <table>
+                                                <tr>
+                                                    <td style="text-align: left;">Mode</td>
+                                                    <td style="text-align: left;">Ref No</td>
+                                                </tr>
+                                                <tr>
+                                                    <td>
+                                                        <select [(ngModel)] = "payCode">
+                                                            <option>CASH</option>
+                                                            <option>MPESA</option>
+                                                        </select>
+                                                    </td>
+                                                    <td><input type="text" *ngIf="payCode != 'CASH'" [(ngModel)]="payRefNo"></td>
+                                                </tr> 
+                                            </table>
+                                        </td>
+                                        <td></td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <div class="alert alert-primary" *ngIf="billReceivables.length == 0">No Data</div>
+                        </div>
+                    </div>
+                </div>
+
+
+
+            </div>
+
+            <div class="row">
+                <div class="col-sm-12 pull-right" style="text-align: right;">
+                    <button class="btn btn-success btn-round-custom" *ngIf="billReceivables.length > 0" (click)="confirmBillsPayment()">Confirm Payment</button>
+                </div>
+                <div class="col-sm-12 pull-right" style="text-align: right;">
+                    <button class="btn btn-success btn-round-custom" (click)="printReceipt()">Print Receipt</button>
+                </div>
+                <div class="col-sm-12 pull-right" style="text-align: right;">
+                    <button class="btn btn-success btn-round-custom" (click)="checkOut()">Checkout</button>
+                </div>
+            </div>
+
+
         </div>
     </div>
 </div>
@@ -270,10 +377,6 @@
                         <button type="button" class="btn btn-primary btn-round-custom" (click)="saveServiceBill()">Save</button>
                     </div>
                 </div>
-
-                
-                
-                
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>

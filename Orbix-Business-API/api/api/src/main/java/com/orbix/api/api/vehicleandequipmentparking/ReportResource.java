@@ -65,7 +65,7 @@ public class ReportResource {
 		regStatuses.add("CHECKED-OUT");
 		parkingTotalsResponse.setRegistered(String.valueOf(parkingRepository.countByDateRangeAndRegistered(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atStartOfDay().plusDays(1), regStatuses)));
 		
-		parkingTotalsResponse.setPaid(String.valueOf(parkingBillReceivableRepository.countByStatusAndDateRange(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atStartOfDay().plusDays(1))));
+		parkingTotalsResponse.setPaid(String.valueOf(parkingBillReceivableRepository.countByPayStatusAndDateRange(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atStartOfDay().plusDays(1))));
 		
 		List<String> checkOutStatuses = new ArrayList<>();
 		checkOutStatuses.add("CHECKED-OUT");

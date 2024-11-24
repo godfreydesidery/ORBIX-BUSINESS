@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
@@ -15,6 +17,8 @@ import javax.persistence.Table;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.orbix.api.api.commons.PayCode;
+import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.modules.adminunits.Branch;
 import com.orbix.api.modules.adminunits.Company;
 import lombok.AllArgsConstructor;
@@ -38,8 +42,9 @@ public class BillReceivable {
 	double paid;
 	@Column(nullable = false)
 	double due;
-	@Column(nullable = false)
-	private String status = "UNPAID";
+	@Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+	PayStatus payStatus = PayStatus.UNPAID;
 	double qty = 1;
 	
 	private String summary = "";
