@@ -65,6 +65,11 @@ export class VehicleEquipmentBillingComponent {
   data: any;
   invoice: any;
 
+  cash : number = 0
+
+  mpesa : number = 0
+  mpesaRefNo : string = ''
+
 
   constructor(
     private http :HttpClient,
@@ -415,6 +420,8 @@ export class VehicleEquipmentBillingComponent {
 
   receiptData : IBillReceivable [] = []
 
+  billReceivableCollections : IBillReceivableCollection[] = []
+
   async confirmBillsPayment(){
 
     this.toPrintReceipt = false
@@ -430,8 +437,41 @@ export class VehicleEquipmentBillingComponent {
 
     this.receiptData = this.billReceivables
 
+
+    this.billReceivableCollections = []
+
+    var billColl : IBillReceivableCollection
+
+    if(this.cash > 0){
+      billColl  = {
+        amount: this.cash,
+        payCode: 'CASH',
+        refNo: ''
+      }
+      this.billReceivableCollections.push(billColl)
+    }
+
+    if(this.mpesa > 0){
+      billColl  = {
+        amount: this.mpesa,
+      payCode: 'MPESA',
+      refNo: this.mpesaRefNo
+      }
+      this.billReceivableCollections.push(billColl)
+    }
+
+
+    var billSummary = {
+      billReceivables :this.billReceivables,
+      billReceivableCollections : this.billReceivableCollections
+    }
+
+
+
+
+
     //this.spinner.show()
-    await this.http.post<IBillReceivable>(API_URL+'/bill_receivables/confirm_bills_payment?total_amount='+this.totalBillReceivable, this.billReceivables, options)
+    await this.http.post<IBillReceivable>(API_URL+'/bill_receivables/confirm_bills_payment?total_amount='+this.totalBillReceivable, billSummary, options)
     //.pipe(finalize(() => this.spinner.hide()))
     .toPromise()
     .then(
@@ -441,9 +481,9 @@ export class VehicleEquipmentBillingComponent {
         this.msg.showSuccessMessage('Payment successiful')
         //this.printReceipt()
 
-        this.getParkingBillReceivables(this.parkingId)
-        this.getParkingServiceBillReceivables(this.parkingId)
-        this.refreshBillReceivables()
+        // this.getParkingBillReceivables(this.parkingId)
+        // this.getParkingServiceBillReceivables(this.parkingId)
+        // this.refreshBillReceivables()
         this.toPrintReceipt = true
       }
     )
@@ -672,4 +712,15 @@ export class VehicleEquipmentBillingComponent {
 
 
 
+}
+
+export interface IBillSummary {
+  billReceivables : IBillReceivable[]
+  billReceivableCollections : IBillReceivableCollection[]
+}
+
+export interface IBillReceivableCollection {
+  amount : number
+  payCode : string 
+  refNo : string 
 }

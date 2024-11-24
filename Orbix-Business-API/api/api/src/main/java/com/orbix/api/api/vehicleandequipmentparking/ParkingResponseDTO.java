@@ -8,6 +8,8 @@ import lombok.Data;
 public class ParkingResponseDTO {
 	String id;
 	
+	String sn;
+	
 	String no;
 	/** Owner information */
 
@@ -59,7 +61,7 @@ public class ParkingResponseDTO {
 	
 	String vehicleEquipmentCategory;
 
-	String status = "PENDING";
+	String status;
 
     String parkingZoneId;
     String parkingZoneName;

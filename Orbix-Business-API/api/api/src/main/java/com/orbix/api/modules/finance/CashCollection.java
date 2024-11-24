@@ -15,6 +15,7 @@ import javax.persistence.Table;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.orbix.api.api.commons.PayCode;
 import com.orbix.api.modules.adminunits.Branch;
 import com.orbix.api.modules.identityandaccess.User;
 
@@ -38,6 +39,7 @@ public class CashCollection {
 	private double amount;
 	
 	String paymentType = "CASH";
+	//PayCode payCode = PayCode.CASH;
 	String reason;
 	
 	LocalDateTime collectionDateTime = LocalDateTime.now();

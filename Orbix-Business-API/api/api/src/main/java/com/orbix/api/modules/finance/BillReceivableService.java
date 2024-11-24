@@ -7,7 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 public interface BillReceivableService {
 	
 	List<BillReceivableResponseDTO> confirmBillPayment(
-			List<BillReceivableRequestDTO> billRequests, 
+			BillReceivableSummaryDTO billReceivableSummary, 
 			double totalAmount,
 			HttpServletRequest request);
 	

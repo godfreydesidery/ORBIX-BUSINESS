@@ -135,8 +135,76 @@ public class ReportResource {
 		return ResponseEntity.ok().body(registrationResponses);
 		
 	}
-
 	
+	@PostMapping("/parking_reports/get_parking_report")
+	public ResponseEntity<List<ParkingResponseDTO>>getParkingReportByDateAndReceptionist(
+			@RequestBody DateRange dateRange,
+			@RequestParam(name = "nickname") String cashierName,
+			HttpServletRequest request){
+		
+		User user = null;
+		if(!cashierName.equals("")) {
+			Optional<User> user_ = userRepository.findByNickname(cashierName);
+			if(user_.isPresent()) {
+				user = user_.get();
+			}else {
+				throw new NotFoundException("User not found");
+			}
+		}
+		
+		List<Parking> parkings = new ArrayList<>();
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+		statuses.add("CHECKED-OUT");
+		if(user != null) {
+			
+			parkings = parkingRepository.findAllByCreatedByUserAndCreatedDateTimeBetweenAndStatusIn(
+			        user, 
+			        dateRange.getFrom().atStartOfDay(),
+			        dateRange.getTo().atStartOfDay().plusDays(1),
+			        statuses
+			    );		
+					
+		}else {
+			parkings = parkingRepository.findAllByCreatedDateTimeBetweenAndStatusIn(
+			        dateRange.getFrom().atStartOfDay(),
+			        dateRange.getTo().atStartOfDay().plusDays(1),
+			        statuses
+			    );	
+		}
+		
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+		int sn = 1;
+		for(Parking parking : parkings) {
+			ParkingResponseDTO parkingResponse = new ParkingResponseDTO();
+			parkingResponse.setVehicleEquipmentCategory(parking.getVehicleEquipmentCategory());
+			parkingResponse.setVehicleEquipmentTypeName(parking.getVehicleEquipmentType().getName());
+			parkingResponse.setOwnerFirstName(parking.getOwnerFirstName());
+			parkingResponse.setOwnerLastName(parking.getOwnerLastName());
+			parkingResponse.setCardNo(parking.getCardNo());
+			parkingResponse.setChasisNo(parking.getChasisNo());
+			parkingResponse.setTformNumber(parking.getTformNumber());
+			parkingResponse.setDeviceStatus(parking.isDeviceStatus() ? "YES" : "NO");
+			parkingResponse.setBillingAmount(String.valueOf(parking.getBillingAmount()));
+			parkingResponse.setCheckedInAt(
+				    Optional.ofNullable(parking.getCheckedInDateTime())
+				            .map(Object::toString)
+				            .orElse("")
+				);
+				parkingResponse.setCheckedOutAt(
+				    Optional.ofNullable(parking.getCheckedOutDateTime())
+				            .map(Object::toString)
+				            .orElse("")
+				);
+			parkingResponse.setSn(String.valueOf(sn));
+			parkingResponse.setStatus(parking.getStatus());
+			parkingResponses.add(parkingResponse);
+			sn++;
+			
+		}
+		return ResponseEntity.ok().body(parkingResponses);
+		
+	}	
 }
 
 @Data

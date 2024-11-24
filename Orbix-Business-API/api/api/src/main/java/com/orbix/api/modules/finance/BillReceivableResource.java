@@ -28,10 +28,10 @@ public class BillReceivableResource {
 	@PostMapping("/bill_receivables/confirm_bills_payment")
 	//@PreAuthorize("hasAnyAuthority('BILL-A')")
 	public ResponseEntity<List<BillReceivableResponseDTO>> confirmBillPayment(
-			@RequestBody List<BillReceivableRequestDTO> billRequests,
+			@RequestBody BillReceivableSummaryDTO billReceivableSummary,
 			@RequestParam(name = "total_amount") double totalAmount,
 			HttpServletRequest request){		
-		return ResponseEntity.ok().body(billReceivableService.confirmBillPayment(billRequests, totalAmount, request));		
+		return ResponseEntity.ok().body(billReceivableService.confirmBillPayment(billReceivableSummary, totalAmount, request));		
 	}
 	
 	

@@ -140,6 +140,12 @@ export const routes: Routes = [
         data : { breadcrumb : 'Parking Management/Parking Price Plan'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'parking-management/reports/parking-report',
+        loadComponent: () => import('./parking-management/reports/parking-report/parking-report.component').then(c => c.ParkingReportComponent),
+        data : { breadcrumb : 'Parking Management/Reports/Parking Report'},
+        canActivate : [AuthGuard]
+      },
 
       /**End of Parking Management */
 
@@ -204,6 +210,8 @@ export const routes: Routes = [
         data : { breadcrumb : 'Management/Vehicle Registration Report'}, 
         canActivate : [AuthGuard]
       },
+
+      
 
 
       // End of Management

@@ -2,6 +2,7 @@ package com.orbix.api.modules.finance;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,19 +38,29 @@ public class BillReceivableServiceController implements BillReceivableService {
 	private final ParkingServiceBillReceivableRepository parkingServiceBillReceivableRepository;
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
 	
+	private final BillReceivableCollectionRepository billReceivableCollectionRepository;
+	
 	private final CashCollectionRepository cashCollectionRepository;
 	private final UserService userService;
 	
 	private final DayService dayService;
 	
 	@Override
-	public List<BillReceivableResponseDTO> confirmBillPayment(List<BillReceivableRequestDTO> billRequests,
+	public List<BillReceivableResponseDTO> confirmBillPayment(BillReceivableSummaryDTO billReceivableSummary,
 			double totalAmount, HttpServletRequest request) {
+		 double t = 0;
+		for( BillReceivableCollectionRequestDTO c : billReceivableSummary.getBillReceivableCollections()) {
+			t = t + c.getAmount();
+		}
+		if(t != totalAmount) {
+			throw new InvalidOperationException("Could not process. Total amount mismatch");
+		}
 	
 		
 		double total = 0;
 		LocalDateTime dateTime = dayService.getTimeStamp();
-		for(BillReceivableRequestDTO bl : billRequests) {
+		List<BillReceivable> billsToConsider = new ArrayList<>();
+		for(BillReceivableRequestDTO bl : billReceivableSummary.getBillReceivables()) {
 			BillReceivable billReceivable = billReceivableRepository.findById(bl.getId()).get();
 			total = total + billReceivable.getDue();
 			if(bl.getAmount() != billReceivable.getDue()) throw new InvalidOperationException("Can not accept partial bill payment");
@@ -59,8 +70,10 @@ public class BillReceivableServiceController implements BillReceivableService {
 			billReceivable.setPaidDateTime(dateTime);
 			
 			billReceivable = billReceivableRepository.save(billReceivable);
+			billsToConsider.add(billReceivable);
 			
 			CashCollection cashCollection = new CashCollection();
+			
 			cashCollection.setAmount(bl.getAmount());
 			cashCollection.setPaymentType("CASH");
 			cashCollection.setReason("General Payment");
@@ -82,6 +95,65 @@ public class BillReceivableServiceController implements BillReceivableService {
 //			invoiceReceivableDetail = invoiceReceivableDetailRepository.save(invoiceReceivableDetail);
 		}
 		if(total != totalAmount) throw new InvalidOperationException("Amounts do not match");	
+		
+		
+			List<BillReceivableCollectionRequestDTO> billReceivableCollections = billReceivableSummary.getBillReceivableCollections();
+
+			double billNewAmount = 0;
+			for (BillReceivableCollectionRequestDTO billReceivableCollectionRequest : billReceivableCollections) {
+			    
+				
+				
+			double summaryAmount = billReceivableCollectionRequest.getAmount();
+		    
+		    Iterator<BillReceivable> iterator = billsToConsider.iterator();
+		    while (iterator.hasNext()) {
+		        BillReceivable billReceivable = iterator.next();
+		        double billAmount;
+		        if(billNewAmount <= 0) {
+		        	billAmount  = billReceivable.getAmount();
+		        }else {
+		        	billAmount = billNewAmount;
+		        }
+		        
+		        
+		        if (summaryAmount >= billAmount) {
+		            BillReceivableCollection billReceivableCollection = new BillReceivableCollection();
+		            double amountToClear = billAmount;
+		            billReceivableCollection.setAmount(amountToClear);
+		            summaryAmount = summaryAmount - billAmount;
+		            billNewAmount = 0;
+		            
+		            billReceivableCollection.setPayCode(billReceivableCollectionRequest.getPayCode());
+		            billReceivableCollection.setReason("General Payment");
+		            billReceivableCollection.setPartial(false);
+		            billReceivableCollection.setRefNo(billReceivableCollectionRequest.getRefNo());
+		            billReceivableCollection.setCollectionDateTime(dateTime);
+		            billReceivableCollection.setCollectedByUser(userService.getUser(request));
+		            billReceivableCollection.setBillReceivable(billReceivable);
+		            billReceivableCollectionRepository.save(billReceivableCollection);
+
+		            iterator.remove(); // Safe removal
+		        } else if (summaryAmount < billAmount && summaryAmount > 0) {
+		            BillReceivableCollection billReceivableCollection = new BillReceivableCollection();
+		            double amountToClear = summaryAmount;
+		            billReceivableCollection.setAmount(amountToClear);
+		            
+		            billNewAmount = billAmount - summaryAmount;
+		            
+        			summaryAmount = 0;
+        			
+		            billReceivableCollection.setPayCode(billReceivableCollectionRequest.getPayCode());
+		            billReceivableCollection.setReason("General Payment");
+		            billReceivableCollection.setPartial(true);
+		            billReceivableCollection.setRefNo(billReceivableCollectionRequest.getRefNo());
+		            billReceivableCollection.setCollectionDateTime(dateTime);
+		            billReceivableCollection.setCollectedByUser(userService.getUser(request));
+		            billReceivableCollection.setBillReceivable(billReceivable);
+		            billReceivableCollectionRepository.save(billReceivableCollection);
+		        }
+		    }
+		}
 	return null;
 	}
 

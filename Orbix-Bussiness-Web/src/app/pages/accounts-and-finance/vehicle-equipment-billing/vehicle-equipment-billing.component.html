@@ -172,13 +172,25 @@
                                     
                                     <td></td>
                                     <td></td>
-                                    <td>Select Payment Method</td>
+                                    <td>Select Payment Method</td>                                   
                                     <td style="text-align: right;">
-                                        <select class="form-control" style="max-width: 30mm;">
-                                            <option>CASH</option>
-                                            <option>MOBILE</option>
-                                            <option>BANK</option>
-                                        </select>
+                                        <table>
+                                            <tr>
+                                                <td></td>
+                                                <td style="text-align: left;">Mode</td>
+                                                <td style="text-align: left;">Ref No</td>
+                                            </tr>
+                                            <tr>
+                                                <td>CASH</td>
+                                                <td><input type="number" [(ngModel)]="cash" (min) = "0"></td>
+                                                <td></td>
+                                            </tr> 
+                                            <tr>
+                                                <td>MPESA</td>
+                                                <td><input type="number" [(ngModel)]="mpesa" (min) = "0"></td>
+                                                <td><input type="text" [(ngModel)]="mpesaRefNo"></td>
+                                            </tr> 
+                                        </table>
                                     </td>
                                     <td></td>
                                 </tr>

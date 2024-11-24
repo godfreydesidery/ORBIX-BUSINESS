@@ -452,6 +452,10 @@ export const menuItems = [
                 routerLink: '/app/management/vehicle-registration-report'
             },
             {
+                title: 'Vehicle Parking Report',
+                routerLink: '/app/parking-management/reports/parking-report'
+            },
+            {
                 title: 'Revenue Report',
                 routerLink: '/app/blank'
             },
