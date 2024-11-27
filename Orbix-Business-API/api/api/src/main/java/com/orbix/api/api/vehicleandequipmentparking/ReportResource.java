@@ -1,0 +1,238 @@
+package com.orbix.api.api.vehicleandequipmentparking;
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Optional;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.CrossOrigin;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RestController;
+
+import com.orbix.api.exceptions.NotFoundException;
+import com.orbix.api.modules.identityandaccess.User;
+import com.orbix.api.modules.identityandaccess.UserRepository;
+import com.orbix.api.modules.identityandaccess.UserService;
+
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
+
+@RestController
+@RequestMapping("/orbix-business-api")
+@RequiredArgsConstructor
+@CrossOrigin(origins = "*", allowedHeaders = "*")
+@Transactional
+public class ReportResource {
+	
+	private final ParkingRepository parkingRepository;
+	private final ParkingBillReceivableRepository parkingBillReceivableRepository;
+	private final UserService userService;
+	private final UserRepository userRepository;
+	
+	
+	@PostMapping("/parking_reports/get_totals_by_dates")
+	public ResponseEntity<ParkingTotalsResponseDTO>getTotalsByDates(
+			@RequestBody DateRange dateRange,
+			HttpServletRequest request){
+		
+		ParkingTotalsResponseDTO parkingTotalsResponse = new ParkingTotalsResponseDTO();
+		parkingTotalsResponse.setFrom(dateRange.getFrom().toString());
+		parkingTotalsResponse.setTo(dateRange.getTo().toString());
+		parkingTotalsResponse.setRegistered("0");
+		parkingTotalsResponse.setPaid("0");
+		parkingTotalsResponse.setCheckedOut("0");
+		parkingTotalsResponse.setCurrentUnpaid("0");
+		parkingTotalsResponse.setCurrentTotalInYards("0");
+		
+		// Count registered vehicles
+		
+//		@Query("SELECT COUNT(p) FROM Parking p WHERE p.checkedInDateTime BETWEEN :startDate AND :endDate AND status IN :statuses")
+//	    long countByDateRangeAndRegistered(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, List<String> statuses);
+
+		List<String> regStatuses = new ArrayList<>();
+		regStatuses.add("CHECKED-IN");
+		regStatuses.add("CHECKED-OUT");
+		parkingTotalsResponse.setRegistered(String.valueOf(parkingRepository.countByDateRangeAndRegistered(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atStartOfDay().plusDays(1), regStatuses)));
+		
+		parkingTotalsResponse.setPaid(String.valueOf(parkingBillReceivableRepository.countByPayStatusAndDateRange(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atStartOfDay().plusDays(1))));
+		
+		List<String> checkOutStatuses = new ArrayList<>();
+		checkOutStatuses.add("CHECKED-OUT");
+		parkingTotalsResponse.setCheckedOut(String.valueOf(parkingRepository.countByDateRangeAndCheckedOut(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atStartOfDay().plusDays(1), checkOutStatuses)));
+		
+		parkingTotalsResponse.setCurrentUnpaid(String.valueOf(parkingRepository.countRegistered()));
+		parkingTotalsResponse.setCurrentTotalInYards(String.valueOf(parkingRepository.countRegistered()));
+		
+		
+//		public long countPaidOrVerifiedBillsWithinDateRange(LocalDateTime startDate, LocalDateTime endDate) {
+//	        return parkingBillReceivableRepository.countByStatusAndDateRange(startDate, endDate);
+//	    }
+		
+		return ResponseEntity.ok().body(parkingTotalsResponse);
+	}
+	
+	@PostMapping("/parking_reports/get_registration_report")
+	public ResponseEntity<List<RegistrationResponseDTO>>getRegistrationReportByDateAndReceptionist(
+			@RequestBody DateRange dateRange,
+			@RequestParam(name = "nickname") String cashierName,
+			HttpServletRequest request){
+		
+		User user = null;
+		if(!cashierName.equals("")) {
+			Optional<User> user_ = userRepository.findByNickname(cashierName);
+			if(user_.isPresent()) {
+				user = user_.get();
+			}else {
+				throw new NotFoundException("User not found");
+			}
+		}
+		
+		List<Parking> parkings = new ArrayList<>();
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+		statuses.add("CHECKED-OUT");
+		if(user != null) {
+			
+			parkings = parkingRepository.findAllByCreatedByUserAndCreatedDateTimeBetweenAndStatusIn(
+			        user, 
+			        dateRange.getFrom().atStartOfDay(),
+			        dateRange.getTo().atStartOfDay().plusDays(1),
+			        statuses
+			    );		
+					
+		}else {
+			parkings = parkingRepository.findAllByCreatedDateTimeBetweenAndStatusIn(
+			        dateRange.getFrom().atStartOfDay(),
+			        dateRange.getTo().atStartOfDay().plusDays(1),
+			        statuses
+			    );	
+		}
+		
+		List<RegistrationResponseDTO> registrationResponses = new ArrayList<>();
+		int sn = 1;
+		for(Parking parking : parkings) {
+			RegistrationResponseDTO registrationResponse = new RegistrationResponseDTO();
+			registrationResponse.setChassisNo(parking.getChasisNo());
+			registrationResponse.setVehicleType(parking.getVehicleEquipmentType().getName());
+			registrationResponse.setRegisteredDate(parking.getCreatedDateTime().toString());
+			registrationResponse.setRegisteredBy(parking.getCreatedByUser().getNickname());
+			registrationResponse.setKeyStatus(parking.isHasKeys() ? "YES" : "NO");
+			registrationResponse.setSn(String.valueOf(sn));
+			registrationResponses.add(registrationResponse);
+			sn++;
+		}
+		return ResponseEntity.ok().body(registrationResponses);
+		
+	}
+	
+	@PostMapping("/parking_reports/get_parking_report")
+	public ResponseEntity<List<ParkingResponseDTO>>getParkingReportByDateAndReceptionist(
+			@RequestBody DateRange dateRange,
+			@RequestParam(name = "nickname") String cashierName,
+			HttpServletRequest request){
+		
+		User user = null;
+		if(!cashierName.equals("")) {
+			Optional<User> user_ = userRepository.findByNickname(cashierName);
+			if(user_.isPresent()) {
+				user = user_.get();
+			}else {
+				throw new NotFoundException("User not found");
+			}
+		}
+		
+		List<Parking> parkings = new ArrayList<>();
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+		statuses.add("CHECKED-OUT");
+		if(user != null) {
+			
+			parkings = parkingRepository.findAllByCreatedByUserAndCreatedDateTimeBetweenAndStatusIn(
+			        user, 
+			        dateRange.getFrom().atStartOfDay(),
+			        dateRange.getTo().atStartOfDay().plusDays(1),
+			        statuses
+			    );		
+					
+		}else {
+			parkings = parkingRepository.findAllByCreatedDateTimeBetweenAndStatusIn(
+			        dateRange.getFrom().atStartOfDay(),
+			        dateRange.getTo().atStartOfDay().plusDays(1),
+			        statuses
+			    );	
+		}
+		
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+		int sn = 1;
+		for(Parking parking : parkings) {
+			ParkingResponseDTO parkingResponse = new ParkingResponseDTO();
+			parkingResponse.setVehicleEquipmentCategory(parking.getVehicleEquipmentCategory());
+			parkingResponse.setVehicleEquipmentTypeName(parking.getVehicleEquipmentType().getName());
+			parkingResponse.setOwnerFirstName(parking.getOwnerFirstName());
+			parkingResponse.setOwnerLastName(parking.getOwnerLastName());
+			parkingResponse.setCardNo(parking.getCardNo());
+			parkingResponse.setChasisNo(parking.getChasisNo());
+			parkingResponse.setTformNumber(parking.getTformNumber());
+			parkingResponse.setDeviceStatus(parking.isDeviceStatus() ? "YES" : "NO");
+			parkingResponse.setKeyStatus(parking.isDeviceStatus() ? "YES" : "NO");
+			parkingResponse.setBillingAmount(String.valueOf(parking.getBillingAmount()));
+			parkingResponse.setCheckedInAt(
+				    Optional.ofNullable(parking.getCheckedInDateTime())
+				            .map(Object::toString)
+				            .orElse("")
+				);
+				parkingResponse.setCheckedOutAt(
+				    Optional.ofNullable(parking.getCheckedOutDateTime())
+				            .map(Object::toString)
+				            .orElse("")
+				);
+			parkingResponse.setSn(String.valueOf(sn));
+			parkingResponse.setStatus(parking.getStatus());
+			parkingResponse.setCreatedBy(parking.getCreatedByUser().getNickname());
+			
+			parkingResponses.add(parkingResponse);
+			sn++;
+			
+		}
+		return ResponseEntity.ok().body(parkingResponses);
+		
+	}	
+}
+
+@Data
+class ParkingTotalsResponseDTO{
+	String from;
+	String to;
+	String registered;
+	String paid;
+	String checkedOut;
+	String currentUnpaid;
+	String currentTotalInYards;	
+}
+
+@Data
+class DateRange {
+	LocalDate from;
+	LocalDate to;
+}
+
+@Data
+class RegistrationResponseDTO{
+	String sn;
+	String chassisNo;
+	String vehicleType;
+	String keyStatus;
+	String registeredDate;
+	String registeredBy;	
+}

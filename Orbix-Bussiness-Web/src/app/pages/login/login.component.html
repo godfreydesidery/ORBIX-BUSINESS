@@ -1,0 +1,33 @@
+<div class="login-container">
+  <div class="col-xl-4 col-md-6 col-10 mx-auto">
+    <div class="card">
+      <div class="card-body text-center">
+        <h2 class="card-title"><i class="fa fa-user"></i> User Login</h2>
+        <span  class="text-success">{{status}}</span>
+          <div class="form-group">
+            <input [formControl]="username" class="form-control checking-field" placeholder="Username" type="text">
+            @if (form.get('username')!.touched && form.get('username')!.hasError('required')) {
+              <span class="help-block text-danger">Username is required</span>
+            }
+          </div>
+          <div class="form-group">
+            <input [formControl]="password" class="form-control checking-field" placeholder="Password" type="password">
+            @if (form.get('password')!.touched && form.get('password')!.hasError('required')) {
+              <span class="help-block text-danger">Password is required</span>
+            }
+            @if (form.get('password')!.touched && form.get('password')!.hasError('minlength')) {
+              <span class="help-block text-danger">Password isn't long enough, minimum of 6 characters</span>
+            }
+          </div>
+          
+          <div class="form-group">
+            <button [disabled]="!form.valid" class="btn btn-primary btn-block" (click)="loginUser()">Log In</button>
+          </div>
+
+        
+
+      </div>
+    </div>
+  </div>
+</div>
+

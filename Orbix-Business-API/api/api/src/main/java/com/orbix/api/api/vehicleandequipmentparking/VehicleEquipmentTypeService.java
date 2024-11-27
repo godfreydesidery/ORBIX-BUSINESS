@@ -1,0 +1,17 @@
+package com.orbix.api.api.vehicleandequipmentparking;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.orbix.api.api.commons.ApiCustomResponse;
+
+public interface VehicleEquipmentTypeService {
+	List<VehicleEquipmentTypeResponseDTO> getAllVehicleEquipmentTypes(HttpServletRequest request);	
+	List<VehicleEquipmentTypeResponseDTO> getAllCompanyActiveVehicleEquipmentTypes(HttpServletRequest request);		
+	VehicleEquipmentTypeResponseDTO get(Long id, HttpServletRequest request);
+	VehicleEquipmentTypeResponseDTO createVehicleEquipmentType(VehicleEquipmentTypeRequestDTO vehicleEquipmentTypeRequest, HttpServletRequest request);
+	VehicleEquipmentTypeResponseDTO updateVehicleEquipmentType(VehicleEquipmentTypeRequestDTO vehicleEquipmentTypeRequest, HttpServletRequest request);
+	ApiCustomResponse activateVehicleEquipmentType(VehicleEquipmentTypeRequestDTO vehicleEquipmentTypeRequest, HttpServletRequest request);
+	ApiCustomResponse deactivateVehicleEquipmentType(VehicleEquipmentTypeRequestDTO vehicleEquipmentTypeRequest, HttpServletRequest request);
+}
