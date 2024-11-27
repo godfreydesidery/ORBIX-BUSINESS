@@ -21,6 +21,8 @@ public class VehicleEquipmentResponseDTO {
 	private String cardNo;
 	private Byte[] image;
 	
+	private String tformNumber;
+	
 	private String active;
 	
 	private String vehicleEquipmentTypeName;

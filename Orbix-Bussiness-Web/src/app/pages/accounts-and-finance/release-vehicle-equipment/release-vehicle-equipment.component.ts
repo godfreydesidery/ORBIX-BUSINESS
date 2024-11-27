@@ -128,9 +128,9 @@ export class ReleaseVehicleEquipmentComponent {
   ) {}
 
   ngOnInit(){
-    this.getAllClearedParkings()   
+    this.getTodayCheckedOut()
     this.getAllCompanyActiveVehicleAndEquipmentTypes()
-    this.getAllBranchActiveParkingZones();
+    this.getAllBranchActiveParkingZones()
   }
 
   async getAllClearedParkings(){
@@ -140,6 +140,27 @@ export class ReleaseVehicleEquipmentComponent {
     this.parkings = []
 
     await this.http.get<IParking[]>(API_URL+'/parkings/get_all_cleared', options)
+    .toPromise()
+    .then(
+      data => {
+        var sn = 1
+        data?.forEach(element => {
+          element.sn = sn
+          this.parkings.push(element)
+          sn = sn + 1
+        })
+        console.log(data)
+      }
+    )
+  }
+
+  async getTodayCheckedOut(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    this.parkings = []
+
+    await this.http.get<IParking[]>(API_URL+'/parkings/get_today_checked_out', options)
     .toPromise()
     .then(
       data => {

@@ -38,8 +38,7 @@ export class VehicleRegisterComponent {
 
   filterRecords : string = ''
 
-  id : any = null
-  no : string = ''
+
 
   // Owner information
   ownerFirstName: string = ''
@@ -104,7 +103,8 @@ export class VehicleRegisterComponent {
   startBillingAt : Date | null
 
   // Foreign keys
-  parkingId: any = ''
+  parkingId: any = null
+  parkingNo : string = ''
   vehicleEquipmentTypeId: any = ''
   vehicleEquipmentTypeName : string = ''
   branchId: any = ''
@@ -225,8 +225,8 @@ export class VehicleRegisterComponent {
     }
 
     var parking = {
-      id: this.id,
-      no: this.no,
+      id: this.parkingId,
+      no: this.parkingNo,
       ownerFirstName: this.ownerFirstName,
       ownerMiddleName: this.ownerMiddleName,
       ownerLastName: this.ownerLastName,
@@ -376,7 +376,7 @@ export class VehicleRegisterComponent {
     }
 
     var parking = {
-      id : this.id,
+      id : this.parkingId,
       cardNo : this.cardNo,
       hasKeys : this.hasKeys === 'YES' ? 1 : 0,
       parkingZoneName : this.parkingZoneName,
@@ -416,7 +416,7 @@ export class VehicleRegisterComponent {
     }
 
     var parking = {
-      id : this.id,
+      id : this.parkingId,
       cardNo : this.cardNo,
       parkingZoneName : this.parkingZoneName,
       startBillingAt : this.startBillingAt
@@ -475,8 +475,8 @@ export class VehicleRegisterComponent {
   }
 
   showParkingData(data : IParking){
-    this.id = data?.id;
-    this.no = data!.no;
+    this.parkingId = data?.id;
+    this.parkingNo = data!.no;
     this.ownerFirstName = data?.ownerFirstName;
     this.ownerMiddleName = data?.ownerMiddleName;
     this.ownerLastName = data?.ownerLastName;
@@ -537,8 +537,8 @@ export class VehicleRegisterComponent {
   }
 
   clearParkingData(){
-    this.id = null;
-    this.no = ''
+    this.parkingId = null;
+    this.parkingNo = ''
     this.ownerFirstName = ''
     this.ownerMiddleName = ''
     this.ownerLastName = ''
@@ -678,7 +678,7 @@ export class VehicleRegisterComponent {
                 ],
                 [
                   {text : 'Parking Ref No', fontSize : 9}, 
-                  {text : this.no, fontSize : 9} 
+                  {text : this.parkingNo, fontSize : 9} 
                 ],
                 [
                   {text : 'Color', fontSize : 9}, 

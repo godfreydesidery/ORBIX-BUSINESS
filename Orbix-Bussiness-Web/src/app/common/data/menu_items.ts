@@ -281,7 +281,22 @@ export const menuItems = [
             {
                 title: 'Parking',
                 routerLink: '/app/parking-management/parking'
+            },
+            {
+                title: 'Reports',
+                url: '#',
+                subMenu: [
+                    {
+                        title: 'Vehicle Registration',
+                        routerLink: '/app/management/vehicle-registration-report'
+                    },
+                    {
+                        title: 'Cashier Collections',
+                        routerLink: '/app/management/cashier-collections'
+                    }, 
+                ]
             }
+
         ]
     },
     /*{
@@ -437,7 +452,7 @@ export const menuItems = [
         icon: 'fa-money',
         selected: false,
         expanded: false,
-        order: 100,
+        order: 200,
         subMenu: [
             {
                 title: 'Management Board',
@@ -446,26 +461,32 @@ export const menuItems = [
             {
                 title: 'Cash Collections',
                 routerLink: '/app/management/cash-collections'
-            },
+            },            
             {
-                title: 'Vehicle Registration Report',
-                routerLink: '/app/management/vehicle-registration-report'
-            },
-            {
-                title: 'Vehicle Parking Report',
-                routerLink: '/app/parking-management/reports/parking-report'
-            },
-            {
-                title: 'Revenue Report',
-                routerLink: '/app/blank'
-            },
-            {
-                title: 'Sales report',
-                routerLink: '/app/blank'
-            },
-            {
-                title: 'Invoice Report',
-                routerLink: '/app/blank'
+                title: 'Reports',
+                url: '#',
+                subMenu: [
+                    {
+                        title: 'Vehicle Registration',
+                        routerLink: '/app/management/vehicle-registration-report'
+                    },                    
+                    {
+                        title: 'Vehicle Parking',
+                        routerLink: '/app/parking-management/reports/parking-report'
+                    },                    
+                    {
+                        title: 'Revenue Report',
+                        routerLink: '/app/blank'
+                    },
+                    {
+                        title: 'Sales report',
+                        routerLink: '/app/blank'
+                    },
+                    {
+                        title: 'Invoice Report',
+                        routerLink: '/app/blank'
+                    }
+                ]
             }
         ]
     },
@@ -542,8 +563,17 @@ export const menuItems = [
                     //     routerLink: '/app/blank'
                     // },
                 ]
+            },
+            {
+                title: 'Reports',
+                url: '#',
+                subMenu: [
+                    {
+                        title: 'Vehicle Parking Report',
+                        routerLink: '/app/parking-management/reports/parking-report'
+                    },
+                ]
             }
-            
         ]
     },
     {

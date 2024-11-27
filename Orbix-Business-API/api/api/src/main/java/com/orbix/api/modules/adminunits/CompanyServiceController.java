@@ -83,6 +83,7 @@ public class CompanyServiceController implements CompanyService {
 		company.setTelephone(companyRequest.getTelephone());
 		company.setMobile(companyRequest.getMobile());
 		company.setEmail(companyRequest.getEmail());
+		company.setWebsite(companyRequest.getWebsite());
 		company.setFax(companyRequest.getFax());
 		
 		company.setTimeZone(systemProfileService.getDefaultTimeZone());
@@ -156,6 +157,7 @@ public class CompanyServiceController implements CompanyService {
 		company.setTelephone(companyRequest.getTelephone());
 		company.setMobile(companyRequest.getMobile());
 		company.setEmail(companyRequest.getEmail());
+		company.setWebsite(companyRequest.getWebsite());
 		company.setFax(companyRequest.getFax());
 		
 		company = companyRepository.save(company);
@@ -223,6 +225,7 @@ public class CompanyServiceController implements CompanyService {
 		companyResponse.setTelephone(company.getTelephone());
 		companyResponse.setMobile(company.getMobile());
 		companyResponse.setEmail(company.getEmail());
+		companyResponse.setWebsite(company.getWebsite());
 		companyResponse.setFax(company.getFax());
 		if(company.isActive()) {
 			companyResponse.setActive("Active");

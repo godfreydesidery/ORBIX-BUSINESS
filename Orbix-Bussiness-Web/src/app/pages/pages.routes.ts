@@ -47,6 +47,15 @@ export const routes: Routes = [
         data : { breadcrumb : 'Identity and Acces/Role Access'},
         canActivate : [AuthGuard]
       },
+
+
+// Refactor later
+      {
+        path : 'management/cashier-collections',
+        loadComponent: () => import('./management/cashier-collection/cashier-collection.component').then(c => c.CashierCollectionComponent),
+        data : { breadcrumb : 'Management/Cash Collections'},
+        canActivate : [AuthGuard]
+      },
       
       //Administration Units
       {

@@ -149,7 +149,7 @@ export class ParkingReportComponent {
     ]);
   
     // Add rows dynamically
-    this.registrations.forEach((element) => {
+    this.parkingReports.forEach((element) => {
       // total += parseFloat(element.amount) || 0;
       // discount += parseFloat(element.discount) || 0;
 
@@ -157,18 +157,18 @@ export class ParkingReportComponent {
   
       report.push([
         { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.chassisNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.vehicleType || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.chasisNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.vehicleEquipmentTypeName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.keyStatus || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.registeredDate.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.registeredBy || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.checkedInAt.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.createdBy || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       ]);
     });
   
     // Define document structure
     const docDefinition: any = {
       header: '',
-      pageOrientation: 'landscape',
+      pageOrientation: 'potrait', // landscape for Landscape
       footer: (currentPage: any, pageCount: any) => ({
         text: `${currentPage} of ${pageCount}`,
         alignment: 'center',
@@ -185,7 +185,7 @@ export class ParkingReportComponent {
         {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         {
           table: {
-            widths: [25, 100, 100, 100, 100, 100],
+            widths: [25, 100, 100, 60, 80, 90],
             body: report,
           },
         },
@@ -219,7 +219,9 @@ export interface IParkingReport{
   billingAmount : number
   checkedInAt : string,
   checkedOutAt : string,
-  status : string
+  status : string,
+  keyStatus : string,
+  createdBy : string
 }
 
 

@@ -30,7 +30,8 @@ export class PosReceiptPrinterService {
     var discount : number = 0
     var tax : number = 0
 
-    var address : any = await this.data.getReceiptHeader(receiptNo)
+    //var address : any = await this.data.getReceiptHeader(receiptNo)
+    var address : any = await this.data.getBranchReceiptHeader(receiptNo)
    
     var receipt = [
       [
@@ -125,7 +126,7 @@ export class PosReceiptPrinterService {
               body : [
                 [{text : '=============================='}],
                 [{text : 'Served By : '+ localStorage.getItem('user-name'), fontSize : 9, alignment : 'left'}],
-                [{text : 'Developed By @Orbix Systems', fontSize : 10, bold : true, alignment : 'center'}],
+                [{text : 'Developed By @Davaghana', fontSize : 10, bold : true, alignment : 'center'}],
                 [{text : '***End of Receipt***', fontSize : 9, alignment : 'center'}]
               ]
             }

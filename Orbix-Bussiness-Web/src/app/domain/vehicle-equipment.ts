@@ -21,6 +21,8 @@ export interface IVehicleEquipment {
     vehicleEquipmentColor : string
     vehicleEquipmentTypeName : string
 
+    tformNumber : string
+
     companyId : string
     companyName : string
     branchId : string

@@ -167,7 +167,7 @@ export class VehicleRegistrationReportComponent {
     // Define document structure
     const docDefinition: any = {
       header: '',
-      pageOrientation: 'landscape',
+      pageOrientation: 'potrait',
       footer: (currentPage: any, pageCount: any) => ({
         text: `${currentPage} of ${pageCount}`,
         alignment: 'center',
@@ -184,7 +184,7 @@ export class VehicleRegistrationReportComponent {
         {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         {
           table: {
-            widths: [25, 100, 100, 100, 100, 100],
+            widths: [25, 100, 100, 50, 60, 100],
             body: report,
           },
         },

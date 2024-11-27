@@ -345,3 +345,5 @@ interface IParkingServiceCollection {
     double getDiscount();
     String getCashierName();
 }
+
+

@@ -291,6 +291,7 @@ export class VehicleEquipmentRegisterComponent {
       branchId : this.branchId,
       comments : this.comments,
       hasKeys : this.hasKeys === 'YES' ? 1 : 0,
+      tformNumber : this.tformNumber,
 
       
   }
@@ -394,6 +395,8 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.vehicleEquipmentColor = data.vehicleEquipmentColor
     this.vehicleEquipmentTypeName = data.vehicleEquipmentTypeName
 
+    this.tformNumber = data.tformNumber
+
     this.deviceStatus = data.deviceStatus
     this.active = data.active
     this.companyId = data.companyId
@@ -430,6 +433,8 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.vehicleEquipmentColor = ''
     this.vehicleEquipmentTypeName = ''
     this.active = ''
+
+    this.tformNumber = ''
 
     this.companyId = ''
     this.companyName = ''

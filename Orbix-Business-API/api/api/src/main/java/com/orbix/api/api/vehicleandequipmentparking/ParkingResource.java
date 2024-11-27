@@ -57,6 +57,11 @@ private final ParkingRepository parkingRepository;
 		return ResponseEntity.ok().body(parkingService.getAllCleared(request));
 	}
 	
+	@GetMapping("/parkings/get_today_checked_out")
+	public ResponseEntity<List<ParkingResponseDTO>>getTodayCheckedOut(HttpServletRequest request){
+		return ResponseEntity.ok().body(parkingService.getTodayCheckedOut(request));
+	}
+	
 	
 	@GetMapping("/parkings/get")
 	public ResponseEntity<ParkingResponseDTO>get(
@@ -116,7 +121,7 @@ private final ParkingRepository parkingRepository;
 		
 		try {
 			List<ParkingBillReceivable> rcs = parkingBillReceivableRepository.findAllByParking(p.get());
-			model.setStringData(rcs.get(rcs.size() - 1).getEndedAt().toString());
+			model.setStringData((rcs.get(rcs.size() - 1).getEndedAt().minusDays(1)).toString());
 		}catch(Exception e) {
 			model.setStringData("");
 		}

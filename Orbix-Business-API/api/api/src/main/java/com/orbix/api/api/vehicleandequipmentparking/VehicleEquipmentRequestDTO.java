@@ -15,6 +15,8 @@ public class VehicleEquipmentRequestDTO {
 	private String ownerEmail;
 	private String ownerAddress;
 	
+	private String tformNumber;
+	
 	private String registrationNo;
 	private String chasisNo;
 	private String cardNo;

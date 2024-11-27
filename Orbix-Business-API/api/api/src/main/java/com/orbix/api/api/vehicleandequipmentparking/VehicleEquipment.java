@@ -59,6 +59,8 @@ public class VehicleEquipment {
 	private String vehicleEquipmentName;
 	private String vehicleEquipmentColor;
 	
+	private String tformNumber;
+	
 	
 	private boolean active = true;
 

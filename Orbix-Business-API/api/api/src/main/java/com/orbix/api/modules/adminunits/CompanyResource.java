@@ -18,7 +18,9 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.modules.identityandaccess.UserService;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -29,6 +31,7 @@ import lombok.RequiredArgsConstructor;
 public class CompanyResource {
 	
 	private final CompanyService companyService;
+	private final UserService userService;
 	/**
 	 * 
 	 * @param request
@@ -109,5 +112,44 @@ public class CompanyResource {
 		return ResponseEntity.created(uri).body(companyService.deactivateCompany(companyRequest, request));
 	}
 	
+	@GetMapping("/companies/get_branch_receipt_header_by_user")
+	public ResponseEntity<BranchReceiptHeaderDTO>getBranchReceiptHeaderByUser(HttpServletRequest request){
+		
+		BranchReceiptHeaderDTO receiptHeader = new BranchReceiptHeaderDTO();
+		receiptHeader.setCompanyName("Davaghan");
+		receiptHeader.setBranchName("HQ-Branch");
+		receiptHeader.setAddress("Dar es Salaam");
+		receiptHeader.setLocation("Dar es Salaam");
+		receiptHeader.setEmail("davagan@email.com");
+		receiptHeader.setWebsite("www.davagan.com");
+		receiptHeader.setTin("111-222-333");
+		receiptHeader.setVrn("V-635-647");
+		
+		Branch branch = userService.getUser(request).getBranch();
+		receiptHeader.setCompanyName(branch.getCompany().getBrandName());
+		receiptHeader.setBranchName("Branch:" + branch.getName());
+		receiptHeader.setAddress(branch.getCompany().getPostalAddress());
+		receiptHeader.setLocation(branch.getCompany().getPhysicalAddress());
+		receiptHeader.setEmail(branch.getCompany().getEmail());
+		receiptHeader.setWebsite(branch.getCompany().getWebsite());
+		receiptHeader.setTin("TIN: " + branch.getCompany().getTin());
+		receiptHeader.setVrn("VRN: " + branch.getCompany().getVrn());
+		
+		
+		return ResponseEntity.ok().body(receiptHeader);
+	}
 	
+	
+}
+
+@Data
+class BranchReceiptHeaderDTO {
+	public String companyName;
+	public String branchName;
+	public String address;
+	public String location;
+	public String email;
+	public String website;
+	public String tin;
+	public String vrn;
 }

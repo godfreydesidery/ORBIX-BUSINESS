@@ -21,7 +21,7 @@
                     </div>
                     <div class="col-lg-3">
                         <div class="form-group">
-                            <label class="form-control">Cashier Name</label>
+                            <label class="form-control">Register Name</label>
                             <select class="form-control" [(ngModel)]="nickname">
                                 <option></option>
                                 <option *ngFor="let cashier of userNames">{{cashier}}</option>
@@ -31,8 +31,8 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <br><br>
-                            <button class="btn btn-success" (click)="getRegistationByDate(from, to)">Run</button>
-                            <button class="btn btn-primary btn-round-custom" (click)="print()" style="padding-left: 3px;">Print</button>
+                            <button class="btn btn-outline-success" (click)="getRegistationByDate(from, to)">Run Report</button>
+                            <button class="btn btn-outline-primary btn-round-custom" (click)="print()" style="padding-left: 3px;">Print Report</button>
                         </div>
                     </div>
                 </div>

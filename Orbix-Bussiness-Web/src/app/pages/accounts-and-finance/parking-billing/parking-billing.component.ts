@@ -49,12 +49,127 @@ export class ParkingBillingComponent {
   autoBilling : any = 1
 
   parkingAmount : number
+  ////////////////////////////////////////////
+
+
+  // Parking attributes
+  // parkingId : any = null
+  parkingNo : string = ''
+  parkingBillReceivableId : any = null
+  parkingBillReceivableDescription : string = ''
+  parkingBillReceivableStartingDate : Date | null
+  parkingBillReceivableEndingDate : Date | null
+  parkingBillReceivablePrice : number = 0
+  parkingBillReceivableQty : number = 0
+  parkingBillReceivableDiscount : number = 0
+  parkingBillReceivableAmount : number = 0
+  parkingBillReceivableStatus : string = ''
+
+  // Service attributes
+  serviceBillReceivableId : any = null
+  serviceBillReceivableDate : Date | null
+  serviceBillReceivableDescription : string = ''
+  serviceBillReceivablePrice : number = 0
+  serviceBillReceivableQty : number = 0
+  serviceBillReceivableDiscount : number = 0
+  serviceBillReceivableStatus : string = ''
+  serviceBillReceivableAmount : number = 0
+
+  //Parking and bills Collections attributes
+  parkingBillReceivables : IParkingBillReceivable[] = []
+  // serviceBillReceivables : IServiceBillReceivable[] = []
+  // billReceivables : IBillReceivable[] = []
+  documentHeader: any;
+  invoice: any;
+
+  cash : number = 0
+
+  mpesa : number = 0
+  mpesaRefNo : string = ''
+
+
+  /////////////////////////////////////////////
+
+
+  // Owner information
+  ownerFirstName: string = ''
+  ownerMiddleName: string = ''
+  ownerLastName: string = ''
+  ownerCompanyName: string = ''
+  ownerIdNo: string = ''
+  ownerIdType: string = ''
+  ownerPhoneNo: string = ''
+  ownerEmail: string = ''
+  ownerAddress: string = ''
+
+  // Agent Information
+  agentName: string = ''
+  agentAddress: string = ''
+  agentPhoneNo: string = ''
+  agentEmail: string = ''
+  tformNumber: string = ''
+
+  // Vehicle or Equipment Information
+  registrationNo: string = ''
+  chasisNo: string = ''
+  leftFrontLamp: string = ''
+  rightFrontLamp: string = ''
+  leftRearLamp: string = ''
+  rightRearLamp: string = ''
+  leftSideMirror: string = ''
+  rightSideMirror: string = ''
+  leftWiper: string = ''
+  rightWiper: string = ''
+  backWiper: string = ''
+  fuelCap: string = ''
+  spareTire: string = ''
+  battery: string = ''
+  starter: string = ''
+  aerial: string = ''
+  wheelCap: string = ''
+  roundMirror: string = ''
+  tireIndicator: string = ''
+  hasKeys : string = ''
+
+  color : string = ''
+
+  validUntilDate : Date | null = new Date()
+
+  comments : string = ''
+
+  cardNo : string = ''
+
+  vehicleEquipmentCategory : string = ''
+
+  billingAmount : number = 0
+  //image: Byte[]
+
+  status: string = "PENDING"
+
+  
+
+  startBillingAt : Date | null
+
+
+  vehicleEquipmentTypeId: any = ''
+  vehicleEquipmentTypeName : string = ''
+  branchId: any = ''
+  companyId: any = ''
+
+  parkingZoneName : string = ''
+
+
+
+
+
+  ////////////////////////////////////////
+
 
 
 
   /**Collections */
   parkings : IParking[] = []
-  parkingBillReceivables : IParkingBillReceivable[] = []
+  // parkingBillReceivables : IParkingBillReceivable[] = []
 
   constructor(
     private http :HttpClient,
@@ -198,6 +313,143 @@ export class ParkingBillingComponent {
       queryParams: { parking_id: parkingId}
     });
 
+  }
+
+  async get(id : any){
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    await this.http.get<IParking>(API_URL+'/parkings/get?id=' + id, options)
+    .toPromise()
+    .then(
+      data => {
+        this.startBillingAt = null
+        this.showParkingData(data!)
+        console.log(data)
+      }
+    )
+  }
+
+  showParkingData(data : IParking){
+
+    this.parkingId = data?.id
+    this.parkingNo = data?.no
+
+    this.ownerFirstName = data?.ownerFirstName;
+    this.ownerMiddleName = data?.ownerMiddleName;
+    this.ownerLastName = data?.ownerLastName;
+    this.ownerCompanyName = data?.ownerCompanyName;
+    this.ownerIdNo = data?.ownerIdNo;
+    this.ownerIdType = data?.ownerIdType;
+    this.ownerPhoneNo = data?.ownerPhoneNo;
+    this.ownerEmail = data?.ownerEmail;
+    this.ownerAddress = data?.ownerAddress;
+
+    // Agent Information
+    this.agentName = data?.agentName;
+    this.agentAddress = data?.agentAddress;
+    this.agentPhoneNo = data?.agentPhoneNo;
+    this.agentEmail = data?.agentEmail;
+    this.tformNumber = data?.tformNumber;
+
+    this.billingType = data?.billingType
+    this.billingAmount = data?.billingAmount
+
+    // Vehicle or Equipment Information
+    this.registrationNo = data?.registrationNo;
+    this.chasisNo = data?.chasisNo;
+    this.leftFrontLamp = data?.leftFrontLamp == true ? 'YES' : 'NO'
+    this.rightFrontLamp = data?.rightFrontLamp == true ? 'YES' : 'NO'
+    this.leftRearLamp = data?.leftRearLamp == true ? 'YES' : 'NO'
+    this.rightRearLamp = data?.rightRearLamp == true ? 'YES' : 'NO'
+    this.leftSideMirror = data?.leftSideMirror == true ? 'YES' : 'NO'
+    this.rightSideMirror = data?.rightSideMirror == true ? 'YES' : 'NO'
+    this.leftWiper = data?.leftWiper == true ? 'YES' : 'NO'
+    this.rightWiper = data?.rightWiper == true ? 'YES' : 'NO'
+    this.backWiper = data?.backWiper == true ? 'YES' : 'NO'
+    this.fuelCap = data?.fuelCap == true ? 'YES' : 'NO'
+    this.spareTire = data?.spareTire == true ? 'YES' : 'NO'
+    this.battery = data?.battery == true ? 'YES' : 'NO'
+    this.starter = data?.starter == true ? 'YES' : 'NO'
+    this.aerial = data?.aerial == true ? 'YES' : 'NO'
+    this.wheelCap = data?.wheelCap == true ? 'YES' : 'NO'
+    this.roundMirror = data?.roundMirror == true ? 'YES' : 'NO'
+    this.tireIndicator = data?.tireIndicator == true ? 'YES' : 'NO'
+    this.hasKeys = data?.hasKeys == true ? 'YES' : 'NO'
+    this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName,
+
+    this.vehicleEquipmentCategory = data!.vehicleEquipmentCategory
+
+    this.parkingZoneName = data!.parkingZoneName,
+     this.cardNo = data!.cardNo
+
+     this.billingType = data!.billingType
+
+     this.status = data!.status
+
+     this.color = data!.vehicleEquipmentColor
+
+     this.validUntilDate = null
+
+     this.comments = '' // check this
+
+  }
+
+  clearParkingData(){
+    this.parkingId = null
+    this.parkingNo = ''
+    this.ownerFirstName = ''
+    this.ownerMiddleName = ''
+    this.ownerLastName = ''
+    this.ownerCompanyName = ''
+    this.ownerIdNo = ''
+    this.ownerIdType = ''
+    this.ownerPhoneNo = ''
+    this.ownerEmail = ''
+    this.ownerAddress = ''
+
+    // Agent Information
+    this.agentName = ''
+    this.agentAddress = ''
+    this.agentPhoneNo = ''
+    this.agentEmail = ''
+    this.tformNumber = ''
+
+    this.billingType = ''
+    this.billingAmount = 0
+
+    // Vehicle or Equipment Information
+    this.registrationNo = ''
+    this.chasisNo = ''
+    this.leftFrontLamp = ''
+    this.rightFrontLamp = ''
+    this.leftRearLamp = ''
+    this.rightRearLamp = ''
+    this.leftSideMirror = ''
+    this.rightSideMirror = ''
+    this.leftWiper = ''
+    this.rightWiper = ''
+    this.backWiper = ''
+    this.fuelCap = ''
+    this.spareTire = ''
+    this.battery = ''
+    this.starter = ''
+    this.aerial = ''
+    this.wheelCap = ''
+    this.roundMirror = ''
+    this.tireIndicator = ''
+    this.vehicleEquipmentTypeName = ''
+
+    this.vehicleEquipmentCategory = ''
+
+    this.parkingZoneName = ''
+
+    this.hasKeys = ''
+
+    this.billingType = ''
+
+    this.color = ''
   }
 
 }

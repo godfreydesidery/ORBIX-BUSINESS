@@ -185,6 +185,7 @@ public class ReportResource {
 			parkingResponse.setChasisNo(parking.getChasisNo());
 			parkingResponse.setTformNumber(parking.getTformNumber());
 			parkingResponse.setDeviceStatus(parking.isDeviceStatus() ? "YES" : "NO");
+			parkingResponse.setKeyStatus(parking.isDeviceStatus() ? "YES" : "NO");
 			parkingResponse.setBillingAmount(String.valueOf(parking.getBillingAmount()));
 			parkingResponse.setCheckedInAt(
 				    Optional.ofNullable(parking.getCheckedInDateTime())
@@ -198,6 +199,8 @@ public class ReportResource {
 				);
 			parkingResponse.setSn(String.valueOf(sn));
 			parkingResponse.setStatus(parking.getStatus());
+			parkingResponse.setCreatedBy(parking.getCreatedByUser().getNickname());
+			
 			parkingResponses.add(parkingResponse);
 			sn++;
 			

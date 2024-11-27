@@ -1,6 +1,7 @@
 package com.orbix.api.api.vehicleandequipmentparking;
 
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
@@ -97,6 +98,52 @@ public class ParkingServiceController implements ParkingService {
 		statuses.add("CHECKED-IN");
 		
 		List<Parking> parkings = parkingRepository.findAllByStatusIn(statuses);
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+
+		for(Parking parking : parkings) {
+			
+			boolean cleared = true;
+			
+			List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
+			if(!parkingBillReceivables.isEmpty() && cleared == true) {
+				for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
+					if(!parkingBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
+						cleared = false;
+						break;
+					}
+				}
+			}
+			
+			List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking);
+			if(!parkingServiceBillReceivables.isEmpty() && cleared == true) {
+				for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
+					if(!parkingServiceBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
+						cleared = false;
+						break;
+					}
+				}
+			}
+			
+			
+			if(cleared) parkingResponses.add(parkingResponseDTOMapper(parking));	
+							
+		}		
+		return parkingResponses;
+	}
+	
+	@Override
+	public List<ParkingResponseDTO> getTodayCheckedOut(HttpServletRequest request) {
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-OUT");
+		
+		// Calculate the range
+		LocalDateTime startOfToday = LocalDateTime.now().minusDays(1).with(LocalTime.MAX);
+		LocalDateTime endOfYesterday = LocalDateTime.now().plusDays(1).with(LocalTime.MIN);
+
+		List<Parking> parkings = parkingRepository.findAllByStatusInAndCheckedOutDateTimeBetween(statuses, startOfToday, endOfYesterday);
+		
+		//List<Parking> parkings = parkingRepository.findAllByStatusInAndCheckedOutBetween(statuses, LocalDateTime.now().);
 		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
 
 		for(Parking parking : parkings) {

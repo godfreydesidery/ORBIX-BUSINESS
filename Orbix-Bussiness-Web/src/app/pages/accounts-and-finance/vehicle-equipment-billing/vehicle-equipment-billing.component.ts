@@ -38,6 +38,7 @@ export class VehicleEquipmentBillingComponent {
 
   // Parking attributes
   parkingId : any = null
+  parkingNo : string = ''
   parkingBillReceivableId : any = null
   parkingBillReceivableDescription : string = ''
   parkingBillReceivableStartingDate : Date | null
@@ -567,6 +568,7 @@ export class VehicleEquipmentBillingComponent {
     this.serviceBillReceivableDate = null
     this.serviceBillReceivableDescription = ''
     this.serviceBillReceivableAmount = 0
+    this.serviceBillReceivablePrice = 0
     this.serviceBillReceivableQty = 0
     this.serviceBillReceivableDiscount = 0
   }
@@ -678,7 +680,8 @@ export class VehicleEquipmentBillingComponent {
     var discount : number = 0
     var tax : number = 0
 
-    var address : any = await this.data.getReceiptHeader(receiptNo)
+    //var address : any = await this.data.getReceiptHeader(receiptNo)
+    var address : any = await this.data.getBranchReceiptHeader(receiptNo)
    
     var receipt = [
       [
@@ -842,6 +845,9 @@ export class VehicleEquipmentBillingComponent {
   ///////////////////////////////////////
   showParkingData(data : IParking){
 
+    this.parkingId = data?.id
+    this.parkingNo = data?.no
+
     this.ownerFirstName = data?.ownerFirstName;
     this.ownerMiddleName = data?.ownerMiddleName;
     this.ownerLastName = data?.ownerLastName;
@@ -903,6 +909,8 @@ export class VehicleEquipmentBillingComponent {
   }
 
   clearParkingData(){
+    this.parkingId = null
+    this.parkingNo = ''
     this.ownerFirstName = ''
     this.ownerMiddleName = ''
     this.ownerLastName = ''
@@ -975,7 +983,8 @@ export class VehicleEquipmentBillingComponent {
     var discount : number = 0
     var tax : number = 0
 
-    var address : any = await this.data.getReceiptHeader(receiptNo)
+    // var address : any = await this.data.getReceiptHeader(receiptNo)
+    var address : any = await this.data.getBranchReceiptHeader(receiptNo)
    
     var receipt = [
       [
@@ -1099,7 +1108,7 @@ export class VehicleEquipmentBillingComponent {
 
 
 
-
+  
 
 }
 

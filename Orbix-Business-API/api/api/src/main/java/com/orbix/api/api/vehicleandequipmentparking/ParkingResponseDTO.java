@@ -53,6 +53,7 @@ public class ParkingResponseDTO {
 	String tireIndicator;
 	String hasKeys;
 	String deviceStatus;
+	String keyStatus;
 	Byte[] image;
 	
 	String comments;

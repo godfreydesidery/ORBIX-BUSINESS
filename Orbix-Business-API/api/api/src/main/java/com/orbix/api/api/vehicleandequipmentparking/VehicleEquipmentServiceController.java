@@ -161,6 +161,7 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		vehicleEquipment.setRegistrationNo(vehicleEquipmentRequest.getRegistrationNo());
 		vehicleEquipment.setChasisNo(vehicleEquipmentRequest.getChasisNo());
 		vehicleEquipment.setCardNo(vehicleEquipmentRequest.getCardNo());
+		vehicleEquipment.setTformNumber(vehicleEquipmentRequest.getTformNumber());
 		//vehicleEquipment.setImage(vehicleEquipmentRequest.getImage());
 		vehicleEquipment.setActive(true);
 		vehicleEquipment.setVehicleEquipmentColor(vehicleEquipmentRequest.getVehicleEquipmentColor());
@@ -200,6 +201,8 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		parkingRequest.setVehicleEquipmentId(vehicleEquipment.getId());
 		
 		parkingRequest.setChasisNo(vehicleEquipment.getChasisNo());
+		
+		parkingRequest.setTformNumber(vehicleEquipment.getTformNumber());
 		
 		parkingRequest.setVehicleEquipmentColor(vehicleEquipment.getVehicleEquipmentColor());
 			
@@ -265,6 +268,7 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		vehicleEquipment.setRegistrationNo(vehicleEquipmentRequest.getRegistrationNo());
 		vehicleEquipment.setChasisNo(vehicleEquipmentRequest.getChasisNo());
 		vehicleEquipment.setCardNo(vehicleEquipmentRequest.getCardNo());
+		vehicleEquipment.setTformNumber(vehicleEquipmentRequest.getTformNumber());
 		//vehicleEquipment.setImage(vehicleEquipmentRequest.getImage());
 				
 		vehicleEquipment = vehicleEquipmentRepository.save(vehicleEquipment);
@@ -292,6 +296,8 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		vehicleEquipmentResponse.setChasisNo(vehicleEquipment.getChasisNo());
 		vehicleEquipmentResponse.setCardNo(vehicleEquipment.getCardNo());
 		vehicleEquipmentResponse.setVehicleEquipmentColor(vehicleEquipment.getVehicleEquipmentColor());
+		
+		vehicleEquipmentResponse.setTformNumber(vehicleEquipment.getTformNumber());
 		
 		//vehicleEquipment.setImage(vehicleEquipmentRequest.getImage());
 
