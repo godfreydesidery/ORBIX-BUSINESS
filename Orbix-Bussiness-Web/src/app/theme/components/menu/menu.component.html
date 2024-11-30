@@ -2,7 +2,13 @@
     <ul class="nav nav-sidebar flex-column">
         <ng-scrollbar pointerEventsMethod="scrollbar" orientation="vertical">
             @for (item of menuItems; track $index) { 
-                <li class="sidebar-list-item">
+                <li class="sidebar-list-item" *ngIf="item.show === true">
+
+                    <!-- @if (item.visible === false) {
+                        
+                    } -->
+
+
                     @if (!item.routerLink && !item.subMenu) {
                         <a [attr.href]="item.url || ''" [attr.target]="item.target || ''" (mouseenter)="hoverItem($event, item)"  class="sidebar-list-link">
                             <i class="fa {{ item.icon }}"></i><span>{{ item.title }}</span>

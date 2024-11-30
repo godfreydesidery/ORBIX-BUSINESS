@@ -1,3 +1,9 @@
+import { JwtHelperService } from "@auth0/angular-jwt";
+import { DataService } from "@services/custom/data.service";
+
+
+import { AuthService } from "src/app/auth.service";
+
 export const menuItems = [
     /*{
         title: 'Dashboard',
@@ -264,6 +270,7 @@ export const menuItems = [
         icon: 'fa-home',
         selected: false,
         expanded: false,
+        show : true,
         order: 0,        
     },
     {
@@ -272,6 +279,7 @@ export const menuItems = [
         icon: 'fa-keyboard-o',
         selected: false,
         expanded: false,
+        show : grant(['RCPTN-ACCESS']),
         order: 100,
         subMenu: [
             {
@@ -289,11 +297,7 @@ export const menuItems = [
                     {
                         title: 'Vehicle Registration',
                         routerLink: '/app/management/vehicle-registration-report'
-                    },
-                    {
-                        title: 'Cashier Collections',
-                        routerLink: '/app/management/cashier-collections'
-                    }, 
+                    } 
                 ]
             }
 
@@ -362,6 +366,7 @@ export const menuItems = [
         icon: 'fa-money',
         selected: false,
         expanded: false,
+        show : grant(['FINC-ACCESS']),
         order: 100,
         subMenu: [
             // {
@@ -390,6 +395,16 @@ export const menuItems = [
                 title: 'Release Vehicles',
                 routerLink: '/app/accounts-and-finance/release-vehicle-equipment'
             },
+            {
+                title: 'Reports',
+                url: '#',
+                subMenu: [
+                    {
+                        title: 'Cashier Collections',
+                        routerLink: '/app/management/cashier-collections'
+                    }, 
+                ]
+            }
         ]
     },
 
@@ -398,6 +413,7 @@ export const menuItems = [
         icon: 'fa-cogs',
         selected: false,
         expanded: false,
+        show : grant(['SHOP-ACCESS']),
         order: 700,
         subMenu: [
             {
@@ -430,6 +446,7 @@ export const menuItems = [
         icon: 'fa-money',
         selected: false,
         expanded: false,
+        show : grant(['PRCMT-ACCESS']),
         order: 100,
         subMenu: [
             {
@@ -452,7 +469,8 @@ export const menuItems = [
         icon: 'fa-money',
         selected: false,
         expanded: false,
-        order: 200,
+        show : grant(['MNGNT-ACCESS']),
+        order: 700,
         subMenu: [
             {
                 title: 'Management Board',
@@ -495,6 +513,7 @@ export const menuItems = [
         icon: 'fa-cogs',
         selected: false,
         expanded: false,
+        show : grant(['ADMIN-ACCESS']),
         order: 700,
         subMenu: [
             {
@@ -582,6 +601,7 @@ export const menuItems = [
         icon: 'fa-wrench',
         selected: false,
         expanded: false,
+        show : true,
         order: 100,
         subMenu: [
             {
@@ -591,3 +611,61 @@ export const menuItems = [
         ]
     },
 ];
+
+// export function grant(privilege: string[]): boolean {
+//     /** Allow user to perform an action if the user has that privilege */
+//     let granted: boolean = false;
+//     privilege.forEach(element => {
+//         console.log(element)
+        
+
+//         var granted : boolean = false
+//         let currentUser : {
+//         username : string, 
+//         access_token : string, 
+//         refresh_token : string
+//         } = JSON.parse(localStorage.getItem('current-user')!)
+//         var privs : {
+//             privileges : string[]
+//             } = (new JwtHelperService()).decodeToken(currentUser.access_token)! 
+//             console.log(privs)
+
+//         for(let i = 0; i < privs.privileges.length; i++){
+//             if(privs.privileges[i] === element){
+//                 return true
+//             }
+//         }
+//         return granted
+//     })
+//     return granted
+// }
+
+
+
+
+export function grant(privileges: string[]): boolean {
+    /** Allow user to perform an action if the user has that privilege */
+    
+    const currentUser = JSON.parse(localStorage.getItem('current-user')!);
+    if (!currentUser || !currentUser.access_token) {
+        console.error('No valid user or access token found.');
+        return false;
+    }
+
+    const decodedToken = new JwtHelperService().decodeToken(currentUser.access_token);
+    if (!decodedToken || !decodedToken.privileges) {
+        console.error('No privileges found in the token.');
+        return false;
+    }
+
+    const userPrivileges = decodedToken.privileges as string[];
+
+    // Check if any of the required privileges exist in the user's privileges
+    return privileges.some(privilege => userPrivileges.includes(privilege));
+}
+
+
+
+
+
+

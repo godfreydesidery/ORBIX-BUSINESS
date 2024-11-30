@@ -256,11 +256,11 @@ export class CashierCollectionComponent {
 
 
 
-  printParkingCollectionReport1 = async () => {
+  printCashierCollectionReport = async () => {
     this.documentHeader = await this.data.getDocumentHeader()
     var header = ''
     var footer = ''
-    var title  = 'Parking Collection Report'
+    var title  = 'Cashier Collection Report'
     const from = this.from?.toString();
     const to = this.to?.toString();
     var logo : any = ''
@@ -279,6 +279,7 @@ export class CashierCollectionComponent {
       { text: 'Vehicle Type', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Qty', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Service Type', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Pay Code', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Cashier Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
     ]);
@@ -286,10 +287,10 @@ export class CashierCollectionComponent {
     // Add rows dynamically
 
 
-    this.cashierCollections.forEach((element) => {
+    this.cashierCollections.forEach(element => {
       total += Number(element.amount) || 0;
 
-      const detail = [
+      report.push([
         { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.chasisNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.vehicleEquipmentTypeName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
@@ -298,25 +299,20 @@ export class CashierCollectionComponent {
         { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
         { text: element.payCode || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-      ];
-
-      report.push(detail);
-    });
+      ])
+    })
     
-    var detailSummary = [
-
+    report.push([
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-      { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-      { text: 'Total', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-      { text: (Number(total) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+      { text: 'Total', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: (Number(total) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: true },
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },        
-    ]
-    report.push(detailSummary)
-    
+    ])
+
     const docDefinition : any = {
       header: '',
       pageOrientation: 'potrait', // Set the orientation to landscape
@@ -327,38 +323,19 @@ export class CashierCollectionComponent {
         content : [
           {
             columns : 
-            //[
+            [
               this.documentHeader
-            //]
+            ]
           },
-          {text : ' '},
-        {text : ' '},
         {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-        {text: from , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-        {text: to , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-
-          
-         
-          // {text : title, fontSize : 12, bold : true},
-          '  ',
-          {
-            layout : 'noBorders',
-            table : {
-              widths : [75, 300],
+        {text: 'From: '+ from + ' To: ' + to , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {
+          //layout : 'noBorders',
+          table : {
+              headerRows : 1,
+              widths : [20, 50, 80, 20, 50, 60, 50, 100],                
               body : report
-            }
-               
-              
-          },
-          '  ',
-          {
-            layout : 'noBorders',
-            table : {
-                headerRows : 1,
-                widths : [100, 100, 100, 100, 100, 100, 100, 100, 100],
-                
-                body : report
-            }
+          }
         },                   
       ]     
     };
