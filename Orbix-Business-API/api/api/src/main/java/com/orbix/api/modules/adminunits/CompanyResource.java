@@ -139,11 +139,50 @@ public class CompanyResource {
 		return ResponseEntity.ok().body(receiptHeader);
 	}
 	
+	@GetMapping("/companies/get_branch_report_header_by_user")
+	public ResponseEntity<BranchReportHeaderDTO>getBranchReportHeaderByUser(HttpServletRequest request){
+		
+		BranchReportHeaderDTO header = new BranchReportHeaderDTO();
+		header.setCompanyName("Davaghan");
+		header.setBranchName("HQ-Branch");
+		header.setAddress("Dar es Salaam");
+		header.setLocation("Dar es Salaam");
+		header.setEmail("davagan@email.com");
+		header.setWebsite("www.davagan.com");
+		header.setTin("111-222-333");
+		header.setVrn("V-635-647");
+		
+		Branch branch = userService.getUser(request).getBranch();
+		header.setCompanyName(branch.getCompany().getBrandName());
+		header.setBranchName("Branch:" + branch.getName());
+		header.setAddress(branch.getCompany().getPostalAddress());
+		header.setLocation(branch.getCompany().getPhysicalAddress());
+		header.setEmail(branch.getCompany().getEmail());
+		header.setWebsite(branch.getCompany().getWebsite());
+		header.setTin("TIN: " + branch.getCompany().getTin());
+		header.setVrn("VRN: " + branch.getCompany().getVrn());
+		
+		
+		return ResponseEntity.ok().body(header);
+	}
+	
 	
 }
 
 @Data
 class BranchReceiptHeaderDTO {
+	public String companyName;
+	public String branchName;
+	public String address;
+	public String location;
+	public String email;
+	public String website;
+	public String tin;
+	public String vrn;
+}
+
+@Data
+class BranchReportHeaderDTO {
 	public String companyName;
 	public String branchName;
 	public String address;

@@ -469,6 +469,11 @@ public class ParkingServiceController implements ParkingService {
 		parkingResponse.setVehicleEquipmentCategory(parking.getVehicleEquipmentCategory());
 		parkingResponse.setVehicleEquipmentName(parking.getVehicleEquipmentName());
 		parkingResponse.setVehicleEquipmentColor(parking.getVehicleEquipmentColor());
+		parkingResponse.setBillingStartAt(
+			    Optional.ofNullable(parking.getStartBillingAt())
+			            .map(Object::toString)
+			            .orElse("")
+			);
 		
 				
 		parkingResponse.setParkingZoneName(

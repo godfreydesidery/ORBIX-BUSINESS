@@ -293,8 +293,15 @@ export class VehicleEquipmentRegisterComponent {
       hasKeys : this.hasKeys === 'YES' ? 1 : 0,
       tformNumber : this.tformNumber,
 
+      agentName : this.agentName,
+      agentPhoneNo : this.agentPhoneNo,
+      agentEmail : this.agentEmail,
+      agentAddress : this.agentAddress,
+      deviceStatus : this.deviceStatus === 'YES' ? 1 : 0
+
       
   }
+
 
   if(this.ownerIdType != 'NONE' && this.ownerIdType === ''){
     this.msg.showErrorMessage3('ID No is required')
@@ -397,6 +404,11 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
     this.tformNumber = data.tformNumber
 
+    this.agentName = data.agentName
+    this.agentPhoneNo = data.agentPhoneNo
+    this.agentEmail = data.agentEmail
+    this.agentAddress = data.agentAddress
+
     this.deviceStatus = data.deviceStatus
     this.active = data.active
     this.companyId = data.companyId
@@ -435,6 +447,11 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.active = ''
 
     this.tformNumber = ''
+
+    this.agentName = ''
+    this.agentPhoneNo = ''
+    this.agentEmail = ''
+    this.agentAddress = ''
 
     this.companyId = ''
     this.companyName = ''

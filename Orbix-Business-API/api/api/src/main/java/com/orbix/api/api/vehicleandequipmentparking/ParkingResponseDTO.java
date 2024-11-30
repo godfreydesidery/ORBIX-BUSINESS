@@ -87,6 +87,7 @@ public class ParkingResponseDTO {
     
     String billingType;
     String billingAmount;
+    String billingStartAt;
     
     List<ServiceBillItem> serviceBillItems;
 }

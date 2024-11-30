@@ -17,10 +17,18 @@ public class VehicleEquipmentRequestDTO {
 	
 	private String tformNumber;
 	
+	/**Agent Information*/
+	String agentName;
+	String agentAddress;
+	String agentPhoneNo;
+	String agentEmail;
+	
 	private String registrationNo;
 	private String chasisNo;
 	private String cardNo;
 	private Byte[] image;
+	
+	private boolean deviceStatus;
 		
 	private String vehicleEquipmentTypeName;
 	

@@ -76,6 +76,34 @@
                                 </div>
                             </div> -->
                         </div>
+                        <h6>Agent Information</h6><hr>
+                        <div class="row">
+                            <input type="hidden" [(ngModel)]="id">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Agent Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="agentName" autocomplete="nope">
+                                </div>
+                            </div>      
+                            <!-- <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Agent Address</label>
+                                    <input class="form-control" type="text" [(ngModel)]="agentAddress" autocomplete="nope">
+                                </div>
+                            </div>  -->
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Agent Phone</label>
+                                    <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo" autocomplete="nope">
+                                </div>
+                            </div>   
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Agent Email</label>
+                                    <input class="form-control" type="email" [(ngModel)]="agentEmail" autocomplete="nope">
+                                </div>
+                            </div>
+                        </div>
                         <p><b>Vehicle Information</b></p><br>
                         <div class="row">
                             <!-- <div class="col-lg-3">

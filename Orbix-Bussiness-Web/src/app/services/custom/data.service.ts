@@ -3,7 +3,7 @@ import { Byte } from 'src/custom-packages/util';
 import { Injectable } from '@angular/core';
 import { DomSanitizer } from '@angular/platform-browser';
 //import { NgxSpinnerService } from 'ngx-spinner';
-import { finalize } from 'rxjs';
+import { finalize, lastValueFrom } from 'rxjs';
 import { environment } from 'src/environments/environment';
 //import { ICompanyProfile } from '../domain/company';
 import { AuthService } from 'src/app/auth.service';
@@ -161,17 +161,17 @@ export class DataService {
       data => {
 
         this.companyId        = ''
-        this.companyName      = 'Davagan'
-        this.contactName      = ''
-        this.tin              = 'NA'
-        this.vrn              = 'NA'
+        this.companyName      = 'SIGHMAN SAFARI HAULAGE LTD'
+        this.contactName      = 'STANSLAUS MTANDI'
+        this.tin              = '121-047-810'
+        this.vrn              = '40027099P'
         this.physicalAddress  = 'Dar es Salaam, TZ'
         this.postCode         = ''
         this.postAddress      = 'Dar es Salaam, TZ'
-        this.telephone        = ''
-        this.mobile           = ''
-        this.email            = ''
-        this.website          = 'www.davagan.net'
+        this.telephone        = '255716516888'
+        this.mobile           = '255716516888'
+        this.email            = 'sighmansafariltd@gmail.com'
+        this.website          = 'www.sighmansafariltd.co.tz'
         this.fax              = ''
 
 
@@ -246,19 +246,18 @@ export class DataService {
     )
 
     this.companyId        = ''
-    this.companyName      = 'Davagan'
-    this.contactName      = ''
-    this.tin              = 'NA'
-    this.vrn              = 'NA'
+    this.companyName      = 'SIGHMAN SAFARI HAULAGE LTD'
+    this.contactName      = 'STANSLAUS MTANDI'
+    this.tin              = '121-047-810'
+    this.vrn              = '40027099P'
     this.physicalAddress  = 'Dar es Salaam, TZ'
-    this.postCode         = 'DSM'
+    this.postCode         = ''
     this.postAddress      = 'Dar es Salaam, TZ'
-    this.telephone        = ''
-    this.mobile           = ''
-    this.email            = ''
-    this.website          = 'www.davagan.net'
+    this.telephone        = '255716516888'
+    this.mobile           = '255716516888'
+    this.email            = 'sighmansafariltd@gmail.com'
+    this.website          = 'www.sighmansafariltd.co.tz'
     this.fax              = ''
-
 
     return company
   }
@@ -369,6 +368,172 @@ export class DataService {
       return null;
     }
   }
+
+
+
+
+
+
+
+
+
+
+  async getDocumentHeader11() {
+    try {
+      const options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token),
+      };
+  
+      // Fetch logo
+      const logoBase64 = await this.getLogo();
+      const logo = logoBase64
+        ? { image: logoBase64, width: 70, absolutePosition: { x: 40, y: 40 } }
+        : { text: '', width: 70, height: 70, absolutePosition: { x: 40, y: 40 } };
+  
+      // Fetch branch report header data
+      const data = await lastValueFrom(
+        this.http.get<IBranchReportHeader>(
+          `${API_URL}/companies/get_branch_receipt_header_by_user`,
+          options
+        )
+      );
+  
+      if (data) {
+        // Extract and format data with fallbacks
+        const cName = data.companyName || 'Company Name';
+        const cPostalAddress = 'P.O. Box ..'; // Placeholder; replace with API data if available
+        const cPhysicalAddress = data.address || 'Physical Address';
+        const cTelephone =  '';
+        const cEmail = data.email || 'email@example.com';
+        const cWebsite = data.website || 'www.example.com';
+        const tin = `TIN: ${data.tin || 'N/A'}`;
+        const vrn = `VRN: ${data.vrn || 'N/A'}`;
+  
+        // Address structure
+        const address = [
+          { text: cName, fontSize: 18, bold: true, alignment: 'center' },
+          {
+            table: {
+              headerRows: 0,
+              widths: ['100%'],
+              body: [[{ text: '.', fontSize: 9, fillColor: '#546f9c', height: 30 }]],
+            },
+            layout: 'headerLineOnly',
+          },
+          {
+            text: `${cPhysicalAddress} ${cPostalAddress} ${cTelephone} ${cEmail} ${cWebsite}`,
+            fontSize: 9,
+            alignment: 'center',
+          },
+        ];
+  
+        // Document header
+        const header: any = {
+          columns: [
+            logo,
+            { width: 10, columns: [[]] },
+            {
+              width: 400,
+              columns: [address],
+            },
+          ],
+        };
+  
+        return header;
+      } else {
+        console.log('No data received from API.');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching document header:', error);
+      return null;
+    }
+  }
+
+
+
+
+
+
+
+
+
+  
+
+
+  async getDocumentHeaderLandScape11(){
+
+    const options = {
+      headers: new HttpHeaders().set('Authorization','Bearer ' + this.auth.user.access_token),
+    }
+
+    var logo : any = await this.getLogo()
+
+    if(logo == ''){
+      logo = { text : '', width : 70, height : 70, absolutePosition : {x : 40, y : 40}}
+    }else{
+      logo = {image : logo, width : 70, absolutePosition : {x : 40, y : 40}}
+    }
+
+    const data = await this.http.get<IBranchReportHeader>(API_URL + '/companies/get_branch_receipt_header_by_user',options)
+    .toPromise()
+    .then(
+      data => {
+        var cName = data!.companyName
+        var cPostalAddress = 'P.O. Box ..'
+        var cPhysicalAddress = data!.address
+        var cTelephone = ''
+        var cMobile = ''
+        var cFax = ''
+        var cEmail = data!.email
+        var cWebsite = data!.website
+        var tin = 'TIN: '+data!.tin
+        var vrn = 'VRN: '+data!.vrn
+
+
+        var address = [
+          {text : cName, fontSize : 18, bold : true, alignment : 'center'},
+          {table : {
+            headerRows : 0,
+            widths: ['100%'],
+            body : [[{text : '.', fontSize : 9, fillColor : '#546f9c', height : 30}]]
+          },
+          layout : 'headerLineOnly'},
+          {text : cPhysicalAddress + ' ' + cPostalAddress + ' ' + cTelephone + ' ' + cEmail + ' ' + cWebsite, fontSize : 9,  alignment : 'center'},
+        ]
+    
+        var header : any = {
+          columns : 
+          [
+            logo,
+            {width : 10, columns : [[]]},
+            {
+              width : 400,
+              columns : [
+                address
+              ]
+            },
+          ]
+        }
+
+
+
+        
+      }
+    )
+        
+          
+          
+        
+
+
+    
+
+    
+  }
+
+
+  
   
 
   
@@ -543,6 +708,17 @@ export interface ICompany{
 } 
 
 export interface IBranchReceiptHeader{
+  companyName : string
+  branchName : string
+  address : string
+  location : string
+  email : string
+  website : string
+  tin : string
+  vrn : string
+}
+
+export interface IBranchReportHeader{
   companyName : string
   branchName : string
   address : string

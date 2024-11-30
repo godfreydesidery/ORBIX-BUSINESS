@@ -53,6 +53,7 @@ export interface IParking {
 
     billingType : string
     billingAmount : number
+    billingStartAt : string
 
     status: "PENDING",
 
