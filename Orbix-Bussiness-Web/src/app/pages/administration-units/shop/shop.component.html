@@ -1,149 +1,97 @@
 
 
-<div class="row">
-
-   
-
-    <div class="col-xl-12 col-lg-12 col-12 bottom-30">
-        <div widget class="card">
-            <div class="card-header">
-                <span>Company Registration</span>
-                
-            </div>
-            <div class="card-body widget-body">
-
-                <div class="row">
-                    <div class="col-lg-4">
-                        <div class="form-group">
-                            <label>Company Code</label>
-                            <input class="form-control" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label>Company Name</label>
-                            <input class="form-control" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label>Brand Name</label>
-                            <input class="form-control" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label>Contact Name</label>
-                            <input class="form-control" type="text">
-                        </div>
-
-                    </div>
-                    <div class="col-lg-4">
-
-                        <div class="form-group">
-                            <label>Email</label>
-                            <input class="form-control" type="email">
-                        </div>
-                        <div class="form-group">
-                            <label>Phone No</label>
-                            <input class="form-control" type="tel">
-                        </div>
-                        <div class="form-group">
-                            <label>Address</label>
-                            <input class="form-control" type="text">
-                        </div>
-
-                    </div>
-                    <div class="col-lg-4">
-
-                        <div class="form-group">
-                            <label>Username</label>
-                            <input class="form-control" type="text">
-                        </div>
-                        <div class="form-group">
-                            <label>Password</label>
-                            <input class="form-control" type="password">
-                        </div>
-                        <div class="form-group">
-                            <label>Confirm Password</label>
-                            <input class="form-control" type="password">
-                        </div>
-
-                        <div class="form-group row">
-                            <div class="col-sm-9 ml-sm-auto d-flex justify-content-between">
-                                <div class="custom-control custom-checkbox">
-                                    <input type="checkbox" class="custom-control-input checkbox-main" id="checkbox-h-f"
-                                        checked>
-                                    <label class="custom-control-label" for="checkbox-h-f">Active</label>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="form-group row">
-                    <div class="col-sm-9 ml-sm-auto d-flex justify-content-between">
-                        <button class="btn btn-main pull-right" type="submit">Save</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-</div>
-
-
-
 
 <div class="row bottom-30">
     <div class="col">
         <div widget class="card">
             <div class="card-header">
-                <span>Company List <button>Click to load</button></span>
+                <span>Shop List</span>
             </div>
             <div class="card-body widget-body"> 
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="clearCompanyData()" data-toggle="modal" data-target="#company-modal">New Shop</button>
+                    <br><br>
+                    </div>
+                </div>
 
                 <div class="table-responsive">
                     <table class="table">
                         <thead>
                             <tr>
                                 <th>SN</th>
-                                <th>Company Code</th>
-                                <th>Company Name</th>
-                                <th>Brand Name</th>
-                                <th>Contact Name</th>
-                                <th>Status</th>
+                                <th>Shop Code</th>
+                                <th>Shop Name</th>
+                                <th>Other Info</th>
+                                <th>Active?</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            <tr>
-                                <td>1</td>
-                                <td>11001</td>
-                                <td>GESCO COMPANY LIMITED</td>
-                                <td>GESCO</td>
-                                <td>Gissima Nyamohanga</td>
-                                <td><span>ACTIVE    </span> <i class="fa fa-lock" style="cursor: pointer;"></i></td>
-                                <td><a class="bg" style="cursor: pointer;">Select</a></td>
-                            </tr>
-                            <tr>
-                                <td>2</td>
-                                <td>11002</td>
-                                <td>OTAPP COMPANY LIMITED</td>
-                                <td>OTAPP</td>
-                                <td>Joachim Ferdinand</td>
-                                <td><span>ACTIVE    </span> <i class="fa fa-lock" style="cursor: pointer;"></i></td>
-                                <td><a class="bg" style="cursor: pointer;">Select</a></td>
-                            </tr>
-                            <tr>
-                                <td>3</td>
-                                <td>11003</td>
-                                <td>OLOTU GENERAL SUPPLIES</td>
-                                <td>OLOTU</td>
-                                <td>Michael Olotu</td>
-                                <td><span>INACTIVE    </span> <i class="fa fa-unlock" style="cursor: pointer;"></i></td>
-                                <td><a class="bg" style="cursor: pointer;">Select</a></td>
-                            </tr>
+                            @for (shop of shops; track shop.id) {
+                                <tr>
+                                    <td>{{shop.sn}}</td>
+                                    <td>{{shop.code}}</td>
+                                    <td>{{shop.name}}</td>
+                                    <td>{{shop.otherInfo}}</td>
+                                    <td>
+                                        <span *ngIf="shop.active ==='Active'">Active__</span><span *ngIf="shop.active ==='Inactive'">Inactive </span> | 
+                                        <button *ngIf="shop.active ==='Inactive'" (click)="activate(shop.id)"><i class="fa fa-unlock text-success"></i></button>
+                                        <button *ngIf="shop.active ==='Active'" (click)="deactivate(shop.id)"><i class="fa fa-lock text-danger"></i></button>
+                                    </td>
+                                    <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(shop.id)" data-toggle="modal" data-target="#company-modal" style="cursor: pointer;">Edit</button></td>
+                                </tr>
+                            }
                         </tbody>
                     </table>
                 </div>
-
             </div>
         </div>
     </div>
 </div>
 
 
+
+
+<div class="modal fade" id="company-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">New/Edit Shop</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <input type="hidden" [(ngModel)]="id">
+                        <div class="form-group">
+                            <label>Shop Code</label>
+                            <input class="form-control" type="text" [(ngModel)]="code" autocomplete="nope">
+                        </div>
+                        <div class="form-group">
+                            <label>Shop Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="name" autocomplete="nope">
+                        </div>
+                        <div class="form-group">
+                            <label>Location</label>
+                            <input class="form-control" type="text" [(ngModel)]="locationName" autocomplete="nope">
+                        </div>
+                    </div>                   
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="save()">Save</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+    
+  
+  

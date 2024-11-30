@@ -11,6 +11,7 @@ import { ShopTillComponent } from './administration-units/shop-till/shop-till.co
 import { SystemProfileComponent } from './system/system-profile/system-profile.component';
 import { RoleAccessComponent } from './identity-and-access/role-access/role-access.component';
 import { AuthGuard } from '../auth-guard';
+import { ProductComponent } from './inventory/product/product.component';
 
 export const routes: Routes = [
   {
@@ -94,6 +95,22 @@ export const routes: Routes = [
         data : { breadcrumb : 'Admin Unit/Shop Till'},
         canActivate : [AuthGuard]
       },
+
+      // Inventory
+
+      {
+        path : 'inventory/product',
+        loadComponent: () => import('./inventory/product/product.component').then(c => c.ProductComponent),
+        data : { breadcrumb : 'Product/Product'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'inventory/uom',
+        loadComponent: () => import('./inventory/uom/uom.component').then(c => c.UomComponent),
+        data : { breadcrumb : 'Product/UOM'},
+        canActivate : [AuthGuard]
+      },
+
       //System Profile
       /**Start of System Profile */
       {

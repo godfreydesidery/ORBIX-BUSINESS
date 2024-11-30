@@ -509,6 +509,52 @@ export const menuItems = [
         ]
     },
     {
+        title: 'Inventory',
+        routerLink: ' ',
+        icon: 'fa-money',
+        selected: false,
+        expanded: false,
+        show : true,//grant(['MNGNT-ACCESS']),
+        order: 700,
+        subMenu: [
+            {
+                title: 'Product',
+                routerLink: '/app/inventory/product'
+            },
+            {
+                title: 'UOM',
+                routerLink: '/app/inventory/uom'
+            },
+                      
+            // {
+            //     title: 'Reports',
+            //     url: '#',
+            //     subMenu: [
+            //         {
+            //             title: 'Vehicle Registration',
+            //             routerLink: '/app/management/vehicle-registration-report'
+            //         },                    
+            //         {
+            //             title: 'Vehicle Parking',
+            //             routerLink: '/app/parking-management/reports/parking-report'
+            //         },                    
+            //         {
+            //             title: 'Revenue Report',
+            //             routerLink: '/app/blank'
+            //         },
+            //         {
+            //             title: 'Sales report',
+            //             routerLink: '/app/blank'
+            //         },
+            //         {
+            //             title: 'Invoice Report',
+            //             routerLink: '/app/blank'
+            //         }
+            //     ]
+            // }
+        ]
+    },
+    {
         title: 'Admin',
         icon: 'fa-cogs',
         selected: false,
@@ -545,6 +591,10 @@ export const menuItems = [
                     {
                         title: 'Branch',
                         routerLink: '/app/admin-unit/branch'
+                    },
+                    {
+                        title: 'Shop',
+                        routerLink: '/app/admin-unit/shop'
                     },
                    /*  
                    {
