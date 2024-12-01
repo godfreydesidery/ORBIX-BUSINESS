@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -30,7 +31,7 @@ public class ShopResource {
 	
 	@GetMapping("/shops")
 	public ResponseEntity<List<ShopResponseDTO>>getAll(HttpServletRequest request){
-		return ResponseEntity.ok().body(shopService.getAllShopes(request));
+		return ResponseEntity.ok().body(shopService.getAllShops(request));
 	}
 	@GetMapping("/shops/get")
 	public ResponseEntity<ShopResponseDTO>get(
@@ -73,5 +74,18 @@ public class ShopResource {
 			HttpServletRequest request){
 		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/shops/deactivate").toUriString());
 		return ResponseEntity.created(uri).body(shopService.deactivateShop(shopRequest, request));
+	}
+	
+	
+	@GetMapping("/shops/get_branch_available_shops_by_user")
+	public ResponseEntity<List<ShopResponseDTO>>getBranchAvailableByUser(HttpServletRequest request){
+		return ResponseEntity.ok().body(shopService.getBranchAvailableShopsByUser(request));
+	}
+	
+	@GetMapping("/shops/get_selected_shop")
+	public ResponseEntity<ShopResponseDTO>getSelectedShopByUser(
+			@RequestParam(name = "shop_id")Long id,
+			HttpServletRequest request){		
+		return ResponseEntity.ok().body(shopService.get(id, request));		
 	}
 }

@@ -13,6 +13,7 @@ import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
+import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,7 +33,7 @@ public class ShopServiceController implements ShopService {
 	 * 
 	 */
 	@Override
-	public List<ShopResponseDTO> getAllShopes(HttpServletRequest request) {
+	public List<ShopResponseDTO> getAllShops(HttpServletRequest request) {
 		List<Shop> shopes = shopRepository.findAll();
 		List<ShopResponseDTO> shopResponses = new ArrayList<>();
 
@@ -163,5 +164,29 @@ public class ShopServiceController implements ShopService {
 	boolean validateShopData(ShopRequestDTO shopRequest) {
 		
 		return true;
+	}
+
+	@Override
+	public List<ShopResponseDTO> getBranchAvailableShopsByUser(HttpServletRequest request) {
+		User user = userService.getUser(request);
+		List<Shop> shops = shopRepository.findAllByBranch(user.getBranch());
+		
+		List<ShopResponseDTO> shopResponses = new ArrayList<>();
+
+		for(Shop shop : shops) {
+			shopResponses.add(shopResponseDTOMapper(shop));					
+		}		
+		return shopResponses;
+	}
+	
+	@Override
+	public ShopResponseDTO getSelectedShop(
+			Long id, 
+			HttpServletRequest request) {
+		Optional<Shop> _shop = shopRepository.findByIdAndBranch(id, userService.getUser(request));
+		if(_shop.isEmpty()) {
+			throw new NotFoundException("Shop not found");
+		}		
+		return shopResponseDTOMapper(_shop.get());	
 	}
 }

@@ -416,27 +416,27 @@ export const menuItems = [
         show : grant(['SHOP-ACCESS']),
         order: 700,
         subMenu: [
+            // {
+            //     title: 'Sales',
+            //     url: '#',
+            //     subMenu: [
+            //         {
+            //             title: 'Sales List',
+            //             routerLink: '/app/blank'
+            //         },
+            //         {
+            //             title: 'Sales Order',
+            //             routerLink: '/app/blank'
+            //         },
+            //     ]
+            // },
+            // {
+            //     title: 'Inventory',
+            //     routerLink: '/app/blank'
+            // },
             {
-                title: 'Sales',
-                url: '#',
-                subMenu: [
-                    {
-                        title: 'Sales List',
-                        routerLink: '/app/blank'
-                    },
-                    {
-                        title: 'Sales Order',
-                        routerLink: '/app/blank'
-                    },
-                ]
-            },
-            {
-                title: 'Inventory',
-                routerLink: '/app/blank'
-            },
-            {
-                title: 'GRN',
-                routerLink: '/app/blank'
+                title: 'Select Shop',
+                routerLink: '/app/mechandizing/select-shop'
             },
         ]
     },

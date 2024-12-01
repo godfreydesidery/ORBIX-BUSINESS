@@ -111,6 +111,23 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
 
+      // Mechandizing
+
+      {
+        path : 'mechandizing/select-shop',
+        loadComponent: () => import('./mechandizing/select-shop/select-shop.component').then(c => c.SelectShopComponent),
+        data : { breadcrumb : 'Mechandizing/Select Shop'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'mechandizing/shop-product-stock-status',
+        loadComponent: () => import('./mechandizing/shop-product-stock-status/shop-product-stock-status.component').then(c => c.ShopProductStockStatusComponent),
+        data : { breadcrumb : 'Mechandizing/Shop Stock Status'},
+        canActivate : [AuthGuard]
+      },
+
+
       //System Profile
       /**Start of System Profile */
       {
