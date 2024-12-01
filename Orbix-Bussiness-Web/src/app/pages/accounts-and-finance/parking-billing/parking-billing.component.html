@@ -51,7 +51,7 @@
                                         <tr>
                                             <!-- <td><button class="btn btn-success btn-round-custom" (click)="getParkingBillReceivables(p.id)" data-toggle="modal" data-target="#parking-billing-modal">Parking</button></td>
                                             <td><button class="btn btn-success btn-round-custom" data-toggle="modal" data-target="#service-billing-modal">Service</button></td> -->
-                                            <td><button class="btn btn-success btn-round-custom" (click)="get(p.id)" data-toggle="modal" data-target="#view-modal">View</button></td>
+                                            <td><button class="btn btn-primary btn-round-custom" (click)="get(p.id)" data-toggle="modal" data-target="#view-modal">View</button></td>
                                             <td><button class="btn btn-success btn-round-custom" (click)="vehicleEquipmentBilling(p.id)" >Billing</button></td>
                                         </tr>
                                     </table>
@@ -337,8 +337,10 @@
                         
                     </div> -->
                     <div class="col-lg-12">
-                        <p><b>Remarks</b></p>
-                        <input type="text" class="form-control" placeholder="Remarks" [(ngModel)]="comments" readonly>
+                        <p><b>Comments</b></p>
+                        <textarea class="form-control" placeholder="Comments" [(ngModel)]="comments" readonly style="background-color: white;"></textarea>
+
+                        <!-- <input type="text" class="form-control" placeholder="Comments" [(ngModel)]="comments" readonly> -->
                         
                     </div>
                 </div>

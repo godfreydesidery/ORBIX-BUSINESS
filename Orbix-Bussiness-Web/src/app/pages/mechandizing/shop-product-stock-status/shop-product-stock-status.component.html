@@ -50,13 +50,37 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-lg-6">
+                        <input type="hidden" [(ngModel)]="productId">
                        <div class="form-group">
-                            <label>Name (Type to Search)</label>
-                            <input class="form-control" type="text" [(ngModel)]="productName" autocomplete="nope">
+                            <!-- <label>Name (Type to Search)</label>
+                            <input class="form-control" type="text" [(ngModel)]="productName" (ngModelChange)="getCompanyProductLike($event)" list="productList" autocomplete="nope">
+                            <datalist id="productList">
+                                <option *ngFor="let product of searchedProducts" [value]="product.name" (change)="searchProduct(product.id)" ></option>
+                            </datalist> -->
+
+                            <label>(Type to Search by Name or Code)</label>
+                            <input 
+                              class="form-control" 
+                              type="text" 
+                              [(ngModel)]="searchKey" 
+                              (ngModelChange)="onInputChange($event)" 
+                              (change)="onProductSelected()" 
+                              list="productList" 
+                              autocomplete="off">
+                            <datalist id="productList" *ngIf="searchedProducts.length > 0">
+                              <option *ngFor="let product of searchedProducts" [value]="product.name"></option>
+                            </datalist>
+
+
                         </div>
+                        <hr>
                         <div class="form-group">
-                            <label>Stock</label>
-                            <input class="form-control" type="number" [(ngModel)]="productName" autocomplete="nope">
+                            <label>Product Code</label>
+                            <input class="form-control" type="text" [(ngModel)]="productCode" autocomplete="nope" readonly>
+                        </div> 
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="productName" autocomplete="nope" readonly>
                         </div> 
                         <div class="form-group">
                             <label>VAT(0-100)%</label>

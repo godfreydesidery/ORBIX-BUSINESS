@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
+import com.orbix.api.modules.adminunits.Company;
 import com.orbix.api.modules.adminunits.CompanyRepository;
 import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.adminunits.Shop;
@@ -30,6 +31,7 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 public class ShopProductServiceController implements ShopProductService {
 	
+	private final CompanyRepository companyRepository;
 	private final ShopRepository shopRepository;
 	private final ProductRepository productRepository;
 	private final ShopProductRepository shopProductRepository;
@@ -268,5 +270,26 @@ public class ShopProductServiceController implements ShopProductService {
 		shopProductLogRepository.save(shopProductLog);
 		return true;
 	}
+	@Override
+	public List<ProductResponseDTO> getProductsByShopAndName(Long shopId, String productName) {
+		
+		// Validate and fetch the shop
+	    Shop shop = shopRepository.findById(shopId)
+	                              .orElseThrow(() -> new NotFoundException("Shop not found"));
+		
+	    List<ShopProduct> shopProducts = shopProductRepository.findAllByShopAndProduct_NameContainingIgnoreCase(shop, productName);
+	    
+	    List<ProductResponseDTO> productResponses = new ArrayList<>();
+	    
+	    for(ShopProduct shopProduct : shopProducts) {
+	    	ProductResponseDTO productResponse = new ProductResponseDTO();
+	    	productResponse.setId(shopProduct.getProduct().getId().toString());
+	    	productResponse.setName(shopProduct.getProduct().getName());
+	    	productResponses.add(productResponse);
+	    }
+	    return productResponses;
+	}
+	
+	
 
 }

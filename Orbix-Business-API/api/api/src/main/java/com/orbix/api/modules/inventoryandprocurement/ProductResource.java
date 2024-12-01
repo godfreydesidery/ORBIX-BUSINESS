@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -35,7 +36,7 @@ public class ProductResource {
 	}
 	@GetMapping("/products/get")
 	public ResponseEntity<ProductResponseDTO>get(
-			Long id,
+			@RequestParam(name = "id")Long id,
 			HttpServletRequest request){		
 		return ResponseEntity.ok().body(productService.get(id, request));		
 	}
@@ -74,5 +75,12 @@ public class ProductResource {
 			HttpServletRequest request){
 		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/products/deactivate").toUriString());
 		return ResponseEntity.created(uri).body(productService.deactivateProduct(productRequest, request));
+	}
+	
+	@GetMapping("/products/get_products_by_company")
+	public ResponseEntity<List<ProductResponseDTO>>getProductsByCompany(
+			@RequestParam(name = "product_name_like") String productNameLike,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(productService.getProductsByCompany(productNameLike, request));
 	}
 }

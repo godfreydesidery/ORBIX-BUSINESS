@@ -18,6 +18,8 @@ public interface ShopProductRepository extends JpaRepository<ShopProduct, Long> 
 	Optional<ShopProduct> findByShopAndProduct(Shop shop, Product product);
 
 	boolean existsByShopAndProduct(Shop shop, Product product);
+	
+	List<ShopProduct> findAllByShopAndProduct_NameContainingIgnoreCase(Shop shop, String name);
 
 	
 }

@@ -3,6 +3,7 @@ package com.orbix.api.modules.inventoryandprocurement;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -169,5 +170,27 @@ public class ProductServiceController implements ProductService {
 	boolean validateProductData(ProductRequestDTO productRequest) {
 		
 		return true;
+	}
+	
+	@Override
+	public List<ProductResponseDTO> getProductsByCompany(String productName, HttpServletRequest request) {
+	    // Validate input
+	    if (productName == null || productName.trim().isEmpty()) {
+	        throw new IllegalArgumentException("Product name cannot be null or empty");
+	    }
+
+	    // Fetch company
+	    Company company = userService.getUserCompany(request);
+	    if (company == null) {
+	        throw new NotFoundException("Company not found for the user");
+	    }
+
+	    // Fetch products
+	    List<Product> products = productRepository.findAllByCompanyAndNameContainingIgnoreCase(company, productName);
+
+	    // Map to DTOs
+	    return products.stream()
+	        .map(this::productResponseDTOMapper)
+	        .collect(Collectors.toList());
 	}
 }

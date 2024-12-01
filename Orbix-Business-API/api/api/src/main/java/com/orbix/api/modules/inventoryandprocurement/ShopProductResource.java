@@ -27,7 +27,9 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class ShopProductResource {
 	
-private final ShopProductService shopProductService;
+	private final ShopProductRepository shopProductRepository;
+	
+	private final ShopProductService shopProductService;
 	
 	@GetMapping("/shop_products")
 	public ResponseEntity<List<ShopProductResponseDTO>>getAllShopProducts(
@@ -85,5 +87,18 @@ private final ShopProductService shopProductService;
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(shopProductService.getAllShopProducts(shopId, request));
 	}
+	
+	
+//	@GetMapping("/shop_products/get_products_by_shop_containing")
+//	public ResponseEntity<List<ShopProductResponseDTO>>getAllShopProductsByShopContaining(
+//			@RequestParam(name = "shop_id")Long shopId, 
+//			HttpServletRequest request){
+//		
+//		List<ShopProduct> shopProducts = shopProductRepository.findAllByShopAndProduct
+//		
+//				return shopProductRepository.findAllByShopAndProduct_NameContainingIgnoreCase(shop, productName);
+//		return ResponseEntity.ok().body(shopProductService.getAllShopProducts(shopId, request));
+//	}
+	
 
 }

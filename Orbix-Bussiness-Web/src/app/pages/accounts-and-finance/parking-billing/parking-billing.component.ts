@@ -395,7 +395,7 @@ export class ParkingBillingComponent {
 
      this.validUntilDate = null
 
-     this.comments = '' // check this
+     this.comments = data!.comments// check this
 
   }
 
@@ -454,6 +454,7 @@ export class ParkingBillingComponent {
     this.billingType = ''
 
     this.color = ''
+    this.comments = ''
   }
 
 }

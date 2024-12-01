@@ -13,6 +13,7 @@ import { IShop } from 'src/app/domain/shop';
 import { environment } from 'src/environments/environment';
 import { HttpHeaders } from '@angular/common/http';
 import { IShopProduct } from 'src/app/domain/shop-product';
+import { IProduct } from 'src/app/domain/product';
 
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
@@ -37,6 +38,8 @@ export class ShopProductStockStatusComponent {
 
   shopProducts : IShopProduct[] = []
 
+  searchKey : string = ''
+
   productId : any
   productName : string = ''
   productCode : string = ''
@@ -44,6 +47,10 @@ export class ShopProductStockStatusComponent {
   selectedShop : IShop
 
   shopName : string = ''
+
+  searchedProducts : IProduct[] = []
+
+  isUserTyping: boolean = true; // Flag to detect user typing
 
   constructor(
     private http :HttpClient,
@@ -112,5 +119,81 @@ export class ShopProductStockStatusComponent {
       }       
     ) 
   }
+
+  getCompanyProductLike = async (searchKey : string) => {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    await this.http.get<IProduct[]>(API_URL+'/products/get_products_by_company?product_name_like=' + searchKey , options)
+      .toPromise()
+      .then(
+        data => {
+          console.log(data)
+          this.searchedProducts = data!
+          
+        }
+      )
+      .catch(error => {
+        console.log(error)
+        
+      }       
+    ) 
+  }
+
+  searchProduct = async (id : any) => {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    await this.http.get<IProduct>(API_URL+'/products/get?id=' + id , options)
+      .toPromise()
+      .then(
+        data => {
+          console.log(data)
+          this.productId = data!.id
+          this.productCode = data!.code
+          this.productName = data!.name
+          
+        }
+      )
+      .catch(error => {
+        console.log(error)
+        
+      }       
+    ) 
+    
+  }
+
+
+  // Handle selection from datalist
+  onProductSelected(): void {
+    const selectedProduct = this.searchedProducts.find(
+      (product) => product.name === this.searchKey
+    );
+
+    if (selectedProduct) {
+      this.searchProduct(selectedProduct.id);
+      this.searchedProducts = []; // Clear suggestions after selection
+    } else {
+      console.warn('Selected product is not in the suggestions list');
+    }
+
+    // Allow typing detection after a short delay
+    setTimeout(() => (this.isUserTyping = true), 0);
+    
+  }
+
+  // Triggered on every keystroke
+  onInputChange(searchText: string): void {
+    if (this.isUserTyping) {
+      this.getCompanyProductLike(searchText);
+    }
+  }
+
+  
+
+
+
 
 }

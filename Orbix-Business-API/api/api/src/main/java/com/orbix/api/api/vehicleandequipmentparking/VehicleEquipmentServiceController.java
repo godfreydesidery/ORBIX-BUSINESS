@@ -218,6 +218,8 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		parkingRequest.setAgentEmail(vehicleEquipment.getAgentEmail());
 		parkingRequest.setDeviceStatus(vehicleEquipment.isDeviceStatus());
 		
+		parkingRequest.setComments(vehicleEquipmentRequest.getComments());
+		
 			
 		parkingRequest.setLeftFrontLamp(true);
 		parkingRequest.setRightFrontLamp(true);

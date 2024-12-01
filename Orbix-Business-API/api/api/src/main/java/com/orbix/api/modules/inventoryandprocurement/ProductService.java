@@ -13,4 +13,6 @@ public interface ProductService {
 	ProductResponseDTO updateProduct(ProductRequestDTO product, HttpServletRequest request);
 	ApiCustomResponse activateProduct(ProductRequestDTO product, HttpServletRequest request);
 	ApiCustomResponse deactivateProduct(ProductRequestDTO product, HttpServletRequest request);
+	
+	List<ProductResponseDTO> getProductsByCompany(String productName, HttpServletRequest request);
 }

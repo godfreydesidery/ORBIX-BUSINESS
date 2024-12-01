@@ -28,6 +28,8 @@ public class VehicleEquipmentRequestDTO {
 	private String cardNo;
 	private Byte[] image;
 	
+	private String comments;
+	
 	private boolean deviceStatus;
 		
 	private String vehicleEquipmentTypeName;

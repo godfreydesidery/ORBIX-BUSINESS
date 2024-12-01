@@ -250,7 +250,6 @@ public class ParkingServiceController implements ParkingService {
 		
 		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), branch_.get());
 		
-		
 		Parking parking = new Parking();
 		parking.setNo(String.valueOf(Math.random()));
 		parking.setOwnerFirstName(parkingRequest.getOwnerFirstName());
@@ -367,6 +366,7 @@ public class ParkingServiceController implements ParkingService {
 		
 		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), branch_.get());
 		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
+		
 		
 		
 		Parking parking = parking_.get();
