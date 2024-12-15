@@ -83,4 +83,12 @@ public class ProductResource {
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(productService.getProductsByCompany(productNameLike, request));
 	}
+	
+	
+	
+	@GetMapping("/products/get_company_sellable_products")
+	public ResponseEntity<List<ProductResponseDTO>>getCompanySellableProducts(
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(productService.getCompanySellableProducts(request));
+	}
 }

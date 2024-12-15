@@ -1,0 +1,382 @@
+
+
+
+
+<div class="container-fluid mt-4">
+    <!-- Shop Name -->
+    <div class="row mb-3">
+        <div class="col-md-12">
+            <h4 class="font-weight-bold">Shop Name: <span class="text-success">{{selectedShop.name}}</span></h4>
+        </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="row mb-4">
+        <div class="col-md-12">
+            <button class="btn btn-outline-success btn-round-custom" (click)="getAllPendingOrders()" data-toggle="modal" data-target="#sales-order-list-modal">Sales Order List</button>
+            <button class="btn btn-outline-success btn-round-custom" (click)="clearOrder()" data-toggle="modal" data-target="#sales-order-modal">New Sales Order</button>
+            <button class="btn btn-outline-danger btn-round-custom" (click)="cancelOrder()" *ngIf="shopSalesOrderId != null">Cancel Order</button>
+        </div>
+    </div>
+
+    <div class="row" *ngIf="shopSalesOrderId != null">
+        <div class="col-md-12">
+
+
+            <div class="row">
+                <!-- General Information -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">General Information</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li><strong>Sales Order ID:</strong> {{shopSalesOrder!.id}}</li>
+                                <li><strong>Sales Order #:</strong> {{shopSalesOrder!.no}}</li>
+                                <li><strong>Order Status:</strong> {{shopSalesOrder!.status}}</li>
+                                <!-- <li><strong>Order Date:</strong> 2024-06-15</li>
+                                
+                                <li><strong>Sales Order Type:</strong> Standard Order</li> -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+        
+                <!-- Customer Details -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Customer Details</h5>
+                        </div>
+                        <!-- <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <li><strong>Customer ID:</strong> CUST78910</li>
+                                <li><strong>Customer Name:</strong> John Doe</li>
+                                <li><strong>Contact Info:</strong> johndoe&#64;example.com</li>
+                                <li><strong>Billing Address:</strong> 123 Main Street, Cityville</li>
+                                <li><strong>Shipping Address:</strong> 456 Delivery Lane, Townsville</li>
+                            </ul>
+                        </div> -->
+                    </div>
+                </div>
+        
+                <!-- Order Summary -->
+                <div class="col-md-4 mb-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-success text-white">
+                            <h5 class="mb-0">Order Summary</h5>
+                        </div>
+                        <div class="card-body">
+                            <ul class="list-unstyled mb-0">
+                                <!-- <li class="d-flex justify-content-between">
+                                    <span>Subtotal:</span> <span>$500.00</span>
+                                </li>
+                                <li class="d-flex justify-content-between">
+                                    <span>Discount:</span> <span>$50.00</span>
+                                </li>
+                                <li class="d-flex justify-content-between">
+                                    <span>Tax (10%):</span> <span>$45.00</span>
+                                </li> -->
+                                <li class="d-flex justify-content-between font-weight-bold border-top pt-2">
+                                    <span>Total Amount:</span> <span>{{totalAmount | currency:'':''}}</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="card-footer text-right">
+                            <button class="btn btn-success btn-sm" (click)="confirmOrder()">Confirm Order</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        
+            <!-- Order Details Table -->
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="d-flex align-items-center mb-3">
+                        <h5 class="font-weight-bold mb-0">Order Details  .</h5>
+                        <button class="btn btn-success rounded-circle mr-2" (click)="clearShopProduct()" style="width: 40px; height: 40px; padding: 0; display: flex; justify-content: center; align-items: center;" data-toggle="modal" data-target="#sales-order-detail-modal">+</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-bordered table-hover">
+                            <thead class="thead-light">
+                                <tr><th scope="col">SN</th>
+                                    <th scope="col">Code</th>
+                                    <th scope="col">Name</th>
+                                    <th scope="col">UOM</th>
+                                    <th scope="col">Qty</th>
+                                    <th scope="col">Unit Price</th>
+                                    <th scope="col">Amount</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let item of shopSalesOrder.shopSalesOrderDetails">
+                                    <td>{{item.sn}}</td>
+                                    <td>{{item.productCode}}</td>
+                                    <td>{{item.productName}}</td>
+                                    <td>{{item.baseUom}}</td>
+                                    <td>{{item.qty}}</td>
+                                    <td style="text-align: right;">{{item.sellingPriceVatIncl | currency:'':''}}</td>
+                                    <td style="text-align: right;">{{item.amount | currency:'':''}}</td>
+                                    <td>
+                                        <!-- <button class="btn btn-sm btn-success btn-round-custom">Edit</button> -->
+                                        <button class="btn btn-sm btn-danger btn-round-custom" (click)="removeDetail(item.id)">Remove</button>
+                                    </td>
+                                </tr>
+
+                                <tr *ngIf="shopSalesOrder.shopSalesOrderDetails.length > 0">
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td style="font-weight: bold;">Total</td>
+                                    <td style="text-align: right; font-weight: bold;">{{totalAmount | currency:'':''}}</td>
+                                    <td></td>
+                                </tr>
+        
+        
+                                <!-- <tr>
+                                    <td>ITEM001</td>
+                                    <td>Product A</td>
+                                    <td>PCS</td>
+                                    <td>10</td>
+                                    <td>$15.00</td>
+                                    <td>$150.00</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success btn-round-custom">Edit</button>
+                                        <button class="btn btn-sm btn-danger btn-round-custom">Remove</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>ITEM002</td>
+                                    <td>Product B</td>
+                                    <td>BOX</td>
+                                    <td>5</td>
+                                    <td>$30.00</td>
+                                    <td>$150.00</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success btn-round-custom">Edit</button>
+                                        <button class="btn btn-sm btn-danger btn-round-custom">Remove</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>ITEM003</td>
+                                    <td>Product C</td>
+                                    <td>LTR</td>
+                                    <td>20</td>
+                                    <td>$10.00</td>
+                                    <td>$200.00</td>
+                                    <td>
+                                        <button class="btn btn-sm btn-success btn-round-custom">Edit</button>
+                                        <button class="btn btn-sm btn-danger btn-round-custom">Remove</button>
+                                    </td>
+                                </tr> -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+        </div>
+    </div>
+
+    
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="sales-order-detail-modal" tabindex="-1" role="dialog" aria-labelledby="salesOrderModalDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="salesOrderModalDetailLabel">Add/Edit Sales Order Detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+
+
+
+
+
+
+
+
+
+                <div class="container mt-4">
+                    <label for="productSearch" class="form-label">Search Product:</label>
+                    <div class="dropdown">
+                      <input
+                        type="text"
+                        id="productSearch"
+                        class="form-control"
+                        [(ngModel)]="searchTerm"
+                        (input)="searchProducts()"
+                        (focus)="isDropdownOpen = true"
+                        placeholder="Type to search products..."
+                        autocomplete="off"
+                      />
+                  
+                      <div
+                        class="dropdown-menu show mt-1"
+                        *ngIf="isDropdownOpen && filteredProducts.length > 0"
+                        style="max-height: 200px; overflow-y: auto;"
+                      >
+                        <button
+                          class="dropdown-item"
+                          *ngFor="let product of filteredProducts"
+                          (click)="selectProduct(product)"
+                        >
+                          {{ product.name }}
+                        </button>
+                      </div>
+                  
+                      <!-- <div class="dropdown-menu show mt-1 text-muted" *ngIf="isDropdownOpen && filteredProducts.length === 0">
+                        No products found.
+                      </div> -->
+                    </div>
+                  
+                    
+                  </div>
+
+
+
+                
+
+
+
+
+
+
+
+
+
+                <!-- <div class="form-group">
+                            
+                    <label>(Type to Search by Name or Code)</label>
+                    <input 
+                        class="form-control" 
+                        type="text" 
+                        [(ngModel)]="searchKey" 
+                        (ngModelChange)="onInputChange($event)" 
+                        (change)="onProductSelected()" 
+                        list="productList" 
+                        autocomplete="off">
+                    <datalist id="productList" *ngIf="searchedProducts.length > 0">
+                        <option *ngFor="let product of searchedProducts" [value]="product.name"></option>
+                    </datalist>
+                </div> -->
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <input class="form-control" type="hidden" [(ngModel)]="productId">
+                        <p>Product Code</p>
+                        <span class="form-control">{{productCode}}</span>
+                        <p>Product Name</p>
+                        <span class="form-control">{{productName}}</span>
+                        <p>Product Description</p>
+                        <span class="form-control">{{productDescription}}</span>
+                        <p>Product Base UOM</p>
+                        <span class="form-control">{{baseUom}}</span>
+                    </div>
+                    <div class="col-md-6">
+                        <p>Price</p>
+                        <input class="form-control" type="text" [(ngModel)]="sellingPriceVatIncl" style="text-align: right;" readonly>
+                        <p>Qty</p>
+                        <input class="form-control" type="number" [(ngModel)]="qty" style="text-align: center;" min="0">
+                        <p>Amount</p>
+                        <span class="form-control" style="text-align: right;">{{sellingPriceVatIncl * qty | currency:'':''}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-success" (click)="saveDetail()" id="saveSalesOrderBtn" data-dismiss="modal">Save</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="sales-order-modal" tabindex="-1" role="dialog" aria-labelledby="salesOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="salesOrderModalLabel">Add/Edit Sales Order</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="salesOrderForm">
+                    <div class="row">
+                        <!-- Product Code -->
+                        <div class="col-md-6 mb-3">
+                            <label for="productCode">Customer Name</label>
+                            <input type="text" class="form-control" id="productCode" name="productCode" placeholder="Enter Customer Name" value="NA">
+                        </div>
+                        
+                    </div>
+                    
+                    
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+                <button type="submit" class="btn btn-success" (click)="save()" id="saveSalesOrderBtn" data-dismiss="modal">Save Order</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="sales-order-list-modal" tabindex="-1" role="dialog" aria-labelledby="salesOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="salesOrderModalLabel">Sales Order List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th scope="col">No</th>
+                                    <th scope="col">Status</th>
+                                    <th scope="col">Summary</th>
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let shopSalesOrder of shopSalesOrders">
+                                    <td>{{shopSalesOrder.no}}</td>
+                                    <td>{{shopSalesOrder.status}}</td>
+                                    <td>{{shopSalesOrder.summary}}</td>
+                                    <td><button class="btn btn-success btn-round-custom" (click)="get(shopSalesOrder.id)" data-dismiss="modal">Select</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+

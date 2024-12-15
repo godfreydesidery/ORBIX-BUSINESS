@@ -10,4 +10,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	List<Product> findAllByCompanyAndNameContainingIgnoreCase(Company company, String productName);
 
+	List<Product> findAllByCompanyAndSellable(Company company, boolean b);
+
 }

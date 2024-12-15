@@ -45,6 +45,14 @@ public class ShopProductResource {
 		return ResponseEntity.ok().body(shopProductService.get(id, shopId, request));		
 	}
 	
+	@GetMapping("/shop_products/get_product_in_shop")
+	public ResponseEntity<ShopProductResponseDTO>getProductInShop(
+			@RequestParam(name = "product_id")Long productId,
+			@RequestParam(name = "shop_id")Long shopId,
+			HttpServletRequest request){		
+		return ResponseEntity.ok().body(shopProductService.getProductInShop(productId, shopId, request));		
+	}
+	
 	@PostMapping("/shop_products/create")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ShopProductResponseDTO>create(
@@ -89,16 +97,16 @@ public class ShopProductResource {
 	}
 	
 	
-//	@GetMapping("/shop_products/get_products_by_shop_containing")
-//	public ResponseEntity<List<ShopProductResponseDTO>>getAllShopProductsByShopContaining(
-//			@RequestParam(name = "shop_id")Long shopId, 
-//			HttpServletRequest request){
-//		
-//		List<ShopProduct> shopProducts = shopProductRepository.findAllByShopAndProduct
-//		
-//				return shopProductRepository.findAllByShopAndProduct_NameContainingIgnoreCase(shop, productName);
-//		return ResponseEntity.ok().body(shopProductService.getAllShopProducts(shopId, request));
-//	}
+	@GetMapping("/shop_products/get_products_by_shop_containing")
+	public ResponseEntity<List<ProductResponseDTO>>getAllShopProductsByShopContaining(
+			@RequestParam(name = "shop_id")Long shopId, 
+			@RequestParam(name = "product_name_like")String productNameLike,
+			HttpServletRequest request){
+
+		return ResponseEntity.ok().body(shopProductService.getProductsByShopAndName(shopId, productNameLike));
+
+	}
+	
 	
 
 }

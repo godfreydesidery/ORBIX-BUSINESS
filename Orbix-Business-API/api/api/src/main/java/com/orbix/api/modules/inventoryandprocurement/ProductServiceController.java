@@ -17,7 +17,9 @@ import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.Company;
 import com.orbix.api.modules.adminunits.CompanyRepository;
 import com.orbix.api.modules.adminunits.DayService;
-
+import com.orbix.api.modules.adminunits.Shop;
+import com.orbix.api.modules.adminunits.ShopRepository;
+import com.orbix.api.modules.adminunits.ShopService;
 import com.orbix.api.modules.identityandaccess.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +34,8 @@ public class ProductServiceController implements ProductService {
 	private final ProductRepository productRepository;
 	private final UserService userService;
 	private final DayService dayService;
+	
+	private final ShopRepository shopRepository;
 	
 	/**
 	 * 
@@ -82,6 +86,8 @@ public class ProductServiceController implements ProductService {
 		product.setBaseUom(productRequest.getBaseUom());		
 		product.setCompany(company_.get());
 		
+		product.setSellable(true);
+		
 		product.setCreatedByUser(userService.getUser(request));
 		product.setCreatedDateTime(dayService.getTimeStamp());
 		
@@ -106,7 +112,11 @@ public class ProductServiceController implements ProductService {
 		Product product = product_.get();
 		product.setName(productRequest.getName());
 		product.setDescription(productRequest.getDescription());
-		product.setBaseUom(productRequest.getBaseUom());		
+		product.setBaseUom(productRequest.getBaseUom());
+		
+		product.setSellable(true);
+		
+		
 		product = productRepository.save(product);		
 		return productResponseDTOMapper(product);
 	}
@@ -187,6 +197,27 @@ public class ProductServiceController implements ProductService {
 
 	    // Fetch products
 	    List<Product> products = productRepository.findAllByCompanyAndNameContainingIgnoreCase(company, productName);
+
+	    // Map to DTOs
+	    return products.stream()
+	        .map(this::productResponseDTOMapper)
+	        .collect(Collectors.toList());
+	}
+	
+	
+	
+	@Override
+	public List<ProductResponseDTO> getCompanySellableProducts(HttpServletRequest request) {
+	    
+
+	    // Fetch company
+	    Company company = userService.getUserCompany(request);
+	    if (company == null) {
+	        throw new NotFoundException("Company not found for the user");
+	    }
+
+	    // Fetch products
+	    List<Product> products = productRepository.findAllByCompanyAndSellable(company, true);
 
 	    // Map to DTOs
 	    return products.stream()

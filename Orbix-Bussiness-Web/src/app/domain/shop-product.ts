@@ -5,6 +5,7 @@ export interface IShopProduct {
     productCode : string
     productName : string
     productDescription : string
+    baseUom : string
     shopId : number
     shopName : string
     currentStock : number

@@ -23,6 +23,8 @@ public class ShopProductResponseDTO {
     private String productId;
     private String productCode;
     private String productName;
+    private String productDescription;
+    private String baseUom;
     private String shopId;
     private String shopName;
     

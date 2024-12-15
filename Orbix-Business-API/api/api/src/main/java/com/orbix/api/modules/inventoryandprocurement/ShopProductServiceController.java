@@ -65,6 +65,21 @@ public class ShopProductServiceController implements ShopProductService {
 	    
 	    return this.shopProductResponseDTOMapper(shopProduct);
 	}
+	
+	@Override
+	public ShopProductResponseDTO getProductInShop(Long productId, Long shopId, HttpServletRequest request) {
+		// Validate and fetch the shop
+	    Shop shop = shopRepository.findById(shopId)
+	                              .orElseThrow(() -> new NotFoundException("Shop not found"));
+	 // Validate and fetch the shop
+	    Product product = productRepository.findById(productId)
+	                              .orElseThrow(() -> new NotFoundException("Product not found"));
+	    
+	    ShopProduct shopProduct = shopProductRepository.findByProductAndShop(product, shop)
+                .orElseThrow(() -> new NotFoundException("Product not found in shop"));
+	    
+	    return this.shopProductResponseDTOMapper(shopProduct);
+	}
 
 	@Override
 	public ShopProductResponseDTO createShopProduct(ShopProductRequestDTO shopProductRequest,
@@ -116,10 +131,12 @@ public class ShopProductServiceController implements ShopProductService {
 	    
 	    shopProduct.setActive(true);
 	    
+	    shopProduct.setCreatedByUser(userService.getUser(request));
+	    shopProduct.setCreatedDateTime(dayService.getTimeStamp());
+	    
 	    shopProduct = shopProductRepository.save(shopProduct);
 	    
-	    product.setCreatedByUser(userService.getUser(request));
-		product.setCreatedDateTime(dayService.getTimeStamp());
+	    
 	    
 	    ////Update ShopProduct log for stock card
 	    
@@ -224,6 +241,11 @@ public class ShopProductServiceController implements ShopProductService {
 	private ShopProductResponseDTO shopProductResponseDTOMapper(ShopProduct shopProduct) {
 		ShopProductResponseDTO shopProductResponse = new ShopProductResponseDTO();
 		
+		shopProductResponse.setProductCode(shopProduct.getProduct().getCode());
+		shopProductResponse.setProductName(shopProduct.getProduct().getName());
+		shopProductResponse.setProductDescription(shopProduct.getProduct().getDescription());
+		shopProductResponse.setBaseUom(shopProduct.getProduct().getBaseUom());
+		
 		// Convert entity ID to String
 		shopProductResponse.setId(shopProduct.getId().toString());
 
@@ -264,6 +286,7 @@ public class ShopProductServiceController implements ShopProductService {
 		shopProductLog.setProduct(product);
 		shopProductLog.setQtyIn(qtyIn);
 		shopProductLog.setQtyOut(qtyOut);
+		shopProductLog.setBalance(balance);
 		shopProductLog.setReference(reference);
 		shopProductLog.setCreatedByUser(createdByUser);
 		shopProductLog.setCreatedDateTime(createdDateTime);

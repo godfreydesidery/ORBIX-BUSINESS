@@ -126,6 +126,12 @@ export const routes: Routes = [
         data : { breadcrumb : 'Mechandizing/Shop Stock Status'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'mechandizing/shop-sales-order',
+        loadComponent: () => import('./mechandizing/shop-sales-order/shop-sales-order.component').then(c => c.ShopSalesOrderComponent),
+        data : { breadcrumb : 'Mechandizing/Sales Order'},
+        canActivate : [AuthGuard]
+      },
 
 
       //System Profile

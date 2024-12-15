@@ -15,4 +15,6 @@ public interface ProductService {
 	ApiCustomResponse deactivateProduct(ProductRequestDTO product, HttpServletRequest request);
 	
 	List<ProductResponseDTO> getProductsByCompany(String productName, HttpServletRequest request);
+	
+	List<ProductResponseDTO> getCompanySellableProducts(HttpServletRequest request);
 }

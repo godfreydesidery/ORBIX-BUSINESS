@@ -44,6 +44,7 @@ public class Product {
 	private String description;
 	private String baseUom;
 	private boolean active = false;
+	private boolean sellable = false;
 	
 	@ManyToOne(targetEntity = Company.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "company_id", nullable = false , updatable = true)

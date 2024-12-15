@@ -10,6 +10,7 @@ import com.orbix.api.modules.adminunits.Shop;
 public interface ShopProductService {
 	List<ShopProductResponseDTO> getAllShopProducts(Long shopId, HttpServletRequest request);
 	ShopProductResponseDTO get(Long id, Long shopId, HttpServletRequest request);
+	ShopProductResponseDTO getProductInShop(Long productId, Long shopId, HttpServletRequest request);
 	ShopProductResponseDTO createShopProduct(ShopProductRequestDTO shopProductRequest, HttpServletRequest request);
 	ShopProductResponseDTO updateShopProduct(ShopProductRequestDTO shopProductRequest, HttpServletRequest request);
 	ApiCustomResponse activateShopProduct(ShopProductRequestDTO shopProductRequest, HttpServletRequest request);

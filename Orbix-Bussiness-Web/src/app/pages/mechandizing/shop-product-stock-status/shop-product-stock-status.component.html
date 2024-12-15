@@ -6,18 +6,89 @@
 
 <div class="row">
     <div class="col-md-12">
-        <button class="btn btn-success btn-round-custom" data-toggle="modal" data-target="#import-modal">New Product</button>
-        <button class="btn btn-success btn-round-custom">Refresh Stock</button>
-        <button class="btn btn-success btn-round-custom">Print Stock Report</button>
+        <button class="btn btn-success btn-round-custom" (click)="toggleShowImportList()">Import Product</button>
+        <button class="btn btn-success btn-round-custom" (click)="clearImportList()" (click)="loadShopProductStockStatus()">Refresh Stock</button>
+        <!-- <button class="btn btn-success btn-round-custom" (click)="clearImportList()">Print Stock Report</button> -->
     </div>
 </div>
 
-<div class="row">
-    <div class="col-md-12">
-        <p>Product List</p>
+<div class="row" *ngIf="showImportList">
+    <div class="col-md-8">
+        <br><br>
+        <p>Select Products to Import</p>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Code</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>
+                    <th scope="col">Is Active?</th>
+                    <th scope="col">Base UOM</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead> 
+            <tbody>
+                <tr *ngFor="let product of importProducts">
+                    <td>{{product.code}}</td>
+                    <td>{{product.name}}</td>
+                    <td>{{product.description}}</td>
+                    <td>{{product.active}}</td>
+                    <td>{{product.baseUom}}</td>
+                    <td><button class="btn btn-primary btn-round-custom" (click)="searchProduct(product.id)" data-toggle="modal" data-target="#import-modal">Import</button></td>
+                </tr>
+            </tbody>           
+        </table>
+        <br>
+    <hr>
     </div>
+    
 </div>
 <div class="row">
+    <div class="col-md-12">
+        <p>Products available in shop</p>
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th scope="col">Code</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Description</th>                   
+                    <th scope="col">Stock</th>
+                    <th scope="col">Base UOM</th>
+                    <th scope="col">Cost Price Incl</th>
+                    <th scope="col">Cost Price Excl</th>
+                    <th scope="col">Selling Price Incl</th>
+                    <th scope="col">Selling Price Excl</th>
+                    <th scope="col">Def Reorder Qty</th>
+                    <th scope="col">Def Reorder Level</th>
+                    <th scope="col">VAT%</th>
+                    <th scope="col">Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr *ngFor="let shopProduct of shopProducts">
+                    <td>{{shopProduct.productCode}}</td>
+                    <td>{{shopProduct.productName}}</td>
+                    <td>{{shopProduct.productDescription}}</td>
+                    <td>{{shopProduct.currentStock}}</td>
+                    <td>{{shopProduct.baseUom}}</td>
+                    <td style="text-align: right;">{{shopProduct.costPriceVatIncl | currency:'':''}}</td>
+                    <td style="text-align: right;">{{shopProduct.costPriceVatExcl | currency:'':''}}</td>
+                    <td style="text-align: right;">{{shopProduct.sellingPriceVatIncl | currency:'':''}}</td>
+                    <td style="text-align: right;">{{shopProduct.sellingPriceVatExcl | currency:'':''}}</td>
+                    <td>{{shopProduct.defaultReorderQty}}</td>
+                    <td>{{shopProduct.defaultReorderLevel}}</td>
+                    <td>{{shopProduct.vatRate * 100}} %</td>
+                    <td><button class="btn btn-primary btn-round-custom" (click)="searchShopProduct(shopProduct.id)" data-toggle="modal" data-target="#update-modal">Edit</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+
+
+
+<!-- <div class="row">
     <div class="col-md-12">
         <table class="table table-striped">
             <thead>
@@ -28,16 +99,16 @@
                     <th scope="col">VAT%</th>
                 </tr>
             </thead>
-            <!-- <tbody>
+            <tbody>
                 <tr *ngFor="let product of productStockStatus">
                     <td>{{product.productName}}</td>
                     <td>{{product.productCode}}</td>
                     <td>{{product.availableStock}}</td>
                 </tr>
-            </tbody> -->
+            </tbody>
         </table>
     </div>
-</div>
+</div> -->
 
 
 <div class="modal fade" id="import-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
@@ -51,13 +122,8 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <input type="hidden" [(ngModel)]="productId">
-                       <div class="form-group">
-                            <!-- <label>Name (Type to Search)</label>
-                            <input class="form-control" type="text" [(ngModel)]="productName" (ngModelChange)="getCompanyProductLike($event)" list="productList" autocomplete="nope">
-                            <datalist id="productList">
-                                <option *ngFor="let product of searchedProducts" [value]="product.name" (change)="searchProduct(product.id)" ></option>
-                            </datalist> -->
-
+                       <!-- <div class="form-group">
+                            
                             <label>(Type to Search by Name or Code)</label>
                             <input 
                               class="form-control" 
@@ -72,8 +138,7 @@
                             </datalist>
 
 
-                        </div>
-                        <hr>
+                        </div> -->
                         <div class="form-group">
                             <label>Product Code</label>
                             <input class="form-control" type="text" [(ngModel)]="productCode" autocomplete="nope" readonly>
@@ -83,41 +148,127 @@
                             <input class="form-control" type="text" [(ngModel)]="productName" autocomplete="nope" readonly>
                         </div> 
                         <div class="form-group">
+                            <label>Product Description</label>
+                            <input class="form-control" type="text" [(ngModel)]="productDescription" autocomplete="nope" readonly>
+                        </div>
+                        <div class="form-group">
                             <label>VAT(0-100)%</label>
-                            <input class="form-control" type="number" [(ngModel)]="productName" autocomplete="nope">
+                            <input class="form-control" type="number" [(ngModel)]="vat" autocomplete="nope">
                         </div>  
                         <div class="form-group">
                             <label>Cost Price Vat Inclusive</label>
-                            <input class="form-control" type="number" [(ngModel)]="productName" autocomplete="nope">
+                            <input class="form-control" type="number" [(ngModel)]="costPriceVatIncl" autocomplete="nope">
+                        </div>
+                        <div class="form-group">
+                            <label>Cost Price Vat Exclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="costPriceVatExcl" autocomplete="nope">
                         </div>
                         <div class="form-group">
                             <label>Selling Price Vat Inclusive</label>
-                            <input class="form-control" type="number" [(ngModel)]="productName" autocomplete="nope">
+                            <input class="form-control" type="number" [(ngModel)]="sellingPriceVatIncl" autocomplete="nope">
+                        </div> 
+                        <div class="form-group">
+                            <label>Selling Price Vat Exclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="sellingPriceVatExcl" autocomplete="nope">
                         </div>                     
                     </div>
                     <div class="col-lg-6">
                         <div class="form-group">
                              <label>Minimum Stock Level</label>
-                            <input class="form-control" type="text" [(ngModel)]="productName" autocomplete="nope">
+                            <input class="form-control" type="text" [(ngModel)]="minStock" autocomplete="nope">
                         </div>
                         <div class="form-group">
                             <label>Maximum Stock Level</label>
-                            <input class="form-control" type="number" [(ngModel)]="productName" autocomplete="nope">
+                            <input class="form-control" type="number" [(ngModel)]="maxStock" autocomplete="nope">
                         </div> 
                         <div class="form-group">
                             <label>Default Reorder Qty</label>
-                            <input class="form-control" type="number" [(ngModel)]="productName" autocomplete="nope">
+                            <input class="form-control" type="number" [(ngModel)]="defaultReorderQty" autocomplete="nope">
                         </div> 
                         <div class="form-group">
                             <label>Default Reorder Level</label>
-                            <input class="form-control" type="number" [(ngModel)]="productName" autocomplete="nope">
+                            <input class="form-control" type="number" [(ngModel)]="defaultReorderLevel" autocomplete="nope">
                         </div>                       
                      </div>
                 </div>
                 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="saveProduct()">Save Product</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="importShopProduct()">Save Product</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="update-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Update Product</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <input type="hidden" [(ngModel)]="productId">                       
+                        <div class="form-group">
+                            <label>Product Code</label>
+                            <input class="form-control" type="text" [(ngModel)]="productCode" autocomplete="nope" readonly>
+                        </div> 
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="productName" autocomplete="nope" readonly>
+                        </div> 
+                        <div class="form-group">
+                            <label>Product Description</label>
+                            <input class="form-control" type="text" [(ngModel)]="productDescription" autocomplete="nope" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>VAT(0-100)%</label>
+                            <input class="form-control" type="number" [(ngModel)]="vat" autocomplete="nope">
+                        </div>  
+                        <div class="form-group">
+                            <label>Cost Price Vat Inclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="costPriceVatIncl" autocomplete="nope">
+                        </div>
+                        <div class="form-group">
+                            <label>Cost Price Vat Exclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="costPriceVatExcl" autocomplete="nope">
+                        </div>
+                        <div class="form-group">
+                            <label>Selling Price Vat Inclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="sellingPriceVatIncl" autocomplete="nope">
+                        </div> 
+                        <div class="form-group">
+                            <label>Selling Price Vat Exclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="sellingPriceVatExcl" autocomplete="nope">
+                        </div>                     
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                             <label>Minimum Stock Level</label>
+                            <input class="form-control" type="text" [(ngModel)]="minStock" autocomplete="nope">
+                        </div>
+                        <div class="form-group">
+                            <label>Maximum Stock Level</label>
+                            <input class="form-control" type="number" [(ngModel)]="maxStock" autocomplete="nope">
+                        </div> 
+                        <div class="form-group">
+                            <label>Default Reorder Qty</label>
+                            <input class="form-control" type="number" [(ngModel)]="defaultReorderQty" autocomplete="nope">
+                        </div> 
+                        <div class="form-group">
+                            <label>Default Reorder Level</label>
+                            <input class="form-control" type="number" [(ngModel)]="defaultReorderLevel" autocomplete="nope">
+                        </div>                       
+                     </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="updateShopProduct()">Save Product</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
             </div>
         </div>
@@ -132,25 +283,3 @@
 
 
 
-<!-- 
-id : number
-    productId : number
-    productCode : string
-    productName : string
-    productDescription : string
-    shopId : number
-    shopName : string
-    currentStock : number
-    minStock : number
-    maxStock : number
-    defaultReorderQty : number
-    defaultReorderLevel : number
-    vatRate : number
-    vatPercentage : number
-    costPriceVatIncl : number
-    costPriceVatExcl : number
-    sellingPriceVatIncl : number
-    sellingPriceVatExcl : number
-    active : string
-    created : string
-    createdDateTime : string -->
