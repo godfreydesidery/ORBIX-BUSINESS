@@ -3,6 +3,7 @@ export interface IShopSalesOrder {
     id : any
     no : string
     summary : string
+    customerName : string
     status : string
     shopId : number
 

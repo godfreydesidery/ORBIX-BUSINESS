@@ -3,7 +3,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MsgBoxService } from '@services/custom/msg-box.service';
+import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from 'src/app/auth.service';
+import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 
 import { ICompany } from 'src/app/domain/company';
 import { IProduct } from 'src/app/domain/product';
@@ -17,7 +19,9 @@ const API_URL = environment.apiUrl;
   standalone: true,
   imports: [
     FormsModule,
-    CommonModule
+    CommonModule,
+    SearchFilterPipe,
+    NgxPaginationModule
   ],
   templateUrl: './product.component.html',
   styleUrl: './product.component.scss'
@@ -39,6 +43,11 @@ products : IProduct[] = []
 
 /**Identifiers */
 productId : string = ''
+
+
+page: number = 1; // Initialize the current page to 1
+filterRecords : string = ''
+selectedOption: string = '';
 
 constructor(
   private http :HttpClient,
@@ -70,6 +79,8 @@ async getAllProducts(){
     }
   )
 }
+
+
 
 async get(id : any){
   let options = {

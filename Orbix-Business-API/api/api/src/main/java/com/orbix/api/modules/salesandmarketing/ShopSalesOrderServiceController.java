@@ -90,6 +90,7 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 		shopSalesOrder.setShop(shop);
 		shopSalesOrder.setStatus(WorkFlowStatus.PENDING);
 		shopSalesOrder.setSummary(shopSalesOrderRequest.getSummary());
+		shopSalesOrder.setCustomerName(shopSalesOrderRequest.getCustomerName());
 		shopSalesOrder.setCreatedByUser(userService.getUser(request));
 		shopSalesOrder.setCreatedDateTime(dayService.getTimeStamp());
 		shopSalesOrder = shopSalesOrderRepository.save(shopSalesOrder);
@@ -115,6 +116,7 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 		shopSalesOrderResponse.setShopId(shopSalesOrder.getShop().getId().toString());
 		shopSalesOrderResponse.setStatus(shopSalesOrder.getStatus().toString());
 		shopSalesOrderResponse.setSummary(shopSalesOrder.getSummary());
+		shopSalesOrderResponse.setCustomerName(shopSalesOrder.getCustomerName());
 		
 		return shopSalesOrderResponse;
 	}
@@ -128,6 +130,7 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 		shopSalesOrderResponse.setShopId(shopSalesOrder.getShop().getId().toString());
 		shopSalesOrderResponse.setStatus(shopSalesOrder.getStatus().toString());
 		shopSalesOrderResponse.setSummary(shopSalesOrder.getSummary());
+		shopSalesOrderResponse.setCustomerName(shopSalesOrder.getCustomerName());
 		
 		for(ShopSalesOrderDetail shopSalesOrderDetail : shopSalesOrder.getShopSalesOrderDetails()) {
 			shopSalesOrderDetailResponses.add(shopSalesOrderDetailResponseDTOMapper(shopSalesOrderDetail));

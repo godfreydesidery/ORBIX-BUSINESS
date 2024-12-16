@@ -50,6 +50,8 @@ public class ShopSalesOrder {
 	@NotBlank
 	private String no;
 	
+	private String customerName;
+	
 	private String summary;
 	
 	@Enumerated(EnumType.STRING)

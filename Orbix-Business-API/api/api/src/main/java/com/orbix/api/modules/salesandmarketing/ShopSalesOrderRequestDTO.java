@@ -9,4 +9,6 @@ public class ShopSalesOrderRequestDTO {
 	String summary;
 	String status;	
     Long shopId;
+    
+    String customerName;
 }

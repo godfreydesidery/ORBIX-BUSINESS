@@ -63,6 +63,12 @@ export class ShopSalesOrderComponent {
 
   shopSalesOrderId : any = null
 
+  customerName : string = ''
+
+  page: number = 1; // Initialize the current page to 1
+  filterRecords : string = ''
+  selectedOption: string = '';
+
   constructor(
     private http :HttpClient,
     private auth : AuthService,
@@ -196,6 +202,8 @@ export class ShopSalesOrderComponent {
 
           this.shopSalesOrderId = this.shopSalesOrder.id
 
+          this.customerName = data!.customerName
+
           this.totalAmount = 0
 
           var sn = 1
@@ -222,7 +230,8 @@ export class ShopSalesOrderComponent {
         id : null,
         no : null,
         summary : null,
-        shopId : this.shopId
+        shopId : this.shopId,
+        customerName : this.customerName
       }
     
       if(shopSalesOrder.id === null){
@@ -277,6 +286,7 @@ export class ShopSalesOrderComponent {
     clearOrder(){
       this.shopSalesOrder!
       this.shopSalesOrderId = null
+      this.customerName = ''
     }
 
     // Triggered on every keystroke
@@ -499,7 +509,7 @@ export class ShopSalesOrderComponent {
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      this.http.post<IShopSalesOrder>(API_URL+'/shop_sales_orders/confirm?shop_sales_order_id=' + this.shopSalesOrderId, null, options)
+      await this.http.post<IShopSalesOrder>(API_URL+'/shop_sales_orders/confirm?shop_sales_order_id=' + this.shopSalesOrderId, null, options)
         .toPromise()
         .then(
           data => {

@@ -8,6 +8,7 @@ import lombok.Data;
 public class ShopSalesOrderResponseDTO {
 	String id;
 	String no;	
+	String customerName;
 	String summary;
 	String status;	
     String shopId;

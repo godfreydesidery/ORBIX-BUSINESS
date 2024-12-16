@@ -12,7 +12,7 @@
                         <br><br>
                         
                         <div class="form-group">
-                            <select class="form-control" [(ngModel)]="selectedShopId" (change)="onShopChange($event)" style="height: 100px;">
+                            <select class="form-control" [(ngModel)]="selectedShopId" (change)="onShopChange($event)">
                                 <option value = ''></option>
                                 <option *ngFor="let shop of availableShops" [value]="shop.id" style="font-size: larger;">Shop name: <b>{{shop.name}}</b> Location: {{shop.locationName}}</option>
                             </select>
