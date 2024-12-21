@@ -499,6 +499,14 @@ export const menuItems = [
                     {
                         title: 'Vehicle Parking',
                         routerLink: '/app/parking-management/reports/parking-report'
+                    },
+                    {
+                        title: 'Sales Listing Report',
+                        routerLink: '/app/mechandizing/sales-listing-report'
+                    },
+                    {
+                        title: 'Fast Moving Products',
+                        routerLink: '/app/mechandizing/fast-moving-products-report'
                     },                    
                     {
                         title: 'Revenue Report',

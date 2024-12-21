@@ -56,6 +56,11 @@ export class ImportProductComponent {
     showImportList : boolean = false
   
     importProducts : IProduct[] = []
+
+    page: number = 1; // Initialize the current page to 1
+    filterRecords : string = ''
+    selectedOption: string = '';
+    options: string[] = ['Option 1', 'Option 2', 'Option 3'];
   
     constructor(
       private http :HttpClient,
@@ -353,7 +358,6 @@ export class ImportProductComponent {
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-  
       await this.http.get<IProduct[]>(API_URL+'/products/get_company_sellable_products_by_shop?shop_id=' + this.shopId, options)
         .toPromise()
         .then(

@@ -13,6 +13,7 @@ public interface ShopProductService {
 	ShopProductResponseDTO getProductInShop(Long productId, Long shopId, HttpServletRequest request);
 	ShopProductResponseDTO createShopProduct(ShopProductRequestDTO shopProductRequest, HttpServletRequest request);
 	ShopProductResponseDTO updateShopProduct(ShopProductRequestDTO shopProductRequest, HttpServletRequest request);
+	ShopProductResponseDTO adjustShopStock(ShopProductRequestDTO shopProductRequest, HttpServletRequest request);
 	ApiCustomResponse activateShopProduct(ShopProductRequestDTO shopProductRequest, HttpServletRequest request);
 	ApiCustomResponse deactivateShopProduct(ShopProductRequestDTO shopProductRequest, HttpServletRequest request);
 	

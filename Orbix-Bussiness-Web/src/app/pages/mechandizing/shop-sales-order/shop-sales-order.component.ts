@@ -69,7 +69,7 @@ export class ShopSalesOrderComponent {
   filterRecords : string = ''
   selectedOption: string = '';
 
-  payCode : string = ''
+  payCode : string = 'CASH'
   payRefNo : string = ''
 
   constructor(

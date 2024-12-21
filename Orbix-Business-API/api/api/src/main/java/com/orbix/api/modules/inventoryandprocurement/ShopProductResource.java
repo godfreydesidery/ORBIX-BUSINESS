@@ -71,6 +71,15 @@ public class ShopProductResource {
 		return ResponseEntity.created(uri).body(shopProductService.updateShopProduct(shopProductRequest, request));
 	}
 	
+	@PostMapping("/shop_products/adjust_stock")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<ShopProductResponseDTO>adjustStock(
+			@RequestBody ShopProductRequestDTO shopProductRequest,
+			HttpServletRequest request){		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/shop_products/adjust_stock").toUriString());
+		return ResponseEntity.created(uri).body(shopProductService.adjustShopStock(shopProductRequest, request));
+	}
+	
 	@PostMapping("/shop_products/activate")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(

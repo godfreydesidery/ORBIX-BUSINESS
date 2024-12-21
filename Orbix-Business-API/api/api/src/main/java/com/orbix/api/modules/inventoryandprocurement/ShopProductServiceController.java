@@ -208,6 +208,52 @@ public class ShopProductServiceController implements ShopProductService {
 	    
 	    return this.shopProductResponseDTOMapper(shopProduct);
 	}
+	
+	
+	@Override
+	public ShopProductResponseDTO adjustShopStock(ShopProductRequestDTO shopProductRequest,
+			HttpServletRequest request) {
+		
+		
+		
+		Long shopId = shopProductRequest.getShopId();
+		Long productId = shopProductRequest.getProductId();
+		
+		/////////////////
+		double currentStock = shopProductRequest.getCurrentStock();
+		
+		// Validate and fetch the shop
+	    Shop shop = shopRepository.findById(shopId)
+	                              .orElseThrow(() -> new NotFoundException("Shop not found"));
+	    // Validate and fetch the product
+	    Product product = productRepository.findById(productId)
+	                              .orElseThrow(() -> new NotFoundException("Shop Product not found"));
+	    
+	    Optional<ShopProduct> shopProduct_ = shopProductRepository.findByShopAndProduct(shop, product);
+	    if(shopProduct_.isEmpty()) {
+	    	throw new InvalidOperationException(
+		            String.format("Product '%s' does not exist in shop '%s'", product.getName(), shop.getName())
+		        );
+	    }
+	   
+		ShopProduct shopProduct = shopProduct_.get();
+		boolean stockChanged = false;
+		if(shopProduct.getCurrentStock() != currentStock) {
+			stockChanged = true;
+		}
+	    shopProduct.setCurrentStock(currentStock);
+	    
+	    shopProduct.setActive(true);
+	    
+	    shopProduct = shopProductRepository.save(shopProduct);
+	    
+	    //Update ShopProduct log for stock card
+	    
+	    if(stockChanged == true)this.createShopProductLog(shop, product, currentStock, 0, currentStock, userService.getUser(request), dayService.getTimeStamp(), "Stock Adjustment");
+
+	    
+	    return this.shopProductResponseDTOMapper(shopProduct);
+	}
 
 	@Override
 	public ApiCustomResponse activateShopProduct(ShopProductRequestDTO shopProductRequest, HttpServletRequest request) {

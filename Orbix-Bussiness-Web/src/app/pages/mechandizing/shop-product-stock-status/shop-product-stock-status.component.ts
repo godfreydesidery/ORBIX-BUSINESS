@@ -49,6 +49,8 @@ export class ShopProductStockStatusComponent {
 
   shopName : string = ''
 
+  currentStock : number = 0
+
   searchedProducts : IProduct[] = []
 
   isUserTyping: boolean = true; // Flag to detect user typing
@@ -56,6 +58,11 @@ export class ShopProductStockStatusComponent {
   showImportList : boolean = false
 
   importProducts : IProduct[] = []
+
+  page: number = 1; // Initialize the current page to 1
+  filterRecords : string = ''
+  selectedOption: string = '';
+  options: string[] = ['Option 1', 'Option 2', 'Option 3'];
 
   constructor(
     private http :HttpClient,
@@ -187,6 +194,37 @@ export class ShopProductStockStatusComponent {
 
   }
 
+  adjustShopStock = async () => {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    var shopProduct = {
+      productId : this.productId,
+      shopId : this.shopId,
+      currentStock : this.currentStock
+    }
+
+    await this.http.post<IShopProduct>(API_URL+'/shop_products/adjust_stock', shopProduct, options)
+    .toPromise()
+    .then(
+      data => {
+        
+        console.log(data)
+        this.msg.showSuccessMessage('Product stock updated successfully')
+        this.loadShopProductStockStatus()
+      }
+    )
+    .catch(
+      error => {
+        console.log(error)
+        this.msg.showErrorMessage(error, 'Error')
+      }
+    )
+
+
+  }
+
   clearShopProduct(){
   this.productId = null
 
@@ -293,6 +331,7 @@ export class ShopProductStockStatusComponent {
           this.sellingPriceVatExcl = data!.sellingPriceVatExcl
           this.minStock = data!.minStock
           this.maxStock = data!.maxStock
+          this.currentStock = data!.currentStock
           this.defaultReorderQty = data!.defaultReorderQty
           this.defaultReorderLevel = data!.defaultReorderLevel
           

@@ -369,6 +369,68 @@ export class DataService {
     }
   }
 
+  async getBranchReceiptHeaderWithNoTinAndVrn(receiptNo: string) {
+    try {
+      const options = {
+        headers: new HttpHeaders().set('Authorization','Bearer ' + this.auth.user.access_token),
+      }
+  
+      // Fetch data from the API
+      const data = await this.http
+        .get<IBranchReceiptHeader>(
+          API_URL + '/companies/get_branch_receipt_header_by_user',
+          options
+        )
+        .toPromise();
+  
+      if (data) {
+        const {
+          companyName,
+          branchName,
+          address,
+          location,
+          email,
+          website,
+          tin,
+          vrn,
+        } = data;
+  
+        // Create the address object
+        const receiptHeader = {
+          headerRows: 0,
+          widths: [200],
+          body: [
+            [
+              {
+                text: 'Document #: ' + receiptNo,
+                fontSize: 12,
+                bold: true,
+                alignment: 'right',
+              },
+            ],
+            [{ text: ' ', fontSize: 7, bold: true, alignment: 'center' }],
+            [{ text: companyName, fontSize: 12, bold: true, alignment: 'center' }],
+            [{ text: branchName, fontSize: 10, bold: true, alignment: 'center' }],
+            [{ text: address, fontSize: 8, bold: true, alignment: 'center' }],
+            [{ text: location, fontSize: 8, bold: true, alignment: 'center' }],
+            [{ text: email, fontSize: 8, bold: true, alignment: 'center' }],
+            [{ text: website, fontSize: 8, bold: true, alignment: 'center' }],
+            // [{ text: tin, fontSize: 8, bold: true, alignment: 'center' }],
+            // [{ text: vrn, fontSize: 8, bold: true, alignment: 'center' }],
+          ],
+        };
+  
+        return receiptHeader;
+      } else {
+        console.log('No data received from API.');
+        return null;
+      }
+    } catch (error) {
+      console.error('Error fetching receipt header:', error);
+      return null;
+    }
+  }
+
 
 
 
