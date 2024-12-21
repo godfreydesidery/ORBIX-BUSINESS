@@ -13,4 +13,5 @@ export interface IProduct {
 
     //Numbering
     sn : number
+    imported : string
 }

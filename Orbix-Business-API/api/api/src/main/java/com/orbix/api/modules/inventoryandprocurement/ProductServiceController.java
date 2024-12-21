@@ -37,6 +37,8 @@ public class ProductServiceController implements ProductService {
 	
 	private final ShopRepository shopRepository;
 	
+	private final ShopProductRepository shopProductRepository;
+	
 	/**
 	 * 
 	 */
@@ -121,7 +123,7 @@ public class ProductServiceController implements ProductService {
 		return productResponseDTOMapper(product);
 	}
 	
-	private ProductResponseDTO productResponseDTOMapper(Product product) {
+	private ProductResponseDTO productResponseDTOMapper(Product product) {	
 		ProductResponseDTO productResponse = new ProductResponseDTO();
 		productResponse.setId(product.getId().toString());
 		productResponse.setCode(product.getCode());
@@ -134,6 +136,30 @@ public class ProductServiceController implements ProductService {
 		}else {
 			productResponse.setActive("Inactive");
 		}
+		
+		//productResponse.setOtherInfo("Company: " + product.getCompany().getName() + " Location: " + product.getLocationName());
+		return productResponse;
+	}
+	
+	private ProductResponseDTO productResponseDTOMapperWithImportedStatus(Product product, boolean importedToShop) {	
+		ProductResponseDTO productResponse = new ProductResponseDTO();
+		productResponse.setId(product.getId().toString());
+		productResponse.setCode(product.getCode());
+		productResponse.setName(product.getName());
+		productResponse.setDescription(product.getDescription());
+		productResponse.setBaseUom(product.getBaseUom());
+		productResponse.setCompanyId(product.getCompany().getId().toString());		
+		if(product.isActive()) {
+			productResponse.setActive("Active");
+		}else {
+			productResponse.setActive("Inactive");
+		}
+		if(importedToShop == true) {
+			productResponse.setImported("1");
+		}else {
+			productResponse.setImported("0");
+		}
+		
 		//productResponse.setOtherInfo("Company: " + product.getCompany().getName() + " Location: " + product.getLocationName());
 		return productResponse;
 	}
@@ -223,5 +249,35 @@ public class ProductServiceController implements ProductService {
 	    return products.stream()
 	        .map(this::productResponseDTOMapper)
 	        .collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<ProductResponseDTO> getCompanySellableProductsByShop(Long shopId, HttpServletRequest request) {
+	    
+
+	    // Fetch company
+	    Company company = userService.getUserCompany(request);
+	    if (company == null) {
+	        throw new NotFoundException("Company not found for the user");
+	    }
+	    Shop shop = shopRepository.findById(shopId)
+	    	    .orElseThrow(() -> new NotFoundException("Shop not found"));
+
+	    // Fetch products
+	    List<Product> products = productRepository.findAllByCompanyAndSellable(company, true);
+	    List<ProductResponseDTO> productResponses = new ArrayList<>();
+	    
+	    for(Product product : products) {
+	    	boolean imported = false;
+	    	Optional<ShopProduct> shopProduct_ = shopProductRepository.findByProductAndShop(product, shop);
+	    	if(shopProduct_.isPresent()) {
+	    		imported = true;
+	    	}	    	
+	    	productResponses.add(productResponseDTOMapperWithImportedStatus(product, imported));
+	    	
+	    }
+
+	    // Map to DTOs
+	    return productResponses;
 	}
 }

@@ -65,6 +65,30 @@
                                         <h5 class="mb-0">Order Payments</h5>
                                     </div>
                                     <div class="card-body">
+
+                                        <table>
+                                            <tr>
+                                                <td style="text-align: left;">Mode</td>
+                                                <td style="text-align: left;">Ref No</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)] = "payCode">
+                                                        <option>CASH</option>
+                                                        <option>MPESA</option>
+                                                        <option>TIGOPESA</option>
+                                                        <option>HALOPESA</option>
+                                                        <option>AIRTELMONEY</option>
+                                                        <option>BANK</option>
+                                                        <option>OTHER</option>
+                                                    </select>
+                                                </td>
+                                                <td><input type="text" class="form-control" *ngIf="payCode != 'CASH'" [(ngModel)]="payRefNo"></td>
+                                            </tr> 
+                                            <br>
+                                        </table>
+
+
                                         <ul class="list-unstyled mb-0">
                                             <!-- <li class="d-flex justify-content-between">
                                                 <span>Subtotal:</span> <span>$500.00</span>
@@ -76,11 +100,11 @@
                                                 <span>Tax (10%):</span> <span>$45.00</span>
                                             </li> -->
                                             <li class="d-flex justify-content-between font-weight-bold border-top pt-2">
-                                                <span>Total Amount:</span> <span>{{totalAmount | currency:'':''}}</span>
+                                                <span style="font-weight: bold;">Total Amount:</span> <span style="font-weight: bold; font-size: larger;">{{totalAmount | currency:'':''}}</span>
                                             </li>
                                         </ul>
                                     </div>
-                                    <div class="card-footer text-right">
+                                    <div class="card-footer text-right" *ngIf="payCode != ''">
                                         <button class="btn btn-success btn-sm" (click)="confirmOrder()">Confirm Order</button>
                                     </div>
                                 </div>

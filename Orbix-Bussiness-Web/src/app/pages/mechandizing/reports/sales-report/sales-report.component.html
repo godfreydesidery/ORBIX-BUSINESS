@@ -1,0 +1,88 @@
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>Cash Collections</span>                       
+            </div>
+            <div class="card-body widget-body text-white"> 
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="form-control">From</label>
+                            <input type="date" class="form-control" [(ngModel)]="from">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="form-control">To</label>
+                            <input type="date" class="form-control" [(ngModel)]="to">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="form-control">Cashier Name</label>
+                            <select class="form-control" [(ngModel)]="nickname">
+                                <option></option>
+                                <option *ngFor="let cashier of userNames">{{cashier}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <br><br>
+                            <button class="btn btn-outline-success" (click)="getTotalsByDates(from, to)">Run Report</button>
+                            <button class="btn btn-outline-primary btn-round-custom" (click)="printCashierCollectionReport()" style="padding-left: 3px;">Print Report</button>
+                        
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12" *ngIf="cashierCollections.length > 0">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <td><b>SN</b></td>
+                                    <td><b>Chasis No</b></td>
+                                    <td><b>Vehicle Type</b></td>
+                                    <td><b>Qty/Days</b></td>
+                                    <td><b>Service Type</b></td>
+                                    <td><b>Amount</b></td>
+                                    <td><b>Pay Code</b></td>
+                                    <td><b>Cashier Name</b></td>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let cashierCollection of cashierCollections">
+                                        <td>{{cashierCollection.sn}}</td>
+                                        <td>{{cashierCollection.chasisNo}}</td>
+                                        <td>{{cashierCollection.vehicleEquipmentTypeName}}</td>
+                                        <td>{{cashierCollection.qty}}</td>
+                                        <td>{{cashierCollection.serviceType}}</td>
+                                        <td style="text-align: right;">{{cashierCollection.amount | currency:'':''}}</td>
+                                        <td>{{cashierCollection.payCode}}</td>  
+                                        <td>{{cashierCollection.cashierName}}</td>                                      
+                                    </tr>
+                                </tbody>
+                                <tfoot>
+                                    <tr>
+                                        <td colspan="4"><b>Total</b></td>
+                                        <td style="text-align: right;"><b>{{totalCollections | currency:'':''}}</b></td>
+                                        <td colspan="2"></td>
+                                    </tr>
+                                </tfoot>
+                            </table>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-12" *ngIf="cashierCollections.length == 0">
+                        <div class="alert alert-info" *ngIf="cashierCollections.length == 0" style="text-align: center;">
+                            No Cash Collections Found
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

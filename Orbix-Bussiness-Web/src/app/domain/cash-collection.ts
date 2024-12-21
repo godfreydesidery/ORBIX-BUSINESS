@@ -2,6 +2,7 @@ export interface ICashCollection {
     reason : string  
     amount : number
     paymentType : string
+    payCode : string
     cashierName : string
 
     sn : number
@@ -31,6 +32,7 @@ export interface IParkingServiceCashCollection {
 
   amount : number
   paymentType : string
+  payCode : string
   cashierName : string
   reason : string
   vehicleEquipmentCategory : string

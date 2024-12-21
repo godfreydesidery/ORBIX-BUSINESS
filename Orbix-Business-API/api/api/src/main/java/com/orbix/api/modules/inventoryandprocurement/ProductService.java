@@ -17,4 +17,5 @@ public interface ProductService {
 	List<ProductResponseDTO> getProductsByCompany(String productName, HttpServletRequest request);
 	
 	List<ProductResponseDTO> getCompanySellableProducts(HttpServletRequest request);
+	List<ProductResponseDTO> getCompanySellableProductsByShop(Long shopId, HttpServletRequest request);
 }

@@ -5,7 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 public interface SaleService {
-	boolean createSale(SaleRequestDTO saleRequest, HttpServletRequest request);
+	public Sale createSale(SaleRequestDTO saleRequest, HttpServletRequest request);
 	
 //	List<SaleResponseDTO> getAllSalesBy(Long shopId, HttpServletRequest request);
 //	List<ShopSalesOrderResponseDTO> getAllPendingShopSalesOrders(Long shopId, HttpServletRequest request);

@@ -1,5 +1,8 @@
 package com.orbix.api.modules.salesandmarketing;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
@@ -28,18 +31,20 @@ public class SaleServiceController implements SaleService {
 	private final DayService dayService;
 	
 	@Override
-	public boolean createSale(SaleRequestDTO saleRequest, HttpServletRequest request) {
+	public Sale createSale(SaleRequestDTO saleRequest, HttpServletRequest request) {
 		
 		Sale sale = new Sale();
 		
 		sale.setCreatedByUser(userService.getUser(request));
 		sale.setCreatedDateTime(dayService.getTimeStamp());
 		
-		sale = saleRepository.save(sale);
+		sale = saleRepository.saveAndFlush(sale);
 		
 		if (saleRequest.getSaleDetails() == null || saleRequest.getSaleDetails().isEmpty()) {
 		    throw new IllegalArgumentException("Sale details cannot be empty.");
 		}
+		
+		List<SaleDetail> saleDetails = new ArrayList<>();
 		
 		for(SaleDetailRequestDTO saleDetailRequest : saleRequest.getSaleDetails()) {
 			SaleDetail saleDetail = new SaleDetail();
@@ -49,13 +54,13 @@ public class SaleServiceController implements SaleService {
 			saleDetail.setSellingPriceVatIncl(saleDetailRequest.getSellingPriceVatIncl());
 			saleDetail.setVatRate(saleDetailRequest.getVatRate());
 			saleDetail.setQty(saleDetailRequest.getQty());
-			saleDetailRepository.save(saleDetail);
-			
-			
-		}	
-		return true;
+			saleDetail = saleDetailRepository.saveAndFlush(saleDetail);
+			saleDetails.add(saleDetail);
+		}
+		
+		sale = saleRepository.findById(sale.getId()).get();
+		sale.setSaleDetails(saleDetails);
+		
+		return sale;
 	}
-	
-	
-
 }

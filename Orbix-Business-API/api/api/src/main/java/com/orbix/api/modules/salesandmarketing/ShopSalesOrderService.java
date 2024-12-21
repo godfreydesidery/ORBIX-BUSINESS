@@ -4,6 +4,8 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.orbix.api.api.commons.PayCode;
+
 public interface ShopSalesOrderService {
 	List<ShopSalesOrderResponseDTO> getAllShopSalesOrders(Long shopId, HttpServletRequest request);
 	List<ShopSalesOrderResponseDTO> getAllPendingShopSalesOrders(Long shopId, HttpServletRequest request);
@@ -19,7 +21,6 @@ public interface ShopSalesOrderService {
 	
 	void removeShopOrderDetail(Long shopOrderDetailId, Long shopOrderId, HttpServletRequest request);
 	
-	boolean confirmShopSalesOrder(Long shopOrderId, HttpServletRequest request);
+	boolean confirmShopSalesOrder(Long shopOrderId, PayCode payCode, String payRefNo, HttpServletRequest request);
 	boolean cancelShopSalesOrder(Long shopOrderId, HttpServletRequest request);
-	
 }

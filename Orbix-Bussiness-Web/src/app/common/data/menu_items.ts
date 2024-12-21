@@ -438,6 +438,14 @@ export const menuItems = [
                 title: 'Select Shop',
                 routerLink: '/app/mechandizing/select-shop'
             },
+            {
+                title: 'Sales Listing Report',
+                routerLink: '/app/mechandizing/sales-listing-report'
+            },
+            {
+                title: 'Fast Moving Products',
+                routerLink: '/app/mechandizing/fast-moving-products-report'
+            },
         ]
     },
     {

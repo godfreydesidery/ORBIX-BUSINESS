@@ -126,10 +126,29 @@ export const routes: Routes = [
         data : { breadcrumb : 'Mechandizing/Shop Stock Status'},
         canActivate : [AuthGuard]
       },
+
+      {
+        path : 'mechandizing/import-product',
+        loadComponent: () => import('./mechandizing/import-product/import-product.component').then(c => c.ImportProductComponent),
+        data : { breadcrumb : 'Mechandizing/Import Product'},
+        canActivate : [AuthGuard]
+      },
       {
         path : 'mechandizing/shop-sales-order',
         loadComponent: () => import('./mechandizing/shop-sales-order/shop-sales-order.component').then(c => c.ShopSalesOrderComponent),
         data : { breadcrumb : 'Mechandizing/Sales Order'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/sales-listing-report',
+        loadComponent: () => import('./mechandizing/reports/sales-listing-report/sales-listing-report.component').then(c => c.SalesListingReportComponent),
+        data : { breadcrumb : 'Mechandizing/Reports/Sales Listing Report'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/fast-moving-products-report',
+        loadComponent: () => import('./mechandizing/reports/fast-moving-products-report/fast-moving-products-report.component').then(c => c.FastMovingProductsReportComponent),
+        data : { breadcrumb : 'Mechandizing/Reports/Fast Moving Products Report'},
         canActivate : [AuthGuard]
       },
 

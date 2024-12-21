@@ -11,12 +11,20 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.orbix.api.api.commons.PayCode;
+import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.api.commons.WorkFlowStatus;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.adminunits.Shop;
 import com.orbix.api.modules.adminunits.ShopRepository;
+import com.orbix.api.modules.finance.BillReceivable;
+import com.orbix.api.modules.finance.BillReceivableCollection;
+import com.orbix.api.modules.finance.BillReceivableCollectionRepository;
+import com.orbix.api.modules.finance.BillReceivableRepository;
+import com.orbix.api.modules.finance.Collection;
+import com.orbix.api.modules.finance.CollectionRepository;
 import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.inventoryandprocurement.Product;
@@ -47,6 +55,14 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 	
 	private final SaleService saleService;
 	private final ShopProductLogRepository shopProductLogRepository;
+	
+	private final BillReceivableRepository billReceivableRepository;
+	private final SaleDetailBillReceivableRepository saleDetailBillReceivableRepository;
+	
+	private final CollectionRepository collectionRepository;
+	private final BillReceivableCollectionRepository billReceivableCollectionRepository;
+	
+	private final SaleRepository saleRepository;
 	
 	
 	@Override
@@ -234,7 +250,11 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 	}
 
 	@Override
-	public boolean confirmShopSalesOrder(Long shopOrderId, HttpServletRequest request) {
+	public boolean confirmShopSalesOrder(
+			Long shopOrderId, 
+			PayCode payCode,
+			String payRefNo,
+			HttpServletRequest request) {
 		ShopSalesOrder shopSalesOrder = shopSalesOrderRepository.findById(shopOrderId)
 			    .orElseThrow(() -> new NotFoundException("Order not found, with id " + shopOrderId));
 		if(!String.valueOf(shopSalesOrder.getStatus()).equals("PENDING")) {
@@ -262,7 +282,7 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 		}
 		saleRequest.setSaleDetails(saleDetails);
 		
-		saleService.createSale(saleRequest, request);
+		Sale sale = saleService.createSale(saleRequest, request);
 		
 		shopSalesOrder.setStatus(WorkFlowStatus.CONFIRMED);
 		
@@ -270,6 +290,60 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 		shopSalesOrder.setConfirmedDateTime(dayService.getTimeStamp());
 		
 		shopSalesOrderRepository.save(shopSalesOrder);
+		for(int i = 1; i < 100; i++) {
+			System.out.println(sale.getId());
+		}
+		
+		
+		for(SaleDetail saleDetail : sale.getSaleDetails()) {
+			
+			double amount = saleDetail.getCostPriceVatIncl() * saleDetail.getQty();
+			
+			// Create a bill receivable
+			
+			BillReceivable billReceivable = new BillReceivable();
+			billReceivable.setAmount(amount);
+			billReceivable.setBranch(shopSalesOrder.getShop().getBranch());
+			billReceivable.setPaid(amount);
+			billReceivable.setDue(0);
+			billReceivable.setSummary("Product sale");
+			billReceivable.setQty(saleDetail.getQty());
+			billReceivable.setPaidDateTime(dayService.getTimeStamp());
+			billReceivable.setPayStatus(PayStatus.PAID);
+			billReceivable.setNo(String.valueOf(Math.random()));
+			
+			billReceivable = billReceivableRepository.save(billReceivable);
+			
+			SaleDetailBillReceivable saleDetailBillReceivable = new SaleDetailBillReceivable();
+			
+			saleDetailBillReceivable.setBillReceivable(billReceivable);
+			saleDetailBillReceivable.setSaleDetail(saleDetail);
+			saleDetailBillReceivable.setDiscount(0);
+			saleDetailBillReceivable.setQty(saleDetail.getQty());
+			saleDetailBillReceivable.setPrice(saleDetail.getCostPriceVatIncl());
+			saleDetailBillReceivableRepository.save(saleDetailBillReceivable);
+			
+			Collection collection = new Collection();
+			collection.setPayCode(payCode);
+			collection.setPayRefNo(payRefNo);
+			collection.setCollectionDateTime(dayService.getTimeStamp());
+			collection.setCollectedByUser(userService.getUser(request));
+			
+			collection = collectionRepository.save(collection);
+			
+			BillReceivableCollection billReceivableCollection = new BillReceivableCollection();
+			
+			billReceivableCollection.setAmount(amount);
+			billReceivableCollection.setPartial(false);
+			billReceivableCollection.setReason("Product Sale");
+			billReceivableCollection.setBillReceivable(billReceivable);
+			billReceivableCollection.setCollection(collection);
+			
+			billReceivableCollectionRepository.save(billReceivableCollection);
+			
+		}
+		
+		
 		
 		return true;
 	}

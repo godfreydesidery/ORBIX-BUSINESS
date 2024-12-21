@@ -69,6 +69,9 @@ export class ShopSalesOrderComponent {
   filterRecords : string = ''
   selectedOption: string = '';
 
+  payCode : string = ''
+  payRefNo : string = ''
+
   constructor(
     private http :HttpClient,
     private auth : AuthService,
@@ -509,7 +512,7 @@ export class ShopSalesOrderComponent {
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      await this.http.post<IShopSalesOrder>(API_URL+'/shop_sales_orders/confirm?shop_sales_order_id=' + this.shopSalesOrderId, null, options)
+      await this.http.post<IShopSalesOrder>(API_URL+'/shop_sales_orders/confirm?shop_sales_order_id=' + this.shopSalesOrderId + '&pay_code=' + this.payCode + '&pay_ref_no=' + this.payRefNo, null, options)
         .toPromise()
         .then(
           data => {
@@ -524,6 +527,8 @@ export class ShopSalesOrderComponent {
           this.msg.showErrorMessage(error, 'Error')
         }       
       )
+      this.payCode = ''
+      this.payRefNo = ''
     }
 
     async cancelOrder(){

@@ -11,4 +11,6 @@ public class ProductResponseDTO {
 	private String baseUom;
 	private String active;
 	private String companyId;
+	
+	private String imported;
 }

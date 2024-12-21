@@ -33,7 +33,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @Transactional
-public class ReportResource {
+public class ParkingReportResource {
 	
 	private final ParkingRepository parkingRepository;
 	private final ParkingBillReceivableRepository parkingBillReceivableRepository;

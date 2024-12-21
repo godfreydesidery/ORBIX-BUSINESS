@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.orbix.api.api.commons.PayCode;
 import com.orbix.api.modules.inventoryandprocurement.ProductResponseDTO;
 import com.orbix.api.modules.inventoryandprocurement.UomRequestDTO;
 import com.orbix.api.modules.inventoryandprocurement.UomResponseDTO;
@@ -78,8 +79,10 @@ public class ShopSalesOrderResource {
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public boolean confirm(
 			@RequestParam(name = "shop_sales_order_id") Long shopOrderId,
+			@RequestParam(name = "pay_code") PayCode payCode,
+			@RequestParam(name = "pay_ref_no") String payRefNo,
 			HttpServletRequest request){		
-		return shopSalesOrderService.confirmShopSalesOrder(shopOrderId, request);
+		return shopSalesOrderService.confirmShopSalesOrder(shopOrderId, payCode, payRefNo,  request);
 	}
 	
 	@PostMapping("/shop_sales_orders/cancel")

@@ -91,4 +91,11 @@ public class ProductResource {
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(productService.getCompanySellableProducts(request));
 	}
+	
+	@GetMapping("/products/get_company_sellable_products_by_shop")
+	public ResponseEntity<List<ProductResponseDTO>>getCompanySellableProductsByShop(
+			@RequestParam(name = "shop_id") Long shopId,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(productService.getCompanySellableProductsByShop(shopId, request));
+	}
 }
