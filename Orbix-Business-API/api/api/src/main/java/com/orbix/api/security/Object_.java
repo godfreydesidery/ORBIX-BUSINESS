@@ -26,6 +26,8 @@ public class Object_ {
 	public static String PRCMT = "PRCMT-ACCESS";
 	public static String MNGNT = "MNGNT-ACCESS";
 	
+	public static String SHPSTK = "SHPSTK-ALL UPDATE";
+	
 //	public static String BILL = "BILL-ALL CREATE";
 //	
 //	public static String CASHIER_SERVICE = "CASHIER_SERVICE-ACCESS";
