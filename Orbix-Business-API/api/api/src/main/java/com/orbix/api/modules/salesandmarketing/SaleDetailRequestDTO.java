@@ -11,6 +11,7 @@ public class SaleDetailRequestDTO {
 	double sellingPriceVatIncl;
 	double vatRate;
 	double qty;
+	double discount;
     Long saleId;
     Long productId;
     Product product;

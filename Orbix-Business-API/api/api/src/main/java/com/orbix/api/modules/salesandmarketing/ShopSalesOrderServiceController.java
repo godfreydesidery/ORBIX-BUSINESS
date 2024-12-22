@@ -164,11 +164,12 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 		shopSalesOrderDetailResponse.setSellingPriceVatIncl(String.valueOf(shopSalesOrderDetail.getSellingPriceVatIncl()));
 		shopSalesOrderDetailResponse.setVatRate(String.valueOf(shopSalesOrderDetail.getVatRate()));
 		shopSalesOrderDetailResponse.setQty(String.valueOf(shopSalesOrderDetail.getQty()));
+		shopSalesOrderDetailResponse.setDiscount(String.valueOf(shopSalesOrderDetail.getDiscount()));
 		shopSalesOrderDetailResponse.setProductCode(shopSalesOrderDetail.getProduct().getCode());
 		shopSalesOrderDetailResponse.setProductName(shopSalesOrderDetail.getProduct().getName());
 		shopSalesOrderDetailResponse.setProductDescription(shopSalesOrderDetail.getProduct().getDescription());
 		shopSalesOrderDetailResponse.setBaseUom(shopSalesOrderDetail.getProduct().getBaseUom());
-		shopSalesOrderDetailResponse.setAmount(String.valueOf(shopSalesOrderDetail.getSellingPriceVatIncl() * shopSalesOrderDetail.getQty()));
+		shopSalesOrderDetailResponse.setAmount(String.valueOf(shopSalesOrderDetail.getSellingPriceVatIncl() * shopSalesOrderDetail.getQty() - shopSalesOrderDetail.getDiscount()));
 		
 		
 		return shopSalesOrderDetailResponse;
@@ -215,11 +216,17 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 		if(shopSalesOrderDetailRequest.getQty() <= 0) {
 			throw new InvalidOperationException("Invalid quantiy selected");
 		}
+		
 		if(shopSalesOrderDetailRepository.existsByShopSalesOrderAndProduct(shopSalesOrder, product)) {
 			throw new InvalidOperationException("Product already present in order");
 		}
 		shopSalesOrderDetail.setQty(shopSalesOrderDetailRequest.getQty());
 		shopSalesOrderDetail.setShopSalesOrder(shopSalesOrder);
+		
+		if(shopSalesOrderDetailRequest.getDiscount() > (shopSalesOrderDetail.getSellingPriceVatIncl() * shopSalesOrderDetail.getQty())) {
+			throw new InvalidOperationException("Invalid discount. Discount is more than amount");
+		}
+		shopSalesOrderDetail.setDiscount(shopSalesOrderDetailRequest.getDiscount());
 		
 
 		shopSalesOrderDetail.setCreatedByUser(userService.getUser(request));
@@ -271,6 +278,7 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 			saleDetailRequest.setSellingPriceVatIncl(shopSalesOrderDetail.getSellingPriceVatIncl());
 			saleDetailRequest.setVatRate(shopSalesOrderDetail.getVatRate());
 			saleDetailRequest.setQty(shopSalesOrderDetail.getQty());
+			saleDetailRequest.setDiscount(shopSalesOrderDetail.getDiscount());
 			saleDetailRequest.setProduct(shopSalesOrderDetail.getProduct());
 			saleDetails.add(saleDetailRequest);
 			// Review this
@@ -297,7 +305,7 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 		
 		for(SaleDetail saleDetail : sale.getSaleDetails()) {
 			
-			double amount = saleDetail.getCostPriceVatIncl() * saleDetail.getQty();
+			double amount = (saleDetail.getCostPriceVatIncl() * saleDetail.getQty()) - saleDetail.getDiscount();
 			
 			// Create a bill receivable
 			

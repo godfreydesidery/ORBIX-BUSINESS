@@ -46,6 +46,7 @@ export class ShopSalesOrderComponent {
   productName : string = ''
   productDescription : string = ''
   productCode : string = ''
+  discount : number = 0
 
   selectedShop : IShop
 
@@ -212,7 +213,7 @@ export class ShopSalesOrderComponent {
           var sn = 1
           this.shopSalesOrder.shopSalesOrderDetails.forEach(element => {
             element.sn = sn
-            this.totalAmount = this.totalAmount + ((+element.sellingPriceVatIncl) * element.qty)
+            this.totalAmount = this.totalAmount + ((+element.sellingPriceVatIncl) * element.qty - (+element.discount))
             sn = sn + 1
             
           })
@@ -332,7 +333,7 @@ export class ShopSalesOrderComponent {
             this.productName = data!.name
             this.productDescription =data!.description
 
-            alert(this.productName)
+           
             
           }
         )
@@ -380,6 +381,7 @@ export class ShopSalesOrderComponent {
       this.defaultReorderLevel = 0
       this.baseUom = ''
       this.qty = 0
+      this.discount = 0
       }
 
 
@@ -449,6 +451,7 @@ export class ShopSalesOrderComponent {
         id : this.salesOrderDetailId,
         shopSalesOrderId : this.shopSalesOrderId,
         productId : this.productId,
+        discount : this.discount,
         qty : this.qty
       }
 
@@ -576,7 +579,7 @@ export class ShopSalesOrderComponent {
           item = new ReceiptItem()
           item.code = element.id
           item.name = element.productName
-          item.amount = element.sellingPriceVatIncl * (+element.qty)
+          item.amount = element.sellingPriceVatIncl * (+element.qty) - (+element.discount)
           item.qty = element.qty
           items.push(item)
         })

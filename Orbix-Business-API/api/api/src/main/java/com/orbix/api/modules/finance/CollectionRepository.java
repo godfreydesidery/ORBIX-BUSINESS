@@ -298,6 +298,30 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
 	    @Param("endDate") LocalDateTime endDate);
 
 
+	
+	@Query(
+		    value = "SELECT " +
+		            "brc.amount AS amount, " +  
+		            "ps.name AS productName, " + 
+		            "c.pay_code AS payCode, " +
+		            "c.collection_date_time AS dateTime, " +
+		            "pbr.qty AS qty, " +
+		            "pbr.discount AS discount, " +
+		            "u.nickname AS cashierName " +
+		            "FROM bill_receivable_collections brc " +
+		            "JOIN collections c ON brc.collection_id = c.id " +
+		            "JOIN users u ON c.collected_by_user_id = u.id " +
+		            "JOIN bill_receivables br ON brc.bill_receivable_id = br.id " +
+		            "JOIN sale_detail_bill_receivables pbr ON pbr.bill_receivable_id = br.id " +
+		            "JOIN sale_details p ON p.id = pbr.sale_detail_id " +
+		            "JOIN products ps ON p.product_id = ps.id " +
+		            "WHERE c.collection_date_time BETWEEN :startDate AND :endDate", 
+		    nativeQuery = true
+		)
+		List<ISalesCollection> findSalesCollectionsBetweenDates(
+		    @Param("startDate") LocalDateTime startDate,
+		    @Param("endDate") LocalDateTime endDate
+		);
 
 
 }
@@ -342,6 +366,17 @@ interface IParkingServiceCollection {
     String getCreatedDateTime();
     double getQty();
     String getServiceDescription();
+    double getDiscount();
+    String getCashierName();
+}
+
+interface ISalesCollection {
+	String getProductName();
+    String getAmount();
+    String getPayCode();
+    String getDateTime();
+    String getCreatedDateTime();
+    double getQty();
     double getDiscount();
     String getCashierName();
 }

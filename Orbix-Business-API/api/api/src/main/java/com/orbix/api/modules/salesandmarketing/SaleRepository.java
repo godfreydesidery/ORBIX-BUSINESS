@@ -14,7 +14,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 	        "    ROW_NUMBER() OVER (ORDER BY s.created_date_time) AS sn, " +
 	        "    p.name AS productName, " +
 	        "    sd.qty AS qty, " +
-	        "    CAST(sd.qty * sd.selling_price_vat_incl AS CHAR) AS amount, " +
+	        "    CAST((sd.qty * sd.selling_price_vat_incl - sd.discount) AS CHAR) AS amount, " +
 	        "    u.nickname AS createdBy, " +
 	        "    s.created_date_time AS timeDate " +
 	        "FROM sale_details sd " +
@@ -33,7 +33,7 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 	        "    ROW_NUMBER() OVER (ORDER BY SUM(sd.qty) DESC) AS sn, " +
 	        "    p.name AS productName, " +
 	        "    SUM(sd.qty) AS qty, " +
-	        "    CAST(SUM(sd.qty * sd.selling_price_vat_incl) AS CHAR) AS amount " +
+	        "    CAST(SUM(sd.qty * sd.selling_price_vat_incl - sd.discount) AS CHAR) AS amount " +
 	        "FROM sale_details sd " +
 	        "JOIN products p ON sd.product_id = p.id " +
 	        "WHERE sd.sale_id IN (SELECT s.id FROM sales s WHERE s.created_date_time BETWEEN :startDate AND :endDate) " +

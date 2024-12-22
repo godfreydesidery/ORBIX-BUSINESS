@@ -130,6 +130,7 @@
                                                 <th scope="col">UOM</th>
                                                 <th scope="col">Qty</th>
                                                 <th scope="col">Unit Price</th>
+                                                <th scope="col">Discount</th>
                                                 <th scope="col">Amount</th>
                                                 <th scope="col">Action</th>
                                             </tr>
@@ -142,6 +143,7 @@
                                                 <td>{{item.baseUom}}</td>
                                                 <td>{{item.qty}}</td>
                                                 <td style="text-align: right;">{{item.sellingPriceVatIncl | currency:'':''}}</td>
+                                                <td style="text-align: right;">{{item.discount | currency:'':''}}</td>
                                                 <td style="text-align: right;">{{item.amount | currency:'':''}}</td>
                                                 <td>
                                                     <!-- <button class="btn btn-sm btn-success btn-round-custom">Edit</button> -->
@@ -150,6 +152,7 @@
                                             </tr>
             
                                             <tr *ngIf="shopSalesOrder.shopSalesOrderDetails.length > 0">
+                                                <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
@@ -337,9 +340,12 @@
                         <p>Price</p>
                         <input class="form-control" type="text" [(ngModel)]="sellingPriceVatIncl" style="text-align: right;" readonly>
                         <p>Qty</p>
+                        <hr>
                         <input class="form-control" type="number" [(ngModel)]="qty" style="text-align: center;" min="0">
+                        <p>Discount</p>
+                        <input class="form-control" type="text" [(ngModel)]="discount" style="text-align: right;" min="0">
                         <p>Amount</p>
-                        <span class="form-control" style="text-align: right;">{{sellingPriceVatIncl * qty | currency:'':''}}</span>
+                        <span class="form-control" style="text-align: right;">{{(sellingPriceVatIncl * qty) - discount | currency:'':''}}</span>
                     </div>
                 </div>
             </div>
@@ -347,7 +353,7 @@
                 <div class="col-md-12">
                     <hr>
                     <button type="button" class="btn btn-danger btn-round-custom" data-dismiss="modal" style="margin: 10px;">Close</button>
-                    <button type="submit" class="btn btn-success btn-round-custom pull-right" (click)="saveDetail()" id="saveSalesOrderBtn" data-dismiss="modal" style="margin: 10px;">Save</button>
+                    <button type="submit" class="btn btn-success btn-round-custom pull-right" *ngIf="(sellingPriceVatIncl * qty) - discount >= 0" (click)="saveDetail()" id="saveSalesOrderBtn" data-dismiss="modal" style="margin: 10px;">Save</button>
                 </div>
             </div>
         </div>

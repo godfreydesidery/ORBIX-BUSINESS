@@ -49,3 +49,17 @@ export interface IParkingServiceCashCollection {
 
   sn : number
 }
+
+export interface ISalesCashCollection {
+
+  amount : number
+  paymentType : string
+  cashierName : string
+  reason : string
+  productName : string
+  dateTime : string
+  qty : number
+  discount : number
+
+  sn : number
+}

@@ -9,6 +9,7 @@ public class SaleDetailResponseDTO {
 	String sellingPriceVatIncl;
 	String vatRate;
 	String qty;
+	String discount;
 	String saleId;
 	String productId;
 	String productCode;

@@ -8,6 +8,7 @@ import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
 
+import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.identityandaccess.UserService;
@@ -54,6 +55,8 @@ public class SaleServiceController implements SaleService {
 			saleDetail.setSellingPriceVatIncl(saleDetailRequest.getSellingPriceVatIncl());
 			saleDetail.setVatRate(saleDetailRequest.getVatRate());
 			saleDetail.setQty(saleDetailRequest.getQty());
+			if(saleDetailRequest.getDiscount() > saleDetailRequest.getSellingPriceVatIncl() * saleDetailRequest.getQty()) throw new InvalidOperationException("Invalid discount");
+			saleDetail.setDiscount(saleDetailRequest.getDiscount());
 			saleDetail = saleDetailRepository.saveAndFlush(saleDetail);
 			saleDetails.add(saleDetail);
 		}

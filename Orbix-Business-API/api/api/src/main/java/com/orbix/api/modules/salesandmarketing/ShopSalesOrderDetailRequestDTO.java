@@ -9,6 +9,7 @@ public class ShopSalesOrderDetailRequestDTO {
 	double sellingPriceVatIncl;
 	double vatRate;
 	double qty;
+	double discount;
     Long productId;
     Long shopSalesOrderId;
 }

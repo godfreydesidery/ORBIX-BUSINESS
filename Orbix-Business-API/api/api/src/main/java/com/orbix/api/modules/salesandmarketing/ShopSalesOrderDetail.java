@@ -46,6 +46,8 @@ public class ShopSalesOrderDetail {
 	private double vatRate = 0;
 	@NotNull
 	private double qty;
+	@NotNull
+	private double discount = 0;
 	
 	@ManyToOne(targetEntity = ShopSalesOrder.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "shop_sales_order_id", nullable = false , updatable = false)

@@ -13,6 +13,7 @@ public class ShopSalesOrderDetailResponseDTO {
 	String sellingPriceVatIncl;
 	String vatRate;
 	String qty;
+	String discount;
 	String baseUom;
 	String amount;
 }
