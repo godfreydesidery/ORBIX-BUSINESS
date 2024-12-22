@@ -293,8 +293,16 @@ export class VehicleEquipmentRegisterComponent {
       hasKeys : this.hasKeys === 'YES' ? 1 : 0,
       tformNumber : this.tformNumber,
 
+      agentName : this.agentName,
+      agentPhoneNo : this.agentPhoneNo,
+      agentEmail : this.agentEmail,
+      agentAddress : this.agentAddress,
+      deviceStatus : this.deviceStatus === 'YES' ? 1 : 0
+
+
       
   }
+
 
   if(this.ownerIdType != 'NONE' && this.ownerIdType === ''){
     this.msg.showErrorMessage3('ID No is required')
@@ -397,6 +405,11 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
     this.tformNumber = data.tformNumber
 
+    this.agentName = data.agentName
+    this.agentPhoneNo = data.agentPhoneNo
+    this.agentEmail = data.agentEmail
+    this.agentAddress = data.agentAddress
+
     this.deviceStatus = data.deviceStatus
     this.active = data.active
     this.companyId = data.companyId
@@ -435,6 +448,11 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.active = ''
 
     this.tformNumber = ''
+
+    this.agentName = ''
+    this.agentPhoneNo = ''
+    this.agentEmail = ''
+    this.agentAddress = ''
 
     this.companyId = ''
     this.companyName = ''
@@ -614,6 +632,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     var parking = {
       id: this.parkingId,
       no: this.parkingNo,
+      vehicleEquipmentId : this.id,
       ownerFirstName: this.ownerFirstName,
       ownerMiddleName: this.ownerMiddleName,
       ownerLastName: this.ownerLastName,
@@ -677,7 +696,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
     console.log(parking)
 
-    if(this.parkingId === null){
+    if(this.parkingId === null || this.parkingId === undefined || this.parkingId === ''){
       /**Create new parking */
       await this.http.post<IParking>(API_URL+'/parkings/create', parking, options)
       .toPromise()

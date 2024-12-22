@@ -63,6 +63,11 @@ export class AuthService {
     user.set('username', username)
     user.set('password', password)
 
+    // Remove shops
+    localStorage.removeItem('selected-shop-id')
+    localStorage.removeItem('selected-shop-code')
+    localStorage.removeItem('selected-shop-name')
+
     //remove pharmacy data
     localStorage.removeItem('selected-pharmacy-id')
     localStorage.removeItem('selected-pharmacy-code')

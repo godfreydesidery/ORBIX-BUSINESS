@@ -22,8 +22,7 @@
                                 <th>Chasis No</th>
                                 <!-- <th>Keys</th> -->
                                 <th>Owner/Driver Name</th>
-                                <th>Owner ID</th>
-                                <th>Owner ID Type</th>
+                                <th>Vehicle Type</th>
                                 <th>Owner Contacts</th>
                                 <th>Agent Name</th>
                                 <th>Agent Contacts</th>
@@ -38,8 +37,7 @@
                                 <td>{{p.chasisNo}}</td>
                                 <!-- <td>{{p.hasKeys}}</td> -->
                                 <td>{{p.ownerFirstName}} {{p.ownerLastName}}</td>
-                                <td>{{p.ownerIdNo}}</td>
-                                <td>{{p.ownerIdType}}</td>
+                                <td>{{p.vehicleEquipmentTypeName}}</td>
                                 <td>{{p.ownerPhoneNo}}</td>
                                 <td>{{p.agentName}}</td>
                                 <td>{{p.agentAddress}} {{p.agentPhoneNo}} {{p.agentEmail}}</td>
@@ -51,7 +49,7 @@
                                         <tr>
                                             <!-- <td><button class="btn btn-success btn-round-custom" (click)="getParkingBillReceivables(p.id)" data-toggle="modal" data-target="#parking-billing-modal">Parking</button></td>
                                             <td><button class="btn btn-success btn-round-custom" data-toggle="modal" data-target="#service-billing-modal">Service</button></td> -->
-                                            <td><button class="btn btn-success btn-round-custom" (click)="get(p.id)" data-toggle="modal" data-target="#view-modal">View</button></td>
+                                            <td><button class="btn btn-primary btn-round-custom" (click)="get(p.id)" data-toggle="modal" data-target="#view-modal">View</button></td>
                                             <td><button class="btn btn-success btn-round-custom" (click)="vehicleEquipmentBilling(p.id)" >Billing</button></td>
                                         </tr>
                                     </table>
@@ -293,7 +291,9 @@
                             <tbody>
                                 <tr><td><b>Parking No</b></td><td>{{parkingNo}}</td></tr>
                                 <tr><td><b>Model/Type</b></td><td>{{vehicleEquipmentTypeName}}</td></tr>
+                                <tr><td><b>Chassis No</b></td><td>{{chasisNo}}</td></tr> 
                                 <tr><td><b>Billing Type</b></td><td>{{billingType}}</td></tr>
+                                <tr><td><b>Billing Start Date</b></td><td>{{billingStartAt}}</td></tr> 
                                 <!-- <tr><td><b>Billing Amount</b></td><td style="text-align: right;">{{billingAmount}}</td></tr>  -->
                                 <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}</td></tr>   
                                 <tr><td><b>Parking No</b></td><td>{{parkingNo}}</td></tr>   
@@ -325,6 +325,7 @@
                                 <tr><td><b>Wheel Cap</b></td><td>{{wheelCap}}</td></tr> 
                                 <tr><td><b>Round Mirror</b></td><td>{{roundMirror}}</td></tr> 
                                 <tr><td><b>Tire Indicator</b></td><td>{{tireIndicator}}</td></tr> 
+                                
                             </tbody>
                         </table>
                     </div>
@@ -334,8 +335,10 @@
                         
                     </div> -->
                     <div class="col-lg-12">
-                        <p><b>Remarks</b></p>
-                        <input type="text" class="form-control" placeholder="Remarks" [(ngModel)]="comments" readonly>
+                        <p><b>Comments</b></p>
+                        <textarea class="form-control" placeholder="Comments" [(ngModel)]="comments" readonly style="background-color: white;"></textarea>
+
+                        <!-- <input type="text" class="form-control" placeholder="Comments" [(ngModel)]="comments" readonly> -->
                         
                     </div>
                 </div>

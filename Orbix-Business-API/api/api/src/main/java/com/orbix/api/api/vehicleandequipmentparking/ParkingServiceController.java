@@ -250,7 +250,6 @@ public class ParkingServiceController implements ParkingService {
 		
 		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), branch_.get());
 		
-		
 		Parking parking = new Parking();
 		parking.setNo(String.valueOf(Math.random()));
 		parking.setOwnerFirstName(parkingRequest.getOwnerFirstName());
@@ -369,6 +368,7 @@ public class ParkingServiceController implements ParkingService {
 		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
 		
 		
+		
 		Parking parking = parking_.get();
 		parking.setOwnerFirstName(parkingRequest.getOwnerFirstName());
 		parking.setOwnerMiddleName(parkingRequest.getOwnerMiddleName());
@@ -469,6 +469,11 @@ public class ParkingServiceController implements ParkingService {
 		parkingResponse.setVehicleEquipmentCategory(parking.getVehicleEquipmentCategory());
 		parkingResponse.setVehicleEquipmentName(parking.getVehicleEquipmentName());
 		parkingResponse.setVehicleEquipmentColor(parking.getVehicleEquipmentColor());
+		parkingResponse.setBillingStartAt(
+			    Optional.ofNullable(parking.getStartBillingAt())
+			            .map(Object::toString)
+			            .orElse("")
+			);
 		
 				
 		parkingResponse.setParkingZoneName(

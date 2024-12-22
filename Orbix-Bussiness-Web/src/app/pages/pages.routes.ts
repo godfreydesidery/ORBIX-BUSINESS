@@ -11,6 +11,7 @@ import { ShopTillComponent } from './administration-units/shop-till/shop-till.co
 import { SystemProfileComponent } from './system/system-profile/system-profile.component';
 import { RoleAccessComponent } from './identity-and-access/role-access/role-access.component';
 import { AuthGuard } from '../auth-guard';
+import { ProductComponent } from './inventory/product/product.component';
 
 export const routes: Routes = [
   {
@@ -94,6 +95,64 @@ export const routes: Routes = [
         data : { breadcrumb : 'Admin Unit/Shop Till'},
         canActivate : [AuthGuard]
       },
+
+      // Inventory
+
+      {
+        path : 'inventory/product',
+        loadComponent: () => import('./inventory/product/product.component').then(c => c.ProductComponent),
+        data : { breadcrumb : 'Product/Product'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'inventory/uom',
+        loadComponent: () => import('./inventory/uom/uom.component').then(c => c.UomComponent),
+        data : { breadcrumb : 'Product/UOM'},
+        canActivate : [AuthGuard]
+      },
+
+      // Mechandizing
+
+      {
+        path : 'mechandizing/select-shop',
+        loadComponent: () => import('./mechandizing/select-shop/select-shop.component').then(c => c.SelectShopComponent),
+        data : { breadcrumb : 'Mechandizing/Select Shop'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'mechandizing/shop-product-stock-status',
+        loadComponent: () => import('./mechandizing/shop-product-stock-status/shop-product-stock-status.component').then(c => c.ShopProductStockStatusComponent),
+        data : { breadcrumb : 'Mechandizing/Shop Stock Status'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'mechandizing/import-product',
+        loadComponent: () => import('./mechandizing/import-product/import-product.component').then(c => c.ImportProductComponent),
+        data : { breadcrumb : 'Mechandizing/Import Product'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/shop-sales-order',
+        loadComponent: () => import('./mechandizing/shop-sales-order/shop-sales-order.component').then(c => c.ShopSalesOrderComponent),
+        data : { breadcrumb : 'Mechandizing/Sales Order'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/sales-listing-report',
+        loadComponent: () => import('./mechandizing/reports/sales-listing-report/sales-listing-report.component').then(c => c.SalesListingReportComponent),
+        data : { breadcrumb : 'Mechandizing/Reports/Sales Listing Report'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/fast-moving-products-report',
+        loadComponent: () => import('./mechandizing/reports/fast-moving-products-report/fast-moving-products-report.component').then(c => c.FastMovingProductsReportComponent),
+        data : { breadcrumb : 'Mechandizing/Reports/Fast Moving Products Report'},
+        canActivate : [AuthGuard]
+      },
+
+
       //System Profile
       /**Start of System Profile */
       {

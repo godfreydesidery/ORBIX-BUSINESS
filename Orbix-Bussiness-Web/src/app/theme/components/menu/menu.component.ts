@@ -1,4 +1,4 @@
-import { NgClass, NgStyle } from '@angular/common';
+import { CommonModule, NgClass, NgStyle } from '@angular/common';
 import { Component, OnInit, ViewEncapsulation, ElementRef, HostListener } from '@angular/core';
 import { Router, ActivatedRoute, NavigationEnd, RouterModule } from '@angular/router'; 
 import { AppState } from '@services/app.state';
@@ -12,7 +12,8 @@ import { NgScrollbarModule } from 'ngx-scrollbar';
         NgClass,
         NgScrollbarModule,
         RouterModule,
-        NgStyle
+        NgStyle,
+        CommonModule
     ],
     encapsulation: ViewEncapsulation.None,
     templateUrl: './menu.component.html',

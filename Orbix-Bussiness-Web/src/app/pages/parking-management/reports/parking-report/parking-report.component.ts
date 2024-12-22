@@ -130,7 +130,7 @@ export class ParkingReportComponent {
   }
 
   print = async () => {
-    this.documentHeader = await this.data.getDocumentHeaderLandScape();
+    this.documentHeader = await this.data.getDocumentHeader();
     const title = 'Vehicle Registration Report';
     const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;
@@ -194,6 +194,92 @@ export class ParkingReportComponent {
   
     pdfMake.createPdf(docDefinition).print();
   };
+
+
+  printParkingReport = async () => {
+    this.documentHeader = await this.data.getDocumentHeaderLandScape();
+    const title = 'Vehicle Parking Report';
+    const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
+    let total: number = 0;
+    let discount: number = 0;
+  
+    const report: any[] = [];
+  
+    // Add header row
+    report.push([
+      { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Category', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Vehicle Type', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Owner Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Phone', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Card No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Chassis No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Sub T1 Form', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Device Status', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Price', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Start Date', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'End Date', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      // { text: 'Remarks', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+    ]);
+
+    
+  
+    // Add rows dynamically
+    this.parkingReports.forEach((element) => {
+      // total += parseFloat(element.amount) || 0;
+      // discount += parseFloat(element.discount) || 0;
+
+    
+  
+      report.push([
+        { text: element.sn || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.vehicleEquipmentCategory || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.vehicleEquipmentTypeName || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.ownerFirstName + ' ' + element.ownerLastName || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.ownerPhoneNo || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.cardNo || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.chasisNo || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.tformNumber || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.deviceStatus || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.billingAmount || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.checkedInAt.substring(0, 10) || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.checkedOutAt.substring(0, 10) || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        // { text: element.status || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+      ]);
+    });
+  
+    // Define document structure
+    const docDefinition: any = {
+      header: '',
+      pageOrientation: 'landscape', // landscape for Landscape
+      footer: (currentPage: any, pageCount: any) => ({
+        text: `${currentPage} of ${pageCount}`,
+        alignment: 'center',
+        fontSize: 8,
+      }),
+      content: [
+        {
+          columns: [
+            this.documentHeader,
+          ],
+        },
+        {text : ' '},
+        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {
+          table: {
+            widths: [25, 50, 80, 90, 80, 60, 50, 50, 30, 50, 50, 50],
+            body: report,
+          },
+        },
+      ],
+    };
+  
+    pdfMake.createPdf(docDefinition).print();
+  };
+
+
+
 }
 
 export interface IRegistration{

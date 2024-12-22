@@ -191,7 +191,10 @@ public class MainApplication {
 			
 			List<String> roleNames = new ArrayList<>();
 			roleNames.add("ROOT");
-			roleNames.add("ADMIN");			
+			roleNames.add("ADMIN");	
+			roleNames.add("MANAGER");	
+			roleNames.add("CASHIER");
+			roleNames.add("RECEPTIONIST");	
 			
 			for(String roleName : roleNames) {
 				if(!roleRepository.existsByName(roleName)) {

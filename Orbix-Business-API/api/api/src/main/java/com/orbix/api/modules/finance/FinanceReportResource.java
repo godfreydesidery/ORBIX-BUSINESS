@@ -104,6 +104,22 @@ public class FinanceReportResource {
 	    return ResponseEntity.ok().body(collections);
 	}
 	
+	@PostMapping("/finance_reports/get_sales_detailed_collections_by_dates")
+	public ResponseEntity<List<ISalesCollection>>getSalesDetailedCollectionByDates(
+			@RequestBody DateRange dateRange,
+	        @RequestParam(name = "nickname", required = false) String nickname,
+			HttpServletRequest request){
+		
+		List<ISalesCollection> collections;
+		
+		collections = collectionRepository.findSalesCollectionsBetweenDates(
+				dateRange.getFrom().atStartOfDay(),
+                dateRange.getTo().atStartOfDay().plusDays(1)
+				);
+	    return ResponseEntity.ok().body(collections);
+
+	}
+	
 }
 
 @Data

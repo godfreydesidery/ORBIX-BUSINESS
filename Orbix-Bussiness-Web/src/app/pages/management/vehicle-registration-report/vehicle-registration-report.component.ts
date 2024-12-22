@@ -129,7 +129,7 @@ export class VehicleRegistrationReportComponent {
   }
 
   print = async () => {
-    this.documentHeader = await this.data.getDocumentHeaderLandScape();
+    this.documentHeader = await this.data.getDocumentHeader();
     const title = 'Vehicle Registration Report';
     const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;

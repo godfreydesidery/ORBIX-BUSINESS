@@ -1,8 +1,2 @@
 com\orbix\api\exceptions\DuplicateEntryException.class
-com\orbix\api\modules\identityandaccess\Role.class
-com\orbix\api\modules\identityandaccess\User.class
-com\orbix\api\modules\identityandaccess\Privilege.class
 com\orbix\api\modules\utilities\Sanitizer.class
-com\orbix\api\modules\adminunits\Day.class
-com\orbix\api\modules\adminunits\Company.class
-com\orbix\api\modules\adminunits\Branch.class

@@ -162,9 +162,15 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		vehicleEquipment.setChasisNo(vehicleEquipmentRequest.getChasisNo());
 		vehicleEquipment.setCardNo(vehicleEquipmentRequest.getCardNo());
 		vehicleEquipment.setTformNumber(vehicleEquipmentRequest.getTformNumber());
+		vehicleEquipment.setAgentName(vehicleEquipmentRequest.getAgentName());
+		vehicleEquipment.setAgentPhoneNo(vehicleEquipmentRequest.getAgentPhoneNo());
+		vehicleEquipment.setAgentAddress(vehicleEquipmentRequest.getAgentAddress());
+		vehicleEquipment.setAgentEmail(vehicleEquipmentRequest.getAgentEmail());
+		vehicleEquipment.setDeviceStatus(vehicleEquipmentRequest.isDeviceStatus());
 		//vehicleEquipment.setImage(vehicleEquipmentRequest.getImage());
 		vehicleEquipment.setActive(true);
 		vehicleEquipment.setVehicleEquipmentColor(vehicleEquipmentRequest.getVehicleEquipmentColor());
+		
 		
 		vehicleEquipment.setVehicleEquipmentType(vehicleEquipmentType_.get());		
 		
@@ -205,6 +211,15 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		parkingRequest.setTformNumber(vehicleEquipment.getTformNumber());
 		
 		parkingRequest.setVehicleEquipmentColor(vehicleEquipment.getVehicleEquipmentColor());
+		
+		parkingRequest.setAgentName(vehicleEquipment.getAgentName());
+		parkingRequest.setAgentAddress(vehicleEquipment.getAgentAddress());
+		parkingRequest.setAgentPhoneNo(vehicleEquipment.getAgentPhoneNo());
+		parkingRequest.setAgentEmail(vehicleEquipment.getAgentEmail());
+		parkingRequest.setDeviceStatus(vehicleEquipment.isDeviceStatus());
+		
+		parkingRequest.setComments(vehicleEquipmentRequest.getComments());
+		
 			
 		parkingRequest.setLeftFrontLamp(true);
 		parkingRequest.setRightFrontLamp(true);
@@ -269,6 +284,12 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		vehicleEquipment.setChasisNo(vehicleEquipmentRequest.getChasisNo());
 		vehicleEquipment.setCardNo(vehicleEquipmentRequest.getCardNo());
 		vehicleEquipment.setTformNumber(vehicleEquipmentRequest.getTformNumber());
+		
+		vehicleEquipment.setAgentName(vehicleEquipmentRequest.getAgentName());
+		vehicleEquipment.setAgentPhoneNo(vehicleEquipmentRequest.getAgentPhoneNo());
+		vehicleEquipment.setAgentAddress(vehicleEquipmentRequest.getAgentAddress());
+		vehicleEquipment.setAgentEmail(vehicleEquipmentRequest.getAgentEmail());
+		
 		//vehicleEquipment.setImage(vehicleEquipmentRequest.getImage());
 				
 		vehicleEquipment = vehicleEquipmentRepository.save(vehicleEquipment);
@@ -296,6 +317,12 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		vehicleEquipmentResponse.setChasisNo(vehicleEquipment.getChasisNo());
 		vehicleEquipmentResponse.setCardNo(vehicleEquipment.getCardNo());
 		vehicleEquipmentResponse.setVehicleEquipmentColor(vehicleEquipment.getVehicleEquipmentColor());
+		
+		vehicleEquipmentResponse.setAgentName(vehicleEquipment.getAgentName());
+		vehicleEquipmentResponse.setAgentPhoneNo(vehicleEquipment.getAgentPhoneNo());
+		vehicleEquipmentResponse.setAgentAddress(vehicleEquipment.getAgentAddress());
+		vehicleEquipmentResponse.setAgentEmail(vehicleEquipment.getAgentEmail());
+		vehicleEquipmentResponse.setDeviceStatus(vehicleEquipment.isDeviceStatus() ? "1" : "0");
 		
 		vehicleEquipmentResponse.setTformNumber(vehicleEquipment.getTformNumber());
 		

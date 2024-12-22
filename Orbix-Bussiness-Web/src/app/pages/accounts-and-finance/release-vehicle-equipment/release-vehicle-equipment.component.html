@@ -30,8 +30,7 @@
                                 <th>SN</th>
                                 <th>No</th>
                                 <th>Owner/Driver Name</th>
-                                <th>Owner ID</th>
-                                <th>Owner ID Type</th>
+                                <th>Vehicle Type</th>
                                 <th>Owner Contacts</th>
                                 <th>Agent Name</th>
                                 <th>Agent Contacts</th>
@@ -46,23 +45,15 @@
                                     <td>{{p.sn}}</td>
                                     <td>{{p.no}}</td>
                                     <td>{{p.ownerFirstName}} {{p.ownerMiddleName}} {{p.ownerLastName}}</td>
-                                    <td>{{p.ownerIdNo}}</td>
-                                    <td>{{p.ownerIdType}}</td>
+                                    <td>{{p.vehicleEquipmentTypeName}}</td>
                                     <td>{{p.ownerPhoneNo}}</td>
                                     <td>{{p.agentName}}</td>
                                     <td>{{p.agentAddress}} {{p.agentPhoneNo}} {{p.agentEmail}}</td>
                                     <td>{{p.billingType}}</td>
                                     <td style="text-align: right;">{{p.billingAmount | currency:'':''}}</td>
                                     <td>{{p.status}}</td>
-                                    
                                     <td>
-                                        <!-- <table>
-                                            <tr>
-                                                <td><button type="button" class="btn btn-primary btn-round-custom" *ngIf="p.status === 'PENDING'" (click)="get(p.id)" data-toggle="modal" data-target="#edit-modal" style="cursor: pointer;">Edit</button></td>
-                                                <td><button type="button" class="btn btn-success btn-round-custom" *ngIf="p.status === 'PENDING'" (click)="get(p.id)" data-toggle="modal" data-target="#check-in-modal" style="cursor: pointer; margin-left: 3px;">Check In</button></td>
-                                                <td><button type="button" class="btn btn-danger btn-round-custom" *ngIf="p.status === 'CHECKED-IN'" (click)="get(p.id)" (click)="getLastBillingDate(p.id)" data-toggle="modal" data-target="#check-out-modal" style="cursor: pointer; margin-left: 3px;">Check Out</button></td>
-                                            </tr>
-                                        </table> -->
+                                        <button type="button" class="btn btn-primary btn-round-custom" (click)="printGatePass(p.id)" style="cursor: pointer;">Gate Pass</button>
                                     </td>
                                 </tr>
                         </tbody> 

@@ -8,7 +8,7 @@ import { NgxPaginationModule } from 'ngx-pagination';
 import { IParking, IServiceBillItem } from 'src/app/domain/parking';
 import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
-import { Byte } from 'src/custom-packages/util';
+import { Byte, error } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 
@@ -173,6 +173,24 @@ export class ReleaseVehicleEquipmentComponent {
         console.log(data)
       }
     )
+  }
+
+  async printGatePass(id : any){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    await this.http.get<IParking>(API_URL+'/parkings/get?id=' + id, options)
+    .toPromise()
+    .then(
+      data => {
+        console.log(data)
+        this.parkingId = data!.id
+        this.printGatePassRcpt(data!.serviceBillItems, '', 0);
+      }
+    )
+    .catch(error => {
+      console.log(error)
+    })
   }
 
   
@@ -637,6 +655,141 @@ export class ReleaseVehicleEquipmentComponent {
     this.color = ''
   }
 
+  printGatePassRcpt = async (billItems : IServiceBillItem[], receiptNo :string, cash : number) => {
+  
+      await this.get(this.parkingId)
+      await this.getLastBillingDate(this.parkingId)
+  
+      var companyName = localStorage.getItem('company-name')!
+  
+      var header = ''
+      var footer = ''
+      var title  = 'Gate Pass(Reprinted)'
+      var total : number = 0
+      var discount : number = 0
+      var tax : number = 0
+  
+      // var address : any = await this.data.getReceiptHeader(receiptNo)
+      var address : any = await this.data.getBranchReceiptHeaderWithNoTinAndVrn(receiptNo)
+     
+      var receipt = [
+        [
+          {text : 'SN', fontSize : 8, bold : true}, 
+          {text : 'Item', fontSize : 8, bold : true},
+          {text : 'Qty', fontSize : 8, bold : true},
+          {text : 'Amount', fontSize : 8, bold : true},
+        ]
+      ] 
+      
+      var sn = 0
+  
+      billItems.forEach((element) => {
+        total = total + (+element.amount)
+        sn = sn + 1
+        var item = [
+          {text : sn.toString(), fontSize : 8, bold : false}, 
+          {text : element.item, fontSize : 8, bold : false},
+          {text : element.qty.toString(), fontSize : 8, bold : false},
+          {text : (element.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 8, alignment : 'right', bold : false},
+        ]
+        receipt.push(item)
+      })
+      var detailSummary = [
+        {text : ' ', fontSize : 8, bold : false},
+        {text : 'Total', fontSize : 9, bold : true},
+        {text : ' ', fontSize : 8, bold : false},
+        {text : total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', bold : true},
+      ]
+      receipt.push(detailSummary)
+      
+  
+      const docDefinition = {
+        header: '',
+        
+        //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
+          content : [
+            {
+              layout : 'noBorders',
+              table : address
+            }, 
+            
+            
+            
+            {
+              layout : 'noBorders',
+              table : {
+                headerRows : 0,
+                widths : [210],
+                body : [
+                  [{text : '=============================='}],
+                ]
+              }
+            },          
+            {
+              layout : 'noBorders',
+              table : {
+                headerRows : 0,
+                widths : [200],
+                body : [
+                  [{text : title, alignment : 'center', fontSize : 9, bold : true}],
+                  [{text : 'Vehicle Name: ' + this.vehicleEquipmentTypeName, alignment : 'left', fontSize : 9, bold : false}],
+                  [{text : 'Vehicle Color: ' + this.color, alignment : 'left', fontSize : 9, bold : false}],
+                  [{text : 'Chassis No: ' + this.chasisNo, alignment : 'left', fontSize : 9, bold : false}],
+                  [{text : '________________________________'}],
+                  [{text : 'Payment Details', alignment : 'center', fontSize : 9, bold : true}],
+                  [{text : ' ', alignment : 'center', fontSize : 9, bold : true}],
+                ]
+              }
+            },   
+            {
+              layout : 'noBorders',
+              table : {
+                  headerRows : 1,
+                  widths : [15, 100, 15, 50],
+                  body : receipt
+              }
+            },
+            {
+              layout : 'noBorders',
+              table : {
+                headerRows : 0,
+                widths : [200],
+                body : [
+                  [{text : ' '}],
+                  [{text : 'Cashier Comments', alignment : 'left', fontSize : 9, bold : true}],
+                  [{text : this.comments, alignment : 'left', fontSize : 9, bold : false}],
+                  [{text : ' '}],
+                  [{text : ' '}],
+                  [{text : 'Issued At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
+                  [{text : 'Checkout At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
+                  [{text : 'Valid Until: ' + this.lastBillingDate, alignment : 'left', fontSize : 9, bold : true}],
+                  [{text : ' '}],
+                  [{text : 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment : 'left', fontSize : 9, bold : true}],
+                  [{text : ' '}],
+                  [{text : 'Signature: ......................'}],
+                ]
+              }
+            },   
+            {
+              layout : 'noBorders',
+              table : {
+                headerRows : 0,
+                widths : [210],
+                body : [
+                  [{text : '=============================='}],
+                  [{text : 'Developed By @Davaghana', fontSize : 10, bold : true, alignment : 'center'}],
+                  [{text : '***End of Document***', fontSize : 9, alignment : 'center'}]
+                ]
+              }
+            },
+          ],
+          pageMargins: 10,
+        }
+        const win = window.open('', "tempWinForPdf")
+        pdfMake.createPdf(docDefinition).print({}, win)
+        //win!.onfocus = function () { setTimeout(function () { win!.close(); }, 10000); } //set to 10 seconds
+    }
+
 
   printGatePass1() {
     const documentDefinition = {
@@ -660,119 +813,7 @@ export class ReleaseVehicleEquipmentComponent {
     pdfMake.createPdf(documentDefinition).open();
   }
 
-  printGatePass = async () => {
-    this.documentHeader = await this.data.getDocumentHeader()
-    var header = ''
-    var footer = ''
-    var title  = 'Gate Pass'
-    var logo : any = ''
-    var total : number = 0
-    var discount : number = 0
-    var tax : number = 0
-    
-    /*this.report.forEach((element) => {
-      total = total + element.amount
-      discount = discount + element.discount
-      tax = tax + element.tax
-      var detail = [
-        {text : formatDate(element.date, 'yyyy-MM-dd', 'en-US'), fontSize : 9, fillColor : '#ffffff'}, 
-        {text : element.amount.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#ffffff'},
-        {text : element.discount.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#ffffff'},  
-        {text : element.tax.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#ffffff'},
-      ]
-      report.push(detail)
-    })*/
-    /*var detailSummary = [
-      {text : 'Total', fontSize : 9, fillColor : '#CCCCCC'}, 
-      {text : total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#CCCCCC'},
-      {text : discount.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#CCCCCC'},  
-      {text : tax.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#CCCCCC'},        
-    ]
-    report.push(detailSummary)*/
-    const docDefinition : any = {
-      header: '',
-      footer: function (currentPage: { toString: () => string; }, pageCount: string) {
-        return currentPage.toString() + " of " + pageCount;
-      },
-      //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
-        content : [
-          {
-            columns : 
-            [
-              this.documentHeader
-            ]
-          },
-          '  ',
-          '  ',
-          {text : title, fontSize : 14, bold : true, alignment : 'center'},
-          this.data.getHorizontalLine(),
-         
-          // {text : title, fontSize : 12, bold : true},
-          '  ',
-          {
-            layout : 'noBorders',
-            table : {
-              widths : [75, 300],
-              body : [
-                [
-                  {text : 'Vehicle Name', fontSize : 9}, 
-                  {text : this.vehicleEquipmentTypeName, fontSize : 9} 
-                ],
-                [
-                  {text : 'Parking Ref No', fontSize : 9}, 
-                  {text : this.no, fontSize : 9} 
-                ],
-                [
-                  {text : 'Color', fontSize : 9}, 
-                  {text : this.color, fontSize : 9} 
-                ],
-                [
-                  {text : 'Chasis No', fontSize : 9}, 
-                  {text :this.chasisNo, fontSize : 9} 
-                ],
-                [
-                  {text : 'Reg No', fontSize : 9}, 
-                  {text : this.registrationNo, fontSize : 9} 
-                ],
-
-                [
-                  {text : '', fontSize : 9}, 
-                  {text : '', fontSize : 9} 
-                ],
-
-                [
-                  {text : 'Cashier Comments', fontSize : 9}, 
-                  {text : this.comments, fontSize : 9} 
-                ],
-                [
-                  {text : '', fontSize : 9}, 
-                  {text : '', fontSize : 9} 
-                ],
-
-                [
-                  {text : 'Gate Pass Issued By', fontSize : 9}, 
-                  {text : '...............................', fontSize : 9} 
-                ],
-              ]
-            },
-          },
-          '  ',
-          //{
-            //layout : 'noBorders',
-            //table : {
-                //headerRows : 1,
-                //widths : [100, 100, 100, 100, 100],
-                //body : report
-            //}
-        //},                   
-      ]     
-    };
-    pdfMake.createPdf(docDefinition).print()
-  }
-
-
-
-  printGatePassRcpt = async (billItems : IServiceBillItem[], receiptNo :string, cash : number) => {
+  printGatePassRcpt111 = async (billItems : IServiceBillItem[], receiptNo :string, cash : number) => {
 
     var companyName = localStorage.getItem('company-name')!
 

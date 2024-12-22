@@ -984,7 +984,7 @@ export class VehicleEquipmentBillingComponent {
     var tax : number = 0
 
     // var address : any = await this.data.getReceiptHeader(receiptNo)
-    var address : any = await this.data.getBranchReceiptHeader(receiptNo)
+    var address : any = await this.data.getBranchReceiptHeaderWithNoTinAndVrn(receiptNo)
    
     var receipt = [
       [

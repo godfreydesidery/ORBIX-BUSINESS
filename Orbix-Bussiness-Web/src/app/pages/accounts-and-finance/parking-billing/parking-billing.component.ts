@@ -49,6 +49,8 @@ export class ParkingBillingComponent {
   autoBilling : any = 1
 
   parkingAmount : number
+
+  billingStartAt : string = ''
   ////////////////////////////////////////////
 
 
@@ -355,6 +357,7 @@ export class ParkingBillingComponent {
 
     this.billingType = data?.billingType
     this.billingAmount = data?.billingAmount
+    this.billingStartAt = data?.billingStartAt
 
     // Vehicle or Equipment Information
     this.registrationNo = data?.registrationNo;
@@ -392,7 +395,7 @@ export class ParkingBillingComponent {
 
      this.validUntilDate = null
 
-     this.comments = '' // check this
+     this.comments = data!.comments// check this
 
   }
 
@@ -418,6 +421,7 @@ export class ParkingBillingComponent {
 
     this.billingType = ''
     this.billingAmount = 0
+    this.billingStartAt = ''
 
     // Vehicle or Equipment Information
     this.registrationNo = ''
@@ -450,6 +454,7 @@ export class ParkingBillingComponent {
     this.billingType = ''
 
     this.color = ''
+    this.comments = ''
   }
 
 }

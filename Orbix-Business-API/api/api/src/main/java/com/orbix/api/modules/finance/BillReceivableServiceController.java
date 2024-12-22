@@ -77,6 +77,8 @@ public class BillReceivableServiceController implements BillReceivableService {
 			billReceivable.setPayStatus(PayStatus.PAID);
 			billReceivable.setPaidDateTime(dateTime);
 			
+			double qty = 1;
+			
 			billReceivable = billReceivableRepository.save(billReceivable);
 			
 			BillReceivableCollection billReceivableCollection = new BillReceivableCollection();
@@ -89,11 +91,20 @@ public class BillReceivableServiceController implements BillReceivableService {
 			
 
 			Optional<ParkingBillReceivable> parkingBillReceivable = parkingBillReceivableRepository.findByBillReceivable(billReceivable);
-			if(parkingBillReceivable.isPresent()) billReceivableCollection.setReason("Vehicle and Equipment/Parking");
+			if(parkingBillReceivable.isPresent()) {
+				billReceivableCollection.setReason("Vehicle and Equipment/Parking");
+				qty = parkingBillReceivable.get().getQty();
+			} 
 			Optional<ParkingServiceBillReceivable> parkingServiceBillReceivable = parkingServiceBillReceivableRepository.findByBillReceivable(billReceivable);
-			if(parkingServiceBillReceivable.isPresent()) billReceivableCollection.setReason("Vehicle and Equipment/Service");
+			if(parkingServiceBillReceivable.isPresent()) {
+				billReceivableCollection.setReason("Vehicle and Equipment/Service");
+				qty = parkingServiceBillReceivable.get().getQty();
+			} 
 			
 			billReceivableCollection = billReceivableCollectionRepository.save(billReceivableCollection);
+			billReceivable = billReceivableRepository.save(billReceivable);
+			billReceivable.setQty(qty); 
+			billReceivableRepository.save(billReceivable);
 			
 		}
 		

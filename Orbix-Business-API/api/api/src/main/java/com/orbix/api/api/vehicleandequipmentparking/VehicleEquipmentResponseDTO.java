@@ -16,6 +16,14 @@ public class VehicleEquipmentResponseDTO {
 	private String ownerEmail;
 	private String ownerAddress;
 	
+	/**Agent Information*/
+	String agentName;
+	String agentAddress;
+	String agentPhoneNo;
+	String agentEmail;
+	
+	String deviceStatus;
+	
 	private String registrationNo;
 	private String chasisNo;
 	private String cardNo;
