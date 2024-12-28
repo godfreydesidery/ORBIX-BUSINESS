@@ -285,6 +285,23 @@ export const routes: Routes = [
       // End of Management
 
 
+      // Procurement
+      {
+        path : 'procurement/suppliers',
+        loadComponent: () => import('./procurement/supplier/supplier.component').then(c => c.SupplierComponent),
+        data : { breadcrumb : 'Procurement/Supplier'}, 
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'procurement/supplier-product-list',
+        loadComponent: () => import('./procurement/supplier-product-list/supplier-product-list.component').then(c => c.SupplierProductListComponent),
+        data : { breadcrumb : 'Procurement/Supplier Product List'}, 
+        canActivate : [AuthGuard]
+      },
+
+      // End of Procurement
+
+
 
       { 
         path: 'blank', 

@@ -458,6 +458,14 @@ export const menuItems = [
         order: 100,
         subMenu: [
             {
+                title: 'Suppliers',
+                routerLink: '/app/procurement/suppliers'
+            },
+            {
+                title: 'Supplier Product List',
+                routerLink: '/app/procurement/supplier-product-list'
+            },
+            {
                 title: 'LPO',
                 routerLink: '/app/blank'
             },
