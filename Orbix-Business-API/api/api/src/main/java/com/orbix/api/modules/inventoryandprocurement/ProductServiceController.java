@@ -44,10 +44,10 @@ public class ProductServiceController implements ProductService {
 	 */
 	@Override
 	public List<ProductResponseDTO> getAllProductes(HttpServletRequest request) {
-		List<Product> productes = productRepository.findAll();
+		List<Product> products = productRepository.findAll();
 		List<ProductResponseDTO> productResponses = new ArrayList<>();
 
-		for(Product product : productes) {
+		for(Product product : products) {
 			productResponses.add(productResponseDTOMapper(product));					
 		}		
 		return productResponses;
@@ -230,7 +230,24 @@ public class ProductServiceController implements ProductService {
 	        .collect(Collectors.toList());
 	}
 	
-	
+	@Override
+	public List<ProductResponseDTO> getCompanyProducts(HttpServletRequest request) {
+	    
+
+	    // Fetch company
+	    Company company = userService.getUserCompany(request);
+	    if (company == null) {
+	        throw new NotFoundException("Company not found for the user");
+	    }
+
+	    // Fetch products
+	    List<Product> products = productRepository.findAllByCompany(company);
+
+	    // Map to DTOs
+	    return products.stream()
+	        .map(this::productResponseDTOMapper)
+	        .collect(Collectors.toList());
+	}
 	
 	@Override
 	public List<ProductResponseDTO> getCompanySellableProducts(HttpServletRequest request) {

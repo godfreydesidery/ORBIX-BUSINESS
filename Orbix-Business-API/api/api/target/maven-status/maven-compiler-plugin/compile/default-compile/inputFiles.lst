@@ -3,9 +3,11 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\FastMovingDrugs.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleEquipmentTypeServiceController.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneResponseDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\SupplierRequestDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleEquipmentTypeService.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingBillReceivableResource.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\CollectionRequestDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\SupplierProductResource.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingBillReceivableResponseDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\NegativeStockReport.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\InvalidOperationException.java
@@ -21,6 +23,7 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\salesandmarketing\SaleServiceController.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\ProductResource.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\Validator.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\SupplierProductResponseDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\FastMovingItems.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleResponseDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\UserResponseDTO.java
@@ -34,6 +37,7 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\ConnectionResource.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\ShopRepository.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\PrivilegeResource.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\SupplierProductRepository.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleEquipment.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\GrnReport.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\InvoiceReceivableRepository.java
@@ -65,6 +69,7 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\package-info.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\CollectionReport.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\PrivilegeServiceController.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\SupplierResponseDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\BillReceivableCollection.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\DebtTrackerReport.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\UnitResource.java
@@ -80,6 +85,7 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleEquipmentType.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\salesandmarketing\SaleDetailBillReceivableRepository.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleRequestDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\SupplierProduct.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\UomRepository.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\UserRepository.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\SupplierStockStatusReport.java
@@ -91,12 +97,14 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingServiceBillReceivableRequestDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\CurrencyRepository.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneSlot.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\LpoDetail.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\salesandmarketing\SaleService.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\ServletInitializer.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\ResourceNotFoundException.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfileResource.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\MaterialUsageReport.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingBillReceivableRequestDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\SupplierProductRequestDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\UomResponseDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\User.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\commons\package-info.java
@@ -113,6 +121,7 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchResponseDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\commons\WorkFlowStatus.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\commons\ApiCustomResponse.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\LpoRepository.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\commons\PayStatus.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\InvoiceReceivable.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\RoleResource.java
@@ -159,6 +168,7 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchService.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\GlobalExceptionHandler.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\CollectionRepository.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\SupplierRepository.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZone.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\exceptions\NotFoundException.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\salesandmarketing\ShopSalesOrderDetailRequestDTO.java
@@ -166,16 +176,20 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\compliance\package-info.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingBillReceivableRepository.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\Collection.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\SupplierProductServiceController.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingResource.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\SlowMovingItems.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfile.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingInvoiceReceivableRepository.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleEquipmentResponseDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\SupplierResource.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneSlotRequestDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\Sanitizer.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\LpoDetailRepository.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\InvoiceReceivableDetailResponseDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\LabTestCollectionReport.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BusinessDay.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\SupplierService.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneResource.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingService.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\ShopServiceController.java
@@ -230,6 +244,7 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\FinanceReportResource.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\VehicleEquipmentRequestDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\BillReceivableServiceController.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\Supplier.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\salesandmarketing\ShopSalesOrderDetailRepository.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingServiceController.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\InvoiceReceivableDetail.java
@@ -238,10 +253,12 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\salesandmarketing\Sale.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\DailyProductionReport.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\package-info.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\SupplierServiceController.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingReportResource.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\service\InventoryReportServiceImpl.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingZoneService.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\ParkingServiceBillReceivableRepository.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\Lpo.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\UpdatePatient.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\SecurityConfig.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\UomRequestDTO.java
@@ -249,6 +266,7 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\Parking.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\TimeZoneRepository.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\salesandmarketing\SaleResponseDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\SupplierProductService.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\CustomAuthorizationFilter.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\document\package-info.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\salesandmarketing\SaleDetailRequestDTO.java

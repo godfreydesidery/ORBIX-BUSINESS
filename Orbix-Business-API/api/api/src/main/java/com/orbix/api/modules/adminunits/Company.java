@@ -38,9 +38,9 @@ import lombok.ToString;
 
 @Entity
 @Data 
-//@NoArgsConstructor 
+@NoArgsConstructor 
 @AllArgsConstructor
-@RequiredArgsConstructor
+//@RequiredArgsConstructor
 @Table(name = "companies")
 public class Company {
 	@Id

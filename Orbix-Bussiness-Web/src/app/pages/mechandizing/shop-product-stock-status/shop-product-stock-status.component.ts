@@ -14,6 +14,7 @@ import { environment } from 'src/environments/environment';
 import { HttpHeaders } from '@angular/common/http';
 import { IShopProduct } from 'src/app/domain/shop-product';
 import { IProduct } from 'src/app/domain/product';
+import { JwtHelperService } from '@auth0/angular-jwt';
 
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
@@ -412,6 +413,28 @@ export class ShopProductStockStatusComponent {
   clearImportList = () => {
     this.importProducts = []
     this.showImportList = false
+  }
+
+
+  grant(privileges: string[]): boolean {
+      /** Allow user to perform an action if the user has that privilege */
+      
+      const currentUser = JSON.parse(localStorage.getItem('current-user')!);
+      if (!currentUser || !currentUser.access_token) {
+          console.error('No valid user or access token found.');
+          return false;
+      }
+  
+      const decodedToken = new JwtHelperService().decodeToken(currentUser.access_token);
+      if (!decodedToken || !decodedToken.privileges) {
+          console.error('No privileges found in the token.');
+          return false;
+      }
+  
+      const userPrivileges = decodedToken.privileges as string[];
+  
+      // Check if any of the required privileges exist in the user's privileges
+      return privileges.some(privilege => userPrivileges.includes(privilege));
   }
 
   

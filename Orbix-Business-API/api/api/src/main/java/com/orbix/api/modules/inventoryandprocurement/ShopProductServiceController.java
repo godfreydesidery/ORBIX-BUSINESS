@@ -161,8 +161,7 @@ public class ShopProductServiceController implements ShopProductService {
 		double costPriceVatExcl = shopProductRequest.getCostPriceVatExcl();
 		double sellingPriceVatIncl = shopProductRequest.getSellingPriceVatIncl();
 		double sellingPriceVatExcl = shopProductRequest.getSellingPriceVatExcl();
-		/////////////////
-		double currentStock = shopProductRequest.getCurrentStock();
+		///////////////// do not update stock
 		double minStock = shopProductRequest.getMinStock();
 		double maxStock = shopProductRequest.getMaxStock();
 		double defaultReorderLevel = shopProductRequest.getDefaultReorderLevel();
@@ -182,11 +181,7 @@ public class ShopProductServiceController implements ShopProductService {
 	    }
 	   
 		ShopProduct shopProduct = shopProduct_.get();
-		boolean stockChanged = false;
-		if(shopProduct.getCurrentStock() != currentStock) {
-			stockChanged = true;
-		}
-	    shopProduct.setCurrentStock(currentStock);
+		
 	    shopProduct.setMinStock(minStock);
 	    shopProduct.setMaxStock(maxStock);
 	    shopProduct.setVatRate(vatRate);
@@ -201,10 +196,7 @@ public class ShopProductServiceController implements ShopProductService {
 	    
 	    shopProduct = shopProductRepository.save(shopProduct);
 	    
-	    ////Update ShopProduct log for stock card
 	    
-	    if(stockChanged == true)this.createShopProductLog(shop, product, currentStock, 0, currentStock, userService.getUser(request), dayService.getTimeStamp(), "Stock Update");
-
 	    
 	    return this.shopProductResponseDTOMapper(shopProduct);
 	}

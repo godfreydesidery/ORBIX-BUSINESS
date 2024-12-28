@@ -285,6 +285,10 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 			
 			ShopProduct shopProduct = shopProductRepository.findByProductAndShop(shopSalesOrderDetail.getProduct(), shopSalesOrder.getShop()).orElseThrow();
 			
+			shopProduct.setCurrentStock(shopProduct.getCurrentStock() - shopSalesOrderDetail.getQty());
+			
+			shopProduct = shopProductRepository.save(shopProduct);
+			
 			this.createShopProductLog(shopSalesOrder.getShop(), shopSalesOrderDetail.getProduct(), 0, shopSalesOrderDetail.getQty(), (shopProduct.getCurrentStock() - shopSalesOrderDetail.getQty()), userService.getUser(request), dayService.getTimeStamp(), "Shop sale");
 
 		}

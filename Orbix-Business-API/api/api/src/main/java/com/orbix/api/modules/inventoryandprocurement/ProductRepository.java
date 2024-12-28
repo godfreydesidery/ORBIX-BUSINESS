@@ -12,4 +12,6 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
 	List<Product> findAllByCompanyAndSellable(Company company, boolean b);
 
+	List<Product> findAllByCompany(Company company);
+
 }
