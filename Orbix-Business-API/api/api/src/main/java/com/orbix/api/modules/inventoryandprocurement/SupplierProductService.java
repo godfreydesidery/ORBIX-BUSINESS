@@ -9,6 +9,7 @@ import com.orbix.api.api.commons.ApiCustomResponse;
 public interface SupplierProductService {
 	List<SupplierProductResponseDTO> getAllSupplierProductsByBranch(Long supplierId, HttpServletRequest request);
 	SupplierProductResponseDTO get(Long id, Long supplierId, HttpServletRequest request);
+	SupplierProductResponseDTO getSupplierProduct(Long supplierId, Long productId, HttpServletRequest request);
 	SupplierProductResponseDTO getProductInSupplier(Long productId, Long supplierId, HttpServletRequest request);
 	SupplierProductResponseDTO createSupplierProduct(SupplierProductRequestDTO supplierProductRequest, HttpServletRequest request);
 	SupplierProductResponseDTO updateSupplierProduct(SupplierProductRequestDTO supplierProductRequest, HttpServletRequest request);

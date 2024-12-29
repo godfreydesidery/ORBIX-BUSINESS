@@ -297,4 +297,20 @@ public class ProductServiceController implements ProductService {
 	    // Map to DTOs
 	    return productResponses;
 	}
+	
+	@Override
+	public List<ProductResponseDTO> getProductsByCompanyAndName(String productName, HttpServletRequest request) {
+		
+	    List<Product> products = productRepository.findAllByCompanyAndNameContainingIgnoreCase(userService.getUserCompany(request), productName);
+	    
+	    List<ProductResponseDTO> productResponses = new ArrayList<>();
+	    
+	    for(Product product : products) {
+	    	ProductResponseDTO productResponse = new ProductResponseDTO();
+	    	productResponse.setId(product.getId().toString());
+	    	productResponse.setName(product.getName());
+	    	productResponses.add(productResponse);
+	    }
+	    return productResponses;
+	}
 }

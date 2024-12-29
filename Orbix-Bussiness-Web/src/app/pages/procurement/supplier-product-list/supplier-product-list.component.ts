@@ -411,10 +411,10 @@ export class SupplierProductListComponent {
         ) 
       }
   
-      async onSupplierChange(event: any): Promise<void> {
-        this.selectedSupplierId = await event.target.value;
-        await this.loadSelectedSupplier()
-        await this.loadSupplierProductsByBranch()
+    async onSupplierChange(event: any): Promise<void> {
+      this.selectedSupplierId = await event.target.value;
+      await this.loadSelectedSupplier()
+      await this.loadSupplierProductsByBranch()
     }
   
     selectSupplier(){

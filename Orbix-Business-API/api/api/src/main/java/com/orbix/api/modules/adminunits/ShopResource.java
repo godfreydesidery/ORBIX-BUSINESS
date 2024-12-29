@@ -88,4 +88,9 @@ public class ShopResource {
 			HttpServletRequest request){		
 		return ResponseEntity.ok().body(shopService.get(id, request));		
 	}
+	
+	@GetMapping("/shops/get_branch_shops")
+	public ResponseEntity<List<ShopResponseDTO>>getBranchShops(HttpServletRequest request){
+		return ResponseEntity.ok().body(shopService.getBranchShops(request));
+	}
 }

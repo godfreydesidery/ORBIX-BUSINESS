@@ -189,4 +189,16 @@ public class ShopServiceController implements ShopService {
 		}		
 		return shopResponseDTOMapper(_shop.get());	
 	}
+	
+	@Override
+	public List<ShopResponseDTO> getBranchShops(HttpServletRequest request) {
+		List<Shop> shops = shopRepository.findAllByBranch(userService.getUserBranch(request));
+		
+		List<ShopResponseDTO> shopResponses = new ArrayList<>();
+
+		for(Shop shop : shops) {
+			shopResponses.add(shopResponseDTOMapper(shop));					
+		}		
+		return shopResponses;
+	}
 }

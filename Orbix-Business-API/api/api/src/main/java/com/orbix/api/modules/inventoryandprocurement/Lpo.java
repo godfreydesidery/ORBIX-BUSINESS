@@ -52,14 +52,7 @@ public class Lpo {
     @Column(nullable = false)
 	WorkFlowStatus status = WorkFlowStatus.PENDING;
 	
-	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = false)
-    @JoinColumn(name = "created_by_user_id", nullable = false , updatable = false)
-    @OnDelete(action = OnDeleteAction.NO_ACTION)
-	@ToString.Exclude
-    @EqualsAndHashCode.Exclude
-    private User createdByUser;
 	
-	private LocalDateTime createdDateTime = LocalDateTime.now();
 	
 	@ManyToOne(targetEntity = Branch.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "branch_id", nullable = false , updatable = false)
@@ -78,6 +71,33 @@ public class Lpo {
     @OnDelete(action = OnDeleteAction.NO_ACTION)
 	@JsonIgnoreProperties("suppliers")
     private Supplier supplier;
+	
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "created_by_user_id", nullable = false , updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User createdByUser;
+	
+	private LocalDateTime createdDateTime = LocalDateTime.now();
+	
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = true)
+    @JoinColumn(name = "approved_by_user_id", nullable = true , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User approvedByUser;
+	
+	private LocalDateTime approvedDateTime = LocalDateTime.now();
+	
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = true)
+    @JoinColumn(name = "canceled_by_user_id", nullable = true , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User canceledByUser;
+	
+	private LocalDateTime canceledDateTime = LocalDateTime.now();
 	
 	@OneToMany(targetEntity = LpoDetail.class, mappedBy = "lpo", fetch = FetchType.EAGER, orphanRemoval = true)
     @Valid

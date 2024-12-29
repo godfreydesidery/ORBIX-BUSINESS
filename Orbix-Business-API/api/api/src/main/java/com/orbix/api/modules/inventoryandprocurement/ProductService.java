@@ -18,4 +18,6 @@ public interface ProductService {
 	List<ProductResponseDTO> getCompanyProducts(HttpServletRequest request);
 	List<ProductResponseDTO> getCompanySellableProducts(HttpServletRequest request);
 	List<ProductResponseDTO> getCompanySellableProductsByShop(Long shopId, HttpServletRequest request);
+	
+	List<ProductResponseDTO> getProductsByCompanyAndName(String productName, HttpServletRequest request);
 }

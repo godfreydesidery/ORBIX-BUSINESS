@@ -102,4 +102,13 @@ public class ProductResource {
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(productService.getCompanySellableProductsByShop(shopId, request));
 	}
+	
+	@GetMapping("/products/get_products_by_company_containing")
+	public ResponseEntity<List<ProductResponseDTO>>getAllProductsByCompanyContaining( 
+			@RequestParam(name = "product_name_like")String productNameLike,
+			HttpServletRequest request){
+
+		return ResponseEntity.ok().body(productService.getProductsByCompanyAndName(productNameLike, request));
+
+	}
 }

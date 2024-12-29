@@ -49,6 +49,17 @@ public class SupplierServiceController implements SupplierService {
 		}		
 		return supplierResponses;
 	}
+	
+	@Override
+	public List<SupplierResponseDTO> getAllCompanySuppliers(HttpServletRequest request) {
+		List<Supplier> suppliers = supplierRepository.findAllByCompany(userService.getUserCompany(request));
+		List<SupplierResponseDTO> supplierResponses = new ArrayList<>();
+
+		for(Supplier supplier : suppliers) {
+			supplierResponses.add(supplierResponseDTOMapper(supplier));					
+		}		
+		return supplierResponses;
+	}
 
 	@Override
 	public SupplierResponseDTO get(Long id, HttpServletRequest request) {
