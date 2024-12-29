@@ -470,13 +470,17 @@ export const menuItems = [
                 routerLink: '/app/procurement/lpo'
             },
             {
-                title: 'BLO',
-                routerLink: '/app/blank'
-            },
-            {
                 title: 'GRN',
-                routerLink: '/app/blank'
-            }
+                routerLink: '/app/procurement/grn'
+            },
+            // {
+            //     title: 'BLO',
+            //     routerLink: '/app/blank'
+            // },
+            // {
+            //     title: 'GRN',
+            //     routerLink: '/app/blank'
+            // }
         ]
     },
     {

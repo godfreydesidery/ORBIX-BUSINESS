@@ -237,6 +237,23 @@ public class LpoServiceController implements LpoService {
 		return true;
 	}
 	
+	@Override
+	public boolean archiveLpo(Long lpoId, HttpServletRequest request) {
+		Lpo lpo = lpoRepository.findById(lpoId)
+			    .orElseThrow(() -> new NotFoundException("LPO not found, with id " + lpoId));
+		if(!String.valueOf(lpo.getStatus()).equals("APPROVED")) {
+			throw new InvalidOperationException("LPO not approved");
+		}
+		
+		lpo.setStatus(WorkFlowStatus.ARCHIVED);
+		
+		lpo.setArchivedByUser(userService.getUser(request));
+		lpo.setArchivedDateTime(dayService.getTimeStamp());
+		
+		lpoRepository.save(lpo);
+		
+		return true;
+	}
 	
 	private LpoResponseDTO lpoResponseDTOMapper(Lpo lpo) {
 		LpoResponseDTO lpoResponse = new LpoResponseDTO();

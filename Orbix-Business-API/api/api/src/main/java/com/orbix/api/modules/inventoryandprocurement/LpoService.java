@@ -23,5 +23,6 @@ public interface LpoService {
 	void removeLpoDetail(Long lpoDetailId, Long lpoId, HttpServletRequest request);
 	
 	boolean approveLpo(Long lpoId, HttpServletRequest request);
+	boolean archiveLpo(Long lpoId, HttpServletRequest request);
 	boolean cancelLpo(Long lpoId, HttpServletRequest request);
 }

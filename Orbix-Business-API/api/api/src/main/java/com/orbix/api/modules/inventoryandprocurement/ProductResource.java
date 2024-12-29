@@ -41,6 +41,13 @@ public class ProductResource {
 		return ResponseEntity.ok().body(productService.get(id, request));		
 	}
 	
+	@GetMapping("/products/get_company_product")
+	public ResponseEntity<ProductResponseDTO>getCompanyProduct(
+			@RequestParam(name = "product_id")Long productId,
+			HttpServletRequest request){		
+		return ResponseEntity.ok().body(productService.getCompanyProduct(productId, request));		
+	}
+	
 	@PostMapping("/products/create")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ProductResponseDTO>create(

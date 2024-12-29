@@ -125,6 +125,7 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\utilities\package-info.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\security\Operation.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchResponseDTO.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\GrnResource.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\commons\WorkFlowStatus.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\commons\ApiCustomResponse.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\LpoRepository.java

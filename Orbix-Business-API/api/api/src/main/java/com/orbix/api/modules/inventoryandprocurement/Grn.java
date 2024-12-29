@@ -88,7 +88,7 @@ public class Grn {
     @EqualsAndHashCode.Exclude
     private User approvedByUser;
 	
-	private LocalDateTime approvedDateTime = LocalDateTime.now();
+	private LocalDateTime approvedDateTime;
 	
 	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = true)
     @JoinColumn(name = "canceled_by_user_id", nullable = true , updatable = true)
@@ -97,7 +97,16 @@ public class Grn {
     @EqualsAndHashCode.Exclude
     private User canceledByUser;
 	
-	private LocalDateTime canceledDateTime = LocalDateTime.now();
+	private LocalDateTime canceledDateTime;
+	
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = true)
+    @JoinColumn(name = "archived_by_user_id", nullable = true , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User archivedByUser;
+	
+	private LocalDateTime archivedDateTime;
 	
 	@OneToMany(targetEntity = GrnDetail.class, mappedBy = "grn", fetch = FetchType.EAGER, orphanRemoval = true)
     @Valid

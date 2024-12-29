@@ -5,5 +5,6 @@ public enum WorkFlowStatus {
 	APPROVED,
 	CANCELED,
 	COMPLETED,
-	CONFIRMED
+	CONFIRMED,
+	ARCHIVED
 }

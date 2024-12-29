@@ -41,6 +41,8 @@ const API_URL = environment.apiUrl;
 export class LpoComponent {
 shopId: any = null
 
+status : string = ''
+
   products : IProduct[] = []
 
   searchKey : string = '' 
@@ -198,6 +200,8 @@ shopId: any = null
           console.log(data)
 
           this.lpo = data!
+
+          this.status = this.lpo.status
 
           this.lpoId = this.lpo.id
 
@@ -514,6 +518,29 @@ shopId: any = null
             console.log(data)
             this.get(this.lpoId)
             this.msg.showSuccessMessage('LPO canceled successifully')
+          }
+        )
+        .catch(error => {
+          console.log(error)
+          this.msg.showErrorMessage(error, 'Error')
+        }       
+      )
+    }
+
+    async archiveOrder(){
+      if(await this.msg.showConfirmMessageDialog('Cancel', 'Are you sure you want to archive this order?', 'question', 'Yes', 'No') == false){
+        return
+      }
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      }
+      this.http.post<ILpo>(API_URL+'/lpos/archive?lpo_id=' + this.lpoId, null, options)
+        .toPromise()
+        .then(
+          data => {
+            console.log(data)
+            this.get(this.lpoId)
+            this.msg.showSuccessMessage('LPO archived successifully')
           }
         )
         .catch(error => {

@@ -67,6 +67,17 @@ public class ProductServiceController implements ProductService {
 		return productResponseDTOMapper(_product.get());	
 	}
 	
+	@Override
+	public ProductResponseDTO getCompanyProduct(
+			Long productId, 
+			HttpServletRequest request) {
+		Optional<Product> _product = productRepository.findByIdAndCompany(productId, userService.getUserCompany(request));
+		if(_product.isEmpty()) {
+			throw new NotFoundException("Product not found");
+		}		
+		return productResponseDTOMapper(_product.get());	
+	}
+	
 	/**
 	 * 
 	 */

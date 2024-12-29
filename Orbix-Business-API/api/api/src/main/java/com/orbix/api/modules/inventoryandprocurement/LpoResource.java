@@ -88,4 +88,12 @@ public class LpoResource {
 			HttpServletRequest request){
 		return lpoService.cancelLpo(lpoId, request);
 	}
+	
+	@PostMapping("/lpos/archive")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public boolean archive(
+			@RequestParam(name = "lpo_id") Long lpoId,
+			HttpServletRequest request){
+		return lpoService.archiveLpo(lpoId, request);
+	}
 }

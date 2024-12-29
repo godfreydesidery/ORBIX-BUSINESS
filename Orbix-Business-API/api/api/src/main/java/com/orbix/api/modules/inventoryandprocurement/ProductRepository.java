@@ -1,6 +1,7 @@
 package com.orbix.api.modules.inventoryandprocurement;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -13,5 +14,7 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	List<Product> findAllByCompanyAndSellable(Company company, boolean b);
 
 	List<Product> findAllByCompany(Company company);
+
+	Optional<Product> findByIdAndCompany(Long productId, Company userCompany);
 
 }

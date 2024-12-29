@@ -14,6 +14,7 @@
                         <button class="btn btn-outline-success btn-round-custom" (click)="clearOrder()" data-toggle="modal" data-target="#sales-order-modal">New LPO</button>
                         <button class="btn btn-outline-primary btn-round-custom" (click)="approveOrder()" *ngIf="lpoId != null">Approve LPO</button>
                         <button class="btn btn-outline-danger btn-round-custom" (click)="cancelOrder()" *ngIf="lpoId != null">Cancel LPO</button>
+                        <button class="btn btn-outline-danger btn-round-custom" (click)="archiveOrder()" *ngIf="lpoId != null">Archive LPO</button>
                     </div>
                 </div>
             
@@ -36,6 +37,7 @@
                                             <!-- <li><strong>Order Date:</strong> 2024-06-15</li>
                                             
                                             <li><strong>Sales Order Type:</strong> Standard Order</li> -->
+                                            <li><strong>Status:</strong> {{status}}</li>
                                         </ul>
                                     </div>
                                 </div>
@@ -204,7 +206,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="salesOrderModalDetailLabel">Add/Edit Sales Order Detail</h5>
+                <h5 class="modal-title" id="salesOrderModalDetailLabel">Add/Edit LPO Detail</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
@@ -324,7 +326,7 @@
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
-                <h5 class="modal-title" id="salesOrderModalLabel">Add/Edit Sales Order</h5>
+                <h5 class="modal-title" id="salesOrderModalLabel">Add/Edit LPO</h5>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close">
                     <span aria-hidden="true">&times;</span>
                 </button>
