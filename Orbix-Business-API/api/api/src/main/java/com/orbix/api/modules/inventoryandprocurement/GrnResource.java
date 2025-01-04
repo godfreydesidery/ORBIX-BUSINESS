@@ -56,6 +56,15 @@ public class GrnResource {
 		return ResponseEntity.created(uri).body(grnService.createGrn(grnRequest, request));
 	}
 	
+	@PostMapping("/grns/create_by_lpo_no")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<GrnResponseDTO>createByLpoNo(
+			@RequestParam(name = "lpo_no") String lpoNo,
+			HttpServletRequest request){		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/grns/create").toUriString());
+		return ResponseEntity.created(uri).body(grnService.createGrnByLpoNo(lpoNo, request));
+	}
+	
 	@PostMapping("/grns/create_detail")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public void createDetail(

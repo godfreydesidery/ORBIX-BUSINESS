@@ -3,6 +3,7 @@ package com.orbix.api.modules.inventoryandprocurement;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -35,6 +36,7 @@ import lombok.extern.slf4j.Slf4j;
 public class GrnServiceController implements GrnService {
 	
 	private final GrnRepository grnRepository;
+	private final LpoRepository lpoRepository;
 	private final GrnDetailRepository grnDetailRepository;
 	private final ShopRepository shopRepository;
 	private final UserService userService;
@@ -125,6 +127,71 @@ public class GrnServiceController implements GrnService {
 		
 		return grnResponseDTOMapper(grn);
 	}
+	
+	@Override
+	public GrnResponseDTO createGrnByLpoNo(String lpoNo, HttpServletRequest request) {
+		Shop shop = null;
+		
+		Optional<Lpo> lpo_ = lpoRepository.findByNo(lpoNo);
+		if(lpo_.isEmpty()) {
+			throw new NotFoundException("LPO not found");
+		}
+		if(!String.valueOf(lpo_.get().getStatus()).equals("APPROVED")) {
+			throw new InvalidOperationException("LPO not approved");
+		}
+
+		if(lpo_.get().getShop() == null) {
+			throw new InvalidOperationException("LPO do not belong to shop");
+		}	
+		
+		Lpo lpo = lpo_.get();
+		lpo.setStatus(WorkFlowStatus.COMPLETED);
+		lpo = lpoRepository.save(lpo);
+		
+		shop = lpo.getShop();
+				
+
+		Grn grn = new Grn();
+		
+		grn.setNo(String.valueOf(Math.random()));
+		grn.setShop(shop);
+		grn.setBranch(userService.getUserBranch(request));
+		grn.setStatus(WorkFlowStatus.PROCESSING);
+//		grn.setSummary(grnRequest.getSummary());
+		grn.setCreatedByUser(userService.getUser(request));
+		grn.setCreatedDateTime(dayService.getTimeStamp());
+		grn = grnRepository.save(grn);
+		grn.setNo(grn.getId().toString());
+		
+		grn = grnRepository.save(grn);
+		
+		List<GrnDetail> grnDetails = new ArrayList<>();
+		for(LpoDetail lpoDetail : lpo_.get().getLpoDetails()) {
+			GrnDetail grnDetail = new GrnDetail();
+			
+			
+			if(lpoDetail.getQty() <= 0) {
+				throw new InvalidOperationException("Invalid quantiy selected");
+			}
+						
+			grnDetail.setProduct(lpoDetail.getProduct());
+			grnDetail.setQty(lpoDetail.getQty());
+			grnDetail.setCostPriceVatIncl(lpoDetail.getCostPriceVatIncl());
+			grnDetail.setVatRate(lpoDetail.getVatRate());
+			grnDetail.setGrn(grn);
+			
+			grnDetail.setCreatedByUser(userService.getUser(request));
+			grnDetail.setCreatedDateTime(dayService.getTimeStamp());
+
+			grnDetail = grnDetailRepository.save(grnDetail);
+			grnDetails.add(grnDetail);
+			
+		}
+		
+		grn.setGrnDetails(grnDetails);
+		
+		return grnResponseDTOMapperWithDetails(grn);
+	}
 
 	@Override
 	public GrnResponseDTO updateGrn(GrnRequestDTO grnRequest, HttpServletRequest request) {
@@ -135,7 +202,7 @@ public class GrnServiceController implements GrnService {
 	@Override
 	public List<GrnDetailResponseDTO> getAllGrnDetails(Long grnId, HttpServletRequest request) {
 		Grn grn = grnRepository.findById(grnId)
-			    .orElseThrow(() -> new NotFoundException("LPO not found, with id " + grnId));
+			    .orElseThrow(() -> new NotFoundException("GRN not found, with id " + grnId));
 		
 		List<GrnDetail> grnDetails = grnDetailRepository.findAllByGrn(grn);
 		
@@ -154,7 +221,7 @@ public class GrnServiceController implements GrnService {
 			    .orElseThrow(() -> new NotFoundException("LPO not found, with id " + grnDetailRequest.getGrnId()));
 		
 		if(!String.valueOf(grn.getStatus()).equals("PENDING")) {
-			throw new InvalidOperationException("Not a pending order");
+			throw new InvalidOperationException("Not a pending GRN");
 		}
 		
 		Product product = productRepository.findById(grnDetailRequest.getProductId()).get();
@@ -192,7 +259,7 @@ public class GrnServiceController implements GrnService {
 		Grn grn = grnRepository.findById(grnId)
 			    .orElseThrow(() -> new NotFoundException("LPO not found, with id " + grnId));
 		if(!String.valueOf(grn.getStatus()).equals("PENDING")) {
-			throw new InvalidOperationException("Not a pending order");
+			throw new InvalidOperationException("Not a pending GRN");
 		}
 		
 		GrnDetail grnDetail = grnDetailRepository.findById(grnDetailId)
@@ -210,8 +277,8 @@ public class GrnServiceController implements GrnService {
 	public boolean approveGrn(Long grnId, HttpServletRequest request) {
 		Grn grn = grnRepository.findById(grnId)
 			    .orElseThrow(() -> new NotFoundException("LPO not found, with id " + grnId));
-		if(!String.valueOf(grn.getStatus()).equals("PENDING")) {
-			throw new InvalidOperationException("Not a pending LPO");
+		if(!(String.valueOf(grn.getStatus()).equals("PENDING") || String.valueOf(grn.getStatus()).equals("PROCESSING"))) {
+			throw new InvalidOperationException("Not a pending or processing GRN");
 		}
 		
 		grn.setStatus(WorkFlowStatus.APPROVED);
@@ -268,7 +335,7 @@ public class GrnServiceController implements GrnService {
 		Grn grn = grnRepository.findById(grnId)
 			    .orElseThrow(() -> new NotFoundException("LPO not found, with id " + grnId));
 		if(!String.valueOf(grn.getStatus()).equals("PENDING")) {
-			throw new InvalidOperationException("Not a pending LPO");
+			throw new InvalidOperationException("Not a pending GRN");
 		}
 		
 		grn.setStatus(WorkFlowStatus.CANCELED);

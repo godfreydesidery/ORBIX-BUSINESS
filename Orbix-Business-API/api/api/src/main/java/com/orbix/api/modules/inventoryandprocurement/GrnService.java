@@ -10,6 +10,7 @@ public interface GrnService {
 	List<GrnResponseDTO> getAllVisibleGrnsByBranch(HttpServletRequest request);
 	GrnResponseDTO get(Long id, HttpServletRequest request);
 	GrnResponseDTO createGrn(GrnRequestDTO grnRequest, HttpServletRequest request);
+	GrnResponseDTO createGrnByLpoNo(String lpoNo, HttpServletRequest request);
 	GrnResponseDTO updateGrn(GrnRequestDTO grnRequest, HttpServletRequest request);
 //	ApiCustomResponse activateProduct(ProductRequestDTO product, HttpServletRequest request);
 //	ApiCustomResponse deactivateProduct(ProductRequestDTO product, HttpServletRequest request);

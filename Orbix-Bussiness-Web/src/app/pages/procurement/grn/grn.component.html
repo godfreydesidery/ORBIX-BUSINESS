@@ -339,6 +339,11 @@
             <div class="modal-body">
 
                 <div class="form-group">
+                    <p>Enter LPO No</p>
+                    <input class="form-control" type="text" [(ngModel)]="lpoNo">
+                </div>
+
+                <!-- <div class="form-group">
                     <p>Select Supplier</p>
                     <select class="form-control" [(ngModel)]="supplierId" (change)="onSupplierChange($event)">
                         <option value = ''></option>
@@ -346,9 +351,9 @@
                             <option *ngFor="let supplier of suppliers" [value]="supplier.id" style="font-size: larger;">Supplier name: <b>{{supplier.name}}</b></option>                   
                         </optgroup>
                     </select>
-                </div>
+                </div> -->
 
-                <div class="form-group" *ngIf="supplierId != null">
+                <!-- <div class="form-group" *ngIf="supplierId != null">
                     <p>Select Destination (Shop)</p>
                     <select class="form-control" [(ngModel)]="shopId" (change)="onShopChange($event)">
                         <option value = ''></option>
@@ -356,7 +361,7 @@
                             <option *ngFor="let shop of shops" [value]="shop.id" style="font-size: larger;">Shop name: <b>{{shop.name}}</b></option>                   
                         </optgroup>
                     </select>
-                </div>
+                </div> -->
 
 
                 <form id="salesOrderForm">
@@ -377,7 +382,7 @@
                 <div class="col-md-12">
                     <hr>
                     <button type="button" class="btn btn-danger btn-round-custom" data-dismiss="modal" style="margin: 10px;">Close</button>
-                    <button type="submit" class="btn btn-success btn-round-custom pull-right" (click)="save()" id="saveSalesOrderBtn" data-dismiss="modal" style="margin: 10px;">Save Order</button>
+                    <button type="submit" class="btn btn-success btn-round-custom pull-right" (click)="createByLpoNo()" data-dismiss="modal" style="margin: 10px;">Create</button>
                 </div>
             </div>
         </div>

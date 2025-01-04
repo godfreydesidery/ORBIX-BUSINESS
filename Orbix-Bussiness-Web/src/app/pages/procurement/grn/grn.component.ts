@@ -68,6 +68,8 @@ shopId: any = null
 
   grnId : any = null
 
+  lpoNo : string = ''
+
 
   page: number = 1; // Initialize the current page to 1
   filterRecords : string = ''
@@ -280,6 +282,34 @@ shopId: any = null
           }
         )
       }
+    }
+
+    public async createByLpoNo(){
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      }
+
+      await this.http.post<IGrn>(API_URL+'/grns/create_by_lpo_no?lpo_no=' + this.lpoNo, null, options)
+        .toPromise()
+        .then(
+          data => {
+            //this.showUomData(data!)
+    
+            console.log(data)
+
+            this.get(data!.id)
+ 
+            this.msg.showSuccessMessage('GRN created successifully')
+    
+          }
+    
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+          }
+        )
     }
 
     clearOrder(){

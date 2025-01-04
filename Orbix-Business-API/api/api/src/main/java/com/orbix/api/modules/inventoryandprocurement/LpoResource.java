@@ -40,6 +40,13 @@ public class LpoResource {
 		return ResponseEntity.ok().body(lpoService.getAllVisibleLposByBranch(request));
 	}
 	
+	@GetMapping("/lpos/get_all_visible_by_shop")
+	public ResponseEntity<List<LpoResponseDTO>>getAllVisibleByShop(
+			@RequestParam(name = "shop_id") Long shopId,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(lpoService.getAllVisibleLposByShop(shopId, request));
+	}
+	
 	@GetMapping("/lpos/get")
 	public ResponseEntity<LpoResponseDTO>get(
 			Long id,

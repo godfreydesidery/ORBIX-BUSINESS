@@ -140,6 +140,12 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
       {
+        path : 'mechandizing/shop-lpo',
+        loadComponent: () => import('./mechandizing/shop-lpo/shop-lpo.component').then(c => c.ShopLpoComponent),
+        data : { breadcrumb : 'Mechandizing/Shop LPO'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'mechandizing/sales-listing-report',
         loadComponent: () => import('./mechandizing/reports/sales-listing-report/sales-listing-report.component').then(c => c.SalesListingReportComponent),
         data : { breadcrumb : 'Mechandizing/Reports/Sales Listing Report'},

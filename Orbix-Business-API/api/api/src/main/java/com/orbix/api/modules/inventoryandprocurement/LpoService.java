@@ -10,6 +10,7 @@ public interface LpoService {
 	List<LpoResponseDTO> getAllLpos(HttpServletRequest request);
 	List<LpoResponseDTO> getAllPendingLpos(HttpServletRequest request);
 	List<LpoResponseDTO> getAllVisibleLposByBranch(HttpServletRequest request);
+	List<LpoResponseDTO> getAllVisibleLposByShop(Long shopId, HttpServletRequest request);
 	LpoResponseDTO get(Long id, HttpServletRequest request);
 	LpoResponseDTO createLpo(LpoRequestDTO lpoRequest, HttpServletRequest request);
 	LpoResponseDTO updateLpo(LpoRequestDTO lpoRequest, HttpServletRequest request);

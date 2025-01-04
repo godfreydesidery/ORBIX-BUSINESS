@@ -2,6 +2,7 @@ package com.orbix.api.modules.inventoryandprocurement;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -81,6 +82,25 @@ public class LpoServiceController implements LpoService {
 		statuses.add(WorkFlowStatus.APPROVED);
 
 			List<Lpo> lpos = lpoRepository.findAllByStatusInAndBranch(statuses, userService.getUserBranch(request));
+
+			return lpos.stream()
+			    .map(this::lpoResponseDTOMapper)
+			    .collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<LpoResponseDTO> getAllVisibleLposByShop(Long shopId, HttpServletRequest request) {
+		
+		Optional<Shop> shop_ = shopRepository.findById(shopId);
+		if(shop_.isEmpty()) {
+			throw new NotFoundException("Shop not found");
+		}
+		
+		List<WorkFlowStatus> statuses = new ArrayList<>();
+		statuses.add(WorkFlowStatus.PENDING);
+		statuses.add(WorkFlowStatus.APPROVED);
+
+			List<Lpo> lpos = lpoRepository.findAllByStatusInAndBranchAndShop(statuses, userService.getUserBranch(request), shop_.get());
 
 			return lpos.stream()
 			    .map(this::lpoResponseDTOMapper)
