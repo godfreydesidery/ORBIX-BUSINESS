@@ -8,6 +8,7 @@ public interface GrnService {
 	List<GrnResponseDTO> getAllGrns(HttpServletRequest request);
 	List<GrnResponseDTO> getAllPendingGrns(HttpServletRequest request);
 	List<GrnResponseDTO> getAllVisibleGrnsByBranch(HttpServletRequest request);
+	List<GrnResponseDTO> getAllVisibleGrnsByShop(Long shopId, HttpServletRequest request);
 	GrnResponseDTO get(Long id, HttpServletRequest request);
 	GrnResponseDTO createGrn(GrnRequestDTO grnRequest, HttpServletRequest request);
 	GrnResponseDTO createGrnByLpoNo(String lpoNo, HttpServletRequest request);

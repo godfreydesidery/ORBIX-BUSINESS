@@ -146,6 +146,12 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
       {
+        path : 'mechandizing/shop-grn',
+        loadComponent: () => import('./mechandizing/shop-grn/shop-grn.component').then(c => c.ShopGrnComponent),
+        data : { breadcrumb : 'Mechandizing/Shop GRN'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'mechandizing/sales-listing-report',
         loadComponent: () => import('./mechandizing/reports/sales-listing-report/sales-listing-report.component').then(c => c.SalesListingReportComponent),
         data : { breadcrumb : 'Mechandizing/Reports/Sales Listing Report'},
@@ -302,6 +308,20 @@ export const routes: Routes = [
         path : 'procurement/supplier-product-list',
         loadComponent: () => import('./procurement/supplier-product-list/supplier-product-list.component').then(c => c.SupplierProductListComponent),
         data : { breadcrumb : 'Procurement/Supplier Product List'}, 
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'procurement/supplier-price-list',
+        loadComponent: () => import('./procurement/supplier-price-list/supplier-price-list.component').then(c => c.SupplierPriceListComponent),
+        data : { breadcrumb : 'Procurement/Supplier Price List'}, 
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'procurement/view-supplier-products',
+        loadComponent: () => import('./procurement/view-supplier-products/view-supplier-products.component').then(c => c.ViewSupplierProductsComponent),
+        data : { breadcrumb : 'Procurement/View Supplier Products'}, 
         canActivate : [AuthGuard]
       },
 

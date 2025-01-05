@@ -22,6 +22,8 @@ import { ISupplier } from 'src/app/domain/supplier';
 import { ISupplierProduct } from 'src/app/domain/supplier-product';
 import { IGrn, IGrnDetail } from 'src/app/domain/grn';
 
+import * as pdfMake from 'pdfmake/build/pdfmake';
+
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
@@ -40,7 +42,13 @@ const API_URL = environment.apiUrl;
   styleUrl: './grn.component.scss'
 })
 export class GrnComponent {
+
+  documentHeader! : any
+
+  id : any = null
 shopId: any = null
+shopCode : string = ''
+shopName : string = ''
 
   products : IProduct[] = []
 
@@ -57,7 +65,7 @@ shopId: any = null
   supplierName : string = ''
   supplierCode : string = ''
 
-  shopName : string = ''
+
 
   searchedProducts : IProduct[] = []
 
@@ -65,8 +73,6 @@ shopId: any = null
 
 
   grns : IGrn[] = []
-
-  grnId : any = null
 
   lpoNo : string = ''
 
@@ -89,8 +95,16 @@ shopId: any = null
   ) {}
 
   async ngOnInit(): Promise<void> {
+    this.route.queryParams.subscribe(params => {
+      this.id = params['grn_id'];
+    });
     this.getCompanySuppliers()
     this.getBranchShops()
+
+    if(this.id != null){
+      this.get(this.id)
+    }
+    
   }
 
 
@@ -204,9 +218,11 @@ shopId: any = null
 
           this.grn = data!
 
+          this.id = data!.id
+
           this.status = this.grn.status
 
-          this.grnId = this.grn.id
+          this.id = this.grn.id
 
           this.totalAmount = 0
 
@@ -314,7 +330,7 @@ shopId: any = null
 
     clearOrder(){
       this.grn!
-      this.grnId = null
+      this.id = null
       this.supplierId = null
       this.shopId = null
     }
@@ -445,14 +461,14 @@ shopId: any = null
       ) 
     }
 
-    saveDetail(){
+    async saveDetail(){
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
 
       var detail = {
         id : this.grnDetailId,
-        grnId : this.grnId,
+        grnId : this.id,
         productId : this.productId,
         qty : this.qty,
         costPriceVatIncl : this.costPriceVatIncl,
@@ -461,12 +477,12 @@ shopId: any = null
 
       if(detail.id === null){
         /**Create new detail */
-        this.http.post<IGrnDetail>(API_URL+'/grns/create_detail', detail, options)
+        await this.http.post<IGrnDetail>(API_URL+'/grns/create_detail', detail, options)
           .toPromise()
           .then(
             data => {
               console.log(data)
-              this.get(this.grnId)
+              this.get(this.id)
             }
           )
           .catch(error => {
@@ -476,12 +492,12 @@ shopId: any = null
         ) 
       }else if(detail.id !== null){
         /**Update detail */
-        this.http.post<IGrnDetail>(API_URL+'/grns/update_detail', detail, options)
+        await this.http.post<IGrnDetail>(API_URL+'/grns/update_detail', detail, options)
           .toPromise()
           .then(
             data => {
               console.log(data)
-              this.get(this.grnId)
+              this.get(this.id)
             }
           )
           .catch(error => {
@@ -493,16 +509,16 @@ shopId: any = null
 
     }
 
-    removeDetail(id : any){
+    async removeDetail(id : any){
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      this.http.get<IGrnDetail>(API_URL+'/grns/remove_detail?grn_detail_id=' + id + '&grn_id=' + this.grnId, options)
+      await this.http.get<IGrnDetail>(API_URL+'/grns/remove_detail?grn_detail_id=' + id + '&grn_id=' + this.id, options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.get(this.grnId)
+            this.get(this.id)
           }
         )
         .catch(error => {
@@ -520,12 +536,12 @@ shopId: any = null
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      this.http.post<IGrn>(API_URL+'/grns/approve?grn_id=' + this.grnId, null, options)
+      this.http.post<IGrn>(API_URL+'/grns/approve?grn_id=' + this.id, null, options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.get(this.grnId)
+            this.get(this.id)
             this.msg.showSuccessMessage('GRN approved successifully')
           }
         )
@@ -544,12 +560,12 @@ shopId: any = null
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      this.http.post<IGrn>(API_URL+'/grns/cancel?grn_id=' + this.grnId, null, options)
+      this.http.post<IGrn>(API_URL+'/grns/cancel?grn_id=' + this.id, null, options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.get(this.grnId)
+            this.get(this.id)
             this.msg.showSuccessMessage('GRN canceled successifully')
           }
         )
@@ -567,12 +583,12 @@ shopId: any = null
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      this.http.post<IGrn>(API_URL+'/grns/archive?grn_id=' + this.grnId, null, options)
+      this.http.post<IGrn>(API_URL+'/grns/archive?grn_id=' + this.id, null, options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.get(this.grnId)
+            this.get(this.id)
             this.msg.showSuccessMessage('GRN archived successifully')
           }
         )
@@ -584,12 +600,12 @@ shopId: any = null
     }
 
     suppliers : ISupplier[] = []
-    getCompanySuppliers(){
+    async getCompanySuppliers(){
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
       this.suppliers = []
-      this.http.get<ISupplier[]>(API_URL+'/suppliers/get_all_by_company', options)
+      await this.http.get<ISupplier[]>(API_URL+'/suppliers/get_all_by_company', options)
         .toPromise()
         .then(
           data => {
@@ -709,6 +725,93 @@ shopId: any = null
         this.printer.print(items, 'NA', 0)
         //this.toPrintReceipt = false
       }
+
+
+
+      print = async () => {
+                this.documentHeader = await this.data.getDocumentHeaderLandScape();
+                const title = 'Goods Received Note(GRN)';
+                
+                let total: number = 0;
+                let discount: number = 0;
+              
+                const list: any[] = [];
+              
+                // Add header row
+                list.push([
+                  { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+                  { text: 'Code', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+                  { text: 'Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+                  { text: 'UOM', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+                  { text: 'Qty', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+                  { text: 'Price', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+                  { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+                ]);
+              
+                // Add rows dynamically
+                this.grn.grnDetails.forEach((element) => {
+                  total += (element.costPriceVatIncl * element.qty) || 0;
+                  // discount += parseFloat(element.discount) || 0;
+            
+                  // if(Number(element.amount) > 0) total += Number(element.amount) || 0;
+                  
+                  // if(Number(element.discount) > 0) discount += Number(element.discount) || 0;
+              
+                  list.push([
+                    { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+                    { text: element.productCode || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },  
+                    { text: element.productName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false }, 
+                    { text: element.baseUom || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },   
+                    { text: element.qty || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
+                    { text: (Number(element.costPriceVatIncl) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+                    { text: (Number(element.costPriceVatIncl * element.qty) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+                  ]);
+                });
+              
+                // Add summary row
+                list.push([
+                  {},     
+                  {},
+                  {},     
+                  {},
+                  {},
+                  { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
+                  { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+                ]);
+              
+                // Define document structure
+                const docDefinition: any = {
+                  header: '',
+                  pageOrientation: 'potrait',
+                  footer: (currentPage: any, pageCount: any) => ({
+                    text: `${currentPage} of ${pageCount}`,
+                    alignment: 'center',
+                    fontSize: 8,
+                  }),
+                  content: [
+                    {
+                      columns: [
+                        this.documentHeader,
+                      ],
+                    },
+                    {text : ' '},
+                    {text: title, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+                    {text: 'GRN No : ' + this.grn.no, fontSize: 10, bold: true, alignment: 'left'},
+                    {text: 'Status : ' + this.status, fontSize: 10, bold: true, alignment: 'left'},
+                    {text: 'Supplier : ' + this.supplierName, fontSize: 10, bold: true, alignment: 'left'},
+                    {text: 'Shop : ' + this.shopName, fontSize: 10, bold: true, alignment: 'left'},
+                    {text: ' ', fontSize: 10, bold: true, alignment: 'left'},
+                    {
+                      table: {
+                        widths: [25, 50, 130, 40, 40, 70, 70],
+                        body: list,
+                      },
+                    },
+                  ],
+                };
+              
+                pdfMake.createPdf(docDefinition).print();
+              };
 
     
     

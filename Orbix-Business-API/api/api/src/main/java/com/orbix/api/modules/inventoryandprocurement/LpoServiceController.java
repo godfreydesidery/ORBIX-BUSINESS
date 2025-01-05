@@ -79,6 +79,7 @@ public class LpoServiceController implements LpoService {
 		
 		List<WorkFlowStatus> statuses = new ArrayList<>();
 		statuses.add(WorkFlowStatus.PENDING);
+		statuses.add(WorkFlowStatus.PROCESSING);
 		statuses.add(WorkFlowStatus.APPROVED);
 
 			List<Lpo> lpos = lpoRepository.findAllByStatusInAndBranch(statuses, userService.getUserBranch(request));
@@ -98,7 +99,9 @@ public class LpoServiceController implements LpoService {
 		
 		List<WorkFlowStatus> statuses = new ArrayList<>();
 		statuses.add(WorkFlowStatus.PENDING);
+		statuses.add(WorkFlowStatus.PROCESSING);
 		statuses.add(WorkFlowStatus.APPROVED);
+		statuses.add(WorkFlowStatus.COMPLETED);
 
 			List<Lpo> lpos = lpoRepository.findAllByStatusInAndBranchAndShop(statuses, userService.getUserBranch(request), shop_.get());
 
@@ -229,6 +232,10 @@ public class LpoServiceController implements LpoService {
 			throw new InvalidOperationException("Not a pending LPO");
 		}
 		
+		if(lpo.getLpoDetails().isEmpty()) {
+			throw new InvalidOperationException("Can not approve an empty LPO");
+		}
+		
 		lpo.setStatus(WorkFlowStatus.APPROVED);
 		
 		lpo.setApprovedByUser(userService.getUser(request));
@@ -301,8 +308,12 @@ public class LpoServiceController implements LpoService {
 		lpoResponse.setNo(lpo.getNo());
 		if (lpo.getShop() != null && lpo.getShop().getId() != null) {
 		    lpoResponse.setShopId(lpo.getShop().getId().toString());
+		    lpoResponse.setShopCode(lpo.getShop().getCode());
+		    lpoResponse.setShopName(lpo.getShop().getName());
 		} else {
-		    lpoResponse.setShopId(null); // or a default value
+		    lpoResponse.setShopId(""); // or a default value
+		    lpoResponse.setShopCode("");
+		    lpoResponse.setShopName("");
 		}
 		lpoResponse.setSupplierId(lpo.getSupplier().getId().toString());		
 		lpoResponse.setSupplierCode(lpo.getSupplier().getCode());

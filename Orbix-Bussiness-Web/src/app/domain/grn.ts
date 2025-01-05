@@ -4,6 +4,8 @@ export interface IGrn {
     summary : string
     status : string
     shopId : number
+    shopCode : string
+    shopName : string
     supplierId : number
     supplierCode : string
     supplierName : string

@@ -15,6 +15,8 @@ public class LpoResponseDTO {
 	private String branchId;
 	private String branchCode;
 	private String shopId;
+	private String shopCode;
+	private String shopName;
 	private String supplierId;
 	private String supplierCode;
 	private String supplierName;

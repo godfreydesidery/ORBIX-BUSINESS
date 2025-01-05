@@ -1,0 +1,281 @@
+
+
+
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>Supplier List</span>
+            </div>
+            <div class="card-body widget-body"> 
+
+                
+
+                <div class="row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>SN</th>
+                                <th>Supplier Code</th>
+                                <th>Supplier Name</th>                           
+                                <th>Contact Name</th>
+                                <th>Address</th>
+                                <th>Phone No</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>        
+                            <tr *ngFor="let supplier of suppliers | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                <td>{{supplier.sn}}</td>
+                                <td>{{supplier.code}}</td>
+                                <td>{{supplier.name}}</td>
+                                <td>{{supplier.contactName}}</td>
+                                <td>{{supplier.address}}</td>
+                                <td>{{supplier.phoneNo}}</td>
+                                <td>
+                                    <button class="btn btn-success btn-round-custom" (click)="loadSupplierProductsByBranch(supplier.id)" data-toggle="modal" data-target="#view-supplier-products-modal">View Products</button>
+                                    <button class="btn btn-success btn-round-custom" (click)="selectSupplier(supplier.id)" data-toggle="modal" data-target="#add-supplier-product-modal">Add Product</button> 
+                                    <button class="btn btn-success btn-round-custom" (click)="selectSupplier(supplier.id)" data-toggle="modal" data-target="#edit-supplier-product-modal">Edit Product</button>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <div class="row">
+                        <div class="col-sm-12" style="text-align: right;">
+                            <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="view-supplier-products-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">View Supplier Products</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-sm-4">
+                    </div>
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                    </div>
+                </div>
+                <br>
+                <div class=" table-responsive table-sm">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th scope="col">Code</th>
+                                <th scope="col">Name</th>
+                                <th scope="col">Description</th>                   
+                                <th scope="col">Max Supply Qty</th>
+                                <th scope="col">Base UOM</th>
+                                <th scope="col">Cost Price Incl</th>
+                                <th scope="col">VAT%</th>
+                                <!-- <th scope="col">Action</th> -->
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr *ngFor="let supplierProduct of supplierProducts | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                <td>{{supplierProduct.productCode}}</td>
+                                <td>{{supplierProduct.productName}}</td>
+                                <td>{{supplierProduct.productDescription}}</td>
+                                <td>{{supplierProduct.maxSupplyQty}}</td>
+                                <td>{{supplierProduct.baseUom}}</td>
+                                <td style="text-align: right;">{{supplierProduct.costPriceVatIncl | currency:'':''}}</td>
+                                <td>{{supplierProduct.vatRate * 100}} %</td>
+                                <!-- <td>
+                                    <button class="btn btn-primary btn-round-custom" (click)="searchSupplierProduct(supplierProduct.id)" data-toggle="modal" data-target="#update-modal">Edit</button>
+                                </td> -->
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                    <div class="row">
+                        <div class="col-sm-12" style="text-align: right;">
+                            <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="add-supplier-product-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Add Supplier Product</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="container mt-4" style="width: 50%;">
+                    <div class="dropdown">
+                      <input
+                        type="text"
+                        id="productSearch"
+                        class="form-control"
+                        [(ngModel)]="searchTerm"
+                        (input)="searchProducts()"
+                        (focus)="isDropdownOpen = true"
+                        placeholder="Type to search products..."
+                        autocomplete="off"
+                      />
+                      <div
+                        class="dropdown-menu show mt-1"
+                        *ngIf="isDropdownOpen && filteredProducts.length > 0"
+                        style="max-height: 200px; overflow-y: auto; width: 100%; border-width: 2px;"
+                      >
+                        <button
+                            class="dropdown-item form-control btn-outline-primary"
+                            *ngFor="let product of filteredProducts"
+                            (click)="searchProduct(product.id)"                           
+                        >
+                          {{ product.name }}
+                        </button>
+                      </div>                 
+                    </div>                    
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-6">
+                        <input type="hidden" [(ngModel)]="productId">
+                       
+                        <div class="form-group">
+                            <label>Product Code</label>
+                            <input class="form-control" type="text" [(ngModel)]="productCode" autocomplete="nope" readonly>
+                        </div> 
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="productName" autocomplete="nope" readonly>
+                        </div> 
+                        <div class="form-group">
+                            <label>Product Description</label>
+                            <input class="form-control" type="text" [(ngModel)]="productDescription" autocomplete="nope" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>VAT(0-100)%</label>
+                            <input class="form-control" type="number" [(ngModel)]="vat" autocomplete="nope">
+                        </div>  
+                        <div class="form-group">
+                            <label>Cost Price Vat Inclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="costPriceVatIncl" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                             <label>Max Supply Qty</label>
+                            <input class="form-control" type="text" [(ngModel)]="maxSupplyQty" autocomplete="nope">
+                        </div>
+                     </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="add()">Save</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="edit-supplier-product-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Edit Supplier Product</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                
+                <div class="container mt-4" style="width: 50%;">
+                    <div class="dropdown">
+                      <input
+                        type="text"
+                        id="productSearch"
+                        class="form-control"
+                        [(ngModel)]="searchTerm"
+                        (input)="searchProducts()"
+                        (focus)="isDropdownOpen = true"
+                        placeholder="Type to search products..."
+                        autocomplete="off"
+                      />
+                      <div
+                        class="dropdown-menu show mt-1"
+                        *ngIf="isDropdownOpen && filteredProducts.length > 0"
+                        style="max-height: 200px; overflow-y: auto; width: 100%; border-width: 2px;"
+                      >
+                        <button
+                            class="dropdown-item form-control btn-outline-primary"
+                            *ngFor="let product of filteredProducts"
+                            (click)="searchSupplierProduct(product.id)"                           
+                        >
+                          {{ product.name }}
+                        </button>
+                      </div>                 
+                    </div>                    
+                </div>
+                
+                <div class="row">
+                    <div class="col-lg-6">
+                        <input type="hidden" [(ngModel)]="productId">
+                       
+                        <div class="form-group">
+                            <label>Product Code</label>
+                            <input class="form-control" type="text" [(ngModel)]="productCode" autocomplete="nope" readonly>
+                        </div> 
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="productName" autocomplete="nope" readonly>
+                        </div> 
+                        <div class="form-group">
+                            <label>Product Description</label>
+                            <input class="form-control" type="text" [(ngModel)]="productDescription" autocomplete="nope" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>VAT(0-100)%</label>
+                            <input class="form-control" type="number" [(ngModel)]="vat" autocomplete="nope">
+                        </div>  
+                        <div class="form-group">
+                            <label>Cost Price Vat Inclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="costPriceVatIncl" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                             <label>Max Supply Qty</label>
+                            <input class="form-control" type="text" [(ngModel)]="maxSupplyQty" autocomplete="nope">
+                        </div>
+                     </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" (click)="updateSupplierProduct()" data-dismiss="modal" >Save</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

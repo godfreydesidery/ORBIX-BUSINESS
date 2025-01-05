@@ -461,9 +461,13 @@ export const menuItems = [
                 title: 'Suppliers',
                 routerLink: '/app/procurement/suppliers'
             },
+            // {
+            //     title: 'Supplier Product List',
+            //     routerLink: '/app/procurement/supplier-product-list'
+            // },
             {
                 title: 'Supplier Product List',
-                routerLink: '/app/procurement/supplier-product-list'
+                routerLink: '/app/procurement/supplier-price-list'
             },
             {
                 title: 'LPO',

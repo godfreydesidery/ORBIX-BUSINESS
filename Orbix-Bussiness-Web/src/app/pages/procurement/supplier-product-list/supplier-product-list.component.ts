@@ -289,6 +289,20 @@ export class SupplierProductListComponent {
     }
   }
 
+  searchTerm: string = '';
+  filteredProducts: any[] = [];
+  selectedProduct: any | null = null;
+  isDropdownOpen: boolean = false;
+
+  selectProduct(product: any): void {
+    this.selectedProduct = product;
+    this.searchTerm = product.name;
+    this.isDropdownOpen = false;
+    
+    this.searchSupplierProduct(product.id)
+    this.filteredProducts = [];
+  }
+
 
   toggleShowImportList = async () => {
 
@@ -410,6 +424,8 @@ export class SupplierProductListComponent {
           }       
         ) 
       }
+
+      filteredSuppliers : ISupplier[] = []
   
     async onSupplierChange(event: any): Promise<void> {
       this.selectedSupplierId = await event.target.value;
@@ -417,7 +433,7 @@ export class SupplierProductListComponent {
       await this.loadSupplierProductsByBranch()
     }
   
-    selectSupplier(){
+    selectSupplier(supplier: any){
       //localStorage.setItem('selected-supplier-id', this.selectedSupplierId!);
       if(this.selectedSupplierId! === '' || this.selectedSupplierId === null){
         this.msg.showErrorMessage3('Please select a supplier first')
@@ -433,8 +449,103 @@ export class SupplierProductListComponent {
 
   ////////////////////////////////////
 
+  searchedSuppliers : ISupplier[] = []
+
+  
+  onSupplierSelected(): void {
+    const selectedProduct = this.searchedSuppliers.find(
+      (supplier: { name: string; }) => supplier.name === this.searchKey
+    );
+
+    if (selectedProduct) {
+      this.searchProduct(selectedProduct.id);
+      this.searchedProducts = []; // Clear suggestions after selection
+    } else {
+      console.warn('Selected supplier is not in the suggestions list');
+    }
+
+    // Allow typing detection after a short delay
+    setTimeout(() => (this.isUserTyping = true), 0);
+    
+  }
+
+  isSupplierDropdownOpen : false
+  // Triggered on every keystroke
+  onSupplierInputChange(searchText: string): void {
+    if (this.isUserTyping) {
+      this.getSupplierLike(searchText);
+    }
+  }
+
+  getSupplierLike = async (searchKey : string) => {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    await this.http.get<ISupplier[]>(API_URL+'/suppliers/get_supplier_by_name_containing?supplier_name_like=' + searchKey, options)
+      .toPromise()
+      .then(
+        data => {
+          console.log(data)
+          this.searchedSuppliers = data!
+          
+        }
+      )
+      .catch(error => {
+        console.log(error)
+        
+      }       
+    ) 
+  }
+
+  searchSupplier = async (id : any) => {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    this.clearSupplierProduct()
+
+    await this.http.get<ISupplier>(API_URL+'/suppliers/get?id=' + this.supplierId , options)
+      .toPromise()
+      .then(
+        data => {
+          console.log(data)
+          this.supplierId = data!.id
+         // this.supplierCode = data!.code
+          this.supplierName = data!.name
+          
+        }
+      )
+      .catch(error => {
+        console.log(error)
+        
+      }       
+    ) 
+    
+  }
+
+  searchProducts(): void {
+      const options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      
+      }
+      this.filteredProducts = [];
+      if (this.searchTerm.trim().length >= 2) {
+        this.http
+        //await this.http.get<IProduct[]>(API_URL+'/shop_products/get_products_by_shop_containing?product_name_like=' + searchKey + '&shop_id=' + this.shopId , options)
+          .get<IProduct[]>(API_URL+'/products/get_products_by_company_containing?product_name_like=' + this.searchTerm, options)
+          .subscribe(
+            (data) => (this.filteredProducts = data),
+            (error) => console.error('Error fetching products:', error)
+          );
+      } else {
+        this.filteredProducts = [];
+      }
+    }
 
 
+
+
+ 
   
 
 }

@@ -81,9 +81,31 @@ public class GrnServiceController implements GrnService {
 	public List<GrnResponseDTO> getAllVisibleGrnsByBranch(HttpServletRequest request) {
 		List<WorkFlowStatus> statuses = new ArrayList<>();
 		statuses.add(WorkFlowStatus.PENDING);
+		//statuses.add(WorkFlowStatus.PROCESSING);
 		statuses.add(WorkFlowStatus.APPROVED);
 
 			List<Grn> grns = grnRepository.findAllByStatusInAndBranch(statuses, userService.getUserBranch(request));
+
+			return grns.stream()
+			    .map(this::grnResponseDTOMapper)
+			    .collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<GrnResponseDTO> getAllVisibleGrnsByShop(Long shopId, HttpServletRequest request) {
+		
+		Optional<Shop> shop_ = shopRepository.findById(shopId);
+		if(shop_.isEmpty()) {
+			throw new NotFoundException("Shop not found");
+		}
+		
+		List<WorkFlowStatus> statuses = new ArrayList<>();
+		statuses.add(WorkFlowStatus.PENDING);
+		statuses.add(WorkFlowStatus.PROCESSING);
+		statuses.add(WorkFlowStatus.APPROVED);
+		statuses.add(WorkFlowStatus.COMPLETED);
+
+			List<Grn> grns = grnRepository.findAllByStatusInAndBranchAndShop(statuses, userService.getUserBranch(request), shop_.get());
 
 			return grns.stream()
 			    .map(this::grnResponseDTOMapper)
@@ -276,9 +298,13 @@ public class GrnServiceController implements GrnService {
 	@Override
 	public boolean approveGrn(Long grnId, HttpServletRequest request) {
 		Grn grn = grnRepository.findById(grnId)
-			    .orElseThrow(() -> new NotFoundException("LPO not found, with id " + grnId));
+			    .orElseThrow(() -> new NotFoundException("GRN not found, with id " + grnId));
 		if(!(String.valueOf(grn.getStatus()).equals("PENDING") || String.valueOf(grn.getStatus()).equals("PROCESSING"))) {
 			throw new InvalidOperationException("Not a pending or processing GRN");
+		}
+		
+		if(grn.getGrnDetails().isEmpty()) {
+			throw new InvalidOperationException("Can not approve an empty GRN");
 		}
 		
 		grn.setStatus(WorkFlowStatus.APPROVED);
@@ -374,12 +400,22 @@ public class GrnServiceController implements GrnService {
 		grnResponse.setNo(grn.getNo());
 		if (grn.getShop() != null && grn.getShop().getId() != null) {
 		    grnResponse.setShopId(grn.getShop().getId().toString());
+		    grnResponse.setShopCode(grn.getShop().getCode());
+		    grnResponse.setShopName(grn.getShop().getName());
 		} else {
-		    grnResponse.setShopId(null); // or a default value
+		    grnResponse.setShopId(""); // or a default value
+		    grnResponse.setShopCode("");
+		    grnResponse.setShopName("");
 		}
-//		grnResponse.setSupplierId(grn.getSupplier().getId().toString());		
-//		grnResponse.setSupplierCode(grn.getSupplier().getCode());
-//		grnResponse.setSupplierName(grn.getSupplier().getName());
+		if (grn.getLpo() != null) {
+		    grnResponse.setSupplierId(grn.getLpo().getSupplier().getId().toString());
+		    grnResponse.setSupplierCode(grn.getLpo().getSupplier().getCode());
+		    grnResponse.setSupplierName(grn.getLpo().getSupplier().getName());
+		} else {
+			grnResponse.setSupplierId("");
+		    grnResponse.setSupplierCode("");
+		    grnResponse.setSupplierName("");
+		}
 		grnResponse.setStatus(grn.getStatus().toString());
 		
 		for(GrnDetail grnDetail : grn.getGrnDetails()) {

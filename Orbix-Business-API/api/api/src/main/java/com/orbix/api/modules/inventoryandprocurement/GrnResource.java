@@ -40,6 +40,13 @@ public class GrnResource {
 		return ResponseEntity.ok().body(grnService.getAllVisibleGrnsByBranch(request));
 	}
 	
+	@GetMapping("/grns/get_all_visible_by_shop")
+	public ResponseEntity<List<GrnResponseDTO>>getAllVisibleByShop(
+			@RequestParam(name = "shop_id") Long shopId,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(grnService.getAllVisibleGrnsByShop(shopId, request));
+	}
+	
 	@GetMapping("/grns/get")
 	public ResponseEntity<GrnResponseDTO>get(
 			Long id,

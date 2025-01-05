@@ -1,7 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule} from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { DataService } from '@services/custom/data.service';
 import { MsgBoxService } from '@services/custom/msg-box.service';
@@ -20,6 +20,9 @@ import { ReceiptItem } from 'src/app/domain/receipt-item';
 import { ILpo, ILpoDetail } from 'src/app/domain/lpo';
 import { ISupplier } from 'src/app/domain/supplier';
 import { ISupplierProduct } from 'src/app/domain/supplier-product';
+import { NgSelectModule } from '@ng-select/ng-select';
+
+import * as pdfMake from 'pdfmake/build/pdfmake';
 
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
@@ -33,15 +36,21 @@ const API_URL = environment.apiUrl;
     CommonModule,
     SearchFilterPipe,
     NgxPaginationModule,
-    RouterModule
+    RouterModule,
+    NgSelectModule
   ],
   templateUrl: './lpo.component.html',
   styleUrl: './lpo.component.scss'
 })
 export class LpoComponent {
-shopId: any = null
 
-status : string = ''
+  documentHeader! : any
+
+  id : any = null
+  no : any = ''
+  shopId: any = null
+
+  status : string = ''
 
   products : IProduct[] = []
 
@@ -65,7 +74,7 @@ status : string = ''
 
   lpos : ILpo[] = []
 
-  lpoId : any = null
+  // lpoId : any = null
 
 
   page: number = 1; // Initialize the current page to 1
@@ -78,7 +87,7 @@ status : string = ''
   constructor(
     private http :HttpClient,
     private auth : AuthService,
-    private router : Router,
+    private router : Router, 
     private printer : PosReceiptPrinterService,
     private msg : MsgBoxService,
     private data : DataService,
@@ -86,13 +95,9 @@ status : string = ''
   ) {}
 
   async ngOnInit(): Promise<void> {
-    this.getCompanySuppliers()
-    this.getBranchShops()
+    await this.getCompanySuppliers()
+    await this.getBranchShops()
   }
-
-
-
-
 
   searchTerm: string = '';
   filteredProducts: any[] = [];
@@ -201,9 +206,12 @@ status : string = ''
 
           this.lpo = data!
 
-          this.status = this.lpo.status
+          this.status = data!.status
 
-          this.lpoId = this.lpo.id
+          this.id = data!.id
+          this.no = data!.no
+          this.supplierName = data!.supplierName
+          this.shopName = data!.shopName
 
           this.totalAmount = 0
 
@@ -281,9 +289,44 @@ status : string = ''
       }
     }
 
+    public async create(){
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      }
+    
+      var lpo = {
+        id : null,
+        no : null,
+        summary : null,
+        shopId : this.shopId,
+        supplierId : this.supplierId
+      }
+
+      await this.http.post<ILpo>(API_URL+'/lpos/create', lpo, options)
+      .toPromise()
+      .then(
+        data => {
+          //this.showUomData(data!)
+  
+          console.log(data)
+
+          this.get(data!.id)
+
+          this.msg.showSuccessMessage('LPO created successifully')
+        }  
+      )
+      .catch(
+        error => {
+          console.log(error)
+          this.msg.showErrorMessage(error, 'Error')
+        }
+      )
+    }
+
     clearOrder(){
       this.lpo!
-      this.lpoId = null
+      this.id = null
+      this.no = ''
       this.supplierId = null
       this.shopId = null
     }
@@ -421,7 +464,7 @@ status : string = ''
 
       var detail = {
         id : this.lpoDetailId,
-        lpoId : this.lpoId,
+        lpoId : this.id,
         productId : this.productId,
         qty : this.qty
       }
@@ -433,7 +476,7 @@ status : string = ''
           .then(
             data => {
               console.log(data)
-              this.get(this.lpoId)
+              this.get(this.id)
             }
           )
           .catch(error => {
@@ -448,7 +491,7 @@ status : string = ''
           .then(
             data => {
               console.log(data)
-              this.get(this.lpoId)
+              this.get(this.id)
             }
           )
           .catch(error => {
@@ -464,12 +507,12 @@ status : string = ''
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      this.http.get<ILpoDetail>(API_URL+'/lpos/remove_detail?lpo_detail_id=' + id + '&lpo_id=' + this.lpoId, options)
+      this.http.get<ILpoDetail>(API_URL+'/lpos/remove_detail?lpo_detail_id=' + id + '&lpo_id=' + this.id, options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.get(this.lpoId)
+            this.get(this.id)
           }
         )
         .catch(error => {
@@ -487,12 +530,12 @@ status : string = ''
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      this.http.post<ILpo>(API_URL+'/lpos/approve?lpo_id=' + this.lpoId, null, options)
+      this.http.post<ILpo>(API_URL+'/lpos/approve?lpo_id=' + this.id, null, options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.get(this.lpoId)
+            this.get(this.id)
             this.msg.showSuccessMessage('LPO approved successifully')
           }
         )
@@ -511,12 +554,12 @@ status : string = ''
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      this.http.post<ILpo>(API_URL+'/lpos/cancel?lpo_id=' + this.lpoId, null, options)
+      this.http.post<ILpo>(API_URL+'/lpos/cancel?lpo_id=' + this.id, null, options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.get(this.lpoId)
+            this.get(this.id)
             this.msg.showSuccessMessage('LPO canceled successifully')
           }
         )
@@ -534,12 +577,12 @@ status : string = ''
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      this.http.post<ILpo>(API_URL+'/lpos/archive?lpo_id=' + this.lpoId, null, options)
+      this.http.post<ILpo>(API_URL+'/lpos/archive?lpo_id=' + this.id, null, options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.get(this.lpoId)
+            this.get(this.id)
             this.msg.showSuccessMessage('LPO archived successifully')
           }
         )
@@ -551,17 +594,21 @@ status : string = ''
     }
 
     suppliers : ISupplier[] = []
-    getCompanySuppliers(){
+    async getCompanySuppliers(){
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
       this.suppliers = []
-      this.http.get<ISupplier[]>(API_URL+'/suppliers/get_all_by_company', options)
+      await this.http.get<ISupplier[]>(API_URL+'/suppliers/get_all_by_company', options)
         .toPromise()
         .then(
           data => {
-            console.log(data)
-            this.suppliers = data!
+            //console.log(data)
+            //this.suppliers = data!
+            data?.forEach(element => {
+              this.suppliers.push(element)
+            })
+            console.log(this.suppliers)
           }
         )
         .catch(error => {
@@ -599,12 +646,12 @@ status : string = ''
     }
 
     shops : IShop[] = []
-    getBranchShops(){
+    async getBranchShops(){
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
       this.shops = []
-      this.http.get<IShop[]>(API_URL+'/shops/get_branch_shops', options)
+      await this.http.get<IShop[]>(API_URL+'/shops/get_branch_shops', options)
         .toPromise()
         .then(
           data => {
@@ -677,6 +724,109 @@ status : string = ''
         //this.toPrintReceipt = false
       }
 
+
+
+      ///////////////
+
+      dropdownOptions = [
+        { id: 1, name: 'Option 1' },
+        { id: 2, name: 'Option 2' },
+        { id: 3, name: 'Option 3' }
+      ];
     
+      //selectedOption: any = null;
+    
+      onSelectionChange(event: any) {
+        console.log('Selected option:', event);
+      }
+
+  
+      
+      print = async () => {
+          this.documentHeader = await this.data.getDocumentHeaderLandScape();
+          const title = 'Local Purchase Order(LPO)';
+          
+          let total: number = 0;
+          let discount: number = 0;
+        
+          const list: any[] = [];
+        
+          // Add header row
+          list.push([
+            { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+            { text: 'Code', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+            { text: 'Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+            { text: 'UOM', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+            { text: 'Qty', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+            { text: 'Price', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+            { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+          ]);
+        
+          // Add rows dynamically
+          this.lpo.lpoDetails.forEach((element) => {
+            total += (element.costPriceVatIncl * element.qty) || 0;
+            // discount += parseFloat(element.discount) || 0;
+      
+            // if(Number(element.amount) > 0) total += Number(element.amount) || 0;
+            
+            // if(Number(element.discount) > 0) discount += Number(element.discount) || 0;
+        
+            list.push([
+              { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+              { text: element.productCode || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },  
+              { text: element.productName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false }, 
+              { text: element.baseUom || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },   
+              { text: element.qty || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
+              { text: (Number(element.costPriceVatIncl) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+              { text: (Number(element.costPriceVatIncl * element.qty) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+            ]);
+          });
+        
+          // Add summary row
+          list.push([
+            {},     
+            {},
+            {},     
+            {},
+            {},
+            { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
+            { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+          ]);
+        
+          // Define document structure
+          const docDefinition: any = {
+            header: '',
+            pageOrientation: 'potrait',
+            footer: (currentPage: any, pageCount: any) => ({
+              text: `${currentPage} of ${pageCount}`,
+              alignment: 'center',
+              fontSize: 8,
+            }),
+            content: [
+              {
+                columns: [
+                  this.documentHeader,
+                ],
+              },
+              {text : ' '},
+              {text: title, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+              {text: 'LPO No : ' + this.no, fontSize: 10, bold: true, alignment: 'left'},
+              {text: 'Status : ' + this.status, fontSize: 10, bold: true, alignment: 'left'},
+              {text: 'Supplier : ' + this.supplierName, fontSize: 10, bold: true, alignment: 'left'},
+              {text: 'Shop : ' + this.shopName, fontSize: 10, bold: true, alignment: 'left'},
+              {text: ' ', fontSize: 10, bold: true, alignment: 'left'},
+              {
+                table: {
+                  widths: [25, 50, 130, 40, 40, 70, 70],
+                  body: list,
+                },
+              },
+            ],
+          };
+        
+          pdfMake.createPdf(docDefinition).print();
+        };
+
+      
     
 }

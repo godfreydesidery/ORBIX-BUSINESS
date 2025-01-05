@@ -4,6 +4,7 @@ export interface ILpo {
     summary : string
     status : string
     shopId : number
+    shopName : string
     supplierId : number
     supplierCode : string
     supplierName : string

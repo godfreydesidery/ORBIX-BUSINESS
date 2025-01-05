@@ -12,6 +12,8 @@ import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { IShop } from 'src/app/domain/shop';
 import { environment } from 'src/environments/environment';
 import { HttpHeaders } from '@angular/common/http';
+import { ILpo } from 'src/app/domain/lpo';
+import { IGrn } from 'src/app/domain/grn';
 
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
@@ -40,6 +42,10 @@ export class SelectShopComponent {
   branchId :string = ''
 
   shopLoaded :boolean = false
+
+  page: number = 1; // Initialize the current page to 1
+  filterRecords : string = ''
+  selectedOption: string = '';
     
   constructor(
     private http :HttpClient,
@@ -124,4 +130,98 @@ export class SelectShopComponent {
     this.selectedShopId = ''
     
   }
+
+  lpos : ILpo[] = []
+  async getAllPendingOrders(){
+        let options = {
+          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+        }
+        this.lpos = []
+      
+        await this.http.get<ILpo[]>(API_URL+'/lpos/get_all_visible_by_shop?shop_id=' + this.selectedShopId, options)
+        .toPromise()
+        .then(
+          data => {
+            var sn = 1
+            data?.forEach(element => {
+              element.sn = sn
+              this.lpos.push(element)
+              sn = sn + 1
+            })
+            console.log(data)
+          }
+        )
+      }
+
+      grns : IGrn[] = []
+      async getAllPendingGrns(){
+        let options = {
+          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+        }
+        this.grns = []
+      
+        await this.http.get<IGrn[]>(API_URL+'/grns/get_all_visible_by_shop?shop_id=' + this.selectedShopId, options)
+        .toPromise()
+        .then(
+          data => {
+            var sn = 1
+            data?.forEach(element => {
+              element.sn = sn
+              this.grns.push(element)
+              sn = sn + 1
+            })
+            console.log(data)
+          }
+        )
+        .catch(error => {
+          console.log(error)
+        })
+      }
+
+
+      lpoId : any = null
+
+      async get(id : any){
+        let options = {
+          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+        }
+        await this.http.get<ILpo>(API_URL+'/lpos/get?id=' + id, options)
+        .toPromise()
+        .then(
+          data => {
+            //this.showUomData(data!)
+            console.log(data)
+            this.lpoId = data!.id
+
+            this.router.navigate(['/app/mechandizing/shop-lpo'], {
+              queryParams: {
+                shop_id: this.selectedShopId,
+                lpo_id: id
+              }
+            });
+          }
+        )
+      }
+
+      async getGrn(id : any){
+        let options = {
+          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+        }
+        await this.http.get<ILpo>(API_URL+'/grns/get?id=' + id, options)
+        .toPromise()
+        .then(
+          data => {
+            //this.showUomData(data!)
+            console.log(data)
+            this.lpoId = data!.id
+
+            this.router.navigate(['/app/mechandizing/shop-grn'], {
+              queryParams: {
+                shop_id: this.selectedShopId,
+                grn_id: id
+              }
+            });
+          }
+        )
+      }
 }

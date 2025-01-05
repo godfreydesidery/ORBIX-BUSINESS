@@ -13,7 +13,13 @@ public class GrnResponseDTO {
 	private String branchId;
 	private String branchCode;
 	private String shopId;
+	private String shopCode;
+	private String shopName;
+	private String supplierId;
+	private String supplierCode;
+	private String supplierName;
 	private String lpoId;
+	private String lpoNo;
 	
 	List<GrnDetailResponseDTO> grnDetails;
 }

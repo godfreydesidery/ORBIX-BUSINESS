@@ -56,6 +56,7 @@
               "src/env.js"
             ],
             "styles": [
+              "node_modules/select2/dist/css/select2.min.css",
               "src/styles.scss"
             ],
             "scripts": [
@@ -69,7 +70,9 @@
               "node_modules/datamaps/dist/datamaps.all.hires.min.js",
               "node_modules/moment/moment.js",
               "node_modules/fullcalendar/dist/fullcalendar.min.js",
-              "node_modules/dropzone/dist/dropzone.js"
+              "node_modules/dropzone/dist/dropzone.js",
+              "node_modules/jquery/dist/jquery.min.js",
+              "node_modules/select2/dist/js/select2.min.js"
             ],
             "allowedCommonJsDependencies": [ 
               "leaflet-map",
