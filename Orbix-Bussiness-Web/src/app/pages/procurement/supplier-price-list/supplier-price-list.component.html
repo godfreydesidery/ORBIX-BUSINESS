@@ -41,9 +41,9 @@
                                 <td>{{supplier.address}}</td>
                                 <td>{{supplier.phoneNo}}</td>
                                 <td>
-                                    <button class="btn btn-success btn-round-custom" (click)="loadSupplierProductsByBranch(supplier.id)" data-toggle="modal" data-target="#view-supplier-products-modal">View Products</button>
+                                    <button class="btn btn-primary btn-round-custom" (click)="loadSupplierProductsByBranch(supplier.id)" data-toggle="modal" data-target="#view-supplier-products-modal">View Products</button>
                                     <button class="btn btn-success btn-round-custom" (click)="selectSupplier(supplier.id)" data-toggle="modal" data-target="#add-supplier-product-modal">Add Product</button> 
-                                    <button class="btn btn-success btn-round-custom" (click)="selectSupplier(supplier.id)" data-toggle="modal" data-target="#edit-supplier-product-modal">Edit Product</button>
+                                    <button class="btn btn-warning btn-round-custom" (click)="selectSupplier(supplier.id)" data-toggle="modal" data-target="#edit-supplier-product-modal">Edit Product</button>
                                 </td>
                             </tr>
                         </tbody>

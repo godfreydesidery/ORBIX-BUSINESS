@@ -60,8 +60,8 @@
                                         <!-- <td>{{shopProduct.defaultReorderLevel}}</td> -->
                                         <td>{{shopProduct.vatRate * 100}} %</td>
                                         <td>
-                                            <button class="btn btn-primary btn-round-custom" (click)="searchShopProduct(shopProduct.id)" data-toggle="modal" data-target="#update-modal">Edit</button>
-                                            <button class="btn btn-primary btn-round-custom" (click)="searchShopProduct(shopProduct.id)" *ngIf="grant(['SHPSTK-ALL','SHPSTK-UPDATE'])," data-toggle="modal" data-target="#adjust-stock-modal">Adjust Stock</button>
+                                            <button class="btn btn-warning btn-round-custom" (click)="searchShopProduct(shopProduct.id)" data-toggle="modal" data-target="#update-modal">Edit</button>
+                                            <button class="btn btn-success btn-round-custom" (click)="searchShopProduct(shopProduct.id)" *ngIf="grant(['SHPSTK-ALL','SHPSTK-UPDATE'])," data-toggle="modal" data-target="#adjust-stock-modal">Adjust Stock</button>
                                         </td>
                                     </tr>
                                 </tbody>
