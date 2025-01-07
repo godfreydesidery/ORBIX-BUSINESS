@@ -63,6 +63,20 @@ public class SupplierProductServiceController implements SupplierProductService 
 	    
 	    return this.supplierProductResponseDTOMapper(supplierProduct);
 	}
+	
+	@Override
+	public SupplierProductResponseDTO getSupplierProduct(Long supplierId, Long productId, HttpServletRequest request) {
+		// Validate and fetch the supplier
+	    Supplier supplier = supplierRepository.findById(supplierId)
+	                              .orElseThrow(() -> new NotFoundException("Supplier not found"));
+	    Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new NotFoundException("Product not found"));
+	 // Validate and fetch the supplier
+	    SupplierProduct supplierProduct = supplierProductRepository.findBySupplierAndProduct(supplier, product)
+	                              .orElseThrow(() -> new NotFoundException("Supplier Product not found"));
+	    
+	    return this.supplierProductResponseDTOMapper(supplierProduct);
+	}
 
 	@Override
 	public SupplierProductResponseDTO getProductInSupplier(Long productId, Long supplierId,

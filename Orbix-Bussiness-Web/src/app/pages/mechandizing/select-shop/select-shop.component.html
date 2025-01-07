@@ -29,9 +29,118 @@
                         <!-- <button class="btn btn-success btn-round-custom">Sales Order</button> -->
                         <button class="btn btn-success btn-round-custom" [routerLink]="'/app/mechandizing/shop-sales-order'" [queryParams]="{ shop_id: selectedShopId }">Sales Order</button>
                         <button class="btn btn-success btn-round-custom" [routerLink]="'/app/mechandizing/shop-product-stock-status'" [queryParams]="{ shop_id: selectedShopId }">Stock Status</button>
+                        <!-- <button class="btn btn-success btn-round-custom" [routerLink]="'/app/mechandizing/shop-lpo'" [queryParams]="{ shop_id: selectedShopId }">LPO</button> -->
+                        <button class="btn btn-success btn-round-custom" (click)="getAllPendingOrders()" data-toggle="modal" data-target="#sales-order-list-modal">LPO List</button>
+                        <button class="btn btn-success btn-round-custom" (click)="getAllPendingGrns()" data-toggle="modal" data-target="#grn-list-modal">GRN List</button>
                         <button class="btn btn-success btn-round-custom" [routerLink]="'/app/mechandizing/import-product'" [queryParams]="{ shop_id: selectedShopId }">Import Product</button>
                     </div>
                 </div>                    
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="sales-order-list-modal" tabindex="-1" role="dialog" aria-labelledby="salesOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="salesOrderModalLabel">LPO List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                    </div>
+                </div>
+                <br>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th scope="col">No</th>
+                                    <th scope="col">Supplier</th>
+                                    <th scope="col">Status</th>                                   
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let lpo of lpos | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                    <td>{{lpo.no}}</td>
+                                    <td>{{lpo.supplierName}}</td>
+                                    <td>{{lpo.status}}</td>
+                                    <td><button class="btn btn-success btn-round-custom" (click)="get(lpo.id)" data-dismiss="modal">Select</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-sm-12" style="text-align: right;">
+                                <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="grn-list-modal" tabindex="-1" role="dialog" aria-labelledby="salesOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="salesOrderModalLabel">GRN List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                    </div>
+                </div>
+                <br>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th scope="col">No</th>
+                                    <th scope="col">Supplier</th>
+                                    <th scope="col">Status</th>                                   
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let grn of grns | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                    <td>{{grn.no}}</td>
+                                    <td>{{grn.supplierName}}</td>
+                                    <td>{{grn.status}}</td>
+                                    <td><button class="btn btn-success btn-round-custom" (click)="getGrn(grn.id)" data-dismiss="modal">Select</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-sm-12" style="text-align: right;">
+                                <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>

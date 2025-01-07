@@ -67,6 +67,17 @@ public class ProductServiceController implements ProductService {
 		return productResponseDTOMapper(_product.get());	
 	}
 	
+	@Override
+	public ProductResponseDTO getCompanyProduct(
+			Long productId, 
+			HttpServletRequest request) {
+		Optional<Product> _product = productRepository.findByIdAndCompany(productId, userService.getUserCompany(request));
+		if(_product.isEmpty()) {
+			throw new NotFoundException("Product not found");
+		}		
+		return productResponseDTOMapper(_product.get());	
+	}
+	
 	/**
 	 * 
 	 */
@@ -295,6 +306,22 @@ public class ProductServiceController implements ProductService {
 	    }
 
 	    // Map to DTOs
+	    return productResponses;
+	}
+	
+	@Override
+	public List<ProductResponseDTO> getProductsByCompanyAndName(String productName, HttpServletRequest request) {
+		
+	    List<Product> products = productRepository.findAllByCompanyAndNameContainingIgnoreCase(userService.getUserCompany(request), productName);
+	    
+	    List<ProductResponseDTO> productResponses = new ArrayList<>();
+	    
+	    for(Product product : products) {
+	    	ProductResponseDTO productResponse = new ProductResponseDTO();
+	    	productResponse.setId(product.getId().toString());
+	    	productResponse.setName(product.getName());
+	    	productResponses.add(productResponse);
+	    }
 	    return productResponses;
 	}
 }

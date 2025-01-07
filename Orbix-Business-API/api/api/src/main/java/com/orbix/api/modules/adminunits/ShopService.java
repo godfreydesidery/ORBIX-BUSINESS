@@ -17,4 +17,6 @@ public interface ShopService {
 	
 	List<ShopResponseDTO> getBranchAvailableShopsByUser(HttpServletRequest request);
 	ShopResponseDTO getSelectedShop(Long id, HttpServletRequest request);
+	
+	List<ShopResponseDTO> getBranchShops(HttpServletRequest request);
 }

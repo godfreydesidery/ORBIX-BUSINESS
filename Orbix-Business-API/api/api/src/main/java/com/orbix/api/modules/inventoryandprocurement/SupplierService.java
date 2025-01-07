@@ -8,6 +8,7 @@ import com.orbix.api.api.commons.ApiCustomResponse;
 
 public interface SupplierService {
 	List<SupplierResponseDTO> getAllSuppliers(HttpServletRequest request);
+	List<SupplierResponseDTO> getAllCompanySuppliers(HttpServletRequest request);
 	SupplierResponseDTO get(Long id, HttpServletRequest request);
 	SupplierResponseDTO createSupplier(SupplierRequestDTO supplier, HttpServletRequest request);
 	SupplierResponseDTO updateSupplier(SupplierRequestDTO supplier, HttpServletRequest request);

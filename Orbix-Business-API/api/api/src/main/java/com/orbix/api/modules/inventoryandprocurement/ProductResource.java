@@ -41,6 +41,13 @@ public class ProductResource {
 		return ResponseEntity.ok().body(productService.get(id, request));		
 	}
 	
+	@GetMapping("/products/get_company_product")
+	public ResponseEntity<ProductResponseDTO>getCompanyProduct(
+			@RequestParam(name = "product_id")Long productId,
+			HttpServletRequest request){		
+		return ResponseEntity.ok().body(productService.getCompanyProduct(productId, request));		
+	}
+	
 	@PostMapping("/products/create")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ProductResponseDTO>create(
@@ -101,5 +108,14 @@ public class ProductResource {
 			@RequestParam(name = "shop_id") Long shopId,
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(productService.getCompanySellableProductsByShop(shopId, request));
+	}
+	
+	@GetMapping("/products/get_products_by_company_containing")
+	public ResponseEntity<List<ProductResponseDTO>>getAllProductsByCompanyContaining( 
+			@RequestParam(name = "product_name_like")String productNameLike,
+			HttpServletRequest request){
+
+		return ResponseEntity.ok().body(productService.getProductsByCompanyAndName(productNameLike, request));
+
 	}
 }

@@ -461,22 +461,30 @@ export const menuItems = [
                 title: 'Suppliers',
                 routerLink: '/app/procurement/suppliers'
             },
+            // {
+            //     title: 'Supplier Product List',
+            //     routerLink: '/app/procurement/supplier-product-list'
+            // },
             {
                 title: 'Supplier Product List',
-                routerLink: '/app/procurement/supplier-product-list'
+                routerLink: '/app/procurement/supplier-price-list'
             },
             {
                 title: 'LPO',
-                routerLink: '/app/blank'
-            },
-            {
-                title: 'BLO',
-                routerLink: '/app/blank'
+                routerLink: '/app/procurement/lpo'
             },
             {
                 title: 'GRN',
-                routerLink: '/app/blank'
-            }
+                routerLink: '/app/procurement/grn'
+            },
+            // {
+            //     title: 'BLO',
+            //     routerLink: '/app/blank'
+            // },
+            // {
+            //     title: 'GRN',
+            //     routerLink: '/app/blank'
+            // }
         ]
     },
     {

@@ -44,6 +44,14 @@ private final SupplierProductRepository supplierProductRepository;
 		return ResponseEntity.ok().body(supplierProductService.get(id, supplierId, request));		
 	}
 	
+	@GetMapping("/supplier_products/get_product")
+	public ResponseEntity<SupplierProductResponseDTO>getSupplierProduct(
+			@RequestParam(name = "supplier_id")Long supplierId,
+			@RequestParam(name = "product_id")Long productId,			
+			HttpServletRequest request){		
+		return ResponseEntity.ok().body(supplierProductService.getSupplierProduct(supplierId, productId, request));		
+	}
+	
 	@GetMapping("/supplier_products/get_product_in_supplier")
 	public ResponseEntity<SupplierProductResponseDTO>getProductInSupplier(
 			@RequestParam(name = "product_id")Long productId,

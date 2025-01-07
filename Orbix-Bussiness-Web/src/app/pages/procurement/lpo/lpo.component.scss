@@ -1,0 +1,83 @@
+/* Style the ng-select container */
+.ng-select {
+    width: 300px;
+    font-family: Arial, sans-serif;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+  }
+  
+  /* Style the dropdown container */
+  .ng-select.ng-select-single {
+    height: 40px;
+  }
+  
+  .ng-select-container {
+    background-color: #fff;
+    border: none;
+    padding: 0 10px;
+    display: flex;
+    align-items: center;
+    border-radius: 4px;
+  }
+  
+  /* Highlighted option in the dropdown */
+  .ng-option-highlighted {
+    background-color: #f0f0f0;
+    color: #000;
+  }
+  
+  /* Style for individual options */
+  .ng-option {
+    padding: 10px;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  /* Placeholder text */
+  .ng-placeholder {
+    color: #999;
+    font-style: italic;
+  }
+  
+  /* Dropdown panel */
+  .ng-dropdown-panel {
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  /* Selected values in multi-select */
+  .ng-value {
+    background-color: #007bff;
+    color: #fff;
+    border-radius: 4px;
+    padding: 4px 8px;
+    margin: 2px;
+  }
+  
+  /* Clear button */
+  .ng-clear-zone {
+    color: #d9534f;
+    cursor: pointer;
+  }
+  
+  /* Disabled state */
+  .ng-select.ng-select-disabled {
+    background-color: #e9ecef;
+    pointer-events: none;
+    opacity: 0.7;
+  }
+
+
+  .custom-ng-select {
+    border: 2px solid #007bff;
+    border-radius: 8px;
+  }
+  
+  .custom-ng-select .ng-option-highlighted {
+    background-color: #007bff;
+    color: #fff;
+  }

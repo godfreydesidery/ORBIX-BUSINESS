@@ -33,6 +33,12 @@ private final SupplierService supplierService;
 	public ResponseEntity<List<SupplierResponseDTO>>getAll(HttpServletRequest request){
 		return ResponseEntity.ok().body(supplierService.getAllSuppliers(request));
 	}
+	
+	@GetMapping("/suppliers/get_all_by_company")
+	public ResponseEntity<List<SupplierResponseDTO>>getAllByCompany(HttpServletRequest request){
+		return ResponseEntity.ok().body(supplierService.getAllCompanySuppliers(request));
+	}
+	
 	@GetMapping("/suppliers/get")
 	public ResponseEntity<SupplierResponseDTO>get(
 			@RequestParam(name = "id")Long id,

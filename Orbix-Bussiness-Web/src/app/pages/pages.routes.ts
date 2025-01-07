@@ -140,6 +140,18 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
       {
+        path : 'mechandizing/shop-lpo',
+        loadComponent: () => import('./mechandizing/shop-lpo/shop-lpo.component').then(c => c.ShopLpoComponent),
+        data : { breadcrumb : 'Mechandizing/Shop LPO'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/shop-grn',
+        loadComponent: () => import('./mechandizing/shop-grn/shop-grn.component').then(c => c.ShopGrnComponent),
+        data : { breadcrumb : 'Mechandizing/Shop GRN'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'mechandizing/sales-listing-report',
         loadComponent: () => import('./mechandizing/reports/sales-listing-report/sales-listing-report.component').then(c => c.SalesListingReportComponent),
         data : { breadcrumb : 'Mechandizing/Reports/Sales Listing Report'},
@@ -298,6 +310,34 @@ export const routes: Routes = [
         data : { breadcrumb : 'Procurement/Supplier Product List'}, 
         canActivate : [AuthGuard]
       },
+
+      {
+        path : 'procurement/supplier-price-list',
+        loadComponent: () => import('./procurement/supplier-price-list/supplier-price-list.component').then(c => c.SupplierPriceListComponent),
+        data : { breadcrumb : 'Procurement/Supplier Price List'}, 
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'procurement/view-supplier-products',
+        loadComponent: () => import('./procurement/view-supplier-products/view-supplier-products.component').then(c => c.ViewSupplierProductsComponent),
+        data : { breadcrumb : 'Procurement/View Supplier Products'}, 
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'procurement/lpo',
+        loadComponent: () => import('./procurement/lpo/lpo.component').then(c => c.LpoComponent),
+        data : { breadcrumb : 'Procurement/LPO'}, 
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'procurement/grn',
+        loadComponent: () => import('./procurement/grn/grn.component').then(c => c.GrnComponent),
+        data : { breadcrumb : 'Procurement/GRN'}, 
+        canActivate : [AuthGuard]
+      },
+      
 
       // End of Procurement
 

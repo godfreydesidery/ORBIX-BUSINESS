@@ -1,0 +1,502 @@
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>Local Purchase Order(LPO)</span>
+            </div>
+
+            <div class="container-fluid mt-4">
+                
+                <!-- Action Buttons -->
+                <div class="row mb-4">
+                    <div class="col-md-12">
+                        <button class="btn btn-outline-success btn-round-custom" (click)="getAllPendingOrders()" data-toggle="modal" data-target="#sales-order-list-modal">LPO List</button>
+                        <button class="btn btn-outline-success btn-round-custom" (click)="clearOrder()">New LPO</button>
+                        <button class="btn btn-outline-primary btn-round-custom" (click)="approveOrder()" *ngIf="id != null">Approve LPO</button>
+                        <button class="btn btn-outline-danger btn-round-custom" (click)="cancelOrder()" *ngIf="id != null">Cancel LPO</button>
+                        <button class="btn btn-outline-danger btn-round-custom" (click)="archiveOrder()" *ngIf="id != null">Archive LPO</button>
+                        <button class="btn btn-outline-success btn-round-custom" *ngIf="id != null" (click)="print()">Print</button>
+                    </div>
+                </div>
+            
+                <div class="row">
+
+
+                    <div class="col-md-12">
+                        <div class="row">
+                            <div class="col-md-3">
+
+                                <div class="form-group" *ngIf="id === null">
+                                    <p>Select Supplier</p>
+                                    <select class="form-control" [(ngModel)]="supplierId" (change)="onSupplierChange($event)">
+                                        <option value = ''></option>
+                                        <optgroup label="">  
+                                            <option *ngFor="let supplier of suppliers" [value]="supplier.id" style="font-size: larger;">Supplier name: <b>{{supplier.name}}</b></option>                   
+                                        </optgroup>
+                                    </select>
+                                </div>
+                
+                                <div class="form-group" *ngIf="supplierId != null && id === null">
+                                    <p>Select Destination (Shop)</p>
+                                    <select class="form-control" [(ngModel)]="shopId" (change)="onShopChange($event)">
+                                        <option value = ''></option>
+                                        <optgroup label="">  
+                                            <option *ngFor="let shop of shops" [value]="shop.id" style="font-size: larger;">Shop name: <b>{{shop.name}}</b></option>                   
+                                        </optgroup>
+                                    </select>
+                                </div>
+
+                                <ul class="list-unstyled mb-0" *ngIf="id != null">
+                                    <li><strong>LPO No:</strong> {{no}}</li>
+                                    <li><strong>Supplier:</strong> {{supplierName}}</li>
+                                    <li><strong>Shop:</strong> {{shopName}}</li>
+                                    <li><strong>Status:</strong> {{status}}</li>
+                                    
+                                </ul>
+
+                                <div class="row" *ngIf="id === null">
+                                    <div class="col-md-12">
+                                        <hr>
+                                        <button type="submit" class="btn btn-success btn-round-custom pull-right" (click)="create()" id="saveSalesOrderBtn" data-dismiss="modal" style="margin: 10px;">Create LPO</button>
+                                    </div>
+                                </div>
+
+                            </div>
+                            <div class="col-md-9">
+
+                                <div class="row">
+                                    <div class="col-md-12" *ngIf="id != null">
+                                        <!-- <div class="d-flex align-items-center mb-3">
+                                            <h5 class="font-weight-bold mb-0">Order Details  .</h5>
+                                            <button class="btn btn-success rounded-circle mr-2" (click)="clearShopProduct()" style="width: 40px; height: 40px; padding: 0; display: flex; justify-content: center; align-items: center;" data-toggle="modal" data-target="#sales-order-detail-modal">+</button>
+                                        </div> -->
+                                        <div class="d-flex align-items-center mb-3">
+                                            <button class="btn btn-success btn-round-custom" (click)="clearLpoDetail()" data-toggle="modal" data-target="#sales-order-detail-modal">Add Items</button>
+                                        </div>
+                                        <div class="table-responsive">
+                                            <table class="table table-bordered table-hover">
+                                                <thead class="thead-light">
+                                                    <tr><th scope="col">SN</th>
+                                                        <th scope="col">Code</th>
+                                                        <th scope="col">Name</th>
+                                                        <th scope="col">UOM</th>
+                                                        <th scope="col">Qty</th>
+                                                        <th scope="col">Unit Price</th>
+                                                        <th scope="col">Amount</th>
+                                                        <th scope="col">Action</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    <tr *ngFor="let item of lpo.lpoDetails">
+                                                        <td>{{item.sn}}</td>
+                                                        <td>{{item.productCode}}</td>
+                                                        <td>{{item.productName}}</td>
+                                                        <td>{{item.baseUom}}</td>
+                                                        <td>{{item.qty}}</td>
+                                                        <td style="text-align: right;">{{item.costPriceVatIncl | currency:'':''}}</td>
+                                                        <td style="text-align: right;">{{item.amount | currency:'':''}}</td>
+                                                        <td>
+                                                            <!-- <button class="btn btn-sm btn-success btn-round-custom">Edit</button> -->
+                                                            <button class="btn btn-sm btn-danger btn-round-custom" (click)="removeDetail(item.id)">Remove</button>
+                                                        </td>
+                                                    </tr>
+                    
+                                                    <tr *ngIf="lpo.lpoDetails.length > 0">
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td></td>
+                                                        <td style="font-weight: bold;">Total</td>
+                                                        <td style="text-align: right; font-weight: bold;">{{totalAmount | currency:'':''}}</td>
+                                                        <td></td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
+                                        </div>
+                                    </div>
+                                </div>
+
+
+                            </div>
+                        </div>
+                    </div>
+
+
+
+                    <div class="col-md-12">
+            
+            
+                        <div class="row">
+                            <!-- General Information -->
+                            <!-- <div class="col-md-4 mb-4">
+                                <div class="card shadow-sm">
+                                    <div class="card-header bg-success text-white">
+                                        <h5 class="mb-0">General Information</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-unstyled mb-0">
+                                            
+                                            <li><strong>Status:</strong> {{status}}</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div> -->
+                    
+                            <!-- Customer Details -->
+                            <div class="col-md-4 mb-4">
+                                <div class="card shadow-sm">
+                                    <!-- <div class="card-header bg-success text-white">
+                                        <h5 class="mb-0">Customer Details</h5>
+                                    </div>
+                                    <div class="card-body">
+                                        <ul class="list-unstyled mb-0">
+                                            <li><strong>Customer ID:</strong> CUST78910</li>
+                                            <li><strong>Customer Name:</strong> {{customerName}}</li>
+                                            <li><strong>Contact Info:</strong> johndoe&#64;example.com</li>
+                                            <li><strong>Billing Address:</strong> 123 Main Street, Cityville</li>
+                                            <li><strong>Shipping Address:</strong> 456 Delivery Lane, Townsville</li>
+                                        </ul>
+                                    </div> -->
+                                </div>
+                            </div>
+                    
+                            <!-- Order Summary -->
+                            <!-- <div class="col-md-4 mb-4">
+                                <div class="card shadow-sm">
+                                    <div class="card-header bg-success text-white">
+                                        <h5 class="mb-0">Order Payments</h5>
+                                    </div>
+                                    <div class="card-body">
+
+                                        <table>
+                                            <tr>
+                                                <td style="text-align: left;">Mode</td>
+                                                <td style="text-align: left; padding-left: 10px;">Ref No</td>
+                                            </tr>
+                                            <tr>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)] = "payCode">
+                                                        <option>CASH</option>
+                                                        <option>MPESA</option>
+                                                        <option>TIGOPESA</option>
+                                                        <option>HALOPESA</option>
+                                                        <option>AIRTELMONEY</option>
+                                                        <option>BANK</option>
+                                                        <option>OTHER</option>
+                                                    </select>
+                                                </td>
+                                                <td style="padding-left: 10px;"><input type="text" class="form-control" *ngIf="payCode != 'CASH'" [(ngModel)]="payRefNo"></td>
+                                            </tr> 
+                                            <br>
+                                        </table>
+
+
+                                        <ul class="list-unstyled mb-0">
+                                            <li class="d-flex justify-content-between">
+                                                <span>Subtotal:</span> <span>$500.00</span>
+                                            </li>
+                                            <li class="d-flex justify-content-between">
+                                                <span>Discount:</span> <span>$50.00</span>
+                                            </li>
+                                            <li class="d-flex justify-content-between">
+                                                <span>Tax (10%):</span> <span>$45.00</span>
+                                            </li>
+                                            <li class="d-flex justify-content-between font-weight-bold border-top pt-2">
+                                                <span style="font-weight: bold;">Total Amount:</span> <span style="font-weight: bold; font-size: larger;">{{totalAmount | currency:'':''}}</span>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                    <div class="card-footer text-right" *ngIf="payCode != ''">
+                                        <button class="btn btn-success btn-sm" (click)="confirmOrder()">Confirm Order</button>
+                                    </div>
+                                </div>
+                            </div> -->
+                        </div>
+                    
+                        <!-- Order Details Table -->
+                        <!-- <div class="row">
+                            <div class="col-md-12">
+                                
+                                <div class="d-flex align-items-center mb-3">
+                                    <button class="btn btn-success btn-round-custom" (click)="clearLpoDetail()" data-toggle="modal" data-target="#sales-order-detail-modal">Add Items</button>
+                                </div>
+                                <div class="table-responsive">
+                                    <table class="table table-bordered table-hover">
+                                        <thead class="thead-light">
+                                            <tr><th scope="col">SN</th>
+                                                <th scope="col">Code</th>
+                                                <th scope="col">Name</th>
+                                                <th scope="col">UOM</th>
+                                                <th scope="col">Qty</th>
+                                                <th scope="col">Unit Price</th>
+                                                <th scope="col">Amount</th>
+                                                <th scope="col">Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let item of lpo.lpoDetails">
+                                                <td>{{item.sn}}</td>
+                                                <td>{{item.productCode}}</td>
+                                                <td>{{item.productName}}</td>
+                                                <td>{{item.baseUom}}</td>
+                                                <td>{{item.qty}}</td>
+                                                <td style="text-align: right;">{{item.costPriceVatIncl | currency:'':''}}</td>
+                                                <td style="text-align: right;">{{item.amount | currency:'':''}}</td>
+                                                <td>
+                                                    <button class="btn btn-sm btn-danger btn-round-custom" (click)="removeDetail(item.id)">Remove</button>
+                                                </td>
+                                            </tr>
+            
+                                            <tr *ngIf="lpo.lpoDetails.length > 0">
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td></td>
+                                                <td style="font-weight: bold;">Total</td>
+                                                <td style="text-align: right; font-weight: bold;">{{totalAmount | currency:'':''}}</td>
+                                                <td></td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div> -->
+                    </div>
+            
+            
+                    </div>
+            </div>
+
+
+
+
+
+
+
+            
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+    
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="sales-order-detail-modal" tabindex="-1" role="dialog" aria-labelledby="salesOrderModalDetailLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="salesOrderModalDetailLabel">Add/Edit LPO Detail</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+
+                <div class="container mt-4" style="width: 50%;">
+                    <div class="dropdown">
+                      <input
+                        type="text"
+                        id="productSearch"
+                        class="form-control"
+                        [(ngModel)]="searchTerm"
+                        (input)="searchProducts()"
+                        (focus)="isDropdownOpen = true"
+                        placeholder="Type to search products..."
+                        autocomplete="off"
+                      />
+                      <div
+                        class="dropdown-menu show mt-1"
+                        *ngIf="isDropdownOpen && filteredProducts.length > 0"
+                        style="max-height: 200px; overflow-y: auto; width: 100%; border-width: 2px;"
+                      >
+                        <button
+                            class="dropdown-item form-control btn-outline-primary"
+                            *ngFor="let product of filteredProducts"
+                            (click)="selectProduct(product)"                           
+                        >
+                          {{ product.name }}
+                        </button>
+                      </div>                 
+                    </div>                    
+                </div>
+
+
+
+
+                <!-- <div class="form-group">
+                            
+                    <label>(Type to Search by Name or Code)</label>
+                    <input 
+                        class="form-control" 
+                        type="text" 
+                        [(ngModel)]="searchKey" 
+                        (ngModelChange)="onInputChange($event)" 
+                        (change)="onProductSelected()" 
+                        list="productList" 
+                        autocomplete="off">
+                    <datalist id="productList" *ngIf="searchedProducts.length > 0">
+                        <option *ngFor="let product of searchedProducts" [value]="product.name"></option>
+                    </datalist>
+                </div> -->
+
+                <hr>
+                <br>
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <input class="form-control" type="hidden" [(ngModel)]="productId">
+                        <p>Product Code</p>
+                        <span class="form-control">{{productCode}}</span>
+                        <p>Product Name</p>
+                        <span class="form-control">{{productName}}</span>
+                        <p>Product Description</p>
+                        <span class="form-control">{{productDescription}}</span>
+                        <p>Product Base UOM</p>
+                        <span class="form-control">{{baseUom}}</span>
+                    </div>
+                    <div class="col-md-6">
+                        <p>Price</p>
+                        <input class="form-control" type="text" [(ngModel)]="costPriceVatIncl" style="text-align: right;" readonly>
+                        <p>Qty</p>
+                        <hr>
+                        <input class="form-control" type="number" [(ngModel)]="qty" style="text-align: center;" min="0">
+                        <p>Amount</p>
+                        <span class="form-control" style="text-align: right;">{{(costPriceVatIncl * qty) | currency:'':''}}</span>
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <hr>
+                    <button type="button" class="btn btn-danger btn-round-custom" data-dismiss="modal" style="margin: 10px;">Close</button>
+                    <button type="submit" class="btn btn-success btn-round-custom pull-right" (click)="saveDetail()" id="saveSalesOrderBtn" data-dismiss="modal" style="margin: 10px;">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal -->
+<div class="modal fade" id="sales-order-modal" tabindex="-1" role="dialog" aria-labelledby="salesOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="salesOrderModalLabel">Add/Edit LPO</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="form-group">
+                    <p>Select Supplier</p>
+                    <select class="form-control" [(ngModel)]="supplierId" (change)="onSupplierChange($event)">
+                        <option value = ''></option>
+                        <optgroup label="">  
+                            <option *ngFor="let supplier of suppliers" [value]="supplier.id" style="font-size: larger;">Supplier name: <b>{{supplier.name}}</b></option>                   
+                        </optgroup>
+                    </select>
+                </div>
+
+                <div class="form-group" *ngIf="supplierId != null">
+                    <p>Select Destination (Shop)</p>
+                    <select class="form-control" [(ngModel)]="shopId" (change)="onShopChange($event)">
+                        <option value = ''></option>
+                        <optgroup label="">  
+                            <option *ngFor="let shop of shops" [value]="shop.id" style="font-size: larger;">Shop name: <b>{{shop.name}}</b></option>                   
+                        </optgroup>
+                    </select>
+                </div>
+
+
+                <form id="salesOrderForm">
+                    <div class="row">
+                        <!-- Product Code -->
+                        <div class="col-md-3"></div> 
+                        <!-- <div class="col-md-6 mb-3">
+                            <label for="productCode">Customer Name</label>
+                            <input type="text" class="form-control" [(ngModel)]="customerName" id="productCode" name="customerName" placeholder="Enter Customer Name">
+                        </div> -->
+                        
+                    </div>
+                    
+                    
+                </form>
+            </div>
+            <div class="row">
+                <div class="col-md-12">
+                    <hr>
+                    <button type="button" class="btn btn-danger btn-round-custom" data-dismiss="modal" style="margin: 10px;">Close</button>
+                    <button type="submit" class="btn btn-success btn-round-custom pull-right" (click)="save()" id="saveSalesOrderBtn" data-dismiss="modal" style="margin: 10px;">Save Order</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="sales-order-list-modal" tabindex="-1" role="dialog" aria-labelledby="salesOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="salesOrderModalLabel">LPO List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                    </div>
+                </div>
+                <br>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th scope="col">No</th>
+                                    <th scope="col">Supplier</th>
+                                    <th scope="col">Status</th>                                   
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let lpo of lpos | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                    <td>{{lpo.no}}</td>
+                                    <td>{{lpo.supplierName}}</td>
+                                    <td>{{lpo.status}}</td>
+                                    <td><button class="btn btn-success btn-round-custom" (click)="get(lpo.id)" data-dismiss="modal">Select</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-sm-12" style="text-align: right;">
+                                <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
