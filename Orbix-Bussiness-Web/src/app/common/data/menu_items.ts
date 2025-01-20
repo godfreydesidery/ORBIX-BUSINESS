@@ -470,11 +470,11 @@ export const menuItems = [
                 routerLink: '/app/procurement/supplier-price-list'
             },
             {
-                title: 'LPO',
+                title: 'Local Purchase Order',
                 routerLink: '/app/procurement/lpo'
             },
             {
-                title: 'GRN',
+                title: 'Goods Received Note',
                 routerLink: '/app/procurement/grn'
             },
             // {

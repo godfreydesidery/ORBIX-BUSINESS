@@ -1,5 +1,6 @@
 package com.orbix.api.modules.inventoryandprocurement;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -130,9 +131,14 @@ public class LpoServiceController implements LpoService {
 		Supplier supplier = supplierRepository.findById(lpoRequest.getSupplierId())
 	    .orElseThrow(() -> new NotFoundException("Supplier not found, with id " + lpoRequest.getSupplierId()));
 		
+		if(lpoRequest.getValidUntilDate().isBefore(LocalDate.now())) {
+			throw new InvalidOperationException("Invalid Expiry date. Date must be equal or more than current date");
+		}
+		
 		Lpo lpo = new Lpo();
 		
 		lpo.setNo(String.valueOf(Math.random()));
+		lpo.setValidUntilDate(lpoRequest.getValidUntilDate());
 		lpo.setShop(shop);
 		lpo.setSupplier(supplier);
 		lpo.setBranch(userService.getUserBranch(request));
@@ -232,6 +238,10 @@ public class LpoServiceController implements LpoService {
 			throw new InvalidOperationException("Not a pending LPO");
 		}
 		
+		if(lpo.getValidUntilDate() != null && lpo.getValidUntilDate().isBefore(LocalDate.now())) {
+			throw new InvalidOperationException("LPO already expired");
+		}
+		
 		if(lpo.getLpoDetails().isEmpty()) {
 			throw new InvalidOperationException("Can not approve an empty LPO");
 		}
@@ -287,6 +297,8 @@ public class LpoServiceController implements LpoService {
 		
 		lpoResponse.setId(lpo.getId().toString());
 		lpoResponse.setNo(lpo.getNo());
+		lpoResponse.setOrderDate(lpo.getCreatedDateTime().toString().substring(0, 10));
+		lpoResponse.setValidUntilDate(lpo.getValidUntilDate() != null ? lpo.getValidUntilDate().toString() : null);
 		if (lpo.getShop() != null && lpo.getShop().getId() != null) {
 		    lpoResponse.setShopId(lpo.getShop().getId().toString());
 		} else {
@@ -306,6 +318,8 @@ public class LpoServiceController implements LpoService {
 		
 		lpoResponse.setId(lpo.getId().toString());
 		lpoResponse.setNo(lpo.getNo());
+		lpoResponse.setOrderDate(lpo.getCreatedDateTime().toString().substring(0, 10));
+		lpoResponse.setValidUntilDate(lpo.getValidUntilDate() != null ? lpo.getValidUntilDate().toString() : null);
 		if (lpo.getShop() != null && lpo.getShop().getId() != null) {
 		    lpoResponse.setShopId(lpo.getShop().getId().toString());
 		    lpoResponse.setShopCode(lpo.getShop().getCode());

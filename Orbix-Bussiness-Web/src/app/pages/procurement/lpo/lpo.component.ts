@@ -48,6 +48,8 @@ export class LpoComponent {
 
   id : any = null
   no : any = ''
+  orderDate : string = ''
+  validUntilDate : Date | null = null
   shopId: any = null
 
   status : string = ''
@@ -210,6 +212,8 @@ export class LpoComponent {
 
           this.id = data!.id
           this.no = data!.no
+          this.orderDate = data!.orderDate
+          this.validUntilDate = data!.validUntilDate
           this.supplierName = data!.supplierName
           this.shopName = data!.shopName
 
@@ -235,6 +239,7 @@ export class LpoComponent {
       var lpo = {
         id : null,
         no : null,
+        validUntilDate : this.validUntilDate,
         summary : null,
         shopId : this.shopId,
         supplierId : this.supplierId
@@ -297,6 +302,7 @@ export class LpoComponent {
       var lpo = {
         id : null,
         no : null,
+        validUntilDate : this.validUntilDate,
         summary : null,
         shopId : this.shopId,
         supplierId : this.supplierId
@@ -327,6 +333,8 @@ export class LpoComponent {
       this.lpo!
       this.id = null
       this.no = ''
+      this.orderDate = ''
+      this.validUntilDate = null
       this.supplierId = null
       this.shopId = null
     }
@@ -811,6 +819,8 @@ export class LpoComponent {
               {text : ' '},
               {text: title, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
               {text: 'LPO No : ' + this.no, fontSize: 10, bold: true, alignment: 'left'},
+              {text: 'Order Date : ' + this.orderDate, fontSize: 10, bold: true, alignment: 'left'},
+              {text: 'Valid Until Date : ' + this.validUntilDate, fontSize: 10, bold: true, alignment: 'left'},
               {text: 'Status : ' + this.status, fontSize: 10, bold: true, alignment: 'left'},
               {text: 'Supplier : ' + this.supplierName, fontSize: 10, bold: true, alignment: 'left'},
               {text: 'Shop : ' + this.shopName, fontSize: 10, bold: true, alignment: 'left'},
@@ -826,7 +836,4 @@ export class LpoComponent {
         
           pdfMake.createPdf(docDefinition).print();
         };
-
-      
-    
 }

@@ -1,6 +1,8 @@
 export interface ILpo {
     id : any
     no : string
+    orderDate : string
+    validUntilDate : Date
     summary : string
     status : string
     shopId : number

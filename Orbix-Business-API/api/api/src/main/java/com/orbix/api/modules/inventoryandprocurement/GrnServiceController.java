@@ -83,6 +83,7 @@ public class GrnServiceController implements GrnService {
 		statuses.add(WorkFlowStatus.PENDING);
 		//statuses.add(WorkFlowStatus.PROCESSING);
 		statuses.add(WorkFlowStatus.APPROVED);
+		statuses.add(WorkFlowStatus.PROCESSING);
 
 			List<Grn> grns = grnRepository.findAllByStatusInAndBranch(statuses, userService.getUserBranch(request));
 
@@ -184,6 +185,7 @@ public class GrnServiceController implements GrnService {
 		grn.setCreatedDateTime(dayService.getTimeStamp());
 		grn = grnRepository.save(grn);
 		grn.setNo(grn.getId().toString());
+		grn.setLpo(lpo);
 		
 		grn = grnRepository.save(grn);
 		
@@ -386,7 +388,12 @@ public class GrnServiceController implements GrnService {
 		}
 //		grnResponse.setSupplierId(grn.getSupplier().getId().toString());		
 //		grnResponse.setSupplierCode(grn.getSupplier().getCode());	
-//		grnResponse.setSupplierName(grn.getSupplier().getName());
+		if (grn.getLpo() != null) {
+		    grnResponse.setSupplierName(grn.getLpo().getSupplier().getName());
+		} else {
+		    grnResponse.setSupplierName("");
+		}
+		
 		grnResponse.setStatus(grn.getStatus().toString());
 		
 		return grnResponse;
