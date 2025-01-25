@@ -53,6 +53,8 @@ shopName : string = ''
   products : IProduct[] = []
 
   status : string = ''
+  receivedBy : string = ''
+  receivedAt : string = ''
 
   searchKey : string = '' 
 
@@ -220,14 +222,16 @@ shopName : string = ''
 
           this.id = data!.id
 
-          this.status = this.grn.status
+          this.status = data!.status
+          this.receivedBy = data!.receivedBy
+          this.receivedAt = data!.receivedAt
 
-          this.id = this.grn.id
+          this.id = data!.id
 
           this.totalAmount = 0
 
           var sn = 1
-          this.grn.grnDetails.forEach(element => {
+          data!.grnDetails.forEach(element => {
             element.sn = sn
             this.totalAmount = this.totalAmount + ((+element.costPriceVatIncl) * element.qty)
             sn = sn + 1

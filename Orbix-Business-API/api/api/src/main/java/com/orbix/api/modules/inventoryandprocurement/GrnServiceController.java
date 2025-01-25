@@ -144,7 +144,7 @@ public class GrnServiceController implements GrnService {
 		grn.setCreatedByUser(userService.getUser(request));
 		grn.setCreatedDateTime(dayService.getTimeStamp());
 		grn = grnRepository.save(grn);
-		grn.setNo(grn.getId().toString());
+		grn.setNo("GRN/DAV/" + grn.getId().toString());
 		
 		grn = grnRepository.save(grn);
 		
@@ -184,7 +184,7 @@ public class GrnServiceController implements GrnService {
 		grn.setCreatedByUser(userService.getUser(request));
 		grn.setCreatedDateTime(dayService.getTimeStamp());
 		grn = grnRepository.save(grn);
-		grn.setNo(grn.getId().toString());
+		grn.setNo("GRN/DAV/" + grn.getId().toString());
 		grn.setLpo(lpo);
 		
 		grn = grnRepository.save(grn);
@@ -394,6 +394,14 @@ public class GrnServiceController implements GrnService {
 		    grnResponse.setSupplierName("");
 		}
 		
+		if(grn.getApprovedByUser() != null) {
+			grnResponse.setReceivedBy(grn.getApprovedByUser().getNickname());
+			grnResponse.setReceivedAt(grn.getApprovedDateTime().toString());
+		}else {
+			grnResponse.setReceivedBy("");
+			grnResponse.setReceivedAt("");
+		}
+		
 		grnResponse.setStatus(grn.getStatus().toString());
 		
 		return grnResponse;
@@ -422,6 +430,13 @@ public class GrnServiceController implements GrnService {
 			grnResponse.setSupplierId("");
 		    grnResponse.setSupplierCode("");
 		    grnResponse.setSupplierName("");
+		}
+		if(grn.getApprovedByUser() != null) {
+			grnResponse.setReceivedBy(grn.getApprovedByUser().getNickname());
+			grnResponse.setReceivedAt(grn.getApprovedDateTime().toString());
+		}else {
+			grnResponse.setReceivedBy("");
+			grnResponse.setReceivedAt("");
 		}
 		grnResponse.setStatus(grn.getStatus().toString());
 		

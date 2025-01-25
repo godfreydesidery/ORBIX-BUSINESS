@@ -3,6 +3,8 @@ export interface IGrn {
     no : string
     summary : string
     status : string
+    receivedBy :string
+    receivedAt : string
     shopId : number
     shopCode : string
     shopName : string

@@ -147,7 +147,7 @@ public class LpoServiceController implements LpoService {
 		lpo.setCreatedByUser(userService.getUser(request));
 		lpo.setCreatedDateTime(dayService.getTimeStamp());
 		lpo = lpoRepository.save(lpo);
-		lpo.setNo(lpo.getId().toString());
+		lpo.setNo("LPO/DAV/" + lpo.getId().toString());
 		
 		lpo = lpoRepository.save(lpo);
 		
