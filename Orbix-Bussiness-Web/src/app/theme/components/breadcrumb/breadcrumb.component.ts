@@ -27,11 +27,12 @@ export class BreadcrumbComponent {
             if (event instanceof NavigationEnd) {
                 this.breadcrumbs = [];
                 this.parseRoute(this._router.routerState.snapshot.root);
-                this.title = "";
+                this.title = "Orbix Bussiness";
                 this.breadcrumbs.forEach(breadcrumb => {
                     this.title += ' > ' + breadcrumb.name;
                 })
-                this._title.setTitle(this.settings.name + this.title);
+                //this._title.setTitle(this.settings.name + this.title);
+                this._title.setTitle(this.title)
             }
         })
     }

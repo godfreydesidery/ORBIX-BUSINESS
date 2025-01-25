@@ -14,6 +14,7 @@ import { environment } from 'src/environments/environment';
 import { HttpHeaders } from '@angular/common/http';
 import { ILpo } from 'src/app/domain/lpo';
 import { IGrn } from 'src/app/domain/grn';
+import { NotificationComponent } from '../../misc/notification/notification.component';
 
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
@@ -34,6 +35,10 @@ const API_URL = environment.apiUrl;
 })
 export class SelectShopComponent {
 
+  underStock : number = 0
+  outofStock : number = 0
+
+
   availableShops :IShop[] = []
 
   selectedShop :IShop | null = null
@@ -41,7 +46,7 @@ export class SelectShopComponent {
 
   branchId :string = ''
 
-  shopLoaded :boolean = false
+  shopLoaded :boolean = false 
 
   page: number = 1; // Initialize the current page to 1
   filterRecords : string = ''
@@ -66,7 +71,9 @@ export class SelectShopComponent {
         this.selectedShopId = localStorage.getItem('selected-shop-id')
         this.loadSelectedShop()
         
-      }
+      }     
+        this.getUnderstock()
+        this.getOutofstock() 
     }
 
     loadAvailableShops = async () => {
@@ -87,28 +94,31 @@ export class SelectShopComponent {
         )
     }
 
-    loadSelectedShop = async () => {
-      let options = {
-        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
-      }
-
-      await this.http.get<IShop>(API_URL+'/shops/get_selected_shop?shop_id=' + this.selectedShopId , options)
-        .toPromise()
-        .then(
-          data => {
-            console.log(data)
-            this.selectedShop = data!
-            localStorage.setItem('selected-shop-id', this.selectedShop.id.toString());
-            this.shopLoaded = true
-          }
-        )
-        .catch(error => {
-          console.log(error)
-          localStorage.setItem('selected-shop-id', '');
-          this.shopLoaded = false
-        }       
-      ) 
+  loadSelectedShop = async () => {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
+
+    await this.http.get<IShop>(API_URL + '/shops/get_selected_shop?shop_id=' + this.selectedShopId, options)
+      .toPromise()
+      .then(
+        data => {
+          console.log(data)
+          this.selectedShop = data!
+          localStorage.setItem('selected-shop-id', this.selectedShop.id.toString());
+          this.shopLoaded = true
+
+          this.getUnderstock()
+          this.getOutofstock()
+        }
+      )
+      .catch(error => {
+        console.log(error)
+        localStorage.setItem('selected-shop-id', '');
+        this.shopLoaded = false
+      }
+      )
+  }
 
     onShopChange(event: any): void {
       this.selectedShopId = event.target.value;
@@ -224,4 +234,69 @@ export class SelectShopComponent {
           }
         )
       }
+
+      getUnderstock = async () => {
+
+        this.underStock = 0
+  
+        let options = {
+          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+        }
+  
+        await this.http.get<number>(API_URL+'/shop_products/get_check_under_stock_by_shop?shop_id=' + this.selectedShopId, options)
+          .toPromise()
+          .then(
+            data => {
+              this.underStock = data!
+              console.log(data)
+            }
+          )
+      }
+
+      getOutofstock = async () => {
+
+        this.outofStock = 0
+  
+        let options = {
+          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+        }
+  
+        await this.http.get<number>(API_URL+'/shop_products/get_check_out_of_stock_by_shop?shop_id=' + this.selectedShopId, options)
+          .toPromise()
+          .then(
+            data => {
+              this.outofStock = data!
+              console.log(data)
+            }
+          )
+      }
+
+
+
+
+
+
+      // Alerts array to manage the notifications
+  alerts: { 
+    type: string; 
+    message: string;
+    link?: string
+   }[] = [
+    { type: 'success', message: 'Shop selected successfully!', link: 'shop-sales-order' },
+    
+  ];
+
+  // Close alert method
+  closeAlert(index: number) {
+    this.alerts.splice(index, 1); // Remove the alert at the given index
+  }
+
+  // Add an alert for testing purposes
+  addAlert(type: string, message: string) {
+    this.alerts.push({ type, message });
+  }
+
+
+
+
 }

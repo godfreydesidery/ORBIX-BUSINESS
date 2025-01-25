@@ -32,9 +32,25 @@
                         <!-- <button class="btn btn-success btn-round-custom" [routerLink]="'/app/mechandizing/shop-lpo'" [queryParams]="{ shop_id: selectedShopId }">LPO</button> -->
                         <button class="btn btn-success btn-round-custom" (click)="getAllPendingOrders()" data-toggle="modal" data-target="#sales-order-list-modal">LPO List</button>
                         <button class="btn btn-success btn-round-custom" (click)="getAllPendingGrns()" data-toggle="modal" data-target="#grn-list-modal">GRN List</button>
-                        <button class="btn btn-success btn-round-custom" [routerLink]="'/app/mechandizing/import-product'" [queryParams]="{ shop_id: selectedShopId }">Import Product</button>
+                        <button class="btn btn-success btn-round-custom" [routerLink]="'/app/mechandizing/import-product'" [queryParams]="{ shop_id: selectedShopId }">Import Product</button>                        
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12" style="margin-left: 20px;">
+                        <div class="alert alert-info alert-dismissible fade show" *ngIf="underStock > 0" role="alert" style="background-color: white;">
+                            <button type="button" class="close btn-round-custom" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true" style="color: black;">&times;</span>
+                            </button>
+                            <strong style="color: black;">{{underStock}} Items are under stocked!   </strong>    <span [routerLink]="'/app/mechandizing/shop-product-stock-status-under'" [queryParams]="{ shop_id: selectedShopId }" style="color: red; cursor: pointer;">   Click Here to View</span>
+                        </div> 
+                        <div class="alert alert-info alert-dismissible fade show" *ngIf="outofStock > 0" role="alert" style="background-color: white;">
+                            <button type="button" class="close btn-round-custom" data-dismiss="alert" aria-label="Close">
+                                <span aria-hidden="true" style="color: black;">&times;</span>
+                            </button>
+                            <strong style="color: black;">{{outofStock}} Items are out of stock!   </strong>    <span [routerLink]="'/app/mechandizing/shop-product-stock-status-out'" [queryParams]="{ shop_id: selectedShopId }" style="color: red; cursor: pointer;">   Click Here to View</span>
+                        </div>                       
                     </div>
-                </div>                    
+                </div>                
             </div>
         </div>
     </div>

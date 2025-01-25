@@ -199,7 +199,7 @@ public class GrnServiceController implements GrnService {
 			}
 						
 			grnDetail.setProduct(lpoDetail.getProduct());
-			grnDetail.setQty(lpoDetail.getQty());
+			grnDetail.setOrderedQty(lpoDetail.getQty());
 			grnDetail.setCostPriceVatIncl(lpoDetail.getCostPriceVatIncl());
 			grnDetail.setVatRate(lpoDetail.getVatRate());
 			grnDetail.setGrn(grn);
@@ -258,14 +258,14 @@ public class GrnServiceController implements GrnService {
 //		grnDetail.setCostPriceVatIncl(supplierProduct.getCostPriceVatIncl());
 //		grnDetail.setVatRate(supplierProduct.getVatRate());
 		grnDetail.setProduct(product);
-		if(grnDetailRequest.getQty() <= 0) {
+		if(grnDetailRequest.getOrderedQty() <= 0) {
 			throw new InvalidOperationException("Invalid quantiy selected");
 		}
 		
 		if(grnDetailRepository.existsByGrnAndProduct(grn, product)) {
 			throw new InvalidOperationException("Product already present in LPO");
 		}
-		grnDetail.setQty(grnDetailRequest.getQty());
+		grnDetail.setOrderedQty(grnDetailRequest.getOrderedQty());
 		grnDetail.setCostPriceVatIncl(grnDetailRequest.getCostPriceVatIncl());
 		grnDetail.setVatRate(grnDetailRequest.getVatRate());
 		grnDetail.setGrn(grn);
@@ -294,6 +294,31 @@ public class GrnServiceController implements GrnService {
 		}
 		
 		grnDetailRepository.delete(grnDetail);	
+		
+	}
+	
+	@Override
+	public void addReceived(Long grnDetailId, Long grnId, double qty, HttpServletRequest request) {
+		Grn grn = grnRepository.findById(grnId)
+			    .orElseThrow(() -> new NotFoundException("GRN not found, with id " + grnId));
+		if(!(String.valueOf(grn.getStatus()).equals("PENDING") || String.valueOf(grn.getStatus()).equals("PROCESSING"))) {
+			throw new InvalidOperationException("Not a pending GRN");
+		}
+		
+		GrnDetail grnDetail = grnDetailRepository.findById(grnDetailId)
+			    .orElseThrow(() -> new NotFoundException("Detail not found, with id " + grnDetailId));
+		
+		if(grnDetail.getOrderedQty() < qty) {
+			throw new InvalidOperationException("Can not receive more than ordered qty");
+		}
+		
+		if(qty <= 0) {
+			throw new InvalidOperationException("Invalid Input. Can not receive zero or less");
+		}
+		
+		grnDetail.setReceivedQty(qty);
+		
+		grnDetailRepository.save(grnDetail);
 		
 	}
 
@@ -326,13 +351,13 @@ public class GrnServiceController implements GrnService {
 			
 				ShopProduct shopProduct = shopProductRepository.findByProductAndShop(grnDetail.getProduct(), shop).orElseThrow();
 				
-				double newStock = shopProduct.getCurrentStock() + grnDetail.getQty();
+				double newStock = shopProduct.getCurrentStock() + grnDetail.getReceivedQty();
 				
 				shopProduct.setCurrentStock(newStock);
 				
 				shopProduct = shopProductRepository.save(shopProduct);
 				
-				this.createShopProductLog(shop, grnDetail.getProduct(), grnDetail.getQty(), 0, newStock, userService.getUser(request), dayService.getTimeStamp(), "GRN: " + grn.getNo());
+				this.createShopProductLog(shop, grnDetail.getProduct(), grnDetail.getReceivedQty(), 0, newStock, userService.getUser(request), dayService.getTimeStamp(), "GRN: " + grn.getNo());
 
 			}
 		}
@@ -454,13 +479,14 @@ public class GrnServiceController implements GrnService {
 		grnDetailResponse.setId(grnDetail.getId().toString());
 		grnDetailResponse.setCostPriceVatIncl(String.valueOf(grnDetail.getCostPriceVatIncl()));
 		grnDetailResponse.setVatRate(String.valueOf(grnDetail.getVatRate()));
-		grnDetailResponse.setQty(String.valueOf(grnDetail.getQty()));
+		grnDetailResponse.setOrderedQty(String.valueOf(grnDetail.getOrderedQty()));
+		grnDetailResponse.setReceivedQty(String.valueOf(grnDetail.getReceivedQty()));
 		grnDetailResponse.setProductId(grnDetail.getProduct().getId().toString());
 		grnDetailResponse.setProductCode(grnDetail.getProduct().getCode());
 		grnDetailResponse.setProductName(grnDetail.getProduct().getName());
 		grnDetailResponse.setProductDescription(grnDetail.getProduct().getDescription());
 		grnDetailResponse.setBaseUom(grnDetail.getProduct().getBaseUom());
-		grnDetailResponse.setAmount(String.valueOf(grnDetail.getCostPriceVatIncl() * grnDetail.getQty()));
+		grnDetailResponse.setAmount(String.valueOf(grnDetail.getCostPriceVatIncl() * grnDetail.getReceivedQty()));
 		
 		return grnDetailResponse;
 	}

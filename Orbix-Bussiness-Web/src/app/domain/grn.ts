@@ -28,7 +28,8 @@ export interface IGrnDetail {
     vatRate : number
 
     baseUom : string
-    qty : number
+    orderedQty : number
+    receivedQty : number
     price : number
     discount : number
     amount : number

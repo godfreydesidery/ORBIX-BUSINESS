@@ -126,6 +126,21 @@ export const routes: Routes = [
         data : { breadcrumb : 'Mechandizing/Shop Stock Status'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'mechandizing/shop-product-stock-status-out',
+        loadComponent: () => import('./mechandizing/shop-product-stock-status-out/shop-product-stock-status-out.component').then(c => c.ShopProductStockStatusOutComponent),
+        data : { breadcrumb : 'Mechandizing/Shop Stock Status(Out of stock)'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'mechandizing/shop-product-stock-status-under',
+        loadComponent: () => import('./mechandizing/shop-product-stock-status-under/shop-product-stock-status-under.component').then(c => c.ShopProductStockStatusUnderComponent),
+        data : { breadcrumb : 'Mechandizing/Shop Stock Status(Under stock)'},
+        canActivate : [AuthGuard]
+      },
+
+
 
       {
         path : 'mechandizing/import-product',

@@ -58,7 +58,8 @@
                                                 <th scope="col">Name</th>
                                                 <th scope="col">UOM</th>
                                                 <th scope="col">VAT(%)</th>
-                                                <th scope="col">Qty</th>
+                                                <th scope="col">Ordered Qty</th>
+                                                <th scope="col">Received Qty</th>
                                                 <th scope="col">Unit Price</th>
                                                 <th scope="col">Amount</th>
                                                 <th scope="col">Action</th>
@@ -71,7 +72,8 @@
                                                 <td>{{item.productName}}</td>
                                                 <td>{{item.baseUom}}</td>
                                                 <td>{{item.vatRate * 100}}</td>
-                                                <td>{{item.qty}}</td>
+                                                <td>{{item.orderedQty}}</td>
+                                                <td>{{item.receivedQty}}</td>
                                                 <td style="text-align: right;">{{item.costPriceVatIncl | currency:'':''}}</td>
                                                 <td style="text-align: right;">{{item.amount | currency:'':''}}</td>
                                                 <td>
@@ -81,6 +83,7 @@
                                             </tr>
             
                                             <tr *ngIf="grn.grnDetails.length > 0">
+                                                <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>

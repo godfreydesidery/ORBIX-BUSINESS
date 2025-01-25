@@ -21,6 +21,7 @@ public interface GrnService {
 	void createGrnDetail(GrnDetailRequestDTO grnDetailRequest, HttpServletRequest request);
 	
 	void removeGrnDetail(Long grnDetailId, Long grnId, HttpServletRequest request);
+	void addReceived(Long grnDetailId, Long grnId, double qty, HttpServletRequest request);
 	
 	boolean approveGrn(Long grnId, HttpServletRequest request);
 	boolean archiveGrn(Long grnId, HttpServletRequest request);

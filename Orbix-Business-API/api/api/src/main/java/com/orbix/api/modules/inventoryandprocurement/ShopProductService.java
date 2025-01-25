@@ -9,6 +9,8 @@ import com.orbix.api.modules.adminunits.Shop;
 
 public interface ShopProductService {
 	List<ShopProductResponseDTO> getAllShopProducts(Long shopId, HttpServletRequest request);
+	List<ShopProductResponseDTO> getUnderstockShopProducts(Long shopId, HttpServletRequest request);
+	List<ShopProductResponseDTO> getOutofstockShopProducts(Long shopId, HttpServletRequest request);
 	ShopProductResponseDTO get(Long id, Long shopId, HttpServletRequest request);
 	ShopProductResponseDTO getProductInShop(Long productId, Long shopId, HttpServletRequest request);
 	ShopProductResponseDTO createShopProduct(ShopProductRequestDTO shopProductRequest, HttpServletRequest request);
@@ -18,4 +20,7 @@ public interface ShopProductService {
 	ApiCustomResponse deactivateShopProduct(ShopProductRequestDTO shopProductRequest, HttpServletRequest request);
 	
 	List<ProductResponseDTO> getProductsByShopAndName(Long shopId, String productName);
+	
+	long checkUnderstockByShop(Long shopId, HttpServletRequest request);
+	long checkOutofstockByShop(Long shopId, HttpServletRequest request);
 }
