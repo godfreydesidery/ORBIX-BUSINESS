@@ -81,6 +81,11 @@ export class LoginComponent {
       })    
   }
 
+  resetFields(){
+    this.username.setValue('')
+    this.password.setValue('')
+  }
+
 
 }
 
