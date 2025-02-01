@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 
@@ -31,6 +32,8 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class ReportResource {
 	
+	private final ShopProductLogRepository shopProductLogRepository;
+	
 //	private final ParkingRepository parkingRepository;
 //	private final ParkingBillReceivableRepository parkingBillReceivableRepository;
 //	private final UserService userService;
@@ -47,6 +50,21 @@ public class ReportResource {
 //
 //	    return ResponseEntity.ok(report);
 //	}
+	
+//	public List<StockLogReportProjection> getStockLogReport(Long shopId) {
+//        return shopProductLogRepository.getStockLogReportByShop(shopId);
+//    }
+	
+	@PostMapping("/shop_stock_logs/get_stock_logs_report_by_dates")
+	public ResponseEntity<List<StockLogReportProjection>> getSalesListingReportByDates(
+			@RequestParam(name = "shop_id") Long shopId,
+	        @RequestBody DateRange dateRange,
+	        HttpServletRequest request) {
+
+	    List<StockLogReportProjection> report = shopProductLogRepository.getStockLogReportByShop(shopId, dateRange.getFrom().atStartOfDay(), dateRange.getTo().atStartOfDay().plusDays(1));
+	    
+	    return ResponseEntity.ok(report);
+	}
 }
 
 //@Data
@@ -59,8 +77,9 @@ public class ReportResource {
 //	public String dateTime;
 //}
 //
-//@Data
-//class DateRange {
-//	LocalDate from;
-//	LocalDate to;
-//}
+@Data
+class DateRange {
+	LocalDate from;
+	LocalDate to;
+}
+

@@ -140,6 +140,13 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
 
+      {
+        path : 'mechandizing/shop-product-stock-log',
+        loadComponent: () => import('./mechandizing/shop-product-stock-log/shop-product-stock-log.component').then(c => c.ShopProductStockLogComponent),
+        data : { breadcrumb : 'Mechandizing/Shop Stock Card'},
+        canActivate : [AuthGuard]
+      },
+
 
 
       {

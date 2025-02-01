@@ -439,13 +439,24 @@ export const menuItems = [
                 routerLink: '/app/mechandizing/select-shop'
             },
             {
-                title: 'Sales Listing Report',
-                routerLink: '/app/mechandizing/sales-listing-report'
+                title: 'Reports',
+                url: '#',
+                subMenu: [
+                    {
+                        title: 'Sales Listing Report',
+                        routerLink: '/app/mechandizing/sales-listing-report'
+                    },
+                    {
+                        title: 'Fast Moving Products',
+                        routerLink: '/app/mechandizing/fast-moving-products-report'
+                    },
+                    {
+                        title: 'Stock Card Report',
+                        routerLink: '/app/mechandizing/shop-product-stock-log'
+                    },
+                ]
             },
-            {
-                title: 'Fast Moving Products',
-                routerLink: '/app/mechandizing/fast-moving-products-report'
-            },
+            
         ]
     },
     {
