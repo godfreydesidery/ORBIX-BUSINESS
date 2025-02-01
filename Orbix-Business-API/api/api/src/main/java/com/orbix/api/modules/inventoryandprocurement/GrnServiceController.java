@@ -318,7 +318,7 @@ public class GrnServiceController implements GrnService {
 			throw new InvalidOperationException("Can not receive more than ordered qty");
 		}
 		
-		if(qty <= 0) {
+		if(qty < 0) {
 			throw new InvalidOperationException("Invalid Input. Can not receive zero or less");
 		}
 		

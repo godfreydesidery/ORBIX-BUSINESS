@@ -87,7 +87,7 @@ shopName : string = ''
 
 
   detailId : any = null
-  receivedQty : number = 0
+  receivedQty : number | any = ''
 
   constructor(
     private http :HttpClient,
@@ -552,7 +552,7 @@ shopName : string = ''
     }
 
     showDetailId(id : any){
-      this.receivedQty = 0
+      this.receivedQty = ''
       this.detailId = id
     }
 

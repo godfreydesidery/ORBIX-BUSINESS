@@ -39,9 +39,9 @@
                             [queryParams]="{ shop_id: selectedShopId }">Stock Status</button>
                         <!-- <button class="btn btn-success btn-round-custom" [routerLink]="'/app/mechandizing/shop-lpo'" [queryParams]="{ shop_id: selectedShopId }">LPO</button> -->
                         <button class="btn btn-success btn-round-custom" (click)="getAllPendingOrders()"
-                            data-toggle="modal" data-target="#sales-order-list-modal">LPO List</button>
+                            data-toggle="modal" data-target="#sales-order-list-modal">Local Purchase Orders</button>
                         <button class="btn btn-success btn-round-custom" (click)="getAllPendingGrns()"
-                            data-toggle="modal" data-target="#grn-list-modal">GRN List</button>
+                            data-toggle="modal" data-target="#grn-list-modal">Goods Received Notes</button>
                         <button class="btn btn-success btn-round-custom"
                             [routerLink]="'/app/mechandizing/import-product'"
                             [queryParams]="{ shop_id: selectedShopId }">Import Product</button>
@@ -59,10 +59,10 @@
                                         aria-label="Close">
                                         <span aria-hidden="true" style="color: black;">&times;</span>
                                     </button>
-                                    <strong style="color: black;">{{underStock}} Items are under stocked! </strong> <br>
+                                    <strong style="color: black; font-size: larger;">{{underStock}} Items are under stocked! </strong> <br>
                                     <span [routerLink]="'/app/mechandizing/shop-product-stock-status-under'"
                                         [queryParams]="{ shop_id: selectedShopId }"
-                                        style="color: red; cursor: pointer;">
+                                        style="color: red; cursor: pointer; font-size: large;">
                                         Click Here to View</span>
                                 </div>
                             </div>
@@ -73,11 +73,11 @@
                                         aria-label="Close">
                                         <span aria-hidden="true" style="color: black;">&times;</span>
                                     </button>
-                                    <strong style="color: black;">{{outofStock}} Items are out of stock! </strong> <br>
+                                    <strong style="color: black; font-size: larger;">{{outofStock}} Items are out of stock! </strong> <br>
                                     <span
                                         [routerLink]="'/app/mechandizing/shop-product-stock-status-out'"
                                         [queryParams]="{ shop_id: selectedShopId }"
-                                        style="color: red; cursor: pointer;">
+                                        style="color: red; cursor: pointer; font-size: large;">
                                         Click Here to View</span>
                                 </div>
                             </div>
