@@ -1,6 +1,7 @@
 package com.orbix.api.modules.inventoryandprocurement;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -162,10 +163,11 @@ public class SupplierServiceController implements SupplierService {
 	    // Fetch products
 	    List<Supplier> suppliers = supplierRepository.findAllByCompanyAndNameContainingIgnoreCase(company, supplierName);
 
-	    // Map to DTOs
+	    // Map to DTOs and sort by name
 	    return suppliers.stream()
-	        .map(this::supplierResponseDTOMapper)
-	        .collect(Collectors.toList());
+	            .sorted(Comparator.comparing(Supplier::getName))  // Sort by name
+	            .map(this::supplierResponseDTOMapper)
+	            .collect(Collectors.toList());
 	}
 	
 	
@@ -196,5 +198,21 @@ public class SupplierServiceController implements SupplierService {
 		}
 		
 		return supplierResponse;
+	}
+	
+	@Override
+	public List<SupplierResponseDTO> getSuppliersByCompanyAndName(String supplierName, HttpServletRequest request) {
+		
+	    List<Supplier> suppliers = supplierRepository.findAllByCompanyAndNameContainingIgnoreCase(userService.getUserCompany(request), supplierName);
+	    
+	    List<SupplierResponseDTO> supplierResponses = new ArrayList<>();
+	    
+	    for(Supplier supplier : suppliers) {
+	    	SupplierResponseDTO supplierResponse = new SupplierResponseDTO();
+	    	supplierResponse.setId(supplier.getId().toString());
+	    	supplierResponse.setName(supplier.getName());
+	    	supplierResponses.add(supplierResponse);
+	    }
+	    return supplierResponses;
 	}
 }

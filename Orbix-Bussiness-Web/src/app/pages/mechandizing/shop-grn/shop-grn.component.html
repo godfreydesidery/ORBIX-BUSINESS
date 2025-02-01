@@ -66,8 +66,8 @@
                                                 <td style="text-align: right;">{{item.amount | currency:'':''}}</td>
                                                 <td>
                                                     <!-- <button class="btn btn-sm btn-success btn-round-custom">Edit</button> -->
-                                                    <button class="btn btn-sm btn-success btn-round-custom" data-toggle="modal" data-target="#add-received-modal" (click)="showDetailId(item.id)">Received Qty</button>
-                                                    <button class="btn btn-sm btn-danger btn-round-custom" (click)="removeDetail(item.id)">Remove</button>
+                                                    <button class="btn btn-sm btn-success btn-round-custom" *ngIf="status === 'PROCESSING'" data-toggle="modal" data-target="#add-received-modal" (click)="showDetailId(item.id)">Received Qty</button>
+                                                    <button class="btn btn-sm btn-danger btn-round-custom" *ngIf="status === 'PENDING'" (click)="removeDetail(item.id)">Remove</button>
                                                 </td>
                                             </tr>
             

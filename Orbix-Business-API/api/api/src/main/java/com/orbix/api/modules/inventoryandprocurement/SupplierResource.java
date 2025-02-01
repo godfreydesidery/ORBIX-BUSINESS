@@ -87,5 +87,14 @@ private final SupplierService supplierService;
 			@RequestParam(name = "supplier_name_like") String supplierNameLike,
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(supplierService.getSuppliersByCompany(supplierNameLike, request));
-	}	
+	}
+	
+	@GetMapping("/products/get_suppliers_by_company_containing")
+	public ResponseEntity<List<SupplierResponseDTO>>getAllSuppliersByCompanyContaining( 
+			@RequestParam(name = "supplier_name_like")String supplierNameLike,
+			HttpServletRequest request){
+
+		return ResponseEntity.ok().body(supplierService.getSuppliersByCompanyAndName(supplierNameLike, request));
+
+	}
 }

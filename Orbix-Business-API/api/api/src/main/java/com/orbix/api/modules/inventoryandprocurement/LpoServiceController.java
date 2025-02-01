@@ -1,6 +1,7 @@
 package com.orbix.api.modules.inventoryandprocurement;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -82,12 +83,16 @@ public class LpoServiceController implements LpoService {
 		statuses.add(WorkFlowStatus.PENDING);
 		statuses.add(WorkFlowStatus.PROCESSING);
 		statuses.add(WorkFlowStatus.APPROVED);
+		
+		LocalDateTime cutoffTime = LocalDateTime.now().minusHours(48);
 
-			List<Lpo> lpos = lpoRepository.findAllByStatusInAndBranch(statuses, userService.getUserBranch(request));
+	    List<Lpo> lpos = lpoRepository.findAllByStatusInAndBranch(statuses, userService.getUserBranch(request));
 
-			return lpos.stream()
-			    .map(this::lpoResponseDTOMapper)
-			    .collect(Collectors.toList());
+	    return lpos.stream()
+	        .filter(lpo -> lpo.getStatus() != WorkFlowStatus.APPROVED || 
+	                       (lpo.getApprovedDateTime() != null && lpo.getApprovedDateTime().isAfter(cutoffTime)))
+	        .map(this::lpoResponseDTOMapper)
+	        .collect(Collectors.toList());
 	}
 	
 	@Override
@@ -103,12 +108,16 @@ public class LpoServiceController implements LpoService {
 		statuses.add(WorkFlowStatus.PROCESSING);
 		statuses.add(WorkFlowStatus.APPROVED);
 		statuses.add(WorkFlowStatus.COMPLETED);
+		
+		LocalDateTime cutoffTime = LocalDateTime.now().minusHours(48);
 
 			List<Lpo> lpos = lpoRepository.findAllByStatusInAndBranchAndShop(statuses, userService.getUserBranch(request), shop_.get());
 
 			return lpos.stream()
-			    .map(this::lpoResponseDTOMapper)
-			    .collect(Collectors.toList());
+			        .filter(lpo -> !(lpo.getStatus() == WorkFlowStatus.APPROVED || lpo.getStatus() == WorkFlowStatus.COMPLETED) ||
+			                       (lpo.getApprovedDateTime() != null && lpo.getApprovedDateTime().isAfter(cutoffTime)))
+			        .map(this::lpoResponseDTOMapper)
+			        .collect(Collectors.toList());
 	}
 
 	@Override

@@ -1,6 +1,7 @@
 package com.orbix.api.modules.inventoryandprocurement;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,5 +16,7 @@ public interface GrnRepository extends JpaRepository<Grn, Long> {
 	List<Grn> findAllByStatus(WorkFlowStatus pending);
 
 	List<Grn> findAllByStatusInAndBranchAndShop(List<WorkFlowStatus> statuses, Branch userBranch, Shop shop);
+
+	Optional<Grn> findByLpo(Lpo lpo);
 
 }

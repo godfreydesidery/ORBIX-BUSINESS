@@ -72,7 +72,7 @@
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterLpoRecords" placeholder="Search..." style="max-width: 8cm;">
                     </div>
                 </div>
                 <br>
@@ -89,19 +89,24 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let lpo of lpos | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
-                                    <td>{{lpo.no}}</td>
-                                    <td>{{lpo.supplierName}}</td>
-                                    <td>{{lpo.status}}</td>
-                                    <td><button class="btn btn-success btn-round-custom" (click)="get(lpo.id)" data-dismiss="modal">Select</button></td>
+                                <tr *ngFor="let lpo of lpos | searchFilter : filterLpoRecords | paginate: { itemsPerPage: 10, currentPage: lpoPage }">
+                                    <td>{{ lpo.no }}</td>
+                                    <td>{{ lpo.supplierName }}</td>
+                                    <td>{{ lpo.status }}</td>
+                                    <td>
+                                        <button class="btn btn-success btn-round-custom" (click)="get(lpo.id)" data-dismiss="modal">Select</button>
+                                    </td>
                                 </tr>
                             </tbody>
                         </table>
+                        
+                        <!-- Pagination Controls -->
                         <div class="row">
-                            <div class="col-sm-12" style="text-align: right;">
-                                <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                            <div class="col-sm-12 text-right">
+                                <pagination-controls (pageChange)="lpoPage = $event"></pagination-controls>
                             </div>
                         </div>
+                        
                     </div>
                 </div>
             </div>
@@ -125,7 +130,7 @@
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterGrnRecords" placeholder="Search..." style="max-width: 8cm;">
                     </div>
                 </div>
                 <br>
@@ -142,7 +147,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let grn of grns | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                <tr *ngFor="let grn of grns | searchFilter : filterGrnRecords | paginate: { itemsPerPage: 10, currentPage: grnPage }">
                                     <td>{{grn.no}}</td>
                                     <td>{{grn.supplierName}}</td>
                                     <td>{{grn.status}}</td>
@@ -152,7 +157,7 @@
                         </table>
                         <div class="row">
                             <div class="col-sm-12" style="text-align: right;">
-                                <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                                <pagination-controls (pageChange)="grnPage = $event"></pagination-controls>
                             </div>
                         </div>
                     </div>

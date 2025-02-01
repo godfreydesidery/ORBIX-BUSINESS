@@ -168,51 +168,57 @@ public class GrnServiceController implements GrnService {
 		}	
 		
 		Lpo lpo = lpo_.get();
-		lpo.setStatus(WorkFlowStatus.COMPLETED);
-		lpo = lpoRepository.save(lpo);
+		//lpo.setStatus(WorkFlowStatus.COMPLETED);
+		//lpo = lpoRepository.save(lpo);
 		
-		shop = lpo.getShop();
+		Optional<Grn> grn_ = grnRepository.findByLpo(lpo);
+		
+		Grn grn;
+		
+		if(grn_.isEmpty()) {
+			grn = new Grn();
+			shop = lpo.getShop();
+			
+			grn.setNo(String.valueOf(Math.random()));
+			grn.setShop(shop);
+			grn.setBranch(userService.getUserBranch(request));
+			grn.setStatus(WorkFlowStatus.PROCESSING);
+//			grn.setSummary(grnRequest.getSummary());
+			grn.setCreatedByUser(userService.getUser(request));
+			grn.setCreatedDateTime(dayService.getTimeStamp());
+			grn = grnRepository.save(grn);
+			grn.setNo("GRN/DAV/" + grn.getId().toString());
+			grn.setLpo(lpo);
+			
+			grn = grnRepository.save(grn);
+			
+			List<GrnDetail> grnDetails = new ArrayList<>();
+			for(LpoDetail lpoDetail : lpo_.get().getLpoDetails()) {
+				GrnDetail grnDetail = new GrnDetail();
 				
+				
+				if(lpoDetail.getQty() <= 0) {
+					throw new InvalidOperationException("Invalid quantiy selected");
+				}
+							
+				grnDetail.setProduct(lpoDetail.getProduct());
+				grnDetail.setOrderedQty(lpoDetail.getQty());
+				grnDetail.setCostPriceVatIncl(lpoDetail.getCostPriceVatIncl());
+				grnDetail.setVatRate(lpoDetail.getVatRate());
+				grnDetail.setGrn(grn);
+				
+				grnDetail.setCreatedByUser(userService.getUser(request));
+				grnDetail.setCreatedDateTime(dayService.getTimeStamp());
 
-		Grn grn = new Grn();
-		
-		grn.setNo(String.valueOf(Math.random()));
-		grn.setShop(shop);
-		grn.setBranch(userService.getUserBranch(request));
-		grn.setStatus(WorkFlowStatus.PROCESSING);
-//		grn.setSummary(grnRequest.getSummary());
-		grn.setCreatedByUser(userService.getUser(request));
-		grn.setCreatedDateTime(dayService.getTimeStamp());
-		grn = grnRepository.save(grn);
-		grn.setNo("GRN/DAV/" + grn.getId().toString());
-		grn.setLpo(lpo);
-		
-		grn = grnRepository.save(grn);
-		
-		List<GrnDetail> grnDetails = new ArrayList<>();
-		for(LpoDetail lpoDetail : lpo_.get().getLpoDetails()) {
-			GrnDetail grnDetail = new GrnDetail();
-			
-			
-			if(lpoDetail.getQty() <= 0) {
-				throw new InvalidOperationException("Invalid quantiy selected");
+				grnDetail = grnDetailRepository.save(grnDetail);
+				grnDetails.add(grnDetail);
+				
 			}
-						
-			grnDetail.setProduct(lpoDetail.getProduct());
-			grnDetail.setOrderedQty(lpoDetail.getQty());
-			grnDetail.setCostPriceVatIncl(lpoDetail.getCostPriceVatIncl());
-			grnDetail.setVatRate(lpoDetail.getVatRate());
-			grnDetail.setGrn(grn);
 			
-			grnDetail.setCreatedByUser(userService.getUser(request));
-			grnDetail.setCreatedDateTime(dayService.getTimeStamp());
-
-			grnDetail = grnDetailRepository.save(grnDetail);
-			grnDetails.add(grnDetail);
-			
+			grn.setGrnDetails(grnDetails);
+		}else {
+			grn = grn_.get();
 		}
-		
-		grn.setGrnDetails(grnDetails);
 		
 		return grnResponseDTOMapperWithDetails(grn);
 	}

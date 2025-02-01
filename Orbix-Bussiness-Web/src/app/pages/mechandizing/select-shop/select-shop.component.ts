@@ -48,8 +48,10 @@ export class SelectShopComponent {
 
   shopLoaded :boolean = false 
 
-  page: number = 1; // Initialize the current page to 1
-  filterRecords : string = ''
+  lpoPage: number = 1; // Initialize the current page to 1
+  grnPage: number = 1; // Initialize the current page to 1
+  filterLpoRecords : string = ''
+  filterGrnRecords : string = ''
   selectedOption: string = '';
     
   constructor(
@@ -152,12 +154,8 @@ export class SelectShopComponent {
         .toPromise()
         .then(
           data => {
-            var sn = 1
-            data?.forEach(element => {
-              element.sn = sn
-              this.lpos.push(element)
-              sn = sn + 1
-            })
+            this.lpos = [...data!]
+            
             console.log(data)
           }
         )
@@ -295,8 +293,5 @@ export class SelectShopComponent {
   addAlert(type: string, message: string) {
     this.alerts.push({ type, message });
   }
-
-
-
 
 }

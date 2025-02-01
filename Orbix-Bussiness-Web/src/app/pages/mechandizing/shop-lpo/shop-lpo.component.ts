@@ -718,10 +718,11 @@ status : string = ''
                   console.log(data)
       
 
-                  this.msg.showSuccessMessage('GRN created successifully')
+                  this.msg.showSuccessMessage('GRN retrieved successifully')
 
-                  this.router.navigate(['/app/procurement/grn'], {
+                  this.router.navigate(['/app/mechandizing/shop-grn'], {
                     queryParams: {
+                      shop_id: this.shopId,
                       grn_id: data!.id
                     }
                   });
