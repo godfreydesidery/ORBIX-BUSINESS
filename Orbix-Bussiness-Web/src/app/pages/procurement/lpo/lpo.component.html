@@ -14,11 +14,11 @@
                             data-toggle="modal" data-target="#sales-order-list-modal">Local Purchase Order List</button>
                         <button class="btn btn-outline-success btn-round-custom" (click)="clearOrder()">New Local Purchase Order</button>
                         <button class="btn btn-outline-primary btn-round-custom" (click)="approveOrder()"
-                            *ngIf="id != null">Approve LPO</button>
+                            *ngIf="id != null">Approve</button>
                         <button class="btn btn-outline-danger btn-round-custom" (click)="cancelOrder()"
-                            *ngIf="id != null">Cancel LPO</button>
+                            *ngIf="id != null">Cancel</button>
                         <button class="btn btn-outline-danger btn-round-custom" (click)="archiveOrder()"
-                            *ngIf="id != null">Archive LPO</button>
+                            *ngIf="id != null">Archive</button>
                         <button class="btn btn-outline-success btn-round-custom" *ngIf="id != null"
                             (click)="print()">Print</button>
                     </div>
@@ -29,7 +29,7 @@
 
                     <div class="col-md-12">
                         <div class="row">
-                            <div class="col-md-3">
+                            <div class="col-md-3" *ngIf="show === true">
 
                                 <div class="form-group" *ngIf="id === null">
                                     <p>Select Supplier</p>
@@ -114,7 +114,7 @@
                                 </div>
 
                             </div>
-                            <div class="col-md-9">
+                            <div class="col-md-9" *ngIf="show === true">
 
                                 <div class="row">
                                     <div class="col-md-12" *ngIf="id != null">

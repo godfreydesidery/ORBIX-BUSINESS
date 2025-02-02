@@ -488,6 +488,20 @@ export const menuItems = [
                 title: 'Goods Received Note',
                 routerLink: '/app/procurement/grn'
             },
+            {
+                title: 'Reports',
+                url: '#',
+                subMenu: [
+                    {
+                        title: 'Local Purchase Order',
+                        routerLink: '/app/procurement/reports/lpo-report'
+                    },
+                    {
+                        title: 'Goods Received Note',
+                        routerLink: '/app/procurement/reports/grn-report'
+                    },               
+                ]
+            },
             // {
             //     title: 'BLO',
             //     routerLink: '/app/blank'

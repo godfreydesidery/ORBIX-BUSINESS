@@ -1,6 +1,7 @@
 package com.orbix.api.modules.inventoryandprocurement;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -33,6 +34,8 @@ import lombok.RequiredArgsConstructor;
 public class ReportResource {
 	
 	private final ShopProductLogRepository shopProductLogRepository;
+	private final LpoRepository lpoRepository;
+	private final GrnRepository grnRepository;
 	
 //	private final ParkingRepository parkingRepository;
 //	private final ParkingBillReceivableRepository parkingBillReceivableRepository;
@@ -63,6 +66,22 @@ public class ReportResource {
 
 	    List<StockLogReportProjection> report = shopProductLogRepository.getStockLogReportByShop(shopId, dateRange.getFrom().atStartOfDay(), dateRange.getTo().atStartOfDay().plusDays(1));
 	    
+	    return ResponseEntity.ok(report);
+	}
+	
+	@PostMapping("/lpos/get_lpo_report_by_dates")
+	public ResponseEntity<List<ILpoProjection>> getLpoReportByDates(
+	        @RequestBody DateRange dateRange,
+	        HttpServletRequest request) {
+	    List<ILpoProjection> report = lpoRepository.getLpoReportByApprovalDateRange(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atTime(LocalTime.MAX));	    
+	    return ResponseEntity.ok(report);
+	}
+	
+	@PostMapping("/grns/get_grn_report_by_dates")
+	public ResponseEntity<List<IGrnProjection>> getGrnReportByDates(
+	        @RequestBody DateRange dateRange,
+	        HttpServletRequest request) {
+	    List<IGrnProjection> report = grnRepository.getGrnReportByApprovalDateRange(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atTime(LocalTime.MAX));	    
 	    return ResponseEntity.ok(report);
 	}
 }

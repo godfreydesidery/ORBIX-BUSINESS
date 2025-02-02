@@ -359,6 +359,19 @@ export const routes: Routes = [
         data : { breadcrumb : 'Procurement/GRN'}, 
         canActivate : [AuthGuard]
       },
+
+      {
+        path : 'procurement/reports/lpo-report',
+        loadComponent: () => import('./procurement/reports/lpo-report/lpo-report.component').then(c => c.LpoReportComponent),
+        data : { breadcrumb : 'Procurement/LPO Report'}, 
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'procurement/reports/grn-report',
+        loadComponent: () => import('./procurement/reports/grn-report/grn-report.component').then(c => c.GrnReportComponent),
+        data : { breadcrumb : 'Procurement/Grn Report'}, 
+        canActivate : [AuthGuard]
+      },
       
 
       // End of Procurement

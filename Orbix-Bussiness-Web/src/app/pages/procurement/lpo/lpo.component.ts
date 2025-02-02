@@ -44,6 +44,8 @@ const API_URL = environment.apiUrl;
 })
 export class LpoComponent {
 
+  show : boolean = false
+
   documentHeader!: any
 
   id: any = null
@@ -236,6 +238,7 @@ export class LpoComponent {
       .toPromise()
       .then(
         data => {
+          this.show = true
           //this.showUomData(data!)
           console.log(data)
 
@@ -375,6 +378,7 @@ export class LpoComponent {
     this.validUntilDate = null
     this.supplierId = null
     this.shopId = null
+    this.show = true
   }
 
   // Triggered on every keystroke
