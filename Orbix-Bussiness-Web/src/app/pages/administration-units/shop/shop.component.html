@@ -36,9 +36,9 @@
                                     <td>{{shop.name}}</td>
                                     <td>{{shop.otherInfo}}</td>
                                     <td>
-                                        <span *ngIf="shop.active ==='Active'">Active__</span><span *ngIf="shop.active ==='Inactive'">Inactive </span> | 
-                                        <button *ngIf="shop.active ==='Inactive'" (click)="activate(shop.id)"><i class="fa fa-unlock text-success"></i></button>
-                                        <button *ngIf="shop.active ==='Active'" (click)="deactivate(shop.id)"><i class="fa fa-lock text-danger"></i></button>
+                                        <span *ngIf="shop.active ==='Active'">Lock__</span><span *ngIf="shop.active ==='Inactive'">Unlock </span> | 
+                                        <button *ngIf="shop.active ==='Active'" (click)="deactivate(shop.id)"><i class="fa fa-unlock text-success"></i></button>
+                                        <button *ngIf="shop.active ==='Inactive'" (click)="activate(shop.id)"><i class="fa fa-lock text-danger"></i></button>
                                     </td>
                                     <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(shop.id)" data-toggle="modal" data-target="#company-modal" style="cursor: pointer;">Edit</button></td>
                                 </tr>
@@ -63,16 +63,22 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-lg-3">
+                    <div class="col-lg-3"></div>
+                    <div class="col-lg-6">
                         <input type="hidden" [(ngModel)]="id">
                         <div class="form-group">
                             <label>Shop Code</label>
                             <input class="form-control" type="text" [(ngModel)]="code" autocomplete="nope">
                         </div>
+                        <hr> 
+                    </div>   
+                    <div class="col-lg-6">
                         <div class="form-group">
                             <label>Shop Name</label>
                             <input class="form-control" type="text" [(ngModel)]="name" autocomplete="nope">
                         </div>
+                    </div>    
+                    <div class="col-lg-6">
                         <div class="form-group">
                             <label>Location</label>
                             <input class="form-control" type="text" [(ngModel)]="locationName" autocomplete="nope">

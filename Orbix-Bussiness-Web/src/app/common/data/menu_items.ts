@@ -748,21 +748,21 @@ export const menuItems = [
             }
         ]
     },
-    {
-        title: 'System Settings',
-        routerLink: ' ',
-        icon: 'fa-wrench',
-        selected: false,
-        expanded: false,
-        show : true,
-        order: 100,
-        subMenu: [
-            {
-                title: 'System Profile',
-                routerLink: '/app/system/system-profile'
-            },
-        ]
-    },
+    // {
+    //     title: 'System Settings',
+    //     routerLink: ' ',
+    //     icon: 'fa-wrench',
+    //     selected: false,
+    //     expanded: false,
+    //     show : true,
+    //     order: 100,
+    //     subMenu: [
+    //         {
+    //             title: 'System Profile',
+    //             routerLink: '/app/system/system-profile'
+    //         },
+    //     ]
+    // },
 ];
 
 // export function grant(privilege: string[]): boolean {

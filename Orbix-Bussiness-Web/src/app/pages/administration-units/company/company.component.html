@@ -38,9 +38,9 @@
                                     <td>{{company.brandName}}</td>
                                     <td>{{company.contactName}}</td>
                                     <td>
-                                        <span *ngIf="company.active ==='Active'">Active__</span><span *ngIf="company.active ==='Inactive'">Inactive </span> | 
-                                        <button *ngIf="company.active ==='Inactive'" (click)="activate(company.id)"><i class="fa fa-unlock text-success"></i></button>
-                                        <button *ngIf="company.active ==='Active'" (click)="deactivate(company.id)"><i class="fa fa-lock text-danger"></i></button>
+                                        <span *ngIf="company.active ==='Active'">Lock__</span><span *ngIf="company.active ==='Inactive'">Unlock </span> | 
+                                        <button *ngIf="company.active ==='Active'" (click)="deactivate(company.id)"><i class="fa fa-unlock text-success"></i></button>
+                                        <button *ngIf="company.active ==='Inactive'" (click)="activate(company.id)"><i class="fa fa-lock text-danger"></i></button>
                                     </td>
                                     <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(company.id)" data-toggle="modal" data-target="#company-modal" style="cursor: pointer;">Edit</button></td>
                                 </tr>

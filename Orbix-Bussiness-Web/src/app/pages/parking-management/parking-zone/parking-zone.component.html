@@ -65,22 +65,27 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-lg-3">
+                    <div class="col-lg-3"></div>
+                    <div class="col-lg-6">
                         <input type="hidden" [(ngModel)]="id">
                         <div class="form-group">
                             <label>ParkingZone Code</label>
                             <input class="form-control" type="text" [(ngModel)]="code" autocomplete="nope" readonly>
-                        </div>
+                        </div>         
+                    </div>  
+                    <div class="col-lg-6">                       
                         <div class="form-group">
                             <label>ParkingZone Name</label>
                             <input class="form-control" type="text" [(ngModel)]="name" autocomplete="nope">
-                        </div>
+                        </div>  
+                    </div> 
+                    <div class="col-lg-6">
                         <div class="form-group">
                             <label>No of Slots</label>
                             <input class="form-control" type="number" [(ngModel)]="noOfSlots" autocomplete="nope">
                         </div>
                         
-                    </div>                   
+                    </div>                  
                 </div>
             </div>
             <div class="modal-footer">

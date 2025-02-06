@@ -38,9 +38,9 @@
                                     <td>{{branch.companyName}}</td>
                                     <td>{{branch.managerName}}</td>
                                     <td>
-                                        <span *ngIf="branch.active ==='Active'">Active__</span><span *ngIf="branch.active ==='Inactive'">Inactive </span> | 
-                                        <button *ngIf="branch.active ==='Inactive'" (click)="activate(branch.id)"><i class="fa fa-unlock text-success"></i></button>
-                                        <button *ngIf="branch.active ==='Active'" (click)="deactivate(branch.id)"><i class="fa fa-lock text-danger"></i></button>
+                                        <span *ngIf="branch.active ==='Active'">Lock__</span><span *ngIf="branch.active ==='Inactive'">Unlock </span> | 
+                                        <button *ngIf="branch.active ==='Active'" (click)="deactivate(branch.id)"><i class="fa fa-unlock text-success"></i></button>
+                                        <button *ngIf="branch.active ==='Inactive'" (click)="activate(branch.id)"><i class="fa fa-lock text-danger"></i></button>
                                     </td>
                                     <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(branch.id)" data-toggle="modal" data-target="#company-modal" style="cursor: pointer;">Edit</button></td>
                                 </tr>

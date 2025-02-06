@@ -27,6 +27,7 @@ public class Object_ {
 	public static String MNGNT = "MNGNT-ACCESS";
 	
 	public static String SHPSTK = "SHPSTK-ALL UPDATE";
+	public static String SHPPRDCT = "SHPPRDCT-ALL CREATE UPDATE DELETE";
 	
 //	public static String BILL = "BILL-ALL CREATE";
 //	

@@ -53,8 +53,8 @@
                                         <td>{{shopProduct.productCode}}</td>
                                         <td>{{shopProduct.productName}}</td>
                                         <td>{{shopProduct.productDescription}}</td>
-                                        <td><b>{{shopProduct.currentStock}}</b></td>
-                                        <td>{{shopProduct.minStock}}</td>
+                                        <td><b style="color: red;">{{shopProduct.currentStock}}</b></td>
+                                        <td><b style="color: red;">{{shopProduct.minStock}}</b></td>
                                         <td>{{shopProduct.baseUom}}</td>
                                         <td style="text-align: right;">{{shopProduct.costPriceVatIncl | currency:'':''}}</td>
                                         <!-- <td style="text-align: right;">{{shopProduct.costPriceVatExcl | currency:'':''}}</td> -->
@@ -64,7 +64,7 @@
                                         <!-- <td>{{shopProduct.defaultReorderLevel}}</td> -->
                                         <td>{{shopProduct.vatRate * 100}} %</td>
                                         <td>
-                                            <button class="btn btn-warning btn-round-custom" (click)="searchShopProduct(shopProduct.id)" data-toggle="modal" data-target="#update-modal">Edit</button>
+                                            <button class="btn btn-warning btn-round-custom" (click)="searchShopProduct(shopProduct.id)" *ngIf="grant(['SHPPRDCT-ALL'])," data-toggle="modal" data-target="#update-modal">Edit</button>
                                             <button class="btn btn-success btn-round-custom" (click)="searchShopProduct(shopProduct.id)" *ngIf="grant(['SHPSTK-ALL','SHPSTK-UPDATE'])," data-toggle="modal" data-target="#adjust-stock-modal">Adjust Stock</button>
                                         </td>
                                     </tr>
