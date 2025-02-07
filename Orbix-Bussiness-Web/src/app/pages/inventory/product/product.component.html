@@ -43,7 +43,7 @@
                                 <td>{{product.code}}</td>
                                 <td>{{product.name}}</td>
                                 <td>{{product.description}}</td>
-                                <td>{{product.baseUom}}</td>
+                                <td>{{product.baseUom}}</td> 
                                 <td>
                                     <span *ngIf="product.active ==='Active'">Lock__</span><span *ngIf="product.active ==='Inactive'">Unlock</span> | 
                                     <button *ngIf="product.active ==='Active'" (click)="deactivate(product.id)"><i class="fa fa-unlock text-success"></i></button>

@@ -80,33 +80,64 @@
                             <label>Brand Name</label>
                             <input class="form-control" type="text" [(ngModel)]="brandName" autocomplete="nope">
                         </div>
-                        <div class="form-group">
-                            <label>Contact Name</label>
-                            <input class="form-control" type="text" [(ngModel)]="contactName" autocomplete="nope">
-                        </div>
+                        
                         <div class="form-group">
                             <label>Domain</label>
                             <input class="form-control" type="text" [(ngModel)]="domain" autocomplete="nope">
                         </div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label>Symbol</label>
                             <input class="form-control" type="text" [(ngModel)]="symbol" autocomplete="nope">
-                        </div>
-                        <div class="form-group">
+                        </div> -->
+                        <!-- <div class="form-group">
                             <label>Legal Type</label>
                             <input class="form-control" type="text" [(ngModel)]="legalType" autocomplete="nope">
-                        </div>
-                        <div class="form-group">
+                        </div> -->
+                        <!-- <div class="form-group">
                             <label>Industry</label>
                             <input class="form-control" type="text" [(ngModel)]="industry" autocomplete="nope">
-                        </div>
-                        <div class="form-group">
+                        </div> -->
+                        <!-- <div class="form-group">
                             <label>Country</label>
                             <input class="form-control" type="text" [(ngModel)]="country" autocomplete="nope">
-                        </div>
-                        <div class="form-group">
+                        </div> -->
+                        <!-- <div class="form-group">
                             <label>Founding Date</label>
                             <input class="form-control" type="date" [(ngModel)]="foundingDate" autocomplete="nope">
+                        </div> -->
+                        
+                    </div>                   
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Contact Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="contactName" autocomplete="nope">
+                        </div>   
+                        
+                        <div class="form-group">
+                            <label>TIN</label>
+                            <input class="form-control" type="text" [(ngModel)]="tin" autocomplete="nope">
+                        </div>
+                        <div class="form-group">
+                            <label>VRN</label>
+                            <input class="form-control" type="text" [(ngModel)]="vrn" autocomplete="nope">
+                        </div>  
+                        <div class="form-group">
+                            <label>Website</label>
+                            <input class="form-control" type="text" [(ngModel)]="website" autocomplete="nope">
+                        </div>                    
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Physical Address</label>
+                            <input class="form-control" type="text" [(ngModel)]="physicalAddress" autocomplete="nope">
+                        </div>
+                        <div class="form-group">
+                            <label>Post Code</label>
+                            <input class="form-control" type="text" [(ngModel)]="postalCode" autocomplete="nope">
+                        </div>
+                        <div class="form-group">
+                            <label>Post Address</label>
+                            <input class="form-control" type="text" [(ngModel)]="postalAddress" autocomplete="nope">
                         </div>
                         <div class="form-group">
                             <div class="form-group">
@@ -122,45 +153,6 @@
                                 </select>
                             </div>
                         </div>
-                    </div>                   
-                    <div class="col-lg-3">   
-                        <div class="form-group">
-                            <label>Logo</label>
-                            <!-- <input class="form-control" type="file" [(ngModel)]="logo" autocomplete="nope"> -->
-
-
-                            <div *ngIf="retrievedImage" style="height: 3cm; width: 3cm;">
-                                <img class="img-fluid img-thumbnail" [src]="retrievedImage">
-                            </div>
-                            <input type="file" (change)="onFileChanged($event)" [(ngModel)]="logo">
-                            <hr>
-                            <input type="button" *ngIf="logo != null" (click)="onUpload()" value="Upload Logo">
-
-
-
-                        </div>
-                        <div class="form-group">
-                            <label>TIN</label>
-                            <input class="form-control" type="text" [(ngModel)]="tin" autocomplete="nope">
-                        </div>
-                        <div class="form-group">
-                            <label>VRN</label>
-                            <input class="form-control" type="text" [(ngModel)]="vrn" autocomplete="nope">
-                        </div>                      
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="form-group">
-                            <label>Physical Address</label>
-                            <input class="form-control" type="text" [(ngModel)]="physicalAddress" autocomplete="nope">
-                        </div>
-                        <div class="form-group">
-                            <label>Post Code</label>
-                            <input class="form-control" type="text" [(ngModel)]="postalCode" autocomplete="nope">
-                        </div>
-                        <div class="form-group">
-                            <label>Post Address</label>
-                            <input class="form-control" type="text" [(ngModel)]="postalAddress" autocomplete="nope">
-                        </div>
                     </div>
                     <div class="col-lg-3">
                         <div class="form-group">
@@ -175,14 +167,21 @@
                             <label>Email</label>
                             <input class="form-control" type="email" [(ngModel)]="email">
                         </div>
+                        
                         <div class="form-group">
-                            <label>Website</label>
-                            <input class="form-control" type="text" [(ngModel)]="website" autocomplete="nope">
+                            <label>Logo</label>
+                            <!-- <input class="form-control" type="file" [(ngModel)]="logo" autocomplete="nope"> -->
+                            <div *ngIf="retrievedImage" style="height: 3cm; width: 3cm;">
+                                <img class="img-fluid img-thumbnail" [src]="retrievedImage">
+                            </div>
+                            <input type="file" (change)="onFileChanged($event)" [(ngModel)]="logo">
+                            <hr>
+                            <input type="button" *ngIf="logo != null" (click)="onUpload()" value="Upload Logo">
                         </div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label>Fax</label>
                             <input class="form-control" type="tel" [(ngModel)]="fax" autocomplete="nope">
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>

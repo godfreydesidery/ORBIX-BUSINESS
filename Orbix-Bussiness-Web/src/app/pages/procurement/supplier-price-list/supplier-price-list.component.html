@@ -96,9 +96,9 @@
                                 <td>{{supplierProduct.productCode}}</td>
                                 <td>{{supplierProduct.productName}}</td>
                                 <td>{{supplierProduct.productDescription}}</td>
-                                <td>{{supplierProduct.maxSupplyQty}}</td>
+                                <td class="text-danger"><b>{{supplierProduct.maxSupplyQty}}</b></td>
                                 <td>{{supplierProduct.baseUom}}</td>
-                                <td style="text-align: right;">{{supplierProduct.costPriceVatIncl | currency:'':''}}</td>
+                                <td class="text-primary" style="text-align: right;"><b>{{supplierProduct.costPriceVatIncl | currency:'':''}}</b></td>
                                 <td>{{supplierProduct.vatRate * 100}} %</td>
                                 <!-- <td>
                                     <button class="btn btn-primary btn-round-custom" (click)="searchSupplierProduct(supplierProduct.id)" data-toggle="modal" data-target="#update-modal">Edit</button>

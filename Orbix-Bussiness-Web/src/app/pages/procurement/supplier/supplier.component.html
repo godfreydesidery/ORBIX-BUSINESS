@@ -47,9 +47,9 @@
                                 <td>{{supplier.address}}</td>
                                 <td>{{supplier.phoneNo}}</td>
                                 <td>
-                                    <span *ngIf="supplier.active ==='Active'">Active__</span><span *ngIf="supplier.active ==='Inactive'">Inactive </span> | 
-                                    <button *ngIf="supplier.active ==='Inactive'" (click)="activate(supplier.id)"><i class="fa fa-unlock text-success"></i></button>
-                                    <button *ngIf="supplier.active ==='Active'" (click)="deactivate(supplier.id)"><i class="fa fa-lock text-danger"></i></button>
+                                    <span *ngIf="supplier.active ==='Active'">Lock__</span><span *ngIf="supplier.active ==='Inactive'">Unlock </span> | 
+                                    <button *ngIf="supplier.active ==='Active'" (click)="deactivate(supplier.id)"><i class="fa fa-unlock text-success"></i></button>
+                                    <button *ngIf="supplier.active ==='Inactive'" (click)="activate(supplier.id)"><i class="fa fa-lock text-danger"></i></button>
                                 </td>
                                 <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(supplier.id)" data-toggle="modal" data-target="#company-modal" style="cursor: pointer;">Edit</button></td>
                             </tr>
@@ -78,29 +78,37 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-lg-3">
+                    <div class="col-lg-6">
                         <input type="hidden" [(ngModel)]="id">
                         <div class="form-group">
                             <label>Supplier Code</label>
                             <input class="form-control" type="text" [(ngModel)]="code" autocomplete="nope" readonly>
                         </div>
+                    </div>
+                    <div class="col-lg-6">
                         <div class="form-group">
                             <label>Supplier Name</label>
                             <input class="form-control" type="text" [(ngModel)]="name" autocomplete="nope">
                         </div>
+                    </div>
+                    <div class="col-lg-6">
                         <div class="form-group">
                             <label>Contact Name</label>
                             <input class="form-control" type="text" [(ngModel)]="contactName" autocomplete="nope">
                         </div>
+                    </div>
+                    <div class="col-lg-6">
                         <div class="form-group">
                             <label>Address</label>
                             <input class="form-control" type="text" [(ngModel)]="address" autocomplete="nope">
                         </div>
+                    </div>
+                    <div class="col-lg-6">
                         <div class="form-group">
                             <label>Phone No</label>
                             <input class="form-control" type="text" [(ngModel)]="phoneNo" autocomplete="nope">
                         </div>
-                    </div>                   
+                    </div>              
                 </div>
             </div>
             <div class="modal-footer">

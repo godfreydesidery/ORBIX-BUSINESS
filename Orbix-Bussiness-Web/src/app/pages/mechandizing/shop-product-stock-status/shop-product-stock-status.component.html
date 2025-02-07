@@ -56,9 +56,9 @@
                                         <td><b style="color: red;">{{shopProduct.currentStock}}</b></td>
                                         <td><b style="color: red;">{{shopProduct.minStock}}</b></td>
                                         <td>{{shopProduct.baseUom}}</td>
-                                        <td style="text-align: right;">{{shopProduct.costPriceVatIncl | currency:'':''}}</td>
+                                        <td class="text-success" style="text-align: right;"><b>{{shopProduct.costPriceVatIncl | currency:'':''}}</b></td>
                                         <!-- <td style="text-align: right;">{{shopProduct.costPriceVatExcl | currency:'':''}}</td> -->
-                                        <td style="text-align: right;">{{shopProduct.sellingPriceVatIncl | currency:'':''}}</td>
+                                        <td class="text-primary" style="text-align: right;"><b>{{shopProduct.sellingPriceVatIncl | currency:'':''}}</b></td>
                                         <!-- <td style="text-align: right;">{{shopProduct.sellingPriceVatExcl | currency:'':''}}</td> -->
                                         <!-- <td>{{shopProduct.defaultReorderQty}}</td> -->
                                         <!-- <td>{{shopProduct.defaultReorderLevel}}</td> -->
