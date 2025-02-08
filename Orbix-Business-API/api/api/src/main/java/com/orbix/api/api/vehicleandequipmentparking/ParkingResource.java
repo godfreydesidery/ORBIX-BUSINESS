@@ -31,11 +31,11 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class ParkingResource {
 	
-private final ParkingService parkingService;
-
-private final ParkingBillReceivableRepository parkingBillReceivableRepository;
-
-private final ParkingRepository parkingRepository;
+	private final ParkingService parkingService;
+	
+	private final ParkingBillReceivableRepository parkingBillReceivableRepository;
+	
+	private final ParkingRepository parkingRepository;
 	
 	@GetMapping("/parkings")
 	public ResponseEntity<List<ParkingResponseDTO>>getAll(HttpServletRequest request){

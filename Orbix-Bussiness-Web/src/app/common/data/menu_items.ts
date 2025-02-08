@@ -460,6 +460,57 @@ export const menuItems = [
         ]
     },
     {
+        title: 'Warehouse',
+        icon: 'fa-cogs',
+        selected: false,
+        expanded: false,
+        show : grant(['WRHOUSE-ACCESS']),
+        order: 700,
+        subMenu: [ 
+            // {
+            //     title: 'Sales',
+            //     url: '#',
+            //     subMenu: [
+            //         {
+            //             title: 'Sales List',
+            //             routerLink: '/app/blank'
+            //         },
+            //         {
+            //             title: 'Sales Order',
+            //             routerLink: '/app/blank'
+            //         },
+            //     ]
+            // },
+            // {
+            //     title: 'Inventory',
+            //     routerLink: '/app/blank'
+            // },
+            {
+                title: 'Select Warehouse',
+                routerLink: '/app/storage-management/select-warehouse'
+            },
+            // {
+            //     title: 'Reports',
+            //     url: '#',
+            //     subMenu: [
+            //         {
+            //             title: 'Sales Listing Report',
+            //             routerLink: '/app/mechandizing/sales-listing-report'
+            //         },
+            //         {
+            //             title: 'Fast Moving Products',
+            //             routerLink: '/app/mechandizing/fast-moving-products-report'
+            //         },
+            //         {
+            //             title: 'Stock Card Report',
+            //             routerLink: '/app/mechandizing/shop-product-stock-log'
+            //         },
+            //     ]
+            // },
+            
+        ]
+    },
+    {
         title: 'Procurement',
         routerLink: ' ',
         icon: 'fa-money',
@@ -688,6 +739,24 @@ export const menuItems = [
                     //     title: 'Pricing Plan',
                     //     routerLink: '/app/blank'
                     // },
+                ]
+            },
+            {
+                title: 'Storage Management',
+                url: '#',
+                subMenu: [
+                    {
+                        title: 'Warehouse',
+                        routerLink: '/app/storage-management/warehouse'
+                    },
+                    {
+                        title: 'Good Types',
+                        routerLink: '/app/storage-management/good-type'
+                    },
+                    // {
+                    //     title: 'Vehicle Type',
+                    //     routerLink: '/app/parking-management/vehicle-and-equipment-type'
+                    // },                  
                 ]
             },
             {

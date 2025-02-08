@@ -1,0 +1,106 @@
+
+
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>Type List</span>
+            </div>
+            <div class="card-body widget-body"> 
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="clearGoodTypeData()" data-toggle="modal" data-target="#parkingZone-modal">New Type</button>
+                    <br><br>
+                    </div>
+                </div>
+
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>SN</th>
+                                <th>Type Code</th>
+                                <th>Type Name</th>
+                                <th>Company</th>
+                                <th>Price(Daily)</th>
+                                <th>Active?</th>
+                                <th>Action</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (v of goodTypes; track v.id) {
+                                <tr>
+                                    <td>{{v.sn}}</td>
+                                    <td>{{v.code}}</td>
+                                    <td>{{v.name}}</td>
+                                    <td>{{v.companyName}}</td>
+                                    <td style="text-align: right;">{{v.dailyPrice | currency:'':''}}</td>
+                                    <td>
+                                        <span *ngIf="v.active ==='Active'">Lock__</span><span *ngIf="v.active ==='Inactive'">Unlock </span> | 
+                                        <button *ngIf="v.active ==='Active'" (click)="deactivate(v.id)"><i class="fa fa-unlock text-success"></i></button>
+                                        <button *ngIf="v.active ==='Inactive'" (click)="activate(v.id)"><i class="fa fa-lock text-danger"></i></button>
+                                    </td>
+                                    <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(v.id)" data-toggle="modal" data-target="#parkingZone-modal" style="cursor: pointer;">Edit</button></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+<div class="modal fade" id="parkingZone-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-lg" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">New/Edit Vehicle Type</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-3"></div>
+                    <div class="col-lg-6">
+                        <input type="hidden" [(ngModel)]="id">
+                        <div class="form-group">
+                            <label>Type Code</label>
+                            <input class="form-control" type="text" [(ngModel)]="code" autocomplete="nope" readonly>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Type Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="name" autocomplete="nope">
+                        </div>   
+                    </div>  
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Price(Daily)</label>
+                            <input class="form-control" type="text" [(ngModel)]="dailyPrice" autocomplete="nope" style="text-align: right;">
+                        </div>               
+                    </div>                   
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="save()">Save</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+    
+  
+  

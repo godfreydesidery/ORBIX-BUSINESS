@@ -1,0 +1,132 @@
+package com.orbix.api.modules.warehouse;
+
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.EnumType;
+import javax.persistence.Enumerated;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.validation.constraints.NotBlank;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import com.orbix.api.api.commons.WorkFlowStatus;
+import com.orbix.api.api.vehicleandequipmentparking.Parking;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingZone;
+import com.orbix.api.api.vehicleandequipmentparking.VehicleEquipment;
+import com.orbix.api.api.vehicleandequipmentparking.VehicleEquipmentType;
+import com.orbix.api.modules.adminunits.Branch;
+import com.orbix.api.modules.identityandaccess.User;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Entity
+@Data 
+@NoArgsConstructor 
+@AllArgsConstructor
+@Table(name = "storages")
+public class Storage {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	@Column(unique = true, nullable = false)
+	private String no;
+	/** Owner information*/
+	@Column(nullable = false)
+	private String ownerFirstName;
+	private String ownerMiddleName;
+	@Column(nullable = false)
+	private String ownerLastName;
+	private String ownerCompanyName;
+	private String ownerIdNo;
+	private String ownerIdType;
+	private String ownerPhoneNo;
+	private String ownerEmail;
+	private String ownerAddress;
+	
+	private String comments;
+	
+	private String goodName;
+	
+	private double weight; // In kg
+	private double length; // In cm
+	private double width; // In cm
+	private double height; // In cm
+		
+	private LocalDateTime startBillingAt = LocalDateTime.now();
+	
+//	@Enumerated(EnumType.STRING)
+//    @Column(nullable = false)
+	String status = "PENDING";
+	
+	/**Billing*/
+	private String billingType;
+	private double billingAmount;
+	
+	private int initialQty = 1;
+	private int currentQty = 1;
+	
+	@ManyToOne(targetEntity = Warehouse.class, fetch = FetchType.EAGER,  optional = true)
+    @JoinColumn(name = "warehouse_id", nullable = true , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+    private Warehouse warehouse;
+	
+	@ManyToOne(targetEntity = GoodType.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "good_type_id", nullable = false , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+    private GoodType goodType;
+		
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "created_by_user_id", nullable = false , updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User createdByUser;
+		
+	private LocalDateTime createdDateTime = LocalDateTime.now();
+	
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = true)
+    @JoinColumn(name = "checked_in_by_user_id", nullable = true , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User checkedInByUser;
+		
+	private LocalDateTime checkedInDateTime;
+	
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = true)
+    @JoinColumn(name = "checked_out_by_user_id", nullable = true , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User checkedOutByUser;
+		
+	private LocalDateTime checkedOutDateTime;
+	
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = true)
+    @JoinColumn(name = "canceled_by_user_id", nullable = true , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User canceledByUser;
+		
+	private LocalDateTime canceledDateTime;
+	
+	@ManyToOne(targetEntity = Branch.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "branch_id", nullable = false , updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+    private Branch branch;
+}

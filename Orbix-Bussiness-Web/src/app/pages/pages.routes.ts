@@ -252,6 +252,32 @@ export const routes: Routes = [
       /**End of Parking Management */
 
 
+      /**Storage Management */
+      {
+        path : 'storage-management/warehouse',
+        loadComponent: () => import('./storage-management/warehouse/warehouse.component').then(c => c.WarehouseComponent),
+        data : { breadcrumb : 'Storage Management/Warehouse'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'storage-management/good-type',
+        loadComponent: () => import('./storage-management/good-type/good-type.component').then(c => c.GoodTypeComponent),
+        data : { breadcrumb : 'Storage Management/Good Types'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'storage-management/select-warehouse',
+        loadComponent: () => import('./storage-management/select-warehouse/select-warehouse.component').then(c => c.SelectWarehouseComponent),
+        data : { breadcrumb : 'Warehouse/Select Warehouse'},
+        canActivate : [AuthGuard]
+      },
+
+
+
+      /**End Storage Management */
+
+
       {
         path : 'accounts-and-finance/invoices/receivable-invoice-list',
         loadComponent: () => import('./accounts-and-finance/invoices/receivable-invoice-list/receivable-invoice-list.component').then(c => c.ReceivableInvoiceListComponent),
