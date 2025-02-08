@@ -214,10 +214,10 @@ public class StorageServiceController implements StorageService {
 		
 		Optional<GoodType> goodType_ = goodTypeRepository.findByNameAndCompany(storageRequest.getGoodTypeName(), company_.get());
 		if(goodType_.isEmpty()) {
-			throw new NotFoundException("Vehicle or  a equipment type not found");
+			throw new NotFoundException("Good type not found");
 		}
 		if(goodType_.get().getCompany().getId() != company_.get().getId()) {
-			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
+			throw new InvalidOperationException("Good type does not belong to this company");
 		}
 		
 		Optional<Warehouse> warehouse_ = warehouseRepository.findByNameAndBranch(storageRequest.getWarehouseName(), branch_.get());
@@ -242,7 +242,8 @@ public class StorageServiceController implements StorageService {
 		storage.setStatus("PENDING");
 		storage.setGoodType(goodType_.get());
 		
-		storage.setGoodName(goodType_.get().getName()); // Look here later
+		storage.setGoodName(storageRequest.getGoodName()); // Look here later
+		storage.setGoodDescription(storageRequest.getGoodDescription());
 		
 		storage.setBranch(branch_.get());
 		
@@ -253,7 +254,7 @@ public class StorageServiceController implements StorageService {
 		
 		storage = storageRepository.save(storage);
 		/**Create  storage no*/
-		storage.setNo("PKN/"+ storage.getId().toString());
+		storage.setNo("STG/"+ storage.getId().toString());
 		storage = storageRepository.save(storage);
 		
 		
@@ -401,6 +402,9 @@ public class StorageServiceController implements StorageService {
 	
 	boolean validateStorageData(StorageRequestDTO storageRequest) {
 		
+		if(storageRequest.getOwnerFirstName().isBlank() || storageRequest.getOwnerLastName().isBlank() || storageRequest.getGoodName().isBlank()) {
+			throw new InvalidOperationException("First name, Last name, Good name can not be empty");
+		}		
 		return true;
 	}
 

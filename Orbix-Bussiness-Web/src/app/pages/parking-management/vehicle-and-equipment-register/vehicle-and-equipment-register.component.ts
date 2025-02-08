@@ -62,18 +62,6 @@ export class VehicleEquipmentRegisterComponent {
   vehicleEquipments : IVehicleEquipment[] = []
   vehicleEquipmentTypes : IVehicleEquipmentType[] = []
 
-
-
-
-
-
-
-
-
-
-
-
-  
   parkingId : any = null
   parkingNo : string = ''
 
@@ -767,11 +755,6 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
       }
     )
   }
-
-
-
-
-
 }
 function then(arg0: (data: any) => void): PromiseConstructor {
   throw new Error('Function not implemented.');

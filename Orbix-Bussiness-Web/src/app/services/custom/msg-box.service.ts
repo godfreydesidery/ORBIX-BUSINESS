@@ -61,8 +61,8 @@ export class MsgBoxService {
     return confirmed
   }
 
-  public showErrorMessage(error : HttpErrorResponse, msg : string){
-    var message : string = msg
+  public showErrorMessage(error : HttpErrorResponse | any, msg : string){
+    var message : string | any = msg
     let code : number = error['status']
     switch(code){
       /**
@@ -81,7 +81,7 @@ export class MsgBoxService {
         message = 'Forbidden. Access restricted or service unavailable. Please contact administrator';
       break;
       case 404:
-        message = 'Not Found. Resource not found';
+        message = 'Not Found. ' + error['error']['message'];
       break;
       case 405:
         message = 'Method Not Allowed';
@@ -201,6 +201,7 @@ export class MsgBoxService {
         message = 'Unknown error has occured. Please contact System Administrator!';
       break;
     }
+
     if(typeof(error['error']) === 'string'){
       message = error['error']
     }

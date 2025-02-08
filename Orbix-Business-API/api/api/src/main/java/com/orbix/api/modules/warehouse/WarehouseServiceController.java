@@ -102,7 +102,7 @@ public class WarehouseServiceController implements WarehouseService {
 		
 		warehouse = warehouseRepository.save(warehouse);
 		/**Create  parking zone code*/
-		warehouse.setCode("PKZ/"+ warehouse.getId().toString());
+		warehouse.setCode("WHS/"+ warehouse.getId().toString());
 		warehouse = warehouseRepository.save(warehouse);
 		
 		return warehouseResponseDTOMapper(warehouse);		

@@ -59,7 +59,9 @@ public class Storage {
 	
 	private String comments;
 	
+	@Column(nullable = false)
 	private String goodName;
+	private String goodDescription;
 	
 	private double weight; // In kg
 	private double length; // In cm

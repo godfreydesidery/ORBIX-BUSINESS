@@ -15,9 +15,11 @@ import { HttpHeaders } from '@angular/common/http';
 import { ILpo } from 'src/app/domain/lpo';
 import { IGrn } from 'src/app/domain/grn';
 import { NotificationComponent } from '../../misc/notification/notification.component';
+import { IStorage } from 'src/app/domain/storage';
+import { IGoodType } from 'src/app/domain/good-type';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
+var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 
@@ -35,71 +37,92 @@ const API_URL = environment.apiUrl;
   styleUrl: './select-warehouse.component.scss'
 })
 export class SelectWarehouseComponent {
-underStock : number = 0
-  outofStock : number = 0
-
-
-  availableWarehouses :IWarehouse[] = []
-
-  selectedWarehouse :IWarehouse | null = null
-  selectedWarehouseId :string | null = null
-
-  branchId :string = ''
-
-  warehouseLoaded :boolean = false 
-
+  mode: string = ''
+  availableWarehouses: IWarehouse[] = []
+  selectedWarehouse: IWarehouse | null = null
+  selectedWarehouseId: string | null = null
+  branchId: string = ''
+  warehouseLoaded: boolean = false
   lpoPage: number = 1; // Initialize the current page to 1
   grnPage: number = 1; // Initialize the current page to 1
-  filterLpoRecords : string = ''
-  filterGrnRecords : string = ''
+  filterLpoRecords: string = ''
+  filterGrnRecords: string = ''
   selectedOption: string = '';
-    
+  /////////////////////////////////
+  // For new storage
+
+  id: any = null
+  no: string = ''
+  ownerFirstName: string = ''
+  ownerMiddleName: string = ''
+  ownerLastName: string = ''
+  ownerCompanyName: string = ''
+  ownerIdNo: string = ''
+  ownerIdType: string = ''
+  ownerPhoneNo: string = ''
+  ownerEmail: string = ''
+  ownerAddress: string = ''
+  comments: string = ''
+  goodName: string = ''
+  goodDescription : string = ''
+  weight: number = 0 // In kg
+  length: number = 0 // In cm
+  width: number = 0 // In cm
+  height: number = 0 // In cm
+  startBillingAt: Date | null = null
+  status: string = ''
+  billingType: string = ''
+  billingAmount: number = 0
+  initialQty: number = 0
+  currentQty: number = 0
+  warehouseId: any = null
+  goodTypeId: any = null
+  goodTypeName: string = ''
+
+  storages: IStorage[] = []
+  goodTypes: IGoodType[] = []
+
   constructor(
-    private http :HttpClient,
-    private auth : AuthService,
+    private http: HttpClient,
+    private auth: AuthService,
     private route: ActivatedRoute,
-    private router : Router,
-    private printer : PosReceiptPrinterService,
-    private msg : MsgBoxService,
-    private data : DataService,
-    ){} //{(window as any).pdfMake.vfs = pdfFonts.pdfMake.vfs;}
+    private router: Router,
+    private printer: PosReceiptPrinterService,
+    private msg: MsgBoxService,
+    private data: DataService,
+  ) { } //{(window as any).pdfMake.vfs = pdfFonts.pdfMake.vfs;}
 
-    ngOnInit() {
+  ngOnInit() {
+    this.selectedWarehouseId = localStorage.getItem('selected-warehouse-id')
+    if (this.selectedWarehouseId == '' || this.selectedWarehouseId == null) {
+      this.warehouseLoaded = false
+      this.loadAvailableWarehouses()
+    } else {
       this.selectedWarehouseId = localStorage.getItem('selected-warehouse-id')
-      if(this.selectedWarehouseId == '' || this.selectedWarehouseId == null){
-        this.warehouseLoaded = false
-        this.loadAvailableWarehouses()
-      }else{      
-        this.selectedWarehouseId = localStorage.getItem('selected-warehouse-id')
-        this.loadSelectedWarehouse()
-        
-      }     
-        
+      this.loadSelectedWarehouse()
     }
+    this.getAllCompanyActiveGoodTypes()
+  }
 
-    loadAvailableWarehouses = async () => {
-
-      this.availableWarehouses = []
-
-      let options = {
-        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
-      }
-
-      await this.http.get<IWarehouse[]>(API_URL+'/warehouses/get_branch_available_warehouses_by_user' , options)
-        .toPromise()
-        .then(
-          data => {
-            this.availableWarehouses = data!
-            console.log(data)
-          }
-        )
+  loadAvailableWarehouses = async () => {
+    this.availableWarehouses = []
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
+    await this.http.get<IWarehouse[]>(API_URL + '/warehouses/get_branch_available_warehouses_by_user', options)
+      .toPromise()
+      .then(
+        data => {
+          this.availableWarehouses = data!
+          console.log(data)
+        }
+      )
+  }
 
   loadSelectedWarehouse = async () => {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
-
     await this.http.get<IWarehouse>(API_URL + '/warehouses/get_selected_warehouse?warehouse_id=' + this.selectedWarehouseId, options)
       .toPromise()
       .then(
@@ -118,167 +141,38 @@ underStock : number = 0
       )
   }
 
-    onWarehouseChange(event: any): void {
-      this.selectedWarehouseId = event.target.value;
-      console.log('Selected Warehouse ID:', this.selectedWarehouseId);
-      //alert('Selected Warehouse ID: ' + this.selectedWarehouseId);
+  
+
+  onWarehouseChange(event: any): void {
+    this.selectedWarehouseId = event.target.value;
+    console.log('Selected Warehouse ID:', this.selectedWarehouseId);
+    //alert('Selected Warehouse ID: ' + this.selectedWarehouseId);
   }
 
-  selectWarehouse(){
+  selectWarehouse() {
     //localStorage.setItem('selected-warehouse-id', this.selectedWarehouseId!);
-    if(this.selectedWarehouseId! === '' || this.selectedWarehouseId === null){
+    if (this.selectedWarehouseId! === '' || this.selectedWarehouseId === null) {
       this.msg.showErrorMessage3('Please select a warehouse first')
       return
     }
     this.loadSelectedWarehouse()
   }
 
-  clearSelectedWarehouse(){
+  clearSelectedWarehouse() {
     localStorage.setItem('selected-warehouse-id', '');
     this.selectedWarehouseId = ''
-    
+
   }
 
-  lpos : ILpo[] = []
-  async getAllPendingOrders(){
-        let options = {
-          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
-        }
-        this.lpos = []
-      
-        await this.http.get<ILpo[]>(API_URL+'/lpos/get_all_visible_by_warehouse?warehouse_id=' + this.selectedWarehouseId, options)
-        .toPromise()
-        .then(
-          data => {
-            this.lpos = [...data!]
-            
-            console.log(data)
-          }
-        )
-      }
-
-      grns : IGrn[] = []
-      async getAllPendingGrns(){
-        let options = {
-          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
-        }
-        this.grns = []
-      
-        await this.http.get<IGrn[]>(API_URL+'/grns/get_all_visible_by_warehouse?warehouse_id=' + this.selectedWarehouseId, options)
-        .toPromise()
-        .then(
-          data => {
-            var sn = 1
-            data?.forEach(element => {
-              element.sn = sn
-              this.grns.push(element)
-              sn = sn + 1
-            })
-            console.log(data)
-          }
-        )
-        .catch(error => {
-          console.log(error)
-        })
-      }
-
-
-      lpoId : any = null
-
-      async get(id : any){
-        let options = {
-          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
-        }
-        await this.http.get<ILpo>(API_URL+'/lpos/get?id=' + id, options)
-        .toPromise()
-        .then(
-          data => {
-            //this.showUomData(data!)
-            console.log(data)
-            this.lpoId = data!.id
-
-            this.router.navigate(['/app/mechandizing/warehouse-lpo'], {
-              queryParams: {
-                warehouse_id: this.selectedWarehouseId,
-                lpo_id: id
-              }
-            });
-          }
-        )
-      }
-
-      async getGrn(id : any){
-        let options = {
-          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
-        }
-        await this.http.get<ILpo>(API_URL+'/grns/get?id=' + id, options)
-        .toPromise()
-        .then(
-          data => {
-            //this.showUomData(data!)
-            console.log(data)
-            this.lpoId = data!.id
-
-            this.router.navigate(['/app/mechandizing/warehouse-grn'], {
-              queryParams: {
-                warehouse_id: this.selectedWarehouseId,
-                grn_id: id
-              }
-            });
-          }
-        )
-      }
-
-      getUnderstock = async () => {
-
-        this.underStock = 0
-  
-        let options = {
-          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
-        }
-  
-        await this.http.get<number>(API_URL+'/warehouse_products/get_check_under_stock_by_warehouse?warehouse_id=' + this.selectedWarehouseId, options)
-          .toPromise()
-          .then(
-            data => {
-              this.underStock = data!
-              console.log(data)
-            }
-          )
-      }
-
-      getOutofstock = async () => {
-
-        this.outofStock = 0
-  
-        let options = {
-          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
-        }
-  
-        await this.http.get<number>(API_URL+'/warehouse_products/get_check_out_of_stock_by_warehouse?warehouse_id=' + this.selectedWarehouseId, options)
-          .toPromise()
-          .then(
-            data => {
-              this.outofStock = data!
-              console.log(data)
-            }
-          )
-      }
-
-
-
-
-
-
-      // Alerts array to manage the notifications
-  alerts: { 
-    type: string; 
+  // Alerts array to manage the notifications
+  alerts: {
+    type: string;
     message: string;
     link?: string
-   }[] = [
-    { type: 'success', message: 'Warehouse selected successfully!', link: 'warehouse-sales-order' },
-    
-  ];
+  }[] = [
+      { type: 'success', message: 'Warehouse selected successfully!', link: 'warehouse-sales-order' },
+
+    ];
 
   // Close alert method
   closeAlert(index: number) {
@@ -290,4 +184,143 @@ underStock : number = 0
     this.alerts.push({ type, message });
   }
 
+  setNew() {
+    this.mode = 'new'
+  }
+
+  setExisting() {
+    this.mode = 'existing'
+  }
+
+  async getAllCompanyActiveGoodTypes(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    this.goodTypes = []
+  
+    await this.http.get<IGoodType[]>(API_URL+'/good_types/get_all_company_active', options)
+    .toPromise()
+    .then(
+      data => {
+        var sn = 1
+        data?.forEach(element => {
+          element.sn = sn
+          this.goodTypes.push(element)
+          sn = sn + 1
+        })
+        console.log(data)
+      }
+    )
+  }
+
+
+  public async saveStorage(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    var storage = {
+      id: this.id,
+      no: this.no,
+      ownerFirstName: this.ownerFirstName,
+      ownerMiddleName: this.ownerMiddleName,
+      ownerLastName: this.ownerLastName,
+      ownerCompanyName: this.ownerCompanyName,
+      ownerIdNo: this.ownerIdNo,
+      ownerIdType: this.ownerIdType,
+      ownerPhoneNo: this.ownerPhoneNo,
+      ownerEmail: this.ownerEmail,
+      ownerAddress: this.ownerAddress,
+      warehouseId: this.warehouseId,
+      billingType : this.billingType,
+      billingAmount : this.billingAmount,
+      comments : this.comments,
+      goodName : this.goodName,
+      goodDescription : this.goodDescription,
+      goodTypeName : this.goodTypeName
+    }
+
+
+    if(this.id === null || this.id === undefined || this.id === ''){
+      /**Create new parking */
+      await this.http.post<IStorage>(API_URL+'/storages/create', storage, options)
+      .toPromise()
+      .then(
+        data => {
+          this.showStorageData(data!)
+          console.log(data)
+          // this.getAllPendingOrCheckedInParkings()
+          this.msg.showSuccessMessage('Storage created successifully')
+        }
+      )
+      .catch(
+        error => {
+          console.log(error)
+          this.msg.showErrorMessage(error, 'Error')
+        }
+      )
+    }else{
+      /**Update an exiisting parking */
+      await this.http.post<IStorage>(API_URL+'/storages/update', storage, options)
+      .toPromise()
+      .then(
+        data => {
+          this.showStorageData(data!)
+          console.log(data)
+          // this.getAllPendingOrCheckedInParkings()
+          this.msg.showSuccessMessage('Storage updated successifully, Vehicle available for check in')
+        }
+      )
+      .catch(
+        error => {
+          console.log(error)
+          this.msg.showErrorMessage3(error)
+        }
+      )
+    }
+  }
+
+  showStorageData(data : IStorage){
+    this.id = data?.id
+    this.no = data!.no
+    this.ownerFirstName = data?.ownerFirstName
+    this.ownerMiddleName = data?.ownerMiddleName
+    this.ownerLastName = data?.ownerLastName
+    this.ownerCompanyName = data?.ownerCompanyName
+    this.ownerIdNo = data?.ownerIdNo
+    this.ownerIdType = data?.ownerIdType
+    this.ownerPhoneNo = data?.ownerPhoneNo
+    this.ownerEmail = data?.ownerEmail
+    this.ownerAddress = data?.ownerAddress
+    this.billingType = data?.billingType
+    this.billingAmount = data?.billingAmount
+    this.comments = data!.comments
+    this.billingType = data!.billingType
+    this.goodName = data!.goodName
+    this.goodDescription = data!.goodDescription
+  }
+
+  clearStorageData(){
+    //this.showParking = false
+    this.id = null;
+    this.no = ''
+    this.ownerFirstName = ''
+    this.ownerMiddleName = ''
+    this.ownerLastName = ''
+    this.ownerCompanyName = ''
+    this.ownerIdNo = ''
+    this.ownerIdType = ''
+    this.ownerPhoneNo = ''
+    this.ownerEmail = ''
+    this.ownerAddress = ''
+    this.billingType = 'DAILY'
+    this.billingAmount = 0
+    this.goodName = ''
+    this.goodDescription = ''
+    this.comments = ''
+  }
+
+  checkIn(){
+    alert('Check in')
+  }
 }

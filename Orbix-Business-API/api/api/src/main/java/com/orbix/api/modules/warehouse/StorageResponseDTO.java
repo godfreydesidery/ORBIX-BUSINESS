@@ -32,6 +32,7 @@ public class StorageResponseDTO {
     String warehouseName;
     
     String goodName;
+    String goodDescription;
 	
     String goodTypeId;	
     String branchId;

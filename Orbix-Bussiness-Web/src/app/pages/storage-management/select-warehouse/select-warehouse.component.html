@@ -3,7 +3,7 @@
         <div class="card-header">
             <span>Warehouse: {{ selectedWarehouse?.name || '' }}</span>
         </div>
-        <div class="card-body widget-body text-white">
+        <div class="card-body widget-body">
             <div class="row" *ngIf="warehouseLoaded == false">
                 <div class="col-md-3"></div>
                 <div class="col-md-6">
@@ -28,10 +28,187 @@
             </div>
             <div class="row" *ngIf="warehouseLoaded == true">
                 <div class="col-lg-12">
-                    <button class="btn btn-success btn-round-custom">Registration</button>
-                    <button class="btn btn-success btn-round-custom">Storage</button>
+                    <button class="btn btn-success btn-round-custom" (click)="setNew()">New Good</button>
+                    <button class="btn btn-success btn-round-custom" (click)="setExisting()">Goods List</button>
+                </div>
+                <div class="col-lg-12" *ngIf="mode === 'new'">
+                    <div class="col-sm-12">
+                        <br>
+                        <p><b class="text-primary" style="font-size: large;">Owner Information</b></p>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>First Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerFirstName" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Middle Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerMiddleName" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Last Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerLastName" autocomplete="nope">
+                                </div>
+                            </div>
+                            <!-- <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Company Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
+                                </div>
+                            </div> -->
+                            
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>ID Type*</label>
+                                    <select class="form-control" [(ngModel)]="ownerIdType">
+                                        <option></option>
+                                        <option>NATIONAL ID</option>
+                                        <option>VOTER ID</option>
+                                        <option>PASSPORT</option>
+                                        <option>DRIVING LICENCE</option>
+                                        <option>LETTER</option>
+                                        <option>VISA</option>
+                                        <option>NONE</option>
+                                    </select>
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>ID No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Phone No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
+                                </div>
+                            </div> 
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Address</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerAddress" autocomplete="nope">
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <p><b class="text-primary" style="font-size: large;">Good Information</b></p>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Good Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="goodName" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Select Good Type</label>
+                                    <select class="form-control" [(ngModel)]="goodTypeName">
+                                        <option></option>
+                                        <option *ngFor="let option of goodTypes" [value]="option.name">{{ option.name }}</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Good Description</label>
+                                    <textarea class="form-control" [(ngModel)]="goodDescription" autocomplete="nope"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Billing Rate</label>
+                                    <input class="form-control" type="number" [(ngModel)]="billingAmount" autocomplete="nope" min="0">
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12" style="text-align: right;">
+                                <button class="btn btn-success btn-round-custom" (click)="saveStorage()">Save</button>
+                                <button class="btn btn-success btn-round-custom" (click)="checkIn()">Check In</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-lg-12" *ngIf="mode === 'existing'">
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>SN</th>
+                                    <th>No</th>
+                                    <th>Owner Name</th>
+                                    <th>Owner ID</th>
+                                    <th>ID Type</th>
+                                    <th>Billing Type</th>
+                                    <th>Price</th>
+                                    <th>Check Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let storage of storages; let i = index">
+                                    <td>{{storage.sn}}</td>
+                                    <td>{{storage.no}}</td>
+                                    <td>{{storage.ownerFirstName}} {{storage.ownerMiddleName}} {{storage.ownerLastName}}</td>
+                                    <td>{{storage.ownerIdNo}}</td>
+                                    <td>{{storage.ownerIdType}}</td>
+                                    <td>{{storage.billingType}}</td>
+                                    <td>{{storage.billingAmount}}</td>
+                                    <td>{{storage.status}}</td>
+                                    <td>
+                                        <button class="btn btn-success btn-round-custom">Select</button>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td></td>
+                                    <td>
+                                        <button class="btn btn-primary btn-round-custom">Edit</button>
+                                        <button class="btn btn-success btn-round-custom">Check-In</button>
+                                    </td>
+                                </tr>
+                            </tbody>                            
+                        </table>
+                    </div>                   
                 </div>
             </div>
         </div>
     </div>
 </div>
+
+
+<!-- <div class="modal fade" id="check-in-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-md" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Check In</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <label>Select Ware</label>
+                            <textarea class="form-control" [(ngModel)]="goodDescription" autocomplete="nope"></textarea>
+                        </div>
+                    </div>          
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Check In</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div> -->

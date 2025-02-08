@@ -1,5 +1,7 @@
 package com.orbix.api.modules.warehouse;
 
+import javax.validation.constraints.NotBlank;
+
 import lombok.Data;
 
 @Data
@@ -9,9 +11,12 @@ public class StorageRequestDTO {
 	String no;
 	/** Owner information */
 
+	@NotBlank(message = "First name cannot be empty")
 	String ownerFirstName;
+	
 	String ownerMiddleName;
 
+	@NotBlank(message = "Last name cannot be empty")
 	String ownerLastName;
 	String ownerCompanyName;
 	String ownerIdNo;
@@ -32,7 +37,9 @@ public class StorageRequestDTO {
     Long companyId;
     
     String goodTypeName;
+    @NotBlank(message = "Good name cannot be empty")
     String goodName;
+    String goodDescription;
 	String vehicleEquipmentColor;
         
     String billingType;

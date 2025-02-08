@@ -98,7 +98,7 @@ public class GoodTypeServiceController implements GoodTypeService {
 		
 		goodType = goodTypeRepository.save(goodType);
 		/**Create  parking zone code*/
-		goodType.setCode("VEQ/"+ goodType.getId().toString());
+		goodType.setCode("GDT/"+ goodType.getId().toString());
 		goodType = goodTypeRepository.save(goodType);
 		
 		return goodTypeResponseDTOMapper(goodType);		
