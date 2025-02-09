@@ -44,6 +44,13 @@ public class StorageResource {
 		return ResponseEntity.ok().body(storageService.getAllPendingOrCheckedInStorages(request));
 	}
 	
+	@GetMapping("/storages/get_all_pending_or_checked_in_by_warehouse")
+	public ResponseEntity<List<StorageResponseDTO>>getAllPendingAndCheckedInByWarehouse(
+			@RequestParam(name = "warehouse_id") Long warehouseId,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(storageService.getAllPendingOrCheckedInStoragesByWarehouse(warehouseId, request));
+	}
+	
 	@GetMapping("/storages/get_all_checked_in")
 	public ResponseEntity<List<StorageResponseDTO>>getAllCheckedIn(HttpServletRequest request){
 		return ResponseEntity.ok().body(storageService.getAllCheckedInStorages(request));

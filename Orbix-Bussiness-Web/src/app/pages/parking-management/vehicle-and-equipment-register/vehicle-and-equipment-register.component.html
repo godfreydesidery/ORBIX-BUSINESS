@@ -4,7 +4,7 @@
             <div class="card-header">
                 <span>Vehicle List</span>
             </div>
-            <div class="card-body widget-body"> 
+            <div class="card-body widget-body">
                 <div class="row">
                     <div class="col-sm-12">
                         <button type="button" class="btn btn-outline-success btn-round-custom" (click)="setNewMode()" style="margin: 3px;">New Vehicle</button>
@@ -590,7 +590,6 @@
                                         <option></option>
                                         <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
                                     </select> -->
-
 
                                     <input class="form-control" type="text" list="venames" [(ngModel)]="vehicleEquipmentTypeName"/>
                                     <datalist id="venames">

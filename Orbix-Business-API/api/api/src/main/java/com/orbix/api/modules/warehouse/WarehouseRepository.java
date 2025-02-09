@@ -15,4 +15,6 @@ public interface WarehouseRepository extends JpaRepository<Warehouse, Long> {
 
 	List<Warehouse> findAllByBranch(Branch branch);
 
+	Optional<Warehouse> findByIdAndBranch(Long warehouseId, Branch branch);
+
 }

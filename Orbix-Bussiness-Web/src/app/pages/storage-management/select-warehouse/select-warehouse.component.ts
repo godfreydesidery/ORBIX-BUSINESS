@@ -17,6 +17,7 @@ import { IGrn } from 'src/app/domain/grn';
 import { NotificationComponent } from '../../misc/notification/notification.component';
 import { IStorage } from 'src/app/domain/storage';
 import { IGoodType } from 'src/app/domain/good-type';
+import { error } from 'src/custom-packages/util';
 
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js');
@@ -37,6 +38,11 @@ const API_URL = environment.apiUrl;
   styleUrl: './select-warehouse.component.scss'
 })
 export class SelectWarehouseComponent {
+
+  page: number = 1; // Initialize the current page to 1
+
+  filterRecords: string = ''
+
   mode: string = ''
   availableWarehouses: IWarehouse[] = []
   selectedWarehouse: IWarehouse | null = null
@@ -64,7 +70,7 @@ export class SelectWarehouseComponent {
   ownerAddress: string = ''
   comments: string = ''
   goodName: string = ''
-  goodDescription : string = ''
+  goodDescription: string = ''
   weight: number = 0 // In kg
   length: number = 0 // In cm
   width: number = 0 // In cm
@@ -130,6 +136,7 @@ export class SelectWarehouseComponent {
           console.log(data)
           this.selectedWarehouse = data!
           localStorage.setItem('selected-warehouse-id', this.selectedWarehouse.id.toString());
+          this.warehouseId = this.selectedWarehouse.id
           this.warehouseLoaded = true
         }
       )
@@ -141,7 +148,7 @@ export class SelectWarehouseComponent {
       )
   }
 
-  
+
 
   onWarehouseChange(event: any): void {
     this.selectedWarehouseId = event.target.value;
@@ -185,6 +192,7 @@ export class SelectWarehouseComponent {
   }
 
   setNew() {
+    this.clearStorageData()
     this.mode = 'new'
   }
 
@@ -192,31 +200,34 @@ export class SelectWarehouseComponent {
     this.mode = 'existing'
   }
 
-  async getAllCompanyActiveGoodTypes(){
+  async getAllCompanyActiveGoodTypes() {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
     this.goodTypes = []
-  
-    await this.http.get<IGoodType[]>(API_URL+'/good_types/get_all_company_active', options)
-    .toPromise()
-    .then(
-      data => {
-        var sn = 1
-        data?.forEach(element => {
-          element.sn = sn
-          this.goodTypes.push(element)
-          sn = sn + 1
-        })
-        console.log(data)
-      }
-    )
+
+    await this.http.get<IGoodType[]>(API_URL + '/good_types/get_all_company_active', options)
+      .toPromise()
+      .then(
+        data => {
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.goodTypes.push(element)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
   }
 
-
-  public async saveStorage(){
+  public async saveStorage() {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+
+    if (this.warehouseId === null || this.warehouseId === undefined) {
+      this.msg.showErrorMessage3('Warehouse not defined, please select a warehouse first')
     }
 
     var storage = {
@@ -232,55 +243,58 @@ export class SelectWarehouseComponent {
       ownerEmail: this.ownerEmail,
       ownerAddress: this.ownerAddress,
       warehouseId: this.warehouseId,
-      billingType : this.billingType,
-      billingAmount : this.billingAmount,
-      comments : this.comments,
-      goodName : this.goodName,
-      goodDescription : this.goodDescription,
-      goodTypeName : this.goodTypeName
+      billingType: this.billingType,
+      billingAmount: this.billingAmount,
+      comments: this.comments,
+      goodName: this.goodName,
+      goodDescription: this.goodDescription,
+      goodTypeName: this.goodTypeName
     }
 
 
-    if(this.id === null || this.id === undefined || this.id === ''){
+    if (this.id === null || this.id === undefined || this.id === '') {
       /**Create new parking */
-      await this.http.post<IStorage>(API_URL+'/storages/create', storage, options)
-      .toPromise()
-      .then(
-        data => {
-          this.showStorageData(data!)
-          console.log(data)
-          // this.getAllPendingOrCheckedInParkings()
-          this.msg.showSuccessMessage('Storage created successifully')
-        }
-      )
-      .catch(
-        error => {
-          console.log(error)
-          this.msg.showErrorMessage(error, 'Error')
-        }
-      )
-    }else{
+      await this.http.post<IStorage>(API_URL + '/storages/create', storage, options)
+        .toPromise()
+        .then(
+          data => {
+            this.showStorageData(data!)
+            console.log(data)
+            // this.getAllPendingOrCheckedInParkings()
+            this.msg.showSuccessMessage('Storage created successifully, good available for check in')
+          }
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+          }
+        )
+    } else {
       /**Update an exiisting parking */
-      await this.http.post<IStorage>(API_URL+'/storages/update', storage, options)
-      .toPromise()
-      .then(
-        data => {
-          this.showStorageData(data!)
-          console.log(data)
-          // this.getAllPendingOrCheckedInParkings()
-          this.msg.showSuccessMessage('Storage updated successifully, Vehicle available for check in')
-        }
-      )
-      .catch(
-        error => {
-          console.log(error)
-          this.msg.showErrorMessage3(error)
-        }
-      )
+      await this.http.post<IStorage>(API_URL + '/storages/update', storage, options)
+        .toPromise()
+        .then(
+          data => {
+            this.showStorageData(data!)
+            console.log(data)
+            // this.getAllPendingOrCheckedInParkings()
+            if (this.mode === 'existing') { // If in existing mode, reload storages to reflect the changes
+              this.getAllCheckedInAndPendingStorages()
+            }
+            this.msg.showSuccessMessage('Storage updated successifully, good available for check in')
+          }
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage3(error)
+          }
+        )
     }
   }
 
-  showStorageData(data : IStorage){
+  showStorageData(data: IStorage) {
     this.id = data?.id
     this.no = data!.no
     this.ownerFirstName = data?.ownerFirstName
@@ -298,9 +312,10 @@ export class SelectWarehouseComponent {
     this.billingType = data!.billingType
     this.goodName = data!.goodName
     this.goodDescription = data!.goodDescription
+    this.goodTypeName = data!.goodTypeName
   }
 
-  clearStorageData(){
+  clearStorageData() {
     //this.showParking = false
     this.id = null;
     this.no = ''
@@ -315,12 +330,124 @@ export class SelectWarehouseComponent {
     this.ownerAddress = ''
     this.billingType = 'DAILY'
     this.billingAmount = 0
+    this.goodTypeId = null
+    this.goodTypeName = ''
     this.goodName = ''
     this.goodDescription = ''
     this.comments = ''
   }
 
-  checkIn(){
-    alert('Check in')
+
+
+  async getAllCheckedInAndPendingStorages() {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    this.storages = []
+
+    await this.http.get<IStorage[]>(API_URL + '/storages/get_all_pending_or_checked_in_by_warehouse?warehouse_id=' + this.warehouseId, options)
+      .toPromise()
+      .then(
+        data => {
+          data?.reverse()
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.storages.push(element)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
+      .catch(error => {
+        console.log(error)
+      })
   }
+
+  async getStorage(storageId: any) {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.get<IStorage>(API_URL + '/storages/get?id=' + storageId, options)
+      .toPromise()
+      .then(
+        data => {
+          this.showStorageData(data!)
+          console.log(data)
+        }
+      )
+      .catch(error => {
+        console.log(error)
+        this.msg.showErrorMessage(error, 'Error')
+      })
+  }
+
+  async checkIn(id: any, no: string, descr: string) {
+    if (await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to check in storage no: ' + no + ' - ' + descr + '?', 'question', 'Yes', 'No') == false) {
+      return
+    }
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+
+    var storage = {
+      id: id
+    }
+
+    await this.http.post<IStorage>(API_URL + '/storages/check_in', storage, options)
+      .toPromise()
+      .then(
+        data => {
+          console.log(data)
+          this.getAllCheckedInAndPendingStorages()
+          this.msg.showSuccessMessage('Checked in Successifully')
+        }
+      )
+      .catch(
+        error => {
+          console.log(error)
+          this.msg.showErrorMessage(error, 'Error')
+        }
+      )
+  }
+
+  // async checkIn(): Promise<void>{
+
+
+  //     if(await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to check out?', 'question', 'Yes', 'No') == false){
+  //       return
+  //     }
+
+  //     let options = {
+  //       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+  //     }
+
+  //     var parking = {
+  //       id : this.id,
+  //       cardNo : this.cardNo,
+  //       parkingZoneName : this.parkingZoneName,
+  //       startBillingAt : this.startBillingAt
+  //     }
+
+  //     await this.http.post<IParking>(API_URL+'/parkings/check_out', parking, options)
+  //       .toPromise()
+  //       .then(
+  //         data => {
+
+  //           console.log(data)
+
+  //           this.getAllClearedParkings()
+  //           this.msg.showSuccessMessage('Checked out Successifully')
+
+  //           this.printGatePassRcpt(data!.serviceBillItems, '', 0);
+  //         }
+  //       )
+  //       .catch(
+  //         error => {
+  //           console.log(error)
+  //           this.msg.showErrorMessage(error, 'Error')
+  //         }
+  //       )
+  //   }
 }

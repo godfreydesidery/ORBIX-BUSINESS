@@ -12,4 +12,6 @@ public interface StorageRepository extends JpaRepository<Storage, Long> {
 	List<Storage> findAllByStatusInAndCheckedOutDateTimeBetween(List<String> statuses, LocalDateTime startOfToday,
 			LocalDateTime endOfYesterday);
 
+	List<Storage> findAllByWarehouseAndStatusIn(Warehouse warehouse, List<String> statuses);
+
 }

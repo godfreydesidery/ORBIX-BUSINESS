@@ -89,6 +89,25 @@ public class StorageServiceController implements StorageService {
 	}
 	
 	@Override
+	public List<StorageResponseDTO> getAllPendingOrCheckedInStoragesByWarehouse(Long warehouseId, HttpServletRequest request) {
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");
+		statuses.add("CHECKED-IN");
+		
+		Warehouse warehouse = warehouseRepository.findById(warehouseId)
+		        .orElseThrow(() -> new NotFoundException("Warehouse not found"));
+		
+		List<Storage> storages = storageRepository.findAllByWarehouseAndStatusIn(warehouse, statuses);
+		List<StorageResponseDTO> storageResponses = new ArrayList<>();
+
+		for(Storage storage : storages) {
+			storageResponses.add(storageResponseDTOMapper(storage));					
+		}		
+		return storageResponses;
+	}
+	
+	@Override
 	public List<StorageResponseDTO> getAllCleared(HttpServletRequest request) {
 		
 		List<String> statuses = new ArrayList<>();
@@ -220,7 +239,10 @@ public class StorageServiceController implements StorageService {
 			throw new InvalidOperationException("Good type does not belong to this company");
 		}
 		
-		Optional<Warehouse> warehouse_ = warehouseRepository.findByNameAndBranch(storageRequest.getWarehouseName(), branch_.get());
+		Optional<Warehouse> warehouse_ = warehouseRepository.findByIdAndBranch(storageRequest.getWarehouseId(), branch_.get());
+		if(warehouse_.isEmpty()) {
+			throw new NotFoundException("Warehouse not found in this branch, please select valid warehouse");
+		}
 		
 		Storage storage = new Storage();
 		storage.setNo(String.valueOf(Math.random()));
@@ -237,6 +259,7 @@ public class StorageServiceController implements StorageService {
 		storage.setComments(storageRequest.getComments());
 		
 		storage.setBillingType("DAILY");
+		storage.setBillingAmount(storageRequest.getBillingAmount());
 		
 		//storage.setImage(storageRequest.getImage());
 		storage.setStatus("PENDING");
@@ -247,7 +270,7 @@ public class StorageServiceController implements StorageService {
 		
 		storage.setBranch(branch_.get());
 		
-		if(!warehouse_.isEmpty()) storage.setWarehouse(warehouse_.get());
+		storage.setWarehouse(warehouse_.get());
 
 		storage.setCreatedByUser(userService.getUser(request));
 		storage.setCreatedDateTime(dayService.getTimeStamp());
@@ -282,6 +305,11 @@ public class StorageServiceController implements StorageService {
 	@Override
 	public StorageResponseDTO updateStorage(StorageRequestDTO storageRequest, HttpServletRequest request) {
 		
+		/**Validate data*/		
+		if(!validateStorageData(storageRequest)) {
+			throw new InvalidEntryException("Validation failed");
+		}
+		
 		Optional<Storage> storage_ = storageRepository.findById(storageRequest.getId());
 		if(storage_.isEmpty()) throw new NotFoundException("Storage not found in database");
 			
@@ -304,10 +332,8 @@ public class StorageServiceController implements StorageService {
 		if(goodType_.get().getCompany().getId() != company_.get().getId()) 
 			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
 		
-		Optional<Warehouse> warehouse_ = warehouseRepository.findByNameAndBranch(storageRequest.getWarehouseName(), branch_.get());
-		if(warehouse_.isEmpty())throw new NotFoundException("Storage Zone not found");
-		
-		
+//		Optional<Warehouse> warehouse_ = warehouseRepository.findByNameAndBranch(storageRequest.getWarehouseName(), branch_.get());
+//		if(warehouse_.isEmpty())throw new NotFoundException("Storage Zone not found");		
 		
 		Storage storage = storage_.get();
 		storage.setOwnerFirstName(storageRequest.getOwnerFirstName());
@@ -322,13 +348,15 @@ public class StorageServiceController implements StorageService {
 		
 		storage.setGoodType(goodType_.get());
 		
-		storage.setGoodName(goodType_.get().getName()); // Look here later
+		storage.setGoodName(storageRequest.getGoodName()); // Look here later
+		storage.setGoodDescription(storageRequest.getGoodDescription());
 		
 		storage.setComments(storageRequest.getComments());
 		
-		storage.setWarehouse(warehouse_.get());
+//		storage.setWarehouse(warehouse_.get());
 		
 		storage.setBillingType(storageRequest.getBillingType());
+		storage.setBillingAmount(storageRequest.getBillingAmount());
 				
 		storage = storageRepository.save(storage);
 		
@@ -373,6 +401,8 @@ public class StorageServiceController implements StorageService {
 		storageResponse.setBillingAmount(String.valueOf(storage.getBillingAmount()));
 		
 		storageResponse.setGoodTypeName(storage.getGoodType().getName());
+		storageResponse.setGoodName(storage.getGoodName());
+		storageResponse.setGoodDescription(storage.getGoodDescription());
 		
 		storageResponse.setWarehouseName(
 				storage.getWarehouse() != null && storage.getWarehouse().getName() != null
@@ -404,7 +434,10 @@ public class StorageServiceController implements StorageService {
 		
 		if(storageRequest.getOwnerFirstName().isBlank() || storageRequest.getOwnerLastName().isBlank() || storageRequest.getGoodName().isBlank()) {
 			throw new InvalidOperationException("First name, Last name, Good name can not be empty");
-		}		
+		}
+		if(storageRequest.getBillingAmount() < 0) {
+			throw new InvalidEntryException("Invalid billing amount");
+		}
 		return true;
 	}
 
@@ -420,24 +453,17 @@ public class StorageServiceController implements StorageService {
 		if(!storage_.get().getStatus().equals("PENDING")) 
 			throw new InvalidOperationException("Can not check in, only a pending storage can be checked in");
 		
-		//now check in vehicle, if it has a pending status
+		if(storage_.get().getWarehouse() == null) throw new InvalidOperationException("Warehouse not assigned");
 		
 		Storage storage = storage_.get();
 		
-		Optional<Warehouse> warehouse_ = warehouseRepository.findByNameAndBranch(storageRequest.getWarehouseName(), storage_.get().getBranch());
-		if(warehouse_.isEmpty())throw new NotFoundException("Storage Zone not found");
-		
-		storage.setBillingAmount(storage.getGoodType().getDailyPrice());
-		
-		storage.setWarehouse(warehouse_.get());
 		storage.setStatus("CHECKED-IN");
 		storage.setCheckedInByUser(userService.getUser(request));
 		storage.setCheckedInDateTime(dayService.getTimeStamp());
 		
 		if(storageRequest.startBillingAt == null) {
 			storage.setStartBillingAt(dayService.getTimeStamp()); // You can change this depending on user billing preferences
-		}else {
-			
+		}else {			
 			//String dateString = "2024-10-26 15:30:45" ;
 			String dateString = storageRequest.getStartBillingAt() + " 00:00:00";
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
