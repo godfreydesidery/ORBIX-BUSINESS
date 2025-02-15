@@ -46,14 +46,18 @@
                                     <td>{{p.sn}}</td>
                                     <td>{{p.no}}</td>
                                     <td>{{p.ownerFirstName}} {{p.ownerLastName}}</td>
-                                    <td>{{p.chasisNo}}</td>
-                                    <td>{{p.vehicleEquipmentTypeName}}</td>
+                                    <td><b style="color: rgb(228, 85, 8);">{{p.chasisNo}}</b></td>
+                                    <td><b class="text-primary">{{p.vehicleEquipmentTypeName}}</b></td>
                                     <td>{{p.ownerPhoneNo}}</td>
                                     <td>{{p.agentName}}</td>
                                     <td>{{p.agentAddress}} {{p.agentPhoneNo}} {{p.agentEmail}}</td>
-                                    <td>{{p.billingType}}</td>
-                                    <td style="text-align: right;">{{p.billingAmount | currency:'':''}}</td>
-                                    <td>{{p.status}}</td>                                    
+                                    <td><span class="badge badge-primary">{{p.billingType}}</span></td>
+                                    <td style="text-align: right;"><b class="text-danger">{{p.billingAmount | currency:'':''}}</b></td>
+                                    <td>
+                                        <span class="badge badge-warning" *ngIf="p.status === 'PENDING'">{{p.status}}</span>
+                                        <span class="badge badge-success" *ngIf="p.status === 'CHECKED-IN'">{{p.status}}</span>
+                                        <span class="badge badge-danger" *ngIf="p.status === 'CHECKED-OUT'">{{p.status}}</span>
+                                    </td>                                    
                                     <td>
                                         <table>
                                             <tr>
@@ -168,12 +172,12 @@
                             <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo" autocomplete="nope">
                         </div>
                     </div>   
-                    <div class="col-lg-3">
+                    <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label>Agent Email</label>
                             <input class="form-control" type="email" [(ngModel)]="agentEmail" autocomplete="nope">
                         </div>
-                    </div> 
+                    </div>  -->
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Sub T1 Number</label>

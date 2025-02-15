@@ -32,17 +32,17 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let p of parkings | searchFilter : filterRecords | paginate: { itemsPerPage: 5, currentPage: page }">
+                            <tr *ngFor="let p of parkings | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }">
                                 <td>{{p.sn}}</td>
-                                <td>{{p.chasisNo}}</td>
+                                <td><b style="color: rgb(228, 85, 8);">{{p.chasisNo}}</b></td>
                                 <!-- <td>{{p.hasKeys}}</td> -->
                                 <td>{{p.ownerFirstName}} {{p.ownerLastName}}</td>
                                 <td>{{p.vehicleEquipmentTypeName}}</td>
                                 <td>{{p.ownerPhoneNo}}</td>
                                 <td>{{p.agentName}}</td>
                                 <td>{{p.agentAddress}} {{p.agentPhoneNo}} {{p.agentEmail}}</td>
-                                <td>{{p.billingType}}</td>
-                                <td style="text-align: right;">{{p.billingAmount | currency:'':''}}</td>
+                                <td><span class="badge badge-primary">{{p.billingType}}</span></td>
+                                <td class="text-danger" style="text-align: right; font-weight: bold;">{{p.billingAmount | currency:'':''}}</td>
                                 
                                 <td>
                                     <table>

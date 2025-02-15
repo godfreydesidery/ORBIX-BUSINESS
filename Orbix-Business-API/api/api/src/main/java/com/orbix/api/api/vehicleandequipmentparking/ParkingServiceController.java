@@ -178,6 +178,53 @@ public class ParkingServiceController implements ParkingService {
 	}
 	
 	@Override
+	public List<ParkingResponseDTO> getRecentCheckedOut(HttpServletRequest request) {
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-OUT");
+		
+		// Calculate the range
+		LocalDateTime now = dayService.getTimeStamp(); //LocalDateTime.now();
+		LocalDateTime before = now.minusHours(24);
+
+
+		List<Parking> parkings = parkingRepository.findAllByStatusInAndCheckedOutDateTimeBetween(statuses, before, now);
+		
+		//List<Parking> parkings = parkingRepository.findAllByStatusInAndCheckedOutBetween(statuses, LocalDateTime.now().);
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+
+		for(Parking parking : parkings) {
+			
+			boolean cleared = true;
+			
+			List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
+			if(!parkingBillReceivables.isEmpty() && cleared == true) {
+				for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
+					if(!parkingBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
+						cleared = false;
+						break;
+					}
+				}
+			}
+			
+			List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking);
+			if(!parkingServiceBillReceivables.isEmpty() && cleared == true) {
+				for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
+					if(!parkingServiceBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
+						cleared = false;
+						break;
+					}
+				}
+			}
+			
+			
+			if(cleared) parkingResponses.add(parkingResponseDTOMapper(parking));	
+							
+		}		
+		return parkingResponses;
+	}
+	
+	@Override
 	public List<ParkingResponseDTO> getAllCheckedInParkings(HttpServletRequest request) {
 		
 		List<String> statuses = new ArrayList<>();

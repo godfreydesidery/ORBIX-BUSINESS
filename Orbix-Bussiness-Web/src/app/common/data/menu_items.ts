@@ -396,6 +396,10 @@ export const menuItems = [
                 routerLink: '/app/accounts-and-finance/release-vehicle-equipment'
             },
             {
+                title: 'Storage Billing',
+                routerLink: '/app/accounts-and-finance/storage-billing'
+            },
+            {
                 title: 'Reports',
                 url: '#',
                 subMenu: [

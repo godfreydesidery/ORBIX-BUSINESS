@@ -305,9 +305,21 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
       {
+        path : 'accounts-and-finance/storage-billing',
+        loadComponent: () => import('./accounts-and-finance/storage-billing/storage-billing.component').then(c => c.StorageBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Storage Billing'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'accounts-and-finance/vehicle-equipment-billing',
         loadComponent: () => import('./accounts-and-finance/vehicle-equipment-billing/vehicle-equipment-billing.component').then(c => c.VehicleEquipmentBillingComponent),
         data : { breadcrumb : 'Accounts & Finance | Vehicle & Equipment Billing'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'accounts-and-finance/good-billing',
+        loadComponent: () => import('./accounts-and-finance/good-billing/good-billing.component').then(c => c.GoodBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Good Storage Billing'},
         canActivate : [AuthGuard]
       },
       {

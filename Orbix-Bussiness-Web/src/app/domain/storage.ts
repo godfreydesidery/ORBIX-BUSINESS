@@ -22,12 +22,24 @@ export interface IStorage {
     status: string
     billingType: string
     billingAmount: number
+    billingStartAt : string
     initialQty: number
     currentQty: number
     warehouseId: any
+    warehouseName: string
     goodTypeId: any
     goodTypeName: string
 
+    serviceBillItems : IServiceBillItem[]
+
     // numbering
     sn : number
+}
+
+export interface IServiceBillItem{
+    sn : number
+    item : string
+    qty : number
+    payStatus : string
+    amount : number
 }

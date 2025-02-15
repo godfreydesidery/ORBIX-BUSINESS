@@ -46,6 +46,13 @@ public class BillReceivableResource {
 		return ResponseEntity.ok().body(billReceivableService.getAllByParking(parkingId, request));
 	}
 	
+	@GetMapping("/bill_receivables/get_all_by_storage")
+	public ResponseEntity<List<BillReceivableResponseDTO>>getAllByStorage(
+			@RequestParam(name = "storage_id") Long storageId,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(billReceivableService.getAllByStorage(storageId, request));
+	}
+	
 	
 	
 	

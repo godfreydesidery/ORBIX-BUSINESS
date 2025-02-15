@@ -78,7 +78,7 @@ export class SelectWarehouseComponent {
   startBillingAt: Date | null = null
   status: string = ''
   billingType: string = ''
-  billingAmount: number = 0
+  billingAmount: number | null = null
   initialQty: number = 0
   currentQty: number = 0
   warehouseId: any = null
@@ -230,6 +230,10 @@ export class SelectWarehouseComponent {
       this.msg.showErrorMessage3('Warehouse not defined, please select a warehouse first')
     }
 
+    if(this.billingAmount === null || this.billingAmount === undefined) {
+      this.msg.showErrorMessage3('Billing amount not defined, please provide billing amount first')
+    }  
+
     var storage = {
       id: this.id,
       no: this.no,
@@ -329,7 +333,7 @@ export class SelectWarehouseComponent {
     this.ownerEmail = ''
     this.ownerAddress = ''
     this.billingType = 'DAILY'
-    this.billingAmount = 0
+    this.billingAmount = null
     this.goodTypeId = null
     this.goodTypeName = ''
     this.goodName = ''
@@ -408,9 +412,50 @@ export class SelectWarehouseComponent {
         error => {
           console.log(error)
           this.msg.showErrorMessage(error, 'Error')
+          this.getAllCheckedInAndPendingStorages()
         }
       )
   }
+
+  async checkOut(id: any, no: string, descr: string): Promise<void>{
+  
+  
+      if(await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to check out storage no: ' + no + ' - ' + descr + '?', 'question', 'Yes', 'No') == false){
+        return
+      }
+  
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      }
+  
+      var storage = {
+        id : id
+        // cardNo : this.cardNo,
+        // storageZoneName : this.storageZoneName,
+        // startBillingAt : this.startBillingAt
+      }
+  
+      await this.http.post<IStorage>(API_URL+'/storages/check_out', storage, options)
+        .toPromise()
+        .then(
+          data => {
+  
+            console.log(data)
+
+            this.getAllCheckedInAndPendingStorages()
+            this.msg.showSuccessMessage('Checked out Successifully')
+            
+            //this.printGatePassRcpt(data!.serviceBillItems, '', 0);
+          }
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+            this.getAllCheckedInAndPendingStorages()
+          }
+        )
+    }
 
   // async checkIn(): Promise<void>{
 

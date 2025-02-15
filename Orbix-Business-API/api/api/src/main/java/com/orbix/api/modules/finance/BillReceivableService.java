@@ -18,4 +18,8 @@ public interface BillReceivableService {
 	List<BillReceivableResponseDTO> getAllByParking( 
 			Long parkingId,
 			HttpServletRequest request);
+	
+	List<BillReceivableResponseDTO> getAllByStorage( 
+			Long storageId,
+			HttpServletRequest request);
 }

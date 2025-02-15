@@ -122,7 +122,7 @@
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Billing Rate</label>
-                                    <input class="form-control" type="number" [(ngModel)]="billingAmount" autocomplete="nope" min="0">
+                                    <input class="form-control" type="number" [(ngModel)]="billingAmount" autocomplete="nope" min="0" style="text-align: center; font-weight: bold;">
                                 </div>
                             </div>
                         </div>
@@ -175,9 +175,10 @@
                                     <td>
                                         <button class="btn btn-primary btn-round-custom" *ngIf="storage.status === 'PENDING'" (click)="getStorage(storage.id)" data-toggle="modal" data-target="#edit-modal">Edit</button>
                                         <button class="btn btn-success btn-round-custom" *ngIf="storage.status === 'PENDING'" (click)="checkIn(storage.id, storage.no, storage.goodName)" >Check-In</button>
+                                        <button class="btn btn-danger btn-round-custom" *ngIf="storage.status === 'CHECKED-IN'" (click)="checkOut(storage.id, storage.no, storage.goodName)" >Check-Out</button>
                                     </td>
                                 </tr>
-                            </tbody>                            
+                            </tbody>
                         </table>
                         <div class="row">
                             <div class="col-sm-12">
@@ -409,7 +410,7 @@
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Billing Rate</label>
-                                    <input class="form-control" type="number" [(ngModel)]="billingAmount" autocomplete="nope" min="0">
+                                    <input class="form-control" type="text" [(ngModel)]="billingAmount" autocomplete="nope" min="0" readonly>
                                 </div>
                             </div>
                             <div class="col-lg-3">

@@ -18,8 +18,8 @@ const API_URL = environment.apiUrl;
   selector: 'az-vehicle-and-equipment-register',
   standalone: true,
   imports: [
-    CommonModule,
-    FormsModule
+    CommonModule, 
+    FormsModule,
   ],
   templateUrl: './vehicle-and-equipment-register.component.html',
   styleUrl: './vehicle-and-equipment-register.component.scss'
@@ -755,6 +755,18 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
       }
     )
   }
+
+
+  onOptionSelected(option: string) {
+    console.log('Selected:', option);
+  }
+
+  onInputChanged(value: string) {
+    console.log('Input changed:', value);
+  }
+
+
+
 }
 function then(arg0: (data: any) => void): PromiseConstructor {
   throw new Error('Function not implemented.');

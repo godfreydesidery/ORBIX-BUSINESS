@@ -62,6 +62,11 @@ public class ParkingResource {
 		return ResponseEntity.ok().body(parkingService.getTodayCheckedOut(request));
 	}
 	
+	@GetMapping("/parkings/get_recent_checked_out")
+	public ResponseEntity<List<ParkingResponseDTO>>getRecentCheckedOut(HttpServletRequest request){
+		return ResponseEntity.ok().body(parkingService.getRecentCheckedOut(request));
+	}
+	
 	
 	@GetMapping("/parkings/get")
 	public ResponseEntity<ParkingResponseDTO>get(

@@ -79,7 +79,7 @@
                         <h6>Agent Information</h6><hr>
                         <div class="row">
                             <input type="hidden" [(ngModel)]="id">
-                            <div class="col-lg-6">
+                            <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Agent Name</label>
                                     <input class="form-control" type="text" [(ngModel)]="agentName" autocomplete="nope">
@@ -97,12 +97,12 @@
                                     <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo" autocomplete="nope">
                                 </div>
                             </div>   
-                            <div class="col-lg-3">
+                            <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Agent Email</label>
                                     <input class="form-control" type="email" [(ngModel)]="agentEmail" autocomplete="nope">
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                         <p><b>Vehicle Information</b></p><br>
                         <div class="row">
@@ -299,12 +299,12 @@
                                     <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo" autocomplete="nope">
                                 </div>
                             </div>   
-                            <div class="col-lg-3">
+                            <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Agent Email</label>
                                     <input class="form-control" type="email" [(ngModel)]="agentEmail" autocomplete="nope">
                                 </div>
-                            </div> 
+                            </div>  -->
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Sub T1 Number</label>
@@ -824,6 +824,7 @@
                                 <option value="orange">Orange</option>
                                 <option value="azul">Azul</option>
                                 <option value="tomato">Tomato</option>
+                                <option value="silver">Silver</option>
                                 <option value="multicolour">Multicolour</option>
                             </select>
                         </div>
@@ -938,10 +939,17 @@
                                 <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
                             </select> -->
 
-                            <input class="form-control" type="text" list="venam" [(ngModel)]="vehicleEquipmentTypeName"/>
-                                    <datalist id="venam">
-                                        <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
-                                    </datalist>
+                            <input 
+                                class="form-control" 
+                                type="text" 
+                                list="vet" 
+                                [(ngModel)]="vehicleEquipmentTypeName"
+                            />
+                            <datalist id="vet">
+                                <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
+                                {{ option.name }}
+                                </option>
+                            </datalist>
                         </div>
                     </div>
 

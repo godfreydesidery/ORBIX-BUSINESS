@@ -41,7 +41,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                                <tr *ngFor="let p of parkings | searchFilter : filterRecords | paginate: { itemsPerPage: 5, currentPage: page }">
+                                <tr *ngFor="let p of parkings | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
                                     <td>{{p.sn}}</td>
                                     <td>{{p.no}}</td>
                                     <td>{{p.ownerFirstName}} {{p.ownerMiddleName}} {{p.ownerLastName}}</td>
@@ -49,11 +49,15 @@
                                     <td>{{p.ownerPhoneNo}}</td>
                                     <td>{{p.agentName}}</td>
                                     <td>{{p.agentAddress}} {{p.agentPhoneNo}} {{p.agentEmail}}</td>
-                                    <td>{{p.billingType}}</td>
-                                    <td style="text-align: right;">{{p.billingAmount | currency:'':''}}</td>
-                                    <td>{{p.status}}</td>
+                                    <td><span class="badge badge-primary">{{p.billingType}}</span></td>
+                                    <td class="text-danger" style="text-align: right; font-weight: bold;">{{p.billingAmount | currency:'':''}}</td> 
                                     <td>
-                                        <button type="button" class="btn btn-primary btn-round-custom" (click)="printGatePass(p.id)" style="cursor: pointer;">Gate Pass</button>
+                                        <span class="badge badge-warning" *ngIf="p.status === 'PENDING'">{{p.status}}</span>
+                                        <span class="badge badge-success" *ngIf="p.status === 'CHECKED-IN'">{{p.status}}</span>
+                                        <span class="badge badge-primary" *ngIf="p.status === 'CHECKED-OUT'">{{p.status}}</span>
+                                    </td>
+                                    <td>
+                                        <button type="button" class="btn btn-warning btn-round-custom" (click)="printGatePass(p.id)" style="cursor: pointer;">Gate Pass</button>
                                     </td>
                                 </tr>
                         </tbody> 
