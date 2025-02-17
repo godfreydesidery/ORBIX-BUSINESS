@@ -5,6 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { AuthService } from 'src/app/auth.service';
+import { IMaintenance } from 'src/app/domain/maintenance';
 import { IParking } from 'src/app/domain/parking';
 import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleEquipment } from 'src/app/domain/vehicle-equipment';
@@ -248,11 +249,23 @@ export class VehicleEquipmentRegisterComponent {
     }
   }
 
+  saveForParking(){
+    this.save('PARKING')
+  }
+  saveForMaintenance(){
+    this.save('MAINTENANCE')
+  }
 
-  public async save() {
+
+  public async save(service : string) {
     
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    if(!(service === 'PARKING' || service === 'MAINTENANCE')){
+      this.msg.showErrorMessage3('Service not specified')
+      return
     }
 
     var vehicleEquipment = {
@@ -285,10 +298,9 @@ export class VehicleEquipmentRegisterComponent {
       agentPhoneNo : this.agentPhoneNo,
       agentEmail : this.agentEmail,
       agentAddress : this.agentAddress,
-      deviceStatus : this.deviceStatus === 'YES' ? 1 : 0
+      deviceStatus : this.deviceStatus === 'YES' ? 1 : 0,
 
-
-      
+      service : service,      
   }
 
 
@@ -310,6 +322,12 @@ export class VehicleEquipmentRegisterComponent {
         // this.getAllActiveVehicleEquipments()
 
         this.msg.showSuccessMessage('Saved Successfully')
+
+        if(data!.parkingId != null){
+          this.getParking(data!.parkingId)
+        }else if(data!.maintenanceId != null){
+          this.getMaintenance(data!.maintenanceId)
+        }
 
         this.getParking(data!.parkingId)
         this.mode = ''
@@ -334,7 +352,11 @@ export class VehicleEquipmentRegisterComponent {
         this.showVehicleEquipmentData(data!)
         this.msg.showSuccessMessage('Updated Successfully')
 
-        this.getParking(data!.parkingId)
+        if(data!.parkingId != null){
+          this.getParking(data!.parkingId)
+        }else if(data!.maintenanceId != null){
+          this.getMaintenance(data!.maintenanceId)
+        }
 
         this.mode = ''
       }
@@ -484,6 +506,21 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     )
   }
 
+  async getMaintenance(id : any){
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    await this.http.get<IMaintenance>(API_URL+'/maintenances/get?id=' + id, options)
+    .toPromise()
+    .then(
+      data => {
+        this.showMaintenanceData(data!)
+        console.log(data)
+      }
+    )
+  }
+
 
   showParkingData(data : IParking){
     this.parkingId = data?.id;
@@ -608,6 +645,102 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
     this.billingType = 'DAILY'
   }
+
+
+
+  showMaintenanceData(data : IMaintenance){
+    this.parkingId = data?.id;
+    this.parkingNo = data!.no;
+    this.ownerFirstName = data?.ownerFirstName;
+    this.ownerMiddleName = data?.ownerMiddleName;
+    this.ownerLastName = data?.ownerLastName;
+    this.ownerCompanyName = data?.ownerCompanyName;
+    this.ownerIdNo = data?.ownerIdNo;
+    this.ownerIdType = data?.ownerIdType;
+    this.ownerPhoneNo = data?.ownerPhoneNo;
+    this.ownerEmail = data?.ownerEmail;
+    this.ownerAddress = data?.ownerAddress;
+
+    // Vehicle or Equipment Information
+    this.registrationNo = data?.registrationNo;
+    this.chasisNo = data?.chasisNo;
+    this.leftFrontLamp = data?.leftFrontLamp == true ? 'YES' : 'NO'
+    this.rightFrontLamp = data?.rightFrontLamp == true ? 'YES' : 'NO'
+    this.leftRearLamp = data?.leftRearLamp == true ? 'YES' : 'NO'
+    this.rightRearLamp = data?.rightRearLamp == true ? 'YES' : 'NO'
+    this.leftSideMirror = data?.leftSideMirror == true ? 'YES' : 'NO'
+    this.rightSideMirror = data?.rightSideMirror == true ? 'YES' : 'NO'
+    this.leftWiper = data?.leftWiper == true ? 'YES' : 'NO'
+    this.rightWiper = data?.rightWiper == true ? 'YES' : 'NO'
+    this.backWiper = data?.backWiper == true ? 'YES' : 'NO'
+    this.fuelCap = data?.fuelCap == true ? 'YES' : 'NO'
+    this.spareTire = data?.spareTire == true ? 'YES' : 'NO'
+    this.battery = data?.battery == true ? 'YES' : 'NO'
+    this.starter = data?.starter == true ? 'YES' : 'NO'
+    this.aerial = data?.aerial == true ? 'YES' : 'NO'
+    this.wheelCap = data?.wheelCap == true ? 'YES' : 'NO'
+    this.roundMirror = data?.roundMirror == true ? 'YES' : 'NO'
+    this.tireIndicator = data?.tireIndicator == true ? 'YES' : 'NO'
+    this.deviceStatus = data?.deviceStatus == true ? 'ATTACHED' : 'NOT-ATTACHED'
+    this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName,
+    this.vehicleEquipmentColor = data!.vehicleEquipmentColor,
+    this.hasKeys = data!.hasKeys == true ? 'YES' : 'NO'
+
+    this.vehicleEquipmentName = data!.vehicleEquipmentName,
+
+    this.vehicleEquipmentCategory = data!.vehicleEquipmentCategory
+
+    this.cardNo = data!.cardNo
+
+    this.comments = data!.comments
+  }
+
+  clearMaintenanceData(){
+    this.showParking = false
+    this.parkingId = null;
+    this.parkingNo = ''
+    this.ownerFirstName = ''
+    this.ownerMiddleName = ''
+    this.ownerLastName = ''
+    this.ownerCompanyName = ''
+    this.ownerIdNo = ''
+    this.ownerIdType = ''
+    this.ownerPhoneNo = ''
+    this.ownerEmail = ''
+    this.ownerAddress = ''
+
+    // Vehicle or Equipment Information
+    this.registrationNo = ''
+    this.chasisNo = ''
+    this.leftFrontLamp = 'YES'
+    this.rightFrontLamp = 'YES'
+    this.leftRearLamp = 'YES'
+    this.rightRearLamp = 'YES'
+    this.leftSideMirror = 'YES'
+    this.rightSideMirror = 'YES'
+    this.leftWiper = 'YES'
+    this.rightWiper = 'YES'
+    this.backWiper = 'YES'
+    this.fuelCap = 'YES'
+    this.spareTire = 'YES'
+    this.battery = 'YES'
+    this.starter = 'YES'
+    this.aerial = 'YES'
+    this.wheelCap = 'YES'
+    this.roundMirror = 'YES'
+    this.tireIndicator = 'YES'
+    this.deviceStatus = 'ATTACHED'
+    this.vehicleEquipmentTypeName = ''
+    this.hasKeys = 'YES'
+
+    this.comments = ''
+
+    this.vehicleEquipmentName = ''
+    this.vehicleEquipmentColor = ''
+
+  }
+
+
 
 
 

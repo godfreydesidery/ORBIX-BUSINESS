@@ -186,7 +186,8 @@
                     </div>
                     <div class="row">
                         <div class="col-sm-12">
-                            <button class="btn btn-success btn-round-custom" (click)="save()">Register</button>
+                            <button class="btn btn-success btn-round-custom" (click)="saveForParking()">Register Parking</button>
+                            <button class="btn btn-success btn-round-custom" (click)="saveForMaintenance()">Register Maintenance</button>
                         </div>
                     </div>
                 </div>
@@ -833,8 +834,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" (click)="save()">Register and Process Parking</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-primary" (click)="save()">Register and Process Parking</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button> -->
             </div>
         </div>
     </div>
@@ -1004,9 +1005,9 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" *ngIf='id != null' (click)="save()">Update</button>
+                <!-- <button type="button" class="btn btn-primary" *ngIf='id != null' (click)="save()">Update</button>
                 <button type="button" class="btn btn-primary" *ngIf='id != null'>Send to Parking</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button> -->
             </div>
         </div>
     </div>

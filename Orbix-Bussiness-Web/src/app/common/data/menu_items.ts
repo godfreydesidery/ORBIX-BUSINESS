@@ -515,6 +515,24 @@ export const menuItems = [
         ]
     },
     {
+        title: 'Maintenance Mngmt',
+        icon: 'fa-cogs',
+        selected: false,
+        expanded: false,
+        //show : grant(['WRHOUSE-ACCESS']),
+        show : true,
+        order: 700,
+        subMenu: [     
+            { 
+                title: 'Maintenance',
+                url: '#',
+                routerLink: '/app/maintenance-management/maintenance'
+            },    
+        ]
+    },
+
+    
+    {
         title: 'Procurement',
         routerLink: ' ',
         icon: 'fa-money',
@@ -763,6 +781,7 @@ export const menuItems = [
                     // },                  
                 ]
             },
+            
             {
                 title: 'Inventory',
                 routerLink: ' ',

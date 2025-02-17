@@ -149,32 +149,7 @@ public class ParkingResource {
 
 		
 		return ResponseEntity.created(uri).body(parkingService.createParkingBillReceivable(parkingBillReceivableRequest.getParkingId(), startedAt, endedAt, parkingBillReceivableRequest.getBillingType(), parkingBillReceivableRequest.getQty(), parkingBillReceivableRequest.getPrice(), parkingBillReceivableRequest.getDiscount(), parkingBillReceivableRequest.getAutoBilling(), request));
-	}
-	
-
-	
-	
-	
-	
-//	@PostMapping("/parkings/activate")
-//	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
-//	public ResponseEntity<ApiCustomResponse>activate(
-//			@RequestBody ParkingRequestDTO parkingRequest,
-//			HttpServletRequest request){
-//		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/parkings/activate").toUriString());
-//		return ResponseEntity.created(uri).body(parkingService.activateParking(parkingRequest, request));
-//	}
-	
-	
-//	@PostMapping("/parkings/deactivate")
-//	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
-//	public ResponseEntity<ApiCustomResponse>deactivate(
-//			@RequestBody ParkingRequestDTO parkingRequest,
-//			HttpServletRequest request){
-//		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/parkings/deactivate").toUriString());
-//		return ResponseEntity.created(uri).body(parkingService.deactivateParking(parkingRequest, request));
-//	}
-	
+	}	
 }
 
 @Data

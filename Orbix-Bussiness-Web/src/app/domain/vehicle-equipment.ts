@@ -34,6 +34,7 @@ export interface IVehicleEquipment {
     branchName : string
 
     parkingId : string
+    maintenanceId : string
 
     deviceStatus : string
 

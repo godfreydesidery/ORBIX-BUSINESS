@@ -241,11 +241,11 @@ public class ParkingServiceController implements ParkingService {
 
 	@Override
 	public ParkingResponseDTO get(Long id, HttpServletRequest request) {		
-	Optional<Parking> parking_ = parkingRepository.findById(id);
-	if(parking_.isEmpty()) {
-		throw new NotFoundException("Parking not found");
-	}		
-	return parkingResponseDTOMapper(parking_.get());	
+		Optional<Parking> parking_ = parkingRepository.findById(id);
+		if(parking_.isEmpty()) {
+			throw new NotFoundException("Parking not found");
+		}		
+		return parkingResponseDTOMapper(parking_.get());	
 	}
 	
 	@Override

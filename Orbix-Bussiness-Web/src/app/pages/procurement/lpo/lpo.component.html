@@ -85,7 +85,7 @@
                                     <li><strong>LPO No:</strong> {{no}}</li>
                                     <li><strong>Supplier:</strong> {{supplierName}}</li>
                                     <li><strong>Shop:</strong> {{shopName}}</li>
-                                    <li><strong>Status:</strong> {{status}}</li>
+                                    <li><strong>Status:</strong><span class="badge badge-primary">{{status}}</span></li>
 
                                 </ul>
 
@@ -545,7 +545,12 @@
                                     *ngFor="let lpo of lpos | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }">
                                     <td>{{lpo.no}}</td>
                                     <td>{{lpo.supplierName}}</td>
-                                    <td>{{lpo.status}}</td>
+                                    <td>
+                                        <span class="badge badge-success" *ngIf="lpo.status === 'PROCESSING'">{{lpo.status}}</span>
+                                        <span class="badge badge-warning" *ngIf="lpo.status === 'PENDING'">{{lpo.status}}</span>
+                                        <span class="badge badge-primary" *ngIf="lpo.status === 'APPROVED'">{{lpo.status}}</span>
+                                        <span class="badge badge-danger" *ngIf="lpo.status === 'CANCELED'">{{lpo.status}}</span>
+                                    </td>
                                     <td><button class="btn btn-success btn-round-custom" (click)="get(lpo.id)"
                                             data-dismiss="modal">Select</button></td>
                                 </tr>

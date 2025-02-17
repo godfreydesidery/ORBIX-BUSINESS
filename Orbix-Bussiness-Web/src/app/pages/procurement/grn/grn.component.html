@@ -31,7 +31,7 @@
                         <ul class="list-unstyled mb-0" *ngIf="id != null">
                             <li><strong>Supplier:</strong> {{supplierName}}</li>
                             <li><strong>Shop:</strong> {{shopName}}</li>
-                            <li><strong>Status:</strong> {{status}}</li>
+                            <li><strong>Status:</strong> <span class="badge badge-primary">{{status}}</span></li>
                             <li><strong>Received By:</strong> {{receivedBy}}</li>
                             <li><strong>Received At:</strong> {{receivedAt}}</li>
                         </ul>
@@ -507,10 +507,15 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let grn of grns | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }">
+                                    *ngFor="let grn of grns | searchFilter : filterRecords | paginate: { itemsPerPage: 8, currentPage: page }">
                                     <td>{{grn.no}}</td>
                                     <td>{{grn.supplierName}}</td>
-                                    <td>{{grn.status}}</td>
+                                    <td>
+                                        <span class="badge badge-success" *ngIf="grn.status === 'PROCESSING'">{{grn.status}}</span>
+                                        <span class="badge badge-warning" *ngIf="grn.status === 'PENDING'">{{grn.status}}</span>
+                                        <span class="badge badge-primary" *ngIf="grn.status === 'APPROVED'">{{grn.status}}</span>
+                                        <span class="badge badge-danger" *ngIf="grn.status === 'CANCELED'">{{grn.status}}</span>
+                                    </td>
                                     <td><button class="btn btn-success btn-round-custom" (click)="get(grn.id)"
                                             data-dismiss="modal">Select</button></td>
                                 </tr>

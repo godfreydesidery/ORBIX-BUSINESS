@@ -251,6 +251,16 @@ export const routes: Routes = [
 
       /**End of Parking Management */
 
+      //Parking Management
+      /**Start of parking management */
+      {
+        path : 'maintenance-management/maintenance',
+        loadComponent: () => import('./maintenance-management/maintenance/maintenance.component').then(c => c.MaintenanceComponent),
+        data : { breadcrumb : 'Maintenance Management/Maintenance'},
+        canActivate : [AuthGuard]
+      },
+      /**End of Parking Management */
+
 
       /**Storage Management */
       {

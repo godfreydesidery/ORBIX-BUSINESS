@@ -1,0 +1,13 @@
+package com.orbix.api.modules.vehicleandequipmentmaintenance;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+public interface MaintenanceBillReceivableService {
+	public List<MaintenanceBillReceivableResponseDTO> getAllByMaintenance(Long maintenanceId, HttpServletRequest request);
+	public boolean deleteMaintenanceBillReceivable(MaintenanceBillReceivableRequestDTO maintenanceBillReceivableRequestDTO, HttpServletRequest request);	
+	public MaintenanceBillReceivableResponseDTO createMaintenanceBillReceivable(MaintenanceBillReceivableRequestDTO maintenanceBillReceivableRequestDTO, HttpServletRequest request);
+	public MaintenanceBillReceivableResponseDTO updateMaintenanceBillReceivable(MaintenanceBillReceivableRequestDTO maintenanceBillReceivableRequestDTO, HttpServletRequest request);	
+	public MaintenanceBillReceivableResponseDTO getMaintenanceBillReceivable(Long id, HttpServletRequest request);
+}

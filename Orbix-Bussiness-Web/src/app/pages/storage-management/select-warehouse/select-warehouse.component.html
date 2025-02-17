@@ -169,9 +169,14 @@
                                     <td>{{storage.ownerFirstName}} {{storage.ownerMiddleName}} {{storage.ownerLastName}}</td>
                                     <td>{{storage.ownerIdNo}}</td>
                                     <td>{{storage.ownerIdType}}</td>
-                                    <td>{{storage.billingType}}</td>
-                                    <td style="text-align: right;">{{storage.billingAmount | currency:'':''}}</td>
-                                    <td>{{storage.status}}</td>
+                                    <td><span class="badge badge-primary">{{storage.billingType}}</span></td>
+                                    <td style="text-align: right;"><span class="badge badge-danger">{{storage.billingAmount | currency:'':''}}</span></td>
+                                    <td>
+                                        <span class="badge badge-success" *ngIf="storage.status === 'PROCESSING'">{{storage.status}}</span>
+                                        <span class="badge badge-warning" *ngIf="storage.status === 'PENDING'">{{storage.status}}</span>
+                                        <span class="badge badge-primary" *ngIf="storage.status === 'APPROVED'">{{storage.status}}</span>
+                                        <span class="badge badge-danger" *ngIf="storage.status === 'CANCELED'">{{storage.status}}</span>
+
                                     <td>
                                         <button class="btn btn-primary btn-round-custom" *ngIf="storage.status === 'PENDING'" (click)="getStorage(storage.id)" data-toggle="modal" data-target="#edit-modal">Edit</button>
                                         <button class="btn btn-success btn-round-custom" *ngIf="storage.status === 'PENDING'" (click)="checkIn(storage.id, storage.no, storage.goodName)" >Check-In</button>
