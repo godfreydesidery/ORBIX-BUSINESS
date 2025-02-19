@@ -181,6 +181,7 @@ public class ParkingReportResource {
 			parkingResponse.setVehicleEquipmentTypeName(parking.getVehicleEquipmentType().getName());
 			parkingResponse.setOwnerFirstName(parking.getOwnerFirstName());
 			parkingResponse.setOwnerLastName(parking.getOwnerLastName());
+			parkingResponse.setOwnerPhoneNo(parking.getOwnerPhoneNo());
 			parkingResponse.setCardNo(parking.getCardNo());
 			parkingResponse.setChasisNo(parking.getChasisNo());
 			parkingResponse.setTformNumber(parking.getTformNumber());

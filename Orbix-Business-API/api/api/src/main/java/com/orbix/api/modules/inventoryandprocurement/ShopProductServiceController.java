@@ -47,6 +47,36 @@ public class ShopProductServiceController implements ShopProductService {
 	    
 	    // Fetch all shop products
 	    List<ShopProduct> shopProducts = shopProductRepository.findAllByShop(shop);
+	    
+	    // Map to response DTOs using streams
+	    return shopProducts.stream()
+	            .map(this::shopProductResponseDTOMapper)
+	            .collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<ShopProductResponseDTO> getUnderstockShopProducts(Long shopId, HttpServletRequest request) {
+	    // Validate and fetch the shop
+	    Shop shop = shopRepository.findById(shopId)
+	                              .orElseThrow(() -> new NotFoundException("Shop not found"));
+	    
+	    // Fetch all shop products
+	    List<ShopProduct> shopProducts = shopProductRepository.findProductsWithLowStock(shop.getId());
+
+	    // Map to response DTOs using streams
+	    return shopProducts.stream()
+	            .map(this::shopProductResponseDTOMapper)
+	            .collect(Collectors.toList());
+	}
+	
+	@Override
+	public List<ShopProductResponseDTO> getOutofstockShopProducts(Long shopId, HttpServletRequest request) {
+	    // Validate and fetch the shop
+	    Shop shop = shopRepository.findById(shopId)
+	                              .orElseThrow(() -> new NotFoundException("Shop not found"));
+	    
+	    // Fetch all shop products
+	    List<ShopProduct> shopProducts = shopProductRepository.findByShopAndCurrentStockLessThanEqual(shop, 0);
 
 	    // Map to response DTOs using streams
 	    return shopProducts.stream()
@@ -349,6 +379,24 @@ public class ShopProductServiceController implements ShopProductService {
 	    	productResponses.add(productResponse);
 	    }
 	    return productResponses;
+	}
+
+	@Override
+	public long checkUnderstockByShop(Long shopId, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		Shop shop = shopRepository.findById(shopId)
+                .orElseThrow(() -> new NotFoundException("Shop not found"));
+		
+		return shopProductRepository.countProductsBelowMinStock(shop);
+	}
+	
+	@Override
+	public long checkOutofstockByShop(Long shopId, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		Shop shop = shopRepository.findById(shopId)
+                .orElseThrow(() -> new NotFoundException("Shop not found"));
+		
+		return shopProductRepository.countProductsOutofStock(shop);
 	}
 	
 	

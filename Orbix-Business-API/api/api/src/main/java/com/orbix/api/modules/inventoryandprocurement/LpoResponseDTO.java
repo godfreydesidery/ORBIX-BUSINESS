@@ -10,6 +10,8 @@ import lombok.Data;
 public class LpoResponseDTO {
 	private String id;
 	private String no;
+	private String orderDate;
+	private String validUntilDate;
 	private String status;
 	
 	private String branchId;

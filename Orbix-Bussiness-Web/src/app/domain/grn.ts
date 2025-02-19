@@ -3,6 +3,8 @@ export interface IGrn {
     no : string
     summary : string
     status : string
+    receivedBy :string
+    receivedAt : string
     shopId : number
     shopCode : string
     shopName : string
@@ -26,7 +28,8 @@ export interface IGrnDetail {
     vatRate : number
 
     baseUom : string
-    qty : number
+    orderedQty : number
+    receivedQty : number
     price : number
     discount : number
     amount : number

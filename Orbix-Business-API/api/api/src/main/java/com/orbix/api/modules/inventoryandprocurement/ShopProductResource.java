@@ -105,6 +105,20 @@ public class ShopProductResource {
 		return ResponseEntity.ok().body(shopProductService.getAllShopProducts(shopId, request));
 	}
 	
+	@GetMapping("/shop_products/get_under_stock_by_shop")
+	public ResponseEntity<List<ShopProductResponseDTO>>getUnderstockShopProductsByShop(
+			@RequestParam(name = "shop_id")Long shopId, 
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(shopProductService.getUnderstockShopProducts(shopId, request));
+	}
+	
+	@GetMapping("/shop_products/get_out_of_stock_by_shop")
+	public ResponseEntity<List<ShopProductResponseDTO>>getOutofstockShopProductsByShop(
+			@RequestParam(name = "shop_id")Long shopId, 
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(shopProductService.getOutofstockShopProducts(shopId, request));
+	}
+	
 	
 	@GetMapping("/shop_products/get_products_by_shop_containing")
 	public ResponseEntity<List<ProductResponseDTO>>getAllShopProductsByShopContaining(
@@ -114,6 +128,20 @@ public class ShopProductResource {
 
 		return ResponseEntity.ok().body(shopProductService.getProductsByShopAndName(shopId, productNameLike));
 
+	}
+	
+	@GetMapping("/shop_products/get_check_under_stock_by_shop")
+	public long checkUnderStockByShop(
+			@RequestParam(name = "shop_id")Long shopId, 
+			HttpServletRequest request){
+		return shopProductService.checkUnderstockByShop(shopId, request);
+	}
+	
+	@GetMapping("/shop_products/get_check_out_of_stock_by_shop")
+	public long checkOutofStockByShop(
+			@RequestParam(name = "shop_id")Long shopId, 
+			HttpServletRequest request){
+		return shopProductService.checkOutofstockByShop(shopId, request);
 	}
 	
 	

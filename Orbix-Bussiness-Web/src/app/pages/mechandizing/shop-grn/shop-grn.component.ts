@@ -85,6 +85,10 @@ shopName : string = ''
   payCode : string = 'CASH'
   payRefNo : string = ''
 
+
+  detailId : any = null
+  receivedQty : number | any = ''
+
   constructor(
     private http :HttpClient,
     private auth : AuthService,
@@ -228,7 +232,7 @@ shopName : string = ''
           var sn = 1
           this.grn.grnDetails.forEach(element => {
             element.sn = sn
-            this.totalAmount = this.totalAmount + ((+element.costPriceVatIncl) * element.qty)
+            this.totalAmount = this.totalAmount + ((+element.costPriceVatIncl) * element.receivedQty)
             sn = sn + 1
             
           })
@@ -527,6 +531,31 @@ shopName : string = ''
       )
     }
 
+    addReceived(){
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      }
+
+      this.http.get<IGrnDetail>(API_URL+'/grns/add_received?grn_detail_id=' + this.detailId + '&grn_id=' + this.id + '&qty=' + this.receivedQty, options)
+        .toPromise()
+        .then(
+          data => {
+            console.log(data)
+            this.get(this.id)
+          }
+        )
+        .catch(error => {
+          console.log(error)
+          this.msg.showErrorMessage(error, 'Error')
+        }       
+      )
+    }
+
+    showDetailId(id : any){
+      this.receivedQty = ''
+      this.detailId = id
+    }
+
 
     async approveOrder(){
       if(await this.msg.showConfirmMessageDialog('Approve', 'Are you sure you want to approve this order?', 'question', 'Yes', 'No') == false){
@@ -749,7 +778,7 @@ shopName : string = ''
                     
                       // Add rows dynamically
                       this.grn.grnDetails.forEach((element) => {
-                        total += (element.costPriceVatIncl * element.qty) || 0;
+                        total += (element.costPriceVatIncl * element.receivedQty) || 0;
                         // discount += parseFloat(element.discount) || 0;
                   
                         // if(Number(element.amount) > 0) total += Number(element.amount) || 0;
@@ -761,9 +790,9 @@ shopName : string = ''
                           { text: element.productCode || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },  
                           { text: element.productName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false }, 
                           { text: element.baseUom || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },   
-                          { text: element.qty || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
+                          { text: element.receivedQty || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
                           { text: (Number(element.costPriceVatIncl) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
-                          { text: (Number(element.costPriceVatIncl * element.qty) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+                          { text: (Number(element.costPriceVatIncl * element.receivedQty) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
                         ]);
                       });
                     

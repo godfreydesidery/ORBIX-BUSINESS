@@ -126,6 +126,28 @@ export const routes: Routes = [
         data : { breadcrumb : 'Mechandizing/Shop Stock Status'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'mechandizing/shop-product-stock-status-out',
+        loadComponent: () => import('./mechandizing/shop-product-stock-status-out/shop-product-stock-status-out.component').then(c => c.ShopProductStockStatusOutComponent),
+        data : { breadcrumb : 'Mechandizing/Shop Stock Status(Out of stock)'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'mechandizing/shop-product-stock-status-under',
+        loadComponent: () => import('./mechandizing/shop-product-stock-status-under/shop-product-stock-status-under.component').then(c => c.ShopProductStockStatusUnderComponent),
+        data : { breadcrumb : 'Mechandizing/Shop Stock Status(Under stock)'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'mechandizing/shop-product-stock-log',
+        loadComponent: () => import('./mechandizing/shop-product-stock-log/shop-product-stock-log.component').then(c => c.ShopProductStockLogComponent),
+        data : { breadcrumb : 'Mechandizing/Shop Stock Card'},
+        canActivate : [AuthGuard]
+      },
+
+
 
       {
         path : 'mechandizing/import-product',
@@ -335,6 +357,19 @@ export const routes: Routes = [
         path : 'procurement/grn',
         loadComponent: () => import('./procurement/grn/grn.component').then(c => c.GrnComponent),
         data : { breadcrumb : 'Procurement/GRN'}, 
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'procurement/reports/lpo-report',
+        loadComponent: () => import('./procurement/reports/lpo-report/lpo-report.component').then(c => c.LpoReportComponent),
+        data : { breadcrumb : 'Procurement/LPO Report'}, 
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'procurement/reports/grn-report',
+        loadComponent: () => import('./procurement/reports/grn-report/grn-report.component').then(c => c.GrnReportComponent),
+        data : { breadcrumb : 'Procurement/Grn Report'}, 
         canActivate : [AuthGuard]
       },
       

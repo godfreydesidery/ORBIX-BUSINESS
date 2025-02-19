@@ -1,0 +1,81 @@
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>Shop Stock Card Report</span>                       
+            </div>
+            <div class="card-body widget-body text-white"> 
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="form-control">From</label>
+                            <input type="date" class="form-control" [(ngModel)]="from">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="form-control">To</label>
+                            <input type="date" class="form-control" [(ngModel)]="to">
+                        </div>
+                    </div>
+                    <!-- <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="form-control">Cashier Name</label>
+                            <select class="form-control" [(ngModel)]="nickname">
+                                <option></option>
+                                <option *ngFor="let cashier of userNames">{{cashier}}</option>
+                            </select>
+                        </div>
+                    </div> -->
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <!-- <br><br> -->
+                            <button class="btn btn-outline-success btn-round-custom" (click)="getStockLogByDate(from, to)">Run Report</button>
+                            <!-- <button class="btn btn-outline-primary btn-round-custom" (click)="printReport()" style="padding-left: 3px;">Print Report</button> -->
+                        
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12" *ngIf="fastMovingProducts.length > 0">
+                        <div class="table-responsive">
+                            <table class="table">
+                                <thead>
+                                    <td><b>SN</b></td>
+                                    <td><b>Date Time</b></td>
+                                    <td><b>Product Name</b></td>
+                                    <td><b>Qty In</b></td>
+                                    <td><b>Qty Out</b></td>
+                                    <td><b>Balance</b></td>
+                                    <td><b>Logged By</b></td>
+                                    <td><b>Reference</b></td>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let s of fastMovingProducts">
+                                        <td>{{s.sn}}</td>
+                                        <td>{{s.dateTime}}</td>
+                                        <td>{{s.productName}}</td>
+                                        <td>{{s.qtyIn}}</td>
+                                        <td>{{s.qtyOut}}</td>
+                                        <td>{{s.balance}}</td>
+                                        <td>{{s.nickname}}</td>
+                                        <td>{{s.reference}}</td>
+                                    </tr>
+                                </tbody>
+                                
+                            </table>
+                        </div>
+
+                    </div>
+                    <div class="col-lg-12" *ngIf="fastMovingProducts.length == 0">
+                        <div class="alert alert-info" *ngIf="fastMovingProducts.length == 0" style="text-align: center;">
+                            No Data
+                        </div>
+                    </div>                    
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

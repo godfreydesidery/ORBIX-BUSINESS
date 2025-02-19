@@ -46,9 +46,9 @@
                                             <td>{{user.companyName}}</td>
                                             <td>{{user.branchName}}</td>
                                             <td>
-                                                <span *ngIf="user.active ==='Active'">Active__</span><span *ngIf="user.active ==='Inactive'">Inactive </span> | 
-                                                <button *ngIf="user.active ==='Inactive'" (click)="activate(user.id)"><i class="fa fa-unlock text-success"></i></button>
-                                                <button *ngIf="user.active ==='Active'" (click)="deactivate(user.id)"><i class="fa fa-lock text-danger"></i></button>
+                                                <span *ngIf="user.active ==='Active'">Lock__</span><span *ngIf="user.active ==='Inactive'">Unlock </span> | 
+                                                <button *ngIf="user.active ==='Active'" (click)="deactivate(user.id)"><i class="fa fa-unlock text-success"></i></button>
+                                                <button *ngIf="user.active ==='Inactive'" (click)="activate(user.id)"><i class="fa fa-lock text-danger"></i></button>
                                             </td>
                                             <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(user.id)" style="cursor: pointer;" data-toggle="modal" data-target="#user-modal">Select</button></td>
                                         </tr>
@@ -80,28 +80,57 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                         <input type="hidden" [(ngModel)]="id">
                         <div class="form-group">
                             <label>Code</label>
                             <input class="form-control" type="text" [(ngModel)]="code" autocomplete="nope" readonly>
                         </div>
+                    </div>
+                    <div class="col-lg-4">
                         <div class="form-group">
                             <label>First Name</label>
                             <input class="form-control" type="text" [(ngModel)]="firstName" autocomplete="nope">
                         </div>
+                    </div>
+                    <div class="col-lg-4">
                         <div class="form-group">
                             <label>Middle Name(s)</label>
                             <input class="form-control" type="text" [(ngModel)]="middleName" autocomplete="nope">
                         </div>
+                    </div>
+                    <div class="col-lg-4">
                         <div class="form-group">
                             <label>Last Name</label>
                             <input class="form-control" type="text" [(ngModel)]="lastName" autocomplete="nope">
                         </div>
+                    </div>
+                    <div class="col-lg-4">
                         <div class="form-group">
-                            <label>Nickname</label>
+                            <label>Display Name</label>
                             <input class="form-control" type="text" [(ngModel)]="nickname" autocomplete="nope">
                         </div>
+                    </div>
+                    
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label>Username</label>
+                            <input class="form-control" type="text" [(ngModel)]="username" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label>Password</label>
+                            <input class="form-control" type="password" [(ngModel)]="password" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label>Confirm Password</label>
+                            <input class="form-control" type="password" [(ngModel)]="confirmPassword" autocomplete="nope">
+                        </div>
+                    </div>  
+                    <div class="col-lg-4">
                         <div class="form-group">
                             <label>Select User Type : System user or Company User</label>
                             <select class="form-control" [(ngModel)]="type" (ngModelChange)="checkUserType(type)">
@@ -110,7 +139,9 @@
                                 <option>COMPANY-USER</option>
                             </select>
                         </div>
-                        <div class="form-group" *ngIf="type === 'COMPANY-USER'">
+                    </div>
+                    <div class="col-lg-4" *ngIf="type === 'COMPANY-USER'">
+                        <div class="form-group">
                             <label>Select Company</label>
                             <select class="form-control" [(ngModel)]="companyName">
                                 <option></option>  
@@ -119,7 +150,9 @@
                                 }
                             </select>
                         </div>
-                        <div class="form-group" *ngIf="type === 'COMPANY-USER'">
+                    </div>
+                    <div class="col-lg-4" *ngIf="type === 'COMPANY-USER'">
+                        <div class="form-group">
                             <label>Select Branch</label>
                             <select class="form-control" [(ngModel)]="branchName">
                                 <option></option>  
@@ -128,22 +161,7 @@
                                 }
                             </select>
                         </div>
-                    </div>  
-                    <div class="col-lg-6">
-                        
-                        <div class="form-group">
-                            <label>Username</label>
-                            <input class="form-control" type="text" [(ngModel)]="username" autocomplete="nope">
-                        </div>
-                        <div class="form-group">
-                            <label>Password</label>
-                            <input class="form-control" type="password" [(ngModel)]="password" autocomplete="nope">
-                        </div>
-                        <div class="form-group">
-                            <label>Confirm Password</label>
-                            <input class="form-control" type="password" [(ngModel)]="confirmPassword" autocomplete="nope">
-                        </div>
-                    </div>
+                    </div>                                  
                 </div>
 
 

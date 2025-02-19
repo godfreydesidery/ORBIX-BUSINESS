@@ -439,13 +439,24 @@ export const menuItems = [
                 routerLink: '/app/mechandizing/select-shop'
             },
             {
-                title: 'Sales Listing Report',
-                routerLink: '/app/mechandizing/sales-listing-report'
+                title: 'Reports',
+                url: '#',
+                subMenu: [
+                    {
+                        title: 'Sales Listing Report',
+                        routerLink: '/app/mechandizing/sales-listing-report'
+                    },
+                    {
+                        title: 'Fast Moving Products',
+                        routerLink: '/app/mechandizing/fast-moving-products-report'
+                    },
+                    {
+                        title: 'Stock Card Report',
+                        routerLink: '/app/mechandizing/shop-product-stock-log'
+                    },
+                ]
             },
-            {
-                title: 'Fast Moving Products',
-                routerLink: '/app/mechandizing/fast-moving-products-report'
-            },
+            
         ]
     },
     {
@@ -470,12 +481,26 @@ export const menuItems = [
                 routerLink: '/app/procurement/supplier-price-list'
             },
             {
-                title: 'LPO',
+                title: 'Local Purchase Order',
                 routerLink: '/app/procurement/lpo'
             },
             {
-                title: 'GRN',
+                title: 'Goods Received Note',
                 routerLink: '/app/procurement/grn'
+            },
+            {
+                title: 'Reports',
+                url: '#',
+                subMenu: [
+                    {
+                        title: 'Local Purchase Order',
+                        routerLink: '/app/procurement/reports/lpo-report'
+                    },
+                    {
+                        title: 'Goods Received Note',
+                        routerLink: '/app/procurement/reports/grn-report'
+                    },               
+                ]
             },
             // {
             //     title: 'BLO',
@@ -723,21 +748,21 @@ export const menuItems = [
             }
         ]
     },
-    {
-        title: 'System Settings',
-        routerLink: ' ',
-        icon: 'fa-wrench',
-        selected: false,
-        expanded: false,
-        show : true,
-        order: 100,
-        subMenu: [
-            {
-                title: 'System Profile',
-                routerLink: '/app/system/system-profile'
-            },
-        ]
-    },
+    // {
+    //     title: 'System Settings',
+    //     routerLink: ' ',
+    //     icon: 'fa-wrench',
+    //     selected: false,
+    //     expanded: false,
+    //     show : true,
+    //     order: 100,
+    //     subMenu: [
+    //         {
+    //             title: 'System Profile',
+    //             routerLink: '/app/system/system-profile'
+    //         },
+    //     ]
+    // },
 ];
 
 // export function grant(privilege: string[]): boolean {

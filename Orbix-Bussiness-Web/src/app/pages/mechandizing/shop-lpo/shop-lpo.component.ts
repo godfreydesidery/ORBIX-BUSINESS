@@ -48,6 +48,8 @@ export class ShopLpoComponent {
 shopId: any = null
 id : any = null
 no : string = ''
+orderDate : string = ''
+validUntilDate : Date | null = null
 
 status : string = ''
 
@@ -219,8 +221,10 @@ status : string = ''
           this.supplierName = data!.supplierName
 
 
-          this.id = this.lpo.id
-          this.no = this.lpo.no
+          this.id = data!.id
+          this.no = data!.no
+          this.orderDate = data!.orderDate
+          this.validUntilDate = data!.validUntilDate
 
 
           this.totalAmount = 0
@@ -303,6 +307,8 @@ status : string = ''
       this.lpo!
       this.id = null
       this.no = ''
+      this.orderDate = ''
+      this.validUntilDate = null
       this.supplierId = null
       this.shopId = null
     }
@@ -712,10 +718,11 @@ status : string = ''
                   console.log(data)
       
 
-                  this.msg.showSuccessMessage('GRN created successifully')
+                  this.msg.showSuccessMessage('GRN retrieved successifully')
 
-                  this.router.navigate(['/app/procurement/grn'], {
+                  this.router.navigate(['/app/mechandizing/shop-grn'], {
                     queryParams: {
+                      shop_id: this.shopId,
                       grn_id: data!.id
                     }
                   });
@@ -802,6 +809,8 @@ status : string = ''
                   {text : ' '},
                   {text: title, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
                   {text: 'LPO No : ' + this.no, fontSize: 10, bold: true, alignment: 'left'},
+                  {text: 'Order Date : ' + this.orderDate, fontSize: 10, bold: true, alignment: 'left'},
+                  {text: 'Valid Until Date : ' + this.validUntilDate, fontSize: 10, bold: true, alignment: 'left'},
                   {text: 'Status : ' + this.status, fontSize: 10, bold: true, alignment: 'left'},
                   {text: 'Supplier : ' + this.supplierName, fontSize: 10, bold: true, alignment: 'left'},
                   {text: 'Shop : ' + this.shopName, fontSize: 10, bold: true, alignment: 'left'},

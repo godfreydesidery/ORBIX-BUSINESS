@@ -22,10 +22,12 @@
                     <div class="col-md-3">
                         <ul class="list-unstyled mb-0">
                             <li><strong>LPO No:</strong> {{no}}</li>
+                            <li><strong>Order Date:</strong> {{orderDate}}</li>
+                            <li><strong>Valid Until:</strong> {{validUntilDate}}</li>
                             <li><strong>Supplier:</strong> {{supplierName}}</li>
                             <li><strong>Shop:</strong> {{shopName}}</li>
                             <li><strong>Status:</strong> {{status}}</li>
-                            <li><button class="btn btn-success btn-round-custom" *ngIf="status == 'APPROVED'" (click)="createGrnByLpoNo()">Receive LPO</button></li>        
+                            <li><button class="btn btn-success btn-round-custom" *ngIf="status == 'APPROVED'" (click)="createGrnByLpoNo()">Create/Update GRN</button></li>        
                         </ul>
                     </div>
                     <div class="col-md-9">

@@ -1,17 +1,24 @@
 <div class="login-container">
   <div class="col-xl-4 col-md-6 col-10 mx-auto">
+    <div class="row">
+      <div class="col-md-12" style="text-align: center;">
+        <h2 class="card-title text-primary" style="font-weight: bold;">SIGHMAN SAFARI HAULAGE LTD.</h2>
+      </div>
+    </div>
     <div class="card">
       <div class="card-body text-center">
-        <h2 class="card-title"><i class="fa fa-user"></i> User Login</h2>
+        <h2 class="card-title text-primary" style="font-weight: bold;"><i class="fa fa-user"></i> User Login</h2>
+        <br>
         <span  class="text-success">{{status}}</span>
           <div class="form-group">
-            <input [formControl]="username" class="form-control checking-field" placeholder="Username" type="text">
+            <input [formControl]="username" class="form-control checking-field" placeholder="Username" type="text" style="height: 15mm; text-align: center;">
             @if (form.get('username')!.touched && form.get('username')!.hasError('required')) {
               <span class="help-block text-danger">Username is required</span>
             }
           </div>
+          <br>
           <div class="form-group">
-            <input [formControl]="password" class="form-control checking-field" placeholder="Password" type="password">
+            <input [formControl]="password" class="form-control checking-field" placeholder="Password" type="password" style="height: 15mm; text-align: center;">
             @if (form.get('password')!.touched && form.get('password')!.hasError('required')) {
               <span class="help-block text-danger">Password is required</span>
             }
@@ -19,15 +26,18 @@
               <span class="help-block text-danger">Password isn't long enough, minimum of 6 characters</span>
             }
           </div>
+          <br>
+
+          <button class="btn btn-danger btn-block btn-round-custom" (click)="resetFields()" style="width: 25%;"><b>Reset</b></button>
+          <br>
           
           <div class="form-group">
-            <button [disabled]="!form.valid" class="btn btn-primary btn-block" (click)="loginUser()">Log In</button>
+            <button [disabled]="!form.valid" class="btn btn-primary btn-block btn-round-custom" (click)="loginUser()" style="cursor: pointer;"><b>Log In</b></button>
           </div>
 
-        
+          <span style="font-weight: bold;">&copy; Davaghan 2025. All Rights Reserved</span>
 
       </div>
     </div>
   </div>
 </div>
-

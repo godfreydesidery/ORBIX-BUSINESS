@@ -46,7 +46,8 @@
                                                 <th scope="col">Name</th>
                                                 <th scope="col">UOM</th>
                                                 <th scope="col">VAT(%)</th>
-                                                <th scope="col">Qty</th>
+                                                <th scope="col">Ordered Qty</th>
+                                                <th scope="col">Received Qty</th>
                                                 <th scope="col">Unit Price</th>
                                                 <th scope="col">Amount</th>
                                                 <th scope="col">Action</th>
@@ -59,16 +60,22 @@
                                                 <td>{{item.productName}}</td>
                                                 <td>{{item.baseUom}}</td>
                                                 <td>{{item.vatRate * 100}}</td>
-                                                <td>{{item.qty}}</td>
+                                                <td>{{item.orderedQty}}</td>
+                                                <td>
+                                                    {{item.receivedQty}}
+                                                    <button class="btn btn-sm btn-warning btn-round-custom pull-right" *ngIf="status === 'PROCESSING'" data-toggle="modal" data-target="#add-received-modal" (click)="showDetailId(item.id)"><b>Received Qty</b></button>
+                                                </td>
                                                 <td style="text-align: right;">{{item.costPriceVatIncl | currency:'':''}}</td>
                                                 <td style="text-align: right;">{{item.amount | currency:'':''}}</td>
                                                 <td>
                                                     <!-- <button class="btn btn-sm btn-success btn-round-custom">Edit</button> -->
-                                                    <button class="btn btn-sm btn-danger btn-round-custom" (click)="removeDetail(item.id)">Remove</button>
+                                                    
+                                                    <button class="btn btn-sm btn-danger btn-round-custom" *ngIf="status === 'PENDING'" (click)="removeDetail(item.id)">Remove</button>
                                                 </td>
                                             </tr>
             
                                             <tr *ngIf="grn.grnDetails.length > 0">
+                                                <td></td>
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
@@ -500,6 +507,38 @@
                                 <pagination-controls (pageChange)="page = $event"></pagination-controls>
                             </div>
                         </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<!-- Modal -->
+<div class="modal fade" id="add-received-modal" tabindex="-1" role="dialog" aria-labelledby="salesOrderModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="salesOrderModalLabel"><b>Enter Received Qty</b></h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-3"></div>
+                    <div class="col-md-6">
+
+                        <label for="receivedQty">Received Qty</label>
+
+                        <input type="text" class="form-control" [(ngModel)]="receivedQty" placeholder="">
+                        <br>
+
+                        <button class="btn btn-success btn-round-custom" *ngIf="receivedQty >= 0" (click)="addReceived()" data-dismiss="modal" style="width: 30mm; height: 10mm;" >Save</button>
+                        <button class="btn btn-danger btn-round-custom" data-dismiss="modal" style="width: 30mm; height: 10mm;" >Cancel</button>
+                        
                     </div>
                 </div>
             </div>

@@ -37,9 +37,9 @@
                                     <td>{{parkingZone.companyName}} | {{parkingZone.branchName}}</td>
                                     <td>{{parkingZone.noOfSlots}}</td>
                                     <td>
-                                        <span *ngIf="parkingZone.active ==='Active'">Active__</span><span *ngIf="parkingZone.active ==='Inactive'">Inactive </span> | 
-                                        <button *ngIf="parkingZone.active ==='Inactive'" (click)="activate(parkingZone.id)"><i class="fa fa-unlock text-success"></i></button>
-                                        <button *ngIf="parkingZone.active ==='Active'" (click)="deactivate(parkingZone.id)"><i class="fa fa-lock text-danger"></i></button>
+                                        <span *ngIf="parkingZone.active ==='Active'">Lock__</span><span *ngIf="parkingZone.active ==='Inactive'">Unlock </span> | 
+                                        <button *ngIf="parkingZone.active ==='Active'" (click)="deactivate(parkingZone.id)"><i class="fa fa-unlock text-success"></i></button>
+                                        <button *ngIf="parkingZone.active ==='Inactive'" (click)="activate(parkingZone.id)"><i class="fa fa-lock text-danger"></i></button>
                                     </td>
                                     <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(parkingZone.id)" data-toggle="modal" data-target="#parkingZone-modal" style="cursor: pointer;">Edit</button></td>
                                 </tr>
@@ -65,22 +65,27 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-lg-3">
+                    <div class="col-lg-3"></div>
+                    <div class="col-lg-6">
                         <input type="hidden" [(ngModel)]="id">
                         <div class="form-group">
                             <label>ParkingZone Code</label>
                             <input class="form-control" type="text" [(ngModel)]="code" autocomplete="nope" readonly>
-                        </div>
+                        </div>         
+                    </div>  
+                    <div class="col-lg-6">                       
                         <div class="form-group">
                             <label>ParkingZone Name</label>
                             <input class="form-control" type="text" [(ngModel)]="name" autocomplete="nope">
-                        </div>
+                        </div>  
+                    </div> 
+                    <div class="col-lg-6">
                         <div class="form-group">
                             <label>No of Slots</label>
                             <input class="form-control" type="number" [(ngModel)]="noOfSlots" autocomplete="nope">
                         </div>
                         
-                    </div>                   
+                    </div>                  
                 </div>
             </div>
             <div class="modal-footer">

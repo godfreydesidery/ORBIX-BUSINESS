@@ -9,7 +9,9 @@
                 <div class="row">
                     <div class="col-md-12">
                         <!-- <button class="btn btn-success btn-round-custom" (click)="toggleShowImportList()">Import Product</button> -->
-                        <button class="btn btn-success btn-round-custom" (click)="clearImportList()" (click)="loadShopProductStockStatus()">Refresh Stock</button>
+                        <button class="btn btn-success btn-round-custom" (click)="clearImportList()" (click)="loadShopProductStockStatus()">Refresh Stock</button>    
+                        <button class="btn btn-primary btn-round-custom" (click)="clearImportList()" (click)="filterUnderStock()">Understock</button>
+                        <button class="btn btn-primary btn-round-custom" (click)="clearImportList()" (click)="filterOutofStock()">Out of stock</button>
                         <!-- <button class="btn btn-success btn-round-custom" (click)="clearImportList()">Print Stock Report</button> -->
                     </div>
                 </div>
@@ -34,6 +36,7 @@
                                         <th scope="col">Name</th>
                                         <th scope="col">Description</th>                   
                                         <th scope="col">Stock</th>
+                                        <th scope="col">Min Stock</th>
                                         <th scope="col">Base UOM</th>
                                         <th scope="col">Cost Price Incl</th>
                                         <!-- <th scope="col">Cost Price Excl</th> -->
@@ -46,21 +49,22 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let shopProduct of shopProducts | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                    <tr *ngFor="let shopProduct of showShopProducts | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
                                         <td>{{shopProduct.productCode}}</td>
                                         <td>{{shopProduct.productName}}</td>
                                         <td>{{shopProduct.productDescription}}</td>
-                                        <td>{{shopProduct.currentStock}}</td>
+                                        <td><b style="color: red;">{{shopProduct.currentStock}}</b></td>
+                                        <td><b style="color: red;">{{shopProduct.minStock}}</b></td>
                                         <td>{{shopProduct.baseUom}}</td>
-                                        <td style="text-align: right;">{{shopProduct.costPriceVatIncl | currency:'':''}}</td>
+                                        <td class="text-success" style="text-align: right;"><b>{{shopProduct.costPriceVatIncl | currency:'':''}}</b></td>
                                         <!-- <td style="text-align: right;">{{shopProduct.costPriceVatExcl | currency:'':''}}</td> -->
-                                        <td style="text-align: right;">{{shopProduct.sellingPriceVatIncl | currency:'':''}}</td>
+                                        <td class="text-primary" style="text-align: right;"><b>{{shopProduct.sellingPriceVatIncl | currency:'':''}}</b></td>
                                         <!-- <td style="text-align: right;">{{shopProduct.sellingPriceVatExcl | currency:'':''}}</td> -->
                                         <!-- <td>{{shopProduct.defaultReorderQty}}</td> -->
                                         <!-- <td>{{shopProduct.defaultReorderLevel}}</td> -->
                                         <td>{{shopProduct.vatRate * 100}} %</td>
                                         <td>
-                                            <button class="btn btn-warning btn-round-custom" (click)="searchShopProduct(shopProduct.id)" data-toggle="modal" data-target="#update-modal">Edit</button>
+                                            <button class="btn btn-warning btn-round-custom" (click)="searchShopProduct(shopProduct.id)" *ngIf="grant(['SHPPRDCT-ALL'])," data-toggle="modal" data-target="#update-modal">Edit</button>
                                             <button class="btn btn-success btn-round-custom" (click)="searchShopProduct(shopProduct.id)" *ngIf="grant(['SHPSTK-ALL','SHPSTK-UPDATE'])," data-toggle="modal" data-target="#adjust-stock-modal">Adjust Stock</button>
                                         </td>
                                     </tr>

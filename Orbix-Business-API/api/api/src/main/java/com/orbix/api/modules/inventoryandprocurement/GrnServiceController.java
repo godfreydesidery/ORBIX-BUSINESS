@@ -83,6 +83,7 @@ public class GrnServiceController implements GrnService {
 		statuses.add(WorkFlowStatus.PENDING);
 		//statuses.add(WorkFlowStatus.PROCESSING);
 		statuses.add(WorkFlowStatus.APPROVED);
+		statuses.add(WorkFlowStatus.PROCESSING);
 
 			List<Grn> grns = grnRepository.findAllByStatusInAndBranch(statuses, userService.getUserBranch(request));
 
@@ -143,7 +144,7 @@ public class GrnServiceController implements GrnService {
 		grn.setCreatedByUser(userService.getUser(request));
 		grn.setCreatedDateTime(dayService.getTimeStamp());
 		grn = grnRepository.save(grn);
-		grn.setNo(grn.getId().toString());
+		grn.setNo("GRN/DAV/" + grn.getId().toString());
 		
 		grn = grnRepository.save(grn);
 		
@@ -167,50 +168,57 @@ public class GrnServiceController implements GrnService {
 		}	
 		
 		Lpo lpo = lpo_.get();
-		lpo.setStatus(WorkFlowStatus.COMPLETED);
-		lpo = lpoRepository.save(lpo);
+		//lpo.setStatus(WorkFlowStatus.COMPLETED);
+		//lpo = lpoRepository.save(lpo);
 		
-		shop = lpo.getShop();
+		Optional<Grn> grn_ = grnRepository.findByLpo(lpo);
+		
+		Grn grn;
+		
+		if(grn_.isEmpty()) {
+			grn = new Grn();
+			shop = lpo.getShop();
+			
+			grn.setNo(String.valueOf(Math.random()));
+			grn.setShop(shop);
+			grn.setBranch(userService.getUserBranch(request));
+			grn.setStatus(WorkFlowStatus.PROCESSING);
+//			grn.setSummary(grnRequest.getSummary());
+			grn.setCreatedByUser(userService.getUser(request));
+			grn.setCreatedDateTime(dayService.getTimeStamp());
+			grn = grnRepository.save(grn);
+			grn.setNo("GRN/DAV/" + grn.getId().toString());
+			grn.setLpo(lpo);
+			
+			grn = grnRepository.save(grn);
+			
+			List<GrnDetail> grnDetails = new ArrayList<>();
+			for(LpoDetail lpoDetail : lpo_.get().getLpoDetails()) {
+				GrnDetail grnDetail = new GrnDetail();
 				
+				
+				if(lpoDetail.getQty() <= 0) {
+					throw new InvalidOperationException("Invalid quantiy selected");
+				}
+							
+				grnDetail.setProduct(lpoDetail.getProduct());
+				grnDetail.setOrderedQty(lpoDetail.getQty());
+				grnDetail.setCostPriceVatIncl(lpoDetail.getCostPriceVatIncl());
+				grnDetail.setVatRate(lpoDetail.getVatRate());
+				grnDetail.setGrn(grn);
+				
+				grnDetail.setCreatedByUser(userService.getUser(request));
+				grnDetail.setCreatedDateTime(dayService.getTimeStamp());
 
-		Grn grn = new Grn();
-		
-		grn.setNo(String.valueOf(Math.random()));
-		grn.setShop(shop);
-		grn.setBranch(userService.getUserBranch(request));
-		grn.setStatus(WorkFlowStatus.PROCESSING);
-//		grn.setSummary(grnRequest.getSummary());
-		grn.setCreatedByUser(userService.getUser(request));
-		grn.setCreatedDateTime(dayService.getTimeStamp());
-		grn = grnRepository.save(grn);
-		grn.setNo(grn.getId().toString());
-		
-		grn = grnRepository.save(grn);
-		
-		List<GrnDetail> grnDetails = new ArrayList<>();
-		for(LpoDetail lpoDetail : lpo_.get().getLpoDetails()) {
-			GrnDetail grnDetail = new GrnDetail();
-			
-			
-			if(lpoDetail.getQty() <= 0) {
-				throw new InvalidOperationException("Invalid quantiy selected");
+				grnDetail = grnDetailRepository.save(grnDetail);
+				grnDetails.add(grnDetail);
+				
 			}
-						
-			grnDetail.setProduct(lpoDetail.getProduct());
-			grnDetail.setQty(lpoDetail.getQty());
-			grnDetail.setCostPriceVatIncl(lpoDetail.getCostPriceVatIncl());
-			grnDetail.setVatRate(lpoDetail.getVatRate());
-			grnDetail.setGrn(grn);
 			
-			grnDetail.setCreatedByUser(userService.getUser(request));
-			grnDetail.setCreatedDateTime(dayService.getTimeStamp());
-
-			grnDetail = grnDetailRepository.save(grnDetail);
-			grnDetails.add(grnDetail);
-			
+			grn.setGrnDetails(grnDetails);
+		}else {
+			grn = grn_.get();
 		}
-		
-		grn.setGrnDetails(grnDetails);
 		
 		return grnResponseDTOMapperWithDetails(grn);
 	}
@@ -256,14 +264,14 @@ public class GrnServiceController implements GrnService {
 //		grnDetail.setCostPriceVatIncl(supplierProduct.getCostPriceVatIncl());
 //		grnDetail.setVatRate(supplierProduct.getVatRate());
 		grnDetail.setProduct(product);
-		if(grnDetailRequest.getQty() <= 0) {
+		if(grnDetailRequest.getOrderedQty() <= 0) {
 			throw new InvalidOperationException("Invalid quantiy selected");
 		}
 		
 		if(grnDetailRepository.existsByGrnAndProduct(grn, product)) {
 			throw new InvalidOperationException("Product already present in LPO");
 		}
-		grnDetail.setQty(grnDetailRequest.getQty());
+		grnDetail.setOrderedQty(grnDetailRequest.getOrderedQty());
 		grnDetail.setCostPriceVatIncl(grnDetailRequest.getCostPriceVatIncl());
 		grnDetail.setVatRate(grnDetailRequest.getVatRate());
 		grnDetail.setGrn(grn);
@@ -292,6 +300,31 @@ public class GrnServiceController implements GrnService {
 		}
 		
 		grnDetailRepository.delete(grnDetail);	
+		
+	}
+	
+	@Override
+	public void addReceived(Long grnDetailId, Long grnId, double qty, HttpServletRequest request) {
+		Grn grn = grnRepository.findById(grnId)
+			    .orElseThrow(() -> new NotFoundException("GRN not found, with id " + grnId));
+		if(!(String.valueOf(grn.getStatus()).equals("PENDING") || String.valueOf(grn.getStatus()).equals("PROCESSING"))) {
+			throw new InvalidOperationException("Not a pending GRN");
+		}
+		
+		GrnDetail grnDetail = grnDetailRepository.findById(grnDetailId)
+			    .orElseThrow(() -> new NotFoundException("Detail not found, with id " + grnDetailId));
+		
+		if(grnDetail.getOrderedQty() < qty) {
+			throw new InvalidOperationException("Can not receive more than ordered qty");
+		}
+		
+		if(qty < 0) {
+			throw new InvalidOperationException("Invalid Input. Can not receive zero or less");
+		}
+		
+		grnDetail.setReceivedQty(qty);
+		
+		grnDetailRepository.save(grnDetail);
 		
 	}
 
@@ -324,13 +357,13 @@ public class GrnServiceController implements GrnService {
 			
 				ShopProduct shopProduct = shopProductRepository.findByProductAndShop(grnDetail.getProduct(), shop).orElseThrow();
 				
-				double newStock = shopProduct.getCurrentStock() + grnDetail.getQty();
+				double newStock = shopProduct.getCurrentStock() + grnDetail.getReceivedQty();
 				
 				shopProduct.setCurrentStock(newStock);
 				
 				shopProduct = shopProductRepository.save(shopProduct);
 				
-				this.createShopProductLog(shop, grnDetail.getProduct(), grnDetail.getQty(), 0, newStock, userService.getUser(request), dayService.getTimeStamp(), "GRN: " + grn.getNo());
+				this.createShopProductLog(shop, grnDetail.getProduct(), grnDetail.getReceivedQty(), 0, newStock, userService.getUser(request), dayService.getTimeStamp(), "GRN: " + grn.getNo());
 
 			}
 		}
@@ -386,7 +419,20 @@ public class GrnServiceController implements GrnService {
 		}
 //		grnResponse.setSupplierId(grn.getSupplier().getId().toString());		
 //		grnResponse.setSupplierCode(grn.getSupplier().getCode());	
-//		grnResponse.setSupplierName(grn.getSupplier().getName());
+		if (grn.getLpo() != null) {
+		    grnResponse.setSupplierName(grn.getLpo().getSupplier().getName());
+		} else {
+		    grnResponse.setSupplierName("");
+		}
+		
+		if(grn.getApprovedByUser() != null) {
+			grnResponse.setReceivedBy(grn.getApprovedByUser().getNickname());
+			grnResponse.setReceivedAt(grn.getApprovedDateTime().toString());
+		}else {
+			grnResponse.setReceivedBy("");
+			grnResponse.setReceivedAt("");
+		}
+		
 		grnResponse.setStatus(grn.getStatus().toString());
 		
 		return grnResponse;
@@ -416,6 +462,13 @@ public class GrnServiceController implements GrnService {
 		    grnResponse.setSupplierCode("");
 		    grnResponse.setSupplierName("");
 		}
+		if(grn.getApprovedByUser() != null) {
+			grnResponse.setReceivedBy(grn.getApprovedByUser().getNickname());
+			grnResponse.setReceivedAt(grn.getApprovedDateTime().toString());
+		}else {
+			grnResponse.setReceivedBy("");
+			grnResponse.setReceivedAt("");
+		}
 		grnResponse.setStatus(grn.getStatus().toString());
 		
 		for(GrnDetail grnDetail : grn.getGrnDetails()) {
@@ -432,13 +485,14 @@ public class GrnServiceController implements GrnService {
 		grnDetailResponse.setId(grnDetail.getId().toString());
 		grnDetailResponse.setCostPriceVatIncl(String.valueOf(grnDetail.getCostPriceVatIncl()));
 		grnDetailResponse.setVatRate(String.valueOf(grnDetail.getVatRate()));
-		grnDetailResponse.setQty(String.valueOf(grnDetail.getQty()));
+		grnDetailResponse.setOrderedQty(String.valueOf(grnDetail.getOrderedQty()));
+		grnDetailResponse.setReceivedQty(String.valueOf(grnDetail.getReceivedQty()));
 		grnDetailResponse.setProductId(grnDetail.getProduct().getId().toString());
 		grnDetailResponse.setProductCode(grnDetail.getProduct().getCode());
 		grnDetailResponse.setProductName(grnDetail.getProduct().getName());
 		grnDetailResponse.setProductDescription(grnDetail.getProduct().getDescription());
 		grnDetailResponse.setBaseUom(grnDetail.getProduct().getBaseUom());
-		grnDetailResponse.setAmount(String.valueOf(grnDetail.getCostPriceVatIncl() * grnDetail.getQty()));
+		grnDetailResponse.setAmount(String.valueOf(grnDetail.getCostPriceVatIncl() * grnDetail.getReceivedQty()));
 		
 		return grnDetailResponse;
 	}

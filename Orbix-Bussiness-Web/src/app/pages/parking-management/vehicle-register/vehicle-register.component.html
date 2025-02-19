@@ -439,10 +439,14 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Select Vehicle Type</label>
-                            <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
+                            <!-- <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
                                 <option></option>
                                 <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
-                            </select>
+                            </select> -->
+                            <input class="form-control" type="text" list="venames" [(ngModel)]="vehicleEquipmentTypeName"/>
+                                    <datalist id="venames">
+                                        <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
+                                    </datalist>
                         </div>
                     </div>
                     

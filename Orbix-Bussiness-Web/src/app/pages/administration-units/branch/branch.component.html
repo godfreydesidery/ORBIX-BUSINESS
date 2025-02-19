@@ -38,9 +38,9 @@
                                     <td>{{branch.companyName}}</td>
                                     <td>{{branch.managerName}}</td>
                                     <td>
-                                        <span *ngIf="branch.active ==='Active'">Active__</span><span *ngIf="branch.active ==='Inactive'">Inactive </span> | 
-                                        <button *ngIf="branch.active ==='Inactive'" (click)="activate(branch.id)"><i class="fa fa-unlock text-success"></i></button>
-                                        <button *ngIf="branch.active ==='Active'" (click)="deactivate(branch.id)"><i class="fa fa-lock text-danger"></i></button>
+                                        <span *ngIf="branch.active ==='Active'">Lock__</span><span *ngIf="branch.active ==='Inactive'">Unlock </span> | 
+                                        <button *ngIf="branch.active ==='Active'" (click)="deactivate(branch.id)"><i class="fa fa-unlock text-success"></i></button>
+                                        <button *ngIf="branch.active ==='Inactive'" (click)="activate(branch.id)"><i class="fa fa-lock text-danger"></i></button>
                                     </td>
                                     <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(branch.id)" data-toggle="modal" data-target="#company-modal" style="cursor: pointer;">Edit</button></td>
                                 </tr>
@@ -72,10 +72,6 @@
                             <input class="form-control" type="text" [(ngModel)]="code" autocomplete="nope" readonly>
                         </div>
                         <div class="form-group">
-                            <label>Branch Name</label>
-                            <input class="form-control" type="text" [(ngModel)]="name" autocomplete="nope">
-                        </div>
-                        <div class="form-group">
                             <label>Company Name</label>
                             <input class="form-control" type="text" [(ngModel)]="company" autocomplete="nope">
                         </div>
@@ -83,11 +79,11 @@
                             <label>Manager Name</label>
                             <input class="form-control" type="text" [(ngModel)]="managerName" autocomplete="nope">
                         </div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label>Opening Hours</label>
                             <input class="form-control" type="text" [(ngModel)]="openingHours" autocomplete="nope">
-                        </div>
-                        <div class="form-group">
+                        </div> -->
+                        <!-- <div class="form-group">
                             <label>Symbol</label>
                             <input class="form-control" type="text"  autocomplete="nope">
                         </div>
@@ -122,7 +118,7 @@
                         <div class="form-group">
                             <label>Notes</label>
                             <input class="form-control" type="text" [(ngModel)]="notes" autocomplete="nope">
-                        </div>
+                        </div> -->
                         <div class="form-group">
                             <div class="form-group">
                                 <label for="exampleSelect1">Select Time Zone</label>
@@ -138,11 +134,11 @@
                             </div>
                         </div>
                     </div>                   
-                    <div class="col-lg-3">   
+                    <div class="col-lg-3">  
                         <div class="form-group">
-                            <label>Logo</label>
-                            <input class="form-control" type="file"  autocomplete="nope">
-                        </div>
+                            <label>Branch Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="name" autocomplete="nope">
+                        </div> 
                         <div class="form-group">
                             <label>TIN</label>
                             <input class="form-control" type="text"  autocomplete="nope">
@@ -150,7 +146,11 @@
                         <div class="form-group">
                             <label>VRN</label>
                             <input class="form-control" type="text"  autocomplete="nope">
-                        </div>                      
+                        </div> 
+                        <div class="form-group">
+                            <label>Website</label>
+                            <input class="form-control" type="text" [(ngModel)]="website" autocomplete="nope">
+                        </div>                     
                     </div>
                     <div class="col-lg-3">
                         <div class="form-group">
@@ -164,6 +164,10 @@
                         <div class="form-group">
                             <label>Post Address</label>
                             <input class="form-control" type="text" [(ngModel)]="postalAddress" autocomplete="nope">
+                        </div>
+                        <div class="form-group">
+                            <label>Logo</label>
+                            <input class="form-control" type="file"  autocomplete="nope">
                         </div>
                     </div>
                     <div class="col-lg-3">
@@ -179,14 +183,10 @@
                             <label>Email</label>
                             <input class="form-control" type="email" [(ngModel)]="email">
                         </div>
-                        <div class="form-group">
-                            <label>Website</label>
-                            <input class="form-control" type="text" [(ngModel)]="website" autocomplete="nope">
-                        </div>
-                        <div class="form-group">
+                        <!-- <div class="form-group">
                             <label>Fax</label>
                             <input class="form-control" type="tel" [(ngModel)]="fax" autocomplete="nope">
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>

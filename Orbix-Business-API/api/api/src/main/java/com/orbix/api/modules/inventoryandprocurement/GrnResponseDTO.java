@@ -10,6 +10,9 @@ public class GrnResponseDTO {
 	private String no;
 	private String status;
 	
+	private String receivedBy;
+	private String receivedAt;
+	
 	private String branchId;
 	private String branchCode;
 	private String shopId;

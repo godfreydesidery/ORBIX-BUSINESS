@@ -85,6 +85,8 @@ export class ShopProductStockStatusComponent {
     this.loadSelectedShop()
   }
 
+  showShopProducts: IShopProduct[] = [];
+
   loadShopProductStockStatus = async () => {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
@@ -97,6 +99,9 @@ export class ShopProductStockStatusComponent {
     .then(
       data => {
         this.shopProducts = data!
+
+        this.showShopProducts = this.shopProducts
+
         console.log(data)
       }
     )
@@ -105,6 +110,24 @@ export class ShopProductStockStatusComponent {
         console.log(error)
       }
     )
+  }
+
+  filterUnderStock(){
+    this.showShopProducts = []
+    this.shopProducts.forEach(element => {
+      if((+element.currentStock) < element.minStock){
+        this.showShopProducts.push(element)
+      }
+    })
+  }
+
+  filterOutofStock(){
+    this.showShopProducts = []
+    this.shopProducts.forEach(element => {
+      if((+element.currentStock) <= 0){
+        this.showShopProducts.push(element)
+      }
+    })
   }
 
   shopProductId : any = null
@@ -430,9 +453,8 @@ export class ShopProductStockStatusComponent {
           console.error('No privileges found in the token.');
           return false;
       }
-  
       const userPrivileges = decodedToken.privileges as string[];
-  
+    
       // Check if any of the required privileges exist in the user's privileges
       return privileges.some(privilege => userPrivileges.includes(privilege));
   }

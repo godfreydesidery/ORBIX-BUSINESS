@@ -17,4 +17,6 @@ public interface SupplierService {
 	
 	List<SupplierResponseDTO> getSuppliersByCompany(String supplierName, HttpServletRequest request);
 	
+	List<SupplierResponseDTO> getSuppliersByCompanyAndName(String supplierName, HttpServletRequest request);
+	
 }

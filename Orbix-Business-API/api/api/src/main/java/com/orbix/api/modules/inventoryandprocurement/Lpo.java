@@ -1,5 +1,6 @@
 package com.orbix.api.modules.inventoryandprocurement;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -47,6 +48,8 @@ public class Lpo {
 	private Long id;
 	@NotBlank
 	private String no;
+	
+	private LocalDate validUntilDate = LocalDate.now().plusDays(7);
 	
 	@Enumerated(EnumType.STRING)
     @Column(nullable = false)

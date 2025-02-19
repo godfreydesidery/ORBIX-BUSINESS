@@ -37,9 +37,9 @@
                                     <td>{{v.companyName}}</td>
                                     <td style="text-align: right;">{{v.dailyPrice | currency:'':''}}</td>
                                     <td>
-                                        <span *ngIf="v.active ==='Active'">Active__</span><span *ngIf="v.active ==='Inactive'">Inactive </span> | 
-                                        <button *ngIf="v.active ==='Inactive'" (click)="activate(v.id)"><i class="fa fa-unlock text-success"></i></button>
-                                        <button *ngIf="v.active ==='Active'" (click)="deactivate(v.id)"><i class="fa fa-lock text-danger"></i></button>
+                                        <span *ngIf="v.active ==='Active'">Lock__</span><span *ngIf="v.active ==='Inactive'">Unlock </span> | 
+                                        <button *ngIf="v.active ==='Active'" (click)="deactivate(v.id)"><i class="fa fa-unlock text-success"></i></button>
+                                        <button *ngIf="v.active ==='Inactive'" (click)="activate(v.id)"><i class="fa fa-lock text-danger"></i></button>
                                     </td>
                                     <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(v.id)" data-toggle="modal" data-target="#parkingZone-modal" style="cursor: pointer;">Edit</button></td>
                                 </tr>
@@ -57,7 +57,7 @@
 
 
 <div class="modal fade" id="parkingZone-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
-    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+    <div class="modal-dialog modal-lg" role="document" style="top: 0;">
         <div class="modal-content">
             <div class="modal-header state modal-default">                                    
                 <h4 class="modal-title" id="modal-large-label">New/Edit Vehicle Type</h4>
@@ -65,22 +65,27 @@
             </div>
             <div class="modal-body">
                 <div class="row">
-                    <div class="col-lg-3">
+                    <div class="col-lg-3"></div>
+                    <div class="col-lg-6">
                         <input type="hidden" [(ngModel)]="id">
                         <div class="form-group">
                             <label>Type Code</label>
                             <input class="form-control" type="text" [(ngModel)]="code" autocomplete="nope" readonly>
                         </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-6">
                         <div class="form-group">
                             <label>Type Name</label>
                             <input class="form-control" type="text" [(ngModel)]="name" autocomplete="nope">
-                        </div>
+                        </div>   
+                    </div>  
+                    <div class="col-lg-6">
                         <div class="form-group">
                             <label>Price(Daily)</label>
                             <input class="form-control" type="text" [(ngModel)]="dailyPrice" autocomplete="nope" style="text-align: right;">
-                        </div>
-                        
-                        
+                        </div>               
                     </div>                   
                 </div>
             </div>

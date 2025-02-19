@@ -7,7 +7,8 @@ public class GrnDetailResponseDTO {
 	private String id;
 	private String costPriceVatIncl;
 	private String vatRate;
-	private String qty;
+	private String orderedQty;
+	private String receivedQty;
 	
 	private String GRNId;
 	private String productId;

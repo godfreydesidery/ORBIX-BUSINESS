@@ -89,6 +89,15 @@ public class GrnResource {
 		grnService.removeGrnDetail(grnDetailId, grnId, request);		
 	}
 	
+	@GetMapping("/grns/add_received")
+	public void addReceived(
+			@RequestParam(name = "grn_id") Long grnId,
+			@RequestParam(name = "grn_detail_id") Long grnDetailId,
+			@RequestParam(name = "qty") double qty,
+			HttpServletRequest request){
+		grnService.addReceived(grnDetailId, grnId, qty, request);		
+	}
+	
 	@PostMapping("/grns/approve")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public boolean approve(

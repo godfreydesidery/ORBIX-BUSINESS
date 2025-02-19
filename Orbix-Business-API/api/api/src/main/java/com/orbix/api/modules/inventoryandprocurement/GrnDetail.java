@@ -39,7 +39,9 @@ public class GrnDetail {
 	@NotNull
 	private double vatRate = 0;
 	@NotNull
-	private double qty;
+	private double orderedQty = 0;
+	@NotNull
+	private double receivedQty = 0;
 	
 	@ManyToOne(targetEntity = Grn.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "grn_id", nullable = false , updatable = false)
