@@ -46,7 +46,7 @@
                                             <td style="text-align: right;">{{p.amount | currency:'':''}}</td>
                                             <td>{{p.payStatus}}</td>
                                             <td>
-                                                <button class="btn btn-success btn-round-custom" (click)="getParkingBill(p.id)" data-toggle="modal" data-target="#parking-bill-modal">Edit</button>
+                                                <button class="btn btn-success btn-round-custom" (click)="getParkingBill(p.id)" data-toggle="modal" data-target="#parking-bill-modal">Discount</button>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -55,7 +55,7 @@
                         </div>
 
                     </div>
-                    <div class="col-lg-6">
+                    <!-- <div class="col-lg-6">
                         <div><h4>Service billing</h4></div>
                         <div class="row">
                             <div class="col-sm-12">
@@ -97,7 +97,7 @@
                                 </table>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
                 </div>
             </div>
             <hr>
@@ -442,7 +442,8 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Qty</label>
-                            <input class="form-control" type="number" [(ngModel)]="parkingBillReceivableQty" autocomplete="nope" style="text-align: center;">
+                            <span class="form-control" style="text-align: right;">{{parkingBillReceivableQty}}</span>
+                            <!-- <input class="form-control" type="number" [(ngModel)]="parkingBillReceivableQty" autocomplete="nope" style="text-align: center;"> -->
                         </div>
                     </div> 
                     <div class="col-lg-3">
@@ -460,7 +461,7 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
-                        <button type="button" class="btn btn-primary btn-round-custom" (click)="saveParkingBill()">Save</button>
+                        <button type="button" class="btn btn-primary btn-round-custom" data-dismiss="modal" (click)="saveParkingBill()">Save</button>
                     </div>
                 </div>
             </div>

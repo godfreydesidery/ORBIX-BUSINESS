@@ -46,7 +46,7 @@
                                             <td style="text-align: right;">{{p.amount | currency:'':''}}</td>
                                             <td>{{p.payStatus}}</td>
                                             <td>
-                                                <button class="btn btn-success btn-round-custom" (click)="getStorageBill(p.id)" data-toggle="modal" data-target="#storage-bill-modal">Edit</button>
+                                                <button class="btn btn-success btn-round-custom" (click)="getStorageBill(p.id)" data-toggle="modal" data-target="#storage-bill-modal">Discount</button>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -321,7 +321,8 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Qty</label>
-                            <input class="form-control" type="number" [(ngModel)]="serviceBillReceivableQty" autocomplete="nope" style="text-align: right;">
+                            <span class="form-control" style="text-align: right;">{{serviceBillReceivableQty}}</span>
+                            <!-- <input class="form-control" type="number" [(ngModel)]="serviceBillReceivableQty" autocomplete="nope" style="text-align: right;"> -->
                         </div>
                     </div> 
                     <div class="col-lg-3">
@@ -391,7 +392,8 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Qty</label>
-                            <input class="form-control" type="number" [(ngModel)]="storageBillReceivableQty" autocomplete="nope" style="text-align: center;">
+                            <span class="form-control" style="text-align: right;">{{storageBillReceivableQty}}</span>
+                            <!-- <input class="form-control" type="number" [(ngModel)]="storageBillReceivableQty" autocomplete="nope" style="text-align: center;"> -->
                         </div>
                     </div> 
                     <div class="col-lg-3">
@@ -409,7 +411,7 @@
                 </div>
                 <div class="row">
                     <div class="col-lg-12">
-                        <button type="button" class="btn btn-primary btn-round-custom" (click)="saveStorageBill()">Save</button>
+                        <button type="button" class="btn btn-primary btn-round-custom" data-dismiss="modal" (click)="saveStorageBill()">Save</button>
                     </div>
                 </div>
             </div>
