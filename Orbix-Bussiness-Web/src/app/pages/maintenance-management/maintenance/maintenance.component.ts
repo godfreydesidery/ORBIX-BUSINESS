@@ -13,6 +13,9 @@ import * as pdfMake from 'pdfmake/build/pdfmake';
 
 import { DataService } from '@services/custom/data.service';
 import { MsgBoxService } from '@services/custom/msg-box.service';
+import { IMaintenanceJobCard } from 'src/app/domain/maintenance-job-card';
+import { IMaintenanceIssueType } from 'src/app/domain/maintenance-issue-type';
+import { IServiceSpecialist } from 'src/app/domain/service-specialist';
 
 
 const API_URL = environment.apiUrl;
@@ -87,10 +90,7 @@ export class MaintenanceComponent {
     startBillingAt : Date | null
   
     // Foreign keys
-    maintenanceId: any = null
-    maintenanceNo : string = ''
-    vehicleEquipmentTypeId: any = ''
-    vehicleEquipmentTypeName : string = ''
+    
     branchId: any = ''
     companyId: any = ''
   
@@ -102,6 +102,19 @@ export class MaintenanceComponent {
     maintenances : IMaintenance[] = []
   
     vehicleEquipmentTypes  : IVehicleEquipmentType[] = []
+    maintenanceIssueTypes : IMaintenanceIssueType[] = []
+    serviceSpecialists : IServiceSpecialist[] = []
+
+    maintenanceJobCard : IMaintenanceJobCard
+
+    maintenanceJobCardId : any = null
+    maintenanceJobCardNo : string = ''
+    maintenanceId: any = null
+    maintenanceNo : string = ''
+    vehicleEquipmentTypeId: any = ''
+    vehicleEquipmentTypeName : string = ''
+    vehicleEquipmentName : string = ''
+    ownerName : string = ''
   
     constructor(
       private http :HttpClient,
@@ -113,6 +126,8 @@ export class MaintenanceComponent {
     ngOnInit(){
       this.getAllPendingOrCheckedInMaintenances()   
       this.getAllCompanyActiveVehicleAndEquipmentTypes()
+      this.getAllCompanyActiveMaintenanceIssueTypes()
+      this.getAllBranchServiceSpecialists()
     }
   
     async getAllPendingOrCheckedInMaintenances(){
@@ -169,6 +184,47 @@ export class MaintenanceComponent {
             element.sn = sn
             this.vehicleEquipmentTypes.push(element)
             sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
+    }
+
+
+    async getAllCompanyActiveMaintenanceIssueTypes(){
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      }
+      this.maintenanceIssueTypes = []
+  
+      await this.http.get<IMaintenanceIssueType[]>(API_URL+'/maintenance_issue_types/get_all_company_active', options)
+      .toPromise()
+      .then(
+        data => {
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.maintenanceIssueTypes.push(element)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
+    }
+
+    async getAllBranchServiceSpecialists(){
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      }
+      this.serviceSpecialists = []
+  
+      await this.http.get<IServiceSpecialist[]>(API_URL+'/service_specialists/get_all_branch_active', options)
+      .toPromise()
+      .then(
+        data => {
+          var sn = 1
+          data?.forEach(element => {
+            this.serviceSpecialists.push(element)
           })
           console.log(data)
         }
@@ -417,6 +473,60 @@ export class MaintenanceComponent {
           }
         )
     }
+
+  async createMaintenanceJobCard(maintenanceId: any) {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+
+
+    this.clearJobCard()
+
+    var maintenance = {
+      id: maintenanceId
+    }
+
+    await this.http.post<IMaintenanceJobCard>(API_URL + '/maintenances/create_maintenance_job_card', maintenance, options)
+      .toPromise()
+      .then(
+        data => {
+
+          this.showJobCard(data!)
+
+          console.log(data)
+
+          this.msg.showSuccessMessage('Card created/fetched successifully')
+
+        }
+
+      )
+      .catch(
+        error => {
+          console.log(error)
+          this.msg.showErrorMessage(error, 'Error')
+        }
+      )
+  }
+
+  showJobCard(data: IMaintenanceJobCard) {
+    this.maintenanceJobCardId = data!.id
+    this.maintenanceJobCardNo = data!.no
+    this.maintenanceId = data!.maintenanceId
+    this.maintenanceNo = data!.maintenanceNo
+    this.vehicleEquipmentName = data!.vehicleEquipmentName
+    this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName
+    this.ownerName = data!.ownerName
+  }
+
+  clearJobCard() {
+    this.maintenanceJobCardId = null
+    this.maintenanceJobCardNo = ''
+    this.maintenanceId = null
+    this.maintenanceNo = ''
+    this.vehicleEquipmentName = ''
+    this.vehicleEquipmentTypeName = ''
+    this.ownerName = ''
+  }
   
     showMaintenanceData(data : IMaintenance){
       this.maintenanceId = data?.id;

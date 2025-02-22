@@ -18,4 +18,10 @@ public interface MaintenanceService {
 	
 	MaintenanceResponseDTO checkIn(MaintenanceRequestDTO maintenanceRequest, HttpServletRequest request);
 	MaintenanceResponseDTO checkOut(MaintenanceRequestDTO maintenanceRequest, HttpServletRequest request);
+	
+	
+	MaintenanceJobCardResponseDTO createMaintenanceJobCard(MaintenanceRequestDTO maintenanceRequest, HttpServletRequest request);
+	MaintenanceJobCardResponseDTO openMaintenanceJobCard(MaintenanceJobCard maintenanceJobCard, HttpServletRequest request);
+	MaintenanceJobCardResponseDTO closeMaintenanceJobCard(MaintenanceJobCard maintenanceJobCard, HttpServletRequest request);
+	MaintenanceJobCardResponseDTO reopenMaintenanceJobCard(MaintenanceJobCard maintenanceJobCard, HttpServletRequest request);
 }

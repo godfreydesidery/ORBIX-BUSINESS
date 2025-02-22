@@ -527,6 +527,16 @@ export const menuItems = [
                 title: 'Maintenance',
                 url: '#',
                 routerLink: '/app/maintenance-management/maintenance'
+            }, 
+            { 
+                title: 'Issue Type',
+                url: '#',
+                routerLink: '/app/maintenance-management/maintenance-issue-type'
+            }, 
+            { 
+                title: 'Service Specialist',
+                url: '#',
+                routerLink: '/app/maintenance-management/service-specialist'
             },    
         ]
     },

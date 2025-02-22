@@ -1,5 +1,135 @@
 package com.orbix.api.modules.vehicleandequipmentmaintenance;
 
-public class MaintenanceJobCardServiceController {
+import java.util.Optional;
+import java.util.UUID;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
+
+import org.springframework.stereotype.Service;
+
+import com.orbix.api.exceptions.InvalidOperationException;
+import com.orbix.api.exceptions.NotFoundException;
+import com.orbix.api.modules.adminunits.DayService;
+import com.orbix.api.modules.finance.BillReceivableRepository;
+import com.orbix.api.modules.identityandaccess.UserService;
+
+import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+
+@Service
+@RequiredArgsConstructor
+@Transactional
+@Slf4j
+public class MaintenanceJobCardServiceController implements MaintenanceJobCardService {
+	
+	private final MaintenanceJobCardRepository maintenanceJobCardRepository;
+	private final MaintenanceRepository maintenanceRepository;
+	
+	private final UserService userService;
+	private final DayService dayService;
+	
+	@Override
+	public MaintenanceJobCardResponseDTO showMaintenanceJobCard(MaintenanceJobCard maintenanceJobCard) {
+		return maintenanceJobCardResponseDTOMapper(maintenanceJobCard);
+	}
+	
+	@Override
+	public MaintenanceJobCardResponseDTO createMaintenanceJobCard(MaintenanceRequestDTO maintenanceRequest, HttpServletRequest request) {
+		
+		Maintenance maintenance = maintenanceRepository.findById(maintenanceRequest.getId())
+				.orElseThrow(() -> new NotFoundException("Maintenance not found"));
+		if(!maintenance.getStatus().equals("PENDING")) {
+			throw new InvalidOperationException("Not a pending maintenance");
+		}
+		
+		MaintenanceJobCard maintenanceJobCard = new MaintenanceJobCard();
+		
+		maintenanceJobCard.setNo("MJC/TEMP-" + UUID.randomUUID());
+		
+		maintenanceJobCard.setMaintenance(maintenance);
+		maintenanceJobCard.setCreatedByUser(userService.getUser(request));
+		maintenanceJobCard.setCreatedDateTime(dayService.getTimeStamp());
+		maintenanceJobCard.setStatus("PENDING");
+		
+		maintenanceJobCard = maintenanceJobCardRepository.save(maintenanceJobCard);
+		maintenanceJobCard.setNo("MJC/" + maintenanceJobCard.getId());
+		return maintenanceJobCardResponseDTOMapper(maintenanceJobCardRepository.save(maintenanceJobCard));
+	}
+
+	@Override
+	public MaintenanceJobCardResponseDTO openMaintenanceJobCard(MaintenanceJobCard jobCard,
+			HttpServletRequest request) {
+		MaintenanceJobCard maintenanceJobCard = maintenanceJobCardRepository.findById(jobCard.getId())
+			    .orElseThrow(() -> new NotFoundException("MaintenanceJobCard not found with ID: " + jobCard.getId()));
+		if(maintenanceJobCard.getStatus().equals("PENDING")) {
+			maintenanceJobCard.setStatus("OPEN");
+			maintenanceJobCard.setOpenedByUser(userService.getUser(request));
+			maintenanceJobCard.setOpenedDateTime(dayService.getTimeStamp());
+			maintenanceJobCard = maintenanceJobCardRepository.save(maintenanceJobCard);
+			return maintenanceJobCardResponseDTOMapper(maintenanceJobCard);
+		}else {
+			throw new InvalidOperationException("Can only open a pending Job card");
+		}
+	}
+
+	@Override
+	public MaintenanceJobCardResponseDTO closeMaintenanceJobCard(MaintenanceJobCard jobCard,
+			HttpServletRequest request) {
+		MaintenanceJobCard maintenanceJobCard = maintenanceJobCardRepository.findById(jobCard.getId())
+			    .orElseThrow(() -> new NotFoundException("MaintenanceJobCard not found with ID: " + jobCard.getId()));
+		if(maintenanceJobCard.getStatus().equals("OPEN")) {
+			maintenanceJobCard.setStatus("CLOSED");
+			maintenanceJobCard.setClosedByUser(userService.getUser(request));
+			maintenanceJobCard.setClosedDateTime(dayService.getTimeStamp());
+			maintenanceJobCard = maintenanceJobCardRepository.save(maintenanceJobCard);
+			return maintenanceJobCardResponseDTOMapper(maintenanceJobCard);
+		}else {
+			throw new InvalidOperationException("Can only open a pending Job card");
+		}
+	}
+	@Override
+	public MaintenanceJobCardResponseDTO reopenMaintenanceJobCard(MaintenanceJobCard jobCard,
+			HttpServletRequest request) {
+		MaintenanceJobCard maintenanceJobCard = maintenanceJobCardRepository.findById(jobCard.getId())
+			    .orElseThrow(() -> new NotFoundException("MaintenanceJobCard not found with ID: " + jobCard.getId()));
+		if(maintenanceJobCard.getStatus().equals("CLOSED")) {
+			maintenanceJobCard.setStatus("OPEN");
+			maintenanceJobCard = maintenanceJobCardRepository.save(maintenanceJobCard);
+			return maintenanceJobCardResponseDTOMapper(maintenanceJobCard);
+		}else {
+			throw new InvalidOperationException("Can only re-open a closed Job card");
+		}
+	}
+	
+	private MaintenanceJobCardResponseDTO maintenanceJobCardResponseDTOMapper(MaintenanceJobCard maintenanceJobCard) {
+		MaintenanceJobCardResponseDTO maintenanceJobCardResponseDTO = new MaintenanceJobCardResponseDTO();
+		
+		maintenanceJobCardResponseDTO.setId(maintenanceJobCard.getId().toString());
+		maintenanceJobCardResponseDTO.setNo(maintenanceJobCard.getNo());
+		maintenanceJobCardResponseDTO.setStatus(maintenanceJobCard.getStatus());
+		maintenanceJobCardResponseDTO.setMaintenanceId(maintenanceJobCard.getMaintenance().getId().toString());
+		maintenanceJobCardResponseDTO.setMaintenanceNo(maintenanceJobCard.getMaintenance().getNo());
+		maintenanceJobCardResponseDTO.setCreatedBy(maintenanceJobCard.getCreatedByUser() != null ? maintenanceJobCard.getCreatedByUser().getNickname() : "");
+		maintenanceJobCardResponseDTO.setCreatedDateTime(maintenanceJobCard.getCreatedDateTime() != null ? maintenanceJobCard.getCreatedDateTime().toString() : "");
+		
+		maintenanceJobCardResponseDTO.setOpenedBy(maintenanceJobCard.getOpenedByUser() != null ? maintenanceJobCard.getOpenedByUser().getNickname() : "");
+		maintenanceJobCardResponseDTO.setOpenedDateTime(maintenanceJobCard.getOpenedDateTime() != null ? maintenanceJobCard.getOpenedDateTime().toString() : "");
+		
+		maintenanceJobCardResponseDTO.setClosedBy(maintenanceJobCard.getClosedByUser() != null ? maintenanceJobCard.getClosedByUser().getNickname() : "");
+		maintenanceJobCardResponseDTO.setClosedDateTime(maintenanceJobCard.getClosedDateTime() != null ? maintenanceJobCard.getClosedDateTime().toString() : "");
+		
+		maintenanceJobCardResponseDTO.setOwnerName(maintenanceJobCard.getMaintenance().getOwnerFirstName() + " " + maintenanceJobCard.getMaintenance().getOwnerLastName());
+		maintenanceJobCardResponseDTO.setVehicleEquipmentTypeName(maintenanceJobCard.getMaintenance().getVehicleEquipmentType().getName());
+		maintenanceJobCardResponseDTO.setVehicleEquipmentName(maintenanceJobCard.getMaintenance().getVehicleEquipmentName());
+		// add others, on conditional
+		
+		return maintenanceJobCardResponseDTO;
+	}
+
+	
+	
+	
+	
 
 }

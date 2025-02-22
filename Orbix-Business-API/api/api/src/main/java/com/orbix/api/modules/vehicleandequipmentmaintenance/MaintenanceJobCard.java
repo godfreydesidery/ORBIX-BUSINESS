@@ -49,6 +49,7 @@ public class MaintenanceJobCard {
 	@ToString.Exclude
     @EqualsAndHashCode.Exclude
     private User createdByUser;
+	private LocalDateTime createdDateTime = LocalDateTime.now();
 	
 	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = true)
     @JoinColumn(name = "opened_by_user_id", nullable = true , updatable = true)
@@ -56,6 +57,7 @@ public class MaintenanceJobCard {
 	@ToString.Exclude
     @EqualsAndHashCode.Exclude
     private User openedByUser;
+	private LocalDateTime openedDateTime;
 	
 	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = true)
     @JoinColumn(name = "closed_by_user_id", nullable = true , updatable = true)
@@ -63,6 +65,7 @@ public class MaintenanceJobCard {
 	@ToString.Exclude
     @EqualsAndHashCode.Exclude
     private User closedByUser;
+	private LocalDateTime closedDateTime;
 	
 	@ManyToOne(targetEntity = Maintenance.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "maintenance_id", nullable = false , updatable = false)

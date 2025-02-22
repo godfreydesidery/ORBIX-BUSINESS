@@ -61,8 +61,7 @@
                                             <td>
                                                 <table class="table table-sm">
                                                     <tr>
-                                                        <td><button type="button" class="btn btn-primary btn-round-custom btn-sm text-nowrap" *ngIf="p.status === 'PENDING'" (click)="get(p.id)" style="cursor: pointer;">Edit</button></td>
-                                                        <td><button type="button" class="btn btn-success btn-round-custom btn-sm text-nowrap" *ngIf="p.status === 'PENDING'" (click)="get(p.id)" style="cursor: pointer; margin-left: 3px;">Job Card</button></td>
+                                                        <td><button type="button" class="btn btn-success btn-round-custom btn-sm text-nowrap" *ngIf="p.status === 'PENDING'" (click)="createMaintenanceJobCard(p.id)" style="cursor: pointer; margin-left: 3px;">Job Card</button></td>
                                                         <!-- <td><button type="button" class="btn btn-danger btn-round-custom" *ngIf="p.status === 'CHECKED-IN'" (click)="get(p.id)" data-toggle="modal" data-target="#check-out-modal" style="cursor: pointer; margin-left: 3px;">Check Out</button></td> -->
                                                     </tr>
                                                 </table>
@@ -79,25 +78,28 @@
                         </div>
 
                     </div>
-                    <div class="col-md-6 card">
+                    <div class="col-md-6 card" *ngIf="maintenanceJobCardNo != ''">
                         <div class="row">
                             <div class="col-lg-12">
                                 <div style="text-align: center;"><h4>Job Card</h4></div>
                                 <div class="row">
                                     <div class="col-lg-6">
-                                        <div><span>Job Card No:</span></div>
+                                        <div><span>Job Card No:</span><b>{{maintenanceJobCardNo}}</b></div>
                                     </div>
                                     <div class="col-lg-6">
-                                        <div><span>Maintenance No:</span></div>
+                                        <div><span>Maintenance No:</span><b>{{maintenanceNo}}</b></div>
                                     </div>
                                     <div class="col-lg-6">
-                                        <div><span>Owner Name:</span></div>
+                                        <div><span>Owner Name:</span><b>{{ownerName}}</b></div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div><span>Chasis No:</span></div>
                                     </div>
                                     <div class="col-lg-6">
-                                        <div><span>Vehicle Type:</span></div>
+                                        <div><span>Vehicle Type:</span><b>{{vehicleEquipmentTypeName}}</b></div>
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div><span>Vehicle:</span><b>{{vehicleEquipmentName}}</b></div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div><span>Contact:</span></div>
@@ -121,6 +123,7 @@
                                     <label>Issue Type</label>
                                     <select class="form-control">
                                         <option></option>
+                                        <option *ngFor="let maintenanceIssueType of maintenanceIssueTypes">{{maintenanceIssueType.name}}</option>
                                     </select>
                                 </div>                       
                             </div>
@@ -136,6 +139,7 @@
                                     <label>Technician</label>
                                     <select class="form-control">
                                         <option></option>
+                                        <option *ngFor="let serviceSpecialist of serviceSpecialists">{{serviceSpecialist.nickname}}</option>
                                     </select>
                                 </div>                       
                             </div>

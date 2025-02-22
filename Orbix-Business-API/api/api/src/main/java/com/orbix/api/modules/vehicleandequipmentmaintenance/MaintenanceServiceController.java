@@ -45,7 +45,11 @@ public class MaintenanceServiceController implements MaintenanceService {
 	private final UserService userService;
 	private final DayService dayService;
 	
+	private final MaintenanceJobCardRepository maintenanceJobCardRepository;
+	
 	private final VehicleEquipmentRepository vehicleEquipmentRepository;
+	
+	private final MaintenanceJobCardService maintenanceJobCardService;
 	
 //	private final MaintenanceZoneRepository maintenanceZoneRepository;
 	
@@ -503,6 +507,48 @@ public class MaintenanceServiceController implements MaintenanceService {
 	
 	boolean validateMaintenanceData(MaintenanceRequestDTO maintenanceRequest) {		
 		return true;
+	}
+
+	@Override
+	public MaintenanceJobCardResponseDTO createMaintenanceJobCard(MaintenanceRequestDTO maintenanceRequest, HttpServletRequest request) {
+		// Find for any job card in the maintenance
+		
+		Maintenance maintenance = maintenanceRepository.findById(maintenanceRequest.getId())
+				.orElseThrow(() -> new NotFoundException("Maintenance not found"));
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");
+		statuses.add("OPEN");
+		
+		Optional<MaintenanceJobCard> maintenanceJobCard_ = maintenanceJobCardRepository
+			    .findFirstByMaintenanceAndStatusIn(maintenance, statuses);
+		
+		if(maintenanceJobCard_.isPresent()) {
+			return maintenanceJobCardService.showMaintenanceJobCard(maintenanceJobCard_.get());
+		}else {
+			return maintenanceJobCardService.createMaintenanceJobCard(maintenanceRequest, request);
+		}		
+	}
+
+	@Override
+	public MaintenanceJobCardResponseDTO openMaintenanceJobCard(MaintenanceJobCard maintenanceJobCard,
+			HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public MaintenanceJobCardResponseDTO closeMaintenanceJobCard(MaintenanceJobCard maintenanceJobCard,
+			HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	@Override
+	public MaintenanceJobCardResponseDTO reopenMaintenanceJobCard(MaintenanceJobCard maintenanceJobCard,
+			HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }
 

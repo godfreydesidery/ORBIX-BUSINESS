@@ -259,6 +259,18 @@ export const routes: Routes = [
         data : { breadcrumb : 'Maintenance Management/Maintenance'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'maintenance-management/maintenance-issue-type',
+        loadComponent: () => import('./maintenance-management/maintenance-issue-type/maintenance-issue-type.component').then(c => c.MaintenanceIssueTypeComponent),
+        data : { breadcrumb : 'Maintenance Management/Maintenance Issue Type'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'maintenance-management/service-specialist',
+        loadComponent: () => import('./maintenance-management/service-specialist/service-specialist.component').then(c => c.ServiceSpecialistComponent),
+        data : { breadcrumb : 'Maintenance Management/Service Specialist'},
+        canActivate : [AuthGuard]
+      },
       /**End of Parking Management */
 
 

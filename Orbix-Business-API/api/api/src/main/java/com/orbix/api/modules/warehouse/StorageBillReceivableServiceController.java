@@ -104,7 +104,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 			
 			if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
 			
-			if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is invalid" + toDate.toString() + fromDate.toString());
+			if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is invalid " + toDate.toString() + fromDate.toString());
 			
 			long dayCount = ChronoUnit.DAYS.between(fromDate, toDate) + 1;
 			

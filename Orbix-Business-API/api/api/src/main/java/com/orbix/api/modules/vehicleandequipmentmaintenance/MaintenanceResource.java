@@ -107,6 +107,15 @@ public class MaintenanceResource {
 			HttpServletRequest request){		
 		return ResponseEntity.ok().body(maintenanceService.checkOut(maintenanceRequest, request));		
 	}
+	
+	@PostMapping("/maintenances/create_maintenance_job_card")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<MaintenanceJobCardResponseDTO>createJobCard(
+			@RequestBody MaintenanceRequestDTO maintenanceRequest,
+			HttpServletRequest request){		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/maintenances/create_maintenance_job_card").toUriString());
+		return ResponseEntity.created(uri).body(maintenanceService.createMaintenanceJobCard(maintenanceRequest, request));
+	}
 }
 
 @Data
