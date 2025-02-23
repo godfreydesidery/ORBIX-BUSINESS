@@ -16,6 +16,7 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { IMaintenanceJobCard } from 'src/app/domain/maintenance-job-card';
 import { IMaintenanceIssueType } from 'src/app/domain/maintenance-issue-type';
 import { IServiceSpecialist } from 'src/app/domain/service-specialist';
+import { IMaintenanceJobCardIssue } from 'src/app/domain/maintenance-job-card-issue';
 
 
 const API_URL = environment.apiUrl;
@@ -474,7 +475,8 @@ export class MaintenanceComponent {
         )
     }
 
-  async createMaintenanceJobCard(maintenanceId: any) {
+
+  async createOrLoadMaintenanceJobCard(maintenanceId: any) {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
@@ -490,6 +492,8 @@ export class MaintenanceComponent {
       .toPromise()
       .then(
         data => {
+
+          this.maintenanceJobCard = data!
 
           this.showJobCard(data!)
 
@@ -509,6 +513,7 @@ export class MaintenanceComponent {
   }
 
   showJobCard(data: IMaintenanceJobCard) {
+    this.maintenanceJobCard = data
     this.maintenanceJobCardId = data!.id
     this.maintenanceJobCardNo = data!.no
     this.maintenanceId = data!.maintenanceId
@@ -616,6 +621,94 @@ export class MaintenanceComponent {
       this.maintenanceZoneName = ''
   
       this.hasKeys = 'YES'
+    }
+
+
+    maintenanceJobCardIssueName : string = ''
+    maintenanceJobCardIssueDescription : string = ''
+    maintenanceJobCardIssueTypeName : string = ''
+    maintenanceJobCardIssueSpecialistUser : string = ''
+
+    maintenanceJobCardIssuePrice : number = 0
+    maintenanceJobCardIssueNoOfDays : number = 1
+
+    async createMaintenanceJobCardIssue(){
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      }
+  
+  
+      var maintenanceJobCard = {
+        id : this.maintenanceJobCardId,
+        no : this.maintenanceJobCardNo,
+        maintenanceJobCardIssueRequest : {
+          id: null,
+          no : null,
+          name : this.maintenanceJobCardIssueName,
+          description : this.maintenanceJobCardIssueDescription,
+          maintenanceIssueTypeName : this.maintenanceJobCardIssueTypeName,
+          serviceSpecialistUserNickname : this.maintenanceJobCardIssueSpecialistUser,
+          price : this.maintenanceJobCardIssuePrice,
+          noOfDays : this.maintenanceJobCardIssueNoOfDays
+        }
+        
+      }
+  
+      await this.http.post<IMaintenanceJobCardIssue>(API_URL + '/maintenance_job_card_issues/create', maintenanceJobCard, options)
+        .toPromise()
+        .then(
+          data => {
+  
+            
+            console.log(data)
+  
+            this.msg.showSuccessMessage('Issue created/fetched successifully')
+
+            this.createOrLoadMaintenanceJobCard(this.maintenanceId)
+  
+          }
+  
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+          }
+        )
+        
+    }
+
+    async openIssue(id : any, no : string){
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      }
+
+      var issue = {
+        id : id,
+        no : no
+      }
+
+      await this.http.post(API_URL + '/maintenance_job_card_issues/open', issue, options)
+        .toPromise()
+        .then(
+          data => {
+  
+            console.log(data)
+  
+            this.msg.showSuccessMessage('Issue opened successifully')
+
+            this.createOrLoadMaintenanceJobCard(this.maintenanceId)
+  
+          }
+  
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+          }
+        )
+
     }
   
   

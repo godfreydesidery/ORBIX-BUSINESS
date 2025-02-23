@@ -1,5 +1,7 @@
 package com.orbix.api.modules.vehicleandequipmentmaintenance;
 
+import java.util.List;
+
 import lombok.Data;
 
 @Data
@@ -18,4 +20,6 @@ public class MaintenanceJobCardResponseDTO {
     String ownerName;
     String vehicleEquipmentName;
     String vehicleEquipmentTypeName;
+    
+    List<MaintenanceJobCardIssueResponseDTO> maintenanceJobCardIssues;
 }

@@ -61,7 +61,7 @@
                                             <td>
                                                 <table class="table table-sm">
                                                     <tr>
-                                                        <td><button type="button" class="btn btn-success btn-round-custom btn-sm text-nowrap" *ngIf="p.status === 'PENDING'" (click)="createMaintenanceJobCard(p.id)" style="cursor: pointer; margin-left: 3px;">Job Card</button></td>
+                                                        <td><button type="button" class="btn btn-success btn-round-custom btn-sm text-nowrap" *ngIf="p.status === 'PENDING'" (click)="createOrLoadMaintenanceJobCard(p.id)" style="cursor: pointer; margin-left: 3px;">Job Card</button></td>
                                                         <!-- <td><button type="button" class="btn btn-danger btn-round-custom" *ngIf="p.status === 'CHECKED-IN'" (click)="get(p.id)" data-toggle="modal" data-target="#check-out-modal" style="cursor: pointer; margin-left: 3px;">Check Out</button></td> -->
                                                     </tr>
                                                 </table>
@@ -115,13 +115,19 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label>Issue</label>
-                                    <textarea class="form-control"></textarea>
+                                    <input type="text" class="form-control" [(ngModel)]="maintenanceJobCardIssueName">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Issue Description</label>
+                                    <textarea class="form-control" [(ngModel)]="maintenanceJobCardIssueDescription"></textarea>
                                 </div>                       
                             </div>
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label>Issue Type</label>
-                                    <select class="form-control">
+                                    <select class="form-control" [(ngModel)]="maintenanceJobCardIssueTypeName">
                                         <option></option>
                                         <option *ngFor="let maintenanceIssueType of maintenanceIssueTypes">{{maintenanceIssueType.name}}</option>
                                     </select>
@@ -137,7 +143,7 @@
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label>Technician</label>
-                                    <select class="form-control">
+                                    <select class="form-control" [(ngModel)]="maintenanceJobCardIssueSpecialistUser">
                                         <option></option>
                                         <option *ngFor="let serviceSpecialist of serviceSpecialists">{{serviceSpecialist.nickname}}</option>
                                     </select>
@@ -148,13 +154,13 @@
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label>Days</label>
-                                            <input class="form-control" type="text" autocomplete="nope">
+                                            <input class="form-control" type="text" [(ngModel)]="maintenanceJobCardIssueNoOfDays" autocomplete="nope">
                                         </div>                       
                                     </div>
                                     <div class="col-lg-6">
                                         <div class="form-group">
                                             <label>Price</label>
-                                            <input class="form-control" type="text" autocomplete="nope">
+                                            <input class="form-control" type="text" [(ngModel)]="maintenanceJobCardIssuePrice" autocomplete="nope">
                                         </div>                       
                                     </div>
                                 </div>
@@ -163,7 +169,7 @@
                         </div>
                         <div class="row">
                             <div class="col-lg-12">
-                                <button class="btn btn-success btn-round-custom pull-right">Add</button>
+                                <button class="btn btn-success btn-round-custom pull-right" (click)="createMaintenanceJobCardIssue()">Add</button>
                             </div>
                         </div>
                         <div class="row">
@@ -172,24 +178,35 @@
                                     <table class="table">
                                         <thead>
                                             <tr>
-                                                <th>SN</th>
+                                                <th>#</th>
                                                 <th>Issue</th>
+                                                <th>Description</th>
                                                 <th>Type</th>
                                                 <th>Technician</th>
                                                 <th>Days</th>
                                                 <th>Price</th>
+                                                <th>Status</th>
                                                 <th>Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                                <tr>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
-                                                    <td></td>
+                                                <tr *ngFor="let m of maintenanceJobCard.maintenanceJobCardIssues">
+                                                    <td>{{m.no}}</td>
+                                                    <td>{{m.name}}</td>
+                                                    <td>{{m.description}}</td>
+                                                    <td>{{m.maintenanceIssueTypeName}}</td>
+                                                    <td>{{m.serviceSpecialist}}</td>
+                                                    <td>{{m.noOfDays}}</td>
+                                                    <td style="text-align: right;">{{m.price | currency : '':''}}</td>
+                                                    <td>{{m.status}}</td>
+                                                    <td>
+                                                        <table>
+                                                            <tr>
+                                                                <td><button class="btn btn-success btn-sm btn-round-custom" *ngIf="m.status === 'PENDING'" (click)="openIssue(m.id, m.no)">Open</button></td>
+                                                                <td><button class="btn btn-danger btn-sm btn-round-custom" *ngIf="m.status === 'PENDING'">Remove</button></td>
+                                                            </tr>
+                                                        </table>
+                                                    </td>
                                                 </tr>
                                         </tbody> 
                                     </table>

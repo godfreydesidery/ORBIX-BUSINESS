@@ -1,5 +1,7 @@
 package com.orbix.api.modules.vehicleandequipmentmaintenance;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -124,7 +126,47 @@ public class MaintenanceJobCardServiceController implements MaintenanceJobCardSe
 		maintenanceJobCardResponseDTO.setVehicleEquipmentName(maintenanceJobCard.getMaintenance().getVehicleEquipmentName());
 		// add others, on conditional
 		
+		List<MaintenanceJobCardIssueResponseDTO> maintenanceJobCardIssues = new ArrayList<>();
+		for(MaintenanceJobCardIssue maintenanceJobCardIssue : maintenanceJobCard.getMaintenanceJobCardIssues()) {
+			MaintenanceJobCardIssueResponseDTO issue = maintenanceJobCardIssueResponseDTOMapper(maintenanceJobCardIssue);
+			maintenanceJobCardIssues.add(issue);
+			
+			
+		}
+		maintenanceJobCardResponseDTO.setMaintenanceJobCardIssues(maintenanceJobCardIssues);
 		return maintenanceJobCardResponseDTO;
+	}
+	
+	private MaintenanceJobCardIssueResponseDTO maintenanceJobCardIssueResponseDTOMapper(MaintenanceJobCardIssue maintenanceJobCardIssue) {
+		MaintenanceJobCardIssueResponseDTO maintenanceJobCardIssueResponseDTO = new MaintenanceJobCardIssueResponseDTO();
+		
+		maintenanceJobCardIssueResponseDTO.setId(maintenanceJobCardIssue.getId().toString());
+		maintenanceJobCardIssueResponseDTO.setNo(maintenanceJobCardIssue.getNo());
+		maintenanceJobCardIssueResponseDTO.setStatus(maintenanceJobCardIssue.getStatus());
+		maintenanceJobCardIssueResponseDTO.setMaintenanceJobCardId(maintenanceJobCardIssue.getMaintenanceJobCard().getId().toString());
+		maintenanceJobCardIssueResponseDTO.setMaintenanceIssueTypeName(maintenanceJobCardIssue.getMaintenanceIssueType().getName());
+		maintenanceJobCardIssueResponseDTO.setName(maintenanceJobCardIssue.getName());
+		maintenanceJobCardIssueResponseDTO.setDescription(maintenanceJobCardIssue.getDescription());
+		maintenanceJobCardIssueResponseDTO.setStatus(maintenanceJobCardIssue.getStatus());
+		maintenanceJobCardIssueResponseDTO.setPrice(String.valueOf(maintenanceJobCardIssue.getPrice()));
+		maintenanceJobCardIssueResponseDTO.setNoOfDays(String.valueOf(maintenanceJobCardIssue.getNoOfDays()));
+		maintenanceJobCardIssueResponseDTO.setServiceSpecialist(maintenanceJobCardIssue.getServiceSpecialistUser().getNickname());
+//		maintenanceJobCardIssueResponseDTO.setMaintenanceNo(maintenanceJobCard.getMaintenance().getNo());
+//		maintenanceJobCardIssueResponseDTO.setCreatedBy(maintenanceJobCard.getCreatedByUser() != null ? maintenanceJobCard.getCreatedByUser().getNickname() : "");
+//		maintenanceJobCardIssueResponseDTO.setCreatedDateTime(maintenanceJobCard.getCreatedDateTime() != null ? maintenanceJobCard.getCreatedDateTime().toString() : "");
+//		
+//		maintenanceJobCardIssueResponseDTO.setOpenedBy(maintenanceJobCard.getOpenedByUser() != null ? maintenanceJobCard.getOpenedByUser().getNickname() : "");
+//		maintenanceJobCardIssueResponseDTO.setOpenedDateTime(maintenanceJobCard.getOpenedDateTime() != null ? maintenanceJobCard.getOpenedDateTime().toString() : "");
+//		
+//		maintenanceJobCardIssueResponseDTO.setClosedBy(maintenanceJobCard.getClosedByUser() != null ? maintenanceJobCard.getClosedByUser().getNickname() : "");
+//		maintenanceJobCardIssueResponseDTO.setClosedDateTime(maintenanceJobCard.getClosedDateTime() != null ? maintenanceJobCard.getClosedDateTime().toString() : "");
+//		
+//		maintenanceJobCardIssueResponseDTO.setOwnerName(maintenanceJobCard.getMaintenance().getOwnerFirstName() + " " + maintenanceJobCard.getMaintenance().getOwnerLastName());
+//		maintenanceJobCardIssueResponseDTO.setVehicleEquipmentTypeName(maintenanceJobCard.getMaintenance().getVehicleEquipmentType().getName());
+//		maintenanceJobCardIssueResponseDTO.setVehicleEquipmentName(maintenanceJobCard.getMaintenance().getVehicleEquipmentName());
+//		// add others, on conditional
+		
+		return maintenanceJobCardIssueResponseDTO;
 	}
 
 	

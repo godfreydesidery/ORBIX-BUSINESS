@@ -1,3 +1,5 @@
+import { IMaintenanceJobCardIssue } from "./maintenance-job-card-issue"
+
 export interface IMaintenanceJobCard {
     id : any
     no : string
@@ -11,6 +13,7 @@ export interface IMaintenanceJobCard {
     vehicleEquipmentName : string
     chasisNo : string
 
-
     sn : number
+
+    maintenanceJobCardIssues : IMaintenanceJobCardIssue[]
 }

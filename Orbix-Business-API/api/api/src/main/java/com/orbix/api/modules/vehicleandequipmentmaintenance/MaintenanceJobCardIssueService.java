@@ -1,5 +1,10 @@
 package com.orbix.api.modules.vehicleandequipmentmaintenance;
 
-public interface MaintenanceJobCardIssueService {
+import javax.servlet.http.HttpServletRequest;
 
+public interface MaintenanceJobCardIssueService {
+	MaintenanceJobCardIssueResponseDTO createMaintenanceJobCardIssue(MaintenanceJobCardRequestDTO maintenanceJobCardRequest, HttpServletRequest request);
+	MaintenanceJobCardIssueResponseDTO openMaintenanceJobCardIssue(MaintenanceJobCardIssueRequestDTO maintenanceJobCardIssueRequest, HttpServletRequest request);
+	MaintenanceJobCardIssueResponseDTO closeMaintenanceJobCardIssue(MaintenanceJobCardIssueRequestDTO maintenanceJobCardIssueRequest, HttpServletRequest request);
+	MaintenanceJobCardIssueResponseDTO reopenMaintenanceJobCardIssue(MaintenanceJobCardIssueRequestDTO maintenanceJobCardIssueRequest, HttpServletRequest request);
 }

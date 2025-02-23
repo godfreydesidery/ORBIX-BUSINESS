@@ -9,4 +9,6 @@ public class MaintenanceJobCardRequestDTO {
 	String status;
     Long maintenanceId;
     String maintenanceNo;
+    
+    MaintenanceJobCardIssueRequestDTO maintenanceJobCardIssueRequest;
 }
