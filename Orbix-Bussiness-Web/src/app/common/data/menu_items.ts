@@ -400,6 +400,10 @@ export const menuItems = [
                 routerLink: '/app/accounts-and-finance/storage-billing'
             },
             {
+                title: 'Maintenance Billing',
+                routerLink: '/app/accounts-and-finance/maintenance-billing'
+            },
+            {
                 title: 'Reports',
                 url: '#',
                 subMenu: [

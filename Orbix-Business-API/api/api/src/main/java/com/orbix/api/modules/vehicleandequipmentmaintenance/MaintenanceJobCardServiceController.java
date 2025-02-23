@@ -41,8 +41,8 @@ public class MaintenanceJobCardServiceController implements MaintenanceJobCardSe
 		
 		Maintenance maintenance = maintenanceRepository.findById(maintenanceRequest.getId())
 				.orElseThrow(() -> new NotFoundException("Maintenance not found"));
-		if(!maintenance.getStatus().equals("PENDING")) {
-			throw new InvalidOperationException("Not a pending maintenance");
+		if(!maintenance.getStatus().equals("CHECKED-IN")) {
+			throw new InvalidOperationException("Maintenance must be checked in");
 		}
 		
 		MaintenanceJobCard maintenanceJobCard = new MaintenanceJobCard();
@@ -127,13 +127,14 @@ public class MaintenanceJobCardServiceController implements MaintenanceJobCardSe
 		// add others, on conditional
 		
 		List<MaintenanceJobCardIssueResponseDTO> maintenanceJobCardIssues = new ArrayList<>();
-		for(MaintenanceJobCardIssue maintenanceJobCardIssue : maintenanceJobCard.getMaintenanceJobCardIssues()) {
-			MaintenanceJobCardIssueResponseDTO issue = maintenanceJobCardIssueResponseDTOMapper(maintenanceJobCardIssue);
-			maintenanceJobCardIssues.add(issue);
-			
-			
+		if(maintenanceJobCard.getMaintenanceJobCardIssues() != null) {
+			for(MaintenanceJobCardIssue maintenanceJobCardIssue : maintenanceJobCard.getMaintenanceJobCardIssues()) {
+				MaintenanceJobCardIssueResponseDTO issue = maintenanceJobCardIssueResponseDTOMapper(maintenanceJobCardIssue);
+				maintenanceJobCardIssues.add(issue);			
+			}
+			maintenanceJobCardResponseDTO.setMaintenanceJobCardIssues(maintenanceJobCardIssues);
 		}
-		maintenanceJobCardResponseDTO.setMaintenanceJobCardIssues(maintenanceJobCardIssues);
+		
 		return maintenanceJobCardResponseDTO;
 	}
 	

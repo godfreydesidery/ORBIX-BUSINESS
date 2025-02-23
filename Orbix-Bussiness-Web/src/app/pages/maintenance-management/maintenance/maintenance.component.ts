@@ -371,17 +371,18 @@ export class MaintenanceComponent {
         )
     }
   
-    async checkIn(){
+    async checkIn(id : any){
+
+      this.clearJobCard()
+
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
   
       var maintenance = {
-        id : this.maintenanceId,
-        cardNo : this.cardNo,
-        hasKeys : this.hasKeys === 'YES' ? 1 : 0,
-        maintenanceZoneName : this.maintenanceZoneName,
-        startBillingAt : this.startBillingAt
+        id : id,
+        // cardNo : this.cardNo,
+        // hasKeys : this.hasKeys === 'YES' ? 1 : 0,
       }
   
       await this.http.post<IMaintenance>(API_URL+'/maintenances/check_in', maintenance, options)

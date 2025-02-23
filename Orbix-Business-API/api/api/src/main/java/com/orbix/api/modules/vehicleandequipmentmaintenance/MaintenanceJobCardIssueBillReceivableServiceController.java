@@ -147,7 +147,7 @@ public class MaintenanceJobCardIssueBillReceivableServiceController implements M
 		MaintenanceJobCardIssueBillReceivableResponseDTO maintenanceJobCardIssueBillReceivableResponseDTO = new MaintenanceJobCardIssueBillReceivableResponseDTO();
 		
 		maintenanceJobCardIssueBillReceivableResponseDTO.setId(maintenanceJobCardIssueBillReceivable.getId().toString());
-		maintenanceJobCardIssueBillReceivableResponseDTO.setDescription("Maintenance issue no: " + maintenanceJobCardIssueBillReceivable.getMaintenanceJobCardIssue().getNo());
+		maintenanceJobCardIssueBillReceivableResponseDTO.setDescription(maintenanceJobCardIssueBillReceivable.getMaintenanceJobCardIssue().getName());
 		maintenanceJobCardIssueBillReceivableResponseDTO.setPrice(String.valueOf(maintenanceJobCardIssueBillReceivable.getPrice()));
 		maintenanceJobCardIssueBillReceivableResponseDTO.setQty(String.valueOf(maintenanceJobCardIssueBillReceivable.getQty()));
 		maintenanceJobCardIssueBillReceivableResponseDTO.setPayStatus(maintenanceJobCardIssueBillReceivable.getBillReceivable().getPayStatus().toString());

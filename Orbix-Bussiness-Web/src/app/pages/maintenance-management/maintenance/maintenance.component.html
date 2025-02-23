@@ -2,7 +2,7 @@
     <div class="col">
         <div widget class="card">
             <div class="card-header">
-                <span>Vehicle List</span>
+                <span>Maintenance Vehicle and Equipment List</span>
             </div>
             <div class="card-body widget-body">
                 
@@ -61,7 +61,8 @@
                                             <td>
                                                 <table class="table table-sm">
                                                     <tr>
-                                                        <td><button type="button" class="btn btn-success btn-round-custom btn-sm text-nowrap" *ngIf="p.status === 'PENDING'" (click)="createOrLoadMaintenanceJobCard(p.id)" style="cursor: pointer; margin-left: 3px;">Job Card</button></td>
+                                                        <td><button type="button" class="btn btn-success btn-round-custom btn-sm text-nowrap" *ngIf="p.status === 'PENDING'" (click)="checkIn(p.id)" style="cursor: pointer; margin-left: 3px;">Check In</button></td>
+                                                        <td><button type="button" class="btn btn-warning btn-round-custom btn-sm text-nowrap" *ngIf="p.status === 'CHECKED-IN'" (click)="createOrLoadMaintenanceJobCard(p.id)" style="cursor: pointer; margin-left: 3px;">Job Card</button></td>
                                                         <!-- <td><button type="button" class="btn btn-danger btn-round-custom" *ngIf="p.status === 'CHECKED-IN'" (click)="get(p.id)" data-toggle="modal" data-target="#check-out-modal" style="cursor: pointer; margin-left: 3px;">Check Out</button></td> -->
                                                     </tr>
                                                 </table>
@@ -766,7 +767,7 @@
                 
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" (click)="checkIn()" data-dismiss="modal">Complete and Check In</button>
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Complete and Check In</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>

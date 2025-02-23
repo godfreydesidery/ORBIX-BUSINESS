@@ -22,4 +22,8 @@ public interface BillReceivableService {
 	List<BillReceivableResponseDTO> getAllByStorage( 
 			Long storageId,
 			HttpServletRequest request);
+	
+	List<BillReceivableResponseDTO> getAllByMaintenance( 
+			Long maintenanceId,
+			HttpServletRequest request);
 }

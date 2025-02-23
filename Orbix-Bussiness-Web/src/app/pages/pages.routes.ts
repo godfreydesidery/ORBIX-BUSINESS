@@ -350,6 +350,18 @@ export const routes: Routes = [
         data : { breadcrumb : 'Accounts & Finance | Release Vehicle & Equipment'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'accounts-and-finance/maintenance-billing',
+        loadComponent: () => import('./accounts-and-finance/maintenance-billing/maintenance-billing.component').then(c => c.MaintenanceBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Maintenance Billing'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'accounts-and-finance/maintenance-vehicle-equipment-billing',
+        loadComponent: () => import('./accounts-and-finance/maintenance-vehicle-equipment-billing/maintenance-vehicle-equipment-billing.component').then(c => c.MaintenanceVehicleEquipmentBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Maintenance Veh/Eq Billing'},
+        canActivate : [AuthGuard]
+      },
 
       // Management
 

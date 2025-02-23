@@ -516,6 +516,10 @@ public class MaintenanceServiceController implements MaintenanceService {
 		Maintenance maintenance = maintenanceRepository.findById(maintenanceRequest.getId())
 				.orElseThrow(() -> new NotFoundException("Maintenance not found"));
 		
+		if(!maintenance.getStatus().equals("CHECKED-IN")) {
+			throw new InvalidOperationException("Only allowed for checked in maintenances");
+		}
+		
 		List<String> statuses = new ArrayList<>();
 		statuses.add("PENDING");
 		statuses.add("OPEN");
