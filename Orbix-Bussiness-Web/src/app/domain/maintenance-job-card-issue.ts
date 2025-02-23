@@ -17,4 +17,6 @@ export interface IMaintenanceJobCardIssue{
     maintenanceIssueTypeName : string
     comments : string
     serviceSpecialist : string
+    maintenanceNo : string
+    equipmentReference : string
 }

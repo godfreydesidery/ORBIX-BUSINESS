@@ -18,5 +18,6 @@ public class MaintenanceJobCardIssueBillReceivableResponseDTO {
 	
 	String maintenanceId;
 	
+	
 	String payStatus;
 }

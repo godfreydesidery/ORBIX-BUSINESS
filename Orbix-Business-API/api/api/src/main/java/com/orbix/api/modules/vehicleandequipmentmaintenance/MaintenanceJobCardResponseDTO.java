@@ -17,9 +17,11 @@ public class MaintenanceJobCardResponseDTO {
     String closedDateTime;
     String maintenanceId;
     String maintenanceNo;
+    String regNo;
     String ownerName;
     String vehicleEquipmentName;
     String vehicleEquipmentTypeName;
     
     List<MaintenanceJobCardIssueResponseDTO> maintenanceJobCardIssues;
+    
 }

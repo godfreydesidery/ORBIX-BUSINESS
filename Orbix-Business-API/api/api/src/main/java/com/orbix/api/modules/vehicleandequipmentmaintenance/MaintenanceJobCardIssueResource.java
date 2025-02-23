@@ -71,6 +71,25 @@ private final MaintenanceJobCardIssueService maintenanceJobCardIssueService;
 //			HttpServletRequest request){		
 //		return ResponseEntity.ok().body(maintenanceService.getMaintenanceBillReceivables(id, request));		
 //	}
+
+
+
+	@GetMapping("/maintenance_job_card_issues/get")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<MaintenanceJobCardIssueResponseDTO>get(
+			@RequestParam(name = "id") Long id,
+			HttpServletRequest request){
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/maintenance_job_card_issues/get").toUriString());
+		return ResponseEntity.created(uri).body(maintenanceJobCardIssueService.get(id, request));
+	}
+
+	@GetMapping("/maintenance_job_card_issues/get_my_jobs")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<List<MaintenanceJobCardIssueResponseDTO>>getMyJobs(HttpServletRequest request){
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/maintenance_job_card_issues/get_my_jobs").toUriString());
+		return ResponseEntity.created(uri).body(maintenanceJobCardIssueService.getMyJobs(request));
+	}
+
 	
 	@PostMapping("/maintenance_job_card_issues/create")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
@@ -88,6 +107,15 @@ private final MaintenanceJobCardIssueService maintenanceJobCardIssueService;
 			HttpServletRequest request){		
 		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/maintenance_job_card_issues/open").toUriString());
 		return ResponseEntity.created(uri).body(maintenanceJobCardIssueService.openMaintenanceJobCardIssue(maintenanceJobCardIssueRequest, request));
+	}
+	
+	@PostMapping("/maintenance_job_card_issues/save_comments")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<MaintenanceJobCardIssueResponseDTO>saveComments(
+			@RequestBody MaintenanceJobCardIssueRequestDTO maintenanceJobCardIssueRequest,
+			HttpServletRequest request){		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/maintenance_job_card_issues/save_comments").toUriString());
+		return ResponseEntity.created(uri).body(maintenanceJobCardIssueService.saveComments(maintenanceJobCardIssueRequest, request));
 	}
 	
 //	@PostMapping("/maintenances/update")

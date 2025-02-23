@@ -95,7 +95,7 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 	
 	@Override
 	public VehicleEquipmentResponseDTO getByChasisNo(String chasisNo, HttpServletRequest request) {		
-		Optional<VehicleEquipment> vehicleEquipment_ = vehicleEquipmentRepository.findByChasisNoAndActiveTrue(chasisNo);
+		Optional<VehicleEquipment> vehicleEquipment_ = vehicleEquipmentRepository.findFirstByChasisNoAndActiveTrue(chasisNo);
 		if(vehicleEquipment_.isEmpty()) {
 			throw new NotFoundException("VehicleEquipment not found");
 		}
@@ -116,7 +116,7 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 	
 	@Override
 	public VehicleEquipmentResponseDTO getMaintenanceByChasisNo(String chasisNo, HttpServletRequest request) {		
-		Optional<VehicleEquipment> vehicleEquipment_ = vehicleEquipmentRepository.findByChasisNoAndActiveTrue(chasisNo);
+		Optional<VehicleEquipment> vehicleEquipment_ = vehicleEquipmentRepository.findFirstByChasisNoAndActiveTrue(chasisNo);
 		if(vehicleEquipment_.isEmpty()) {
 			throw new NotFoundException("VehicleEquipment not found");
 		}
@@ -136,15 +136,17 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 	}
 	
 	
-	@Override
+	@Override	
 	public List<String> getChasisNos(HttpServletRequest request) {
-		List<String> chasisNos = vehicleEquipmentRepository.findAllByActiveTrue()
+		List<String> chasisNos = vehicleEquipmentRepository.findTop2000ByActiveTrue()
 			    .stream()
 			    .map(VehicleEquipment::getChasisNo)
 			    .collect(Collectors.toList());
 		
 			return chasisNos;		
 	}
+	
+	
 
 	@Override
 	public VehicleEquipmentResponseDTO createVehicleEquipment(VehicleEquipmentRequestDTO vehicleEquipmentRequest, HttpServletRequest request) {

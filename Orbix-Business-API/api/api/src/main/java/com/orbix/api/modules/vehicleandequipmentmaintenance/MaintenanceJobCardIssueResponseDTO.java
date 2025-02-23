@@ -6,7 +6,8 @@ import lombok.Data;
 public class MaintenanceJobCardIssueResponseDTO {
 	String id;
 	String no;
-	String name;	
+	String name;
+	String description;
 	String status;
 	String noOfDays;
 	String price;
@@ -20,9 +21,13 @@ public class MaintenanceJobCardIssueResponseDTO {
     
     String maintenanceJobCardId;
     
+    String maintenanceNo;
+    String regNo;
+    
     String maintenanceIssueTypeId;
     String maintenanceIssueTypeName;
     
-    String description;
     String comments;
+    
+    String equipmentReference;
 }

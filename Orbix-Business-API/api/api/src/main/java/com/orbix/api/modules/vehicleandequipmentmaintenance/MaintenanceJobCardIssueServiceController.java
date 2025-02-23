@@ -1,5 +1,7 @@
 package com.orbix.api.modules.vehicleandequipmentmaintenance;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 import javax.servlet.http.HttpServletRequest;
@@ -36,6 +38,13 @@ public class MaintenanceJobCardIssueServiceController implements MaintenanceJobC
 	
 	private final BillReceivableRepository billReceivableRepository;
 	private final MaintenanceJobCardIssueBillReceivableRepository maintenanceJobCardIssueBillReceivableRepository;
+	
+	@Override
+	public MaintenanceJobCardIssueResponseDTO get(Long id, HttpServletRequest request ) {
+		MaintenanceJobCardIssue maintenanceJobCardIssue = maintenanceJobCardIssueRepository.findById(id)
+			    .orElseThrow(() -> new NotFoundException("MaintenanceJobCardIssue not found with ID: " + id));
+		return maintenanceJobCardIssueResponseDTOMapper(maintenanceJobCardIssue);
+	}
 	
 	@Override
 	public MaintenanceJobCardIssueResponseDTO createMaintenanceJobCardIssue(MaintenanceJobCardRequestDTO maintenanceJobCardRequest, HttpServletRequest request) {
@@ -172,7 +181,35 @@ public class MaintenanceJobCardIssueServiceController implements MaintenanceJobC
 		maintenanceJobCardIssueResponseDTO.setStatus(maintenanceJobCardIssue.getStatus());
 		maintenanceJobCardIssueResponseDTO.setMaintenanceJobCardId(maintenanceJobCardIssue.getMaintenanceJobCard().getId().toString());
 		maintenanceJobCardIssueResponseDTO.setMaintenanceIssueTypeName(maintenanceJobCardIssue.getMaintenanceIssueType().getName());
-//		maintenanceJobCardIssueResponseDTO.setMaintenanceNo(maintenanceJobCard.getMaintenance().getNo());
+		maintenanceJobCardIssueResponseDTO.setName(maintenanceJobCardIssue.getName());
+		maintenanceJobCardIssueResponseDTO.setDescription(maintenanceJobCardIssue.getDescription());
+		maintenanceJobCardIssueResponseDTO.setStatus(maintenanceJobCardIssue.getStatus());
+		maintenanceJobCardIssueResponseDTO.setPrice(String.valueOf(maintenanceJobCardIssue.getPrice()));
+		maintenanceJobCardIssueResponseDTO.setNoOfDays(String.valueOf(maintenanceJobCardIssue.getNoOfDays()));
+		maintenanceJobCardIssueResponseDTO.setServiceSpecialist(maintenanceJobCardIssue.getServiceSpecialistUser().getNickname());
+
+		maintenanceJobCardIssueResponseDTO.setMaintenanceNo(maintenanceJobCardIssue.getMaintenanceJobCard().getMaintenance().getNo());
+		maintenanceJobCardIssueResponseDTO.setComments(maintenanceJobCardIssue.getComments());
+		
+		String regNo = "NA";
+		String eqName = "NA";
+		String eqType = "NA";
+		
+		if(maintenanceJobCardIssue.getMaintenanceJobCard().getMaintenance().getVehicleEquipment().getRegistrationNo() != null) {
+			regNo = maintenanceJobCardIssue.getMaintenanceJobCard().getMaintenance().getVehicleEquipment().getRegistrationNo();
+		}
+		if(maintenanceJobCardIssue.getMaintenanceJobCard().getMaintenance().getVehicleEquipment().getVehicleEquipmentName() != null) {
+			eqName = maintenanceJobCardIssue.getMaintenanceJobCard().getMaintenance().getVehicleEquipment().getVehicleEquipmentName();
+		}
+		if(maintenanceJobCardIssue.getMaintenanceJobCard().getMaintenance().getVehicleEquipment().getVehicleEquipmentType().getName() != null) {
+			eqType = maintenanceJobCardIssue.getMaintenanceJobCard().getMaintenance().getVehicleEquipment().getVehicleEquipmentType().getName();
+		}
+		String ref = "Reg No: " + regNo + ", " + "Name: " + eqName + ", " + "Type: " + eqType;
+		maintenanceJobCardIssueResponseDTO.setEquipmentReference(ref);
+		
+		
+		
+		//		maintenanceJobCardIssueResponseDTO.setMaintenanceNo(maintenanceJobCard.getMaintenance().getNo());
 //		maintenanceJobCardIssueResponseDTO.setCreatedBy(maintenanceJobCard.getCreatedByUser() != null ? maintenanceJobCard.getCreatedByUser().getNickname() : "");
 //		maintenanceJobCardIssueResponseDTO.setCreatedDateTime(maintenanceJobCard.getCreatedDateTime() != null ? maintenanceJobCard.getCreatedDateTime().toString() : "");
 //		
@@ -188,6 +225,33 @@ public class MaintenanceJobCardIssueServiceController implements MaintenanceJobC
 //		// add others, on conditional
 		
 		return maintenanceJobCardIssueResponseDTO;
+	}
+
+	@Override
+	public List<MaintenanceJobCardIssueResponseDTO> getMyJobs(HttpServletRequest request) {
+		List<MaintenanceJobCardIssue> maintenanceJobCardIssues = maintenanceJobCardIssueRepository.findAllByServiceSpecialistUserAndStatus(userService.getUser(request), "OPEN");
+		List<MaintenanceJobCardIssueResponseDTO> myJobs = new ArrayList<>();
+		for(MaintenanceJobCardIssue maintenanceJobCardIssue : maintenanceJobCardIssues) {
+			MaintenanceJobCardIssueResponseDTO job = maintenanceJobCardIssueResponseDTOMapper(maintenanceJobCardIssue);
+			myJobs.add(job);
+		}
+		return myJobs;
+	}
+	
+	
+	@Override
+	public MaintenanceJobCardIssueResponseDTO saveComments(MaintenanceJobCardIssueRequestDTO jobCardIssue,
+			HttpServletRequest request) {
+		MaintenanceJobCardIssue maintenanceJobCardIssue = maintenanceJobCardIssueRepository.findById(jobCardIssue.getId())
+			    .orElseThrow(() -> new NotFoundException("MaintenanceJobCard issue not found with ID: " + jobCardIssue.getId()));
+//		if(!maintenanceJobCardIssue.getNo().equals(jobCardIssue.getNo())) {
+//			throw new InvalidOperationException("ID and number do not match");
+//		}
+		
+		// think of validating later on, if I get time
+		maintenanceJobCardIssue.setComments(jobCardIssue.getComments());
+		maintenanceJobCardIssue = maintenanceJobCardIssueRepository.save(maintenanceJobCardIssue);
+		return maintenanceJobCardIssueResponseDTOMapper(maintenanceJobCardIssue);		
 	}
 
 	

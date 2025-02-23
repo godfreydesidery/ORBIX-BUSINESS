@@ -152,6 +152,7 @@ public class MaintenanceJobCardServiceController implements MaintenanceJobCardSe
 		maintenanceJobCardIssueResponseDTO.setPrice(String.valueOf(maintenanceJobCardIssue.getPrice()));
 		maintenanceJobCardIssueResponseDTO.setNoOfDays(String.valueOf(maintenanceJobCardIssue.getNoOfDays()));
 		maintenanceJobCardIssueResponseDTO.setServiceSpecialist(maintenanceJobCardIssue.getServiceSpecialistUser().getNickname());
+		
 //		maintenanceJobCardIssueResponseDTO.setMaintenanceNo(maintenanceJobCard.getMaintenance().getNo());
 //		maintenanceJobCardIssueResponseDTO.setCreatedBy(maintenanceJobCard.getCreatedByUser() != null ? maintenanceJobCard.getCreatedByUser().getNickname() : "");
 //		maintenanceJobCardIssueResponseDTO.setCreatedDateTime(maintenanceJobCard.getCreatedDateTime() != null ? maintenanceJobCard.getCreatedDateTime().toString() : "");

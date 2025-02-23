@@ -251,12 +251,18 @@ export const routes: Routes = [
 
       /**End of Parking Management */
 
-      //Parking Management
-      /**Start of parking management */
+      //Maintenance Management
+      /**Start of Maintenance management */
       {
         path : 'maintenance-management/maintenance',
         loadComponent: () => import('./maintenance-management/maintenance/maintenance.component').then(c => c.MaintenanceComponent),
         data : { breadcrumb : 'Maintenance Management/Maintenance'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'maintenance-management/maintenance-verify',
+        loadComponent: () => import('./maintenance-management/maintenance-verify/maintenance-verify.component').then(c => c.MaintenanceVerifyComponent),
+        data : { breadcrumb : 'Maintenance Management/Maintenance Verify'},
         canActivate : [AuthGuard]
       },
       {
@@ -271,8 +277,18 @@ export const routes: Routes = [
         data : { breadcrumb : 'Maintenance Management/Service Specialist'},
         canActivate : [AuthGuard]
       },
-      /**End of Parking Management */
+      /**End of Maintenance Management */
 
+      /**Workshop */
+
+
+      /**End of Workshop */
+      {
+        path : 'workshop/my-jobs',
+        loadComponent: () => import('./workshop/my-jobs/my-jobs.component').then(c => c.MyJobsComponent),
+        data : { breadcrumb : 'Workshop/My Jobs'},
+        canActivate : [AuthGuard]
+      },
 
       /**Storage Management */
       {

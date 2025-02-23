@@ -1,0 +1,93 @@
+
+
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>My Job List</span>
+            </div>
+            <div class="card-body widget-body"> 
+                <div class="table-responsive">
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Maintenance#</th>
+                                <th>Name</th>
+                                <th>Description</th>
+                                <th>Reference</th>
+                                <th>Comments</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (job of maintenanceJobCardIssues; track job.id) {
+                                <tr>
+                                    <td>{{job.no}}</td>
+                                    <td>{{job.maintenanceNo}}</td>
+                                    <td>{{job.name}}</td>
+                                    <td>{{job.description}}</td>
+                                    <td>{{job.equipmentReference}}</td>
+                                    <td>
+                                        <button class="btn btn-success btn-sm btn-round-custom" (click)="loadIssue(job.id)" data-toggle="modal" data-target="#edit-modal"><i class="fa fa-edit" style="cursor: pointer;"></i> Edit</button>
+                                        <button class="btn btn-success btn-sm btn-round-custom" (click)="loadIssue(job.id)" data-toggle="modal" data-target="#view-modal"><i class="fa fa-eye" style="cursor: pointer;"></i> View</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="edit-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-lg" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Add/Edit Comment</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <textarea class="form-control" [(ngModel)]="comments" placeholder="Comments" style="background-color: white; min-height: 10cm;"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" (click)="saveComments()" data-dismiss="modal">Save</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="view-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-lg" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">View Comment</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <textarea class="form-control" [(ngModel)]="comments" placeholder="Comments" readonly style="background-color: white; min-height: 10cm;"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

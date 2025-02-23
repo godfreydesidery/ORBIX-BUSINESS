@@ -42,6 +42,7 @@ public class MaintenanceJobCardIssue {
 	
 	private String description;
 	
+	@Column(length = 1000)
 	private String comments;
 	
 	@NotBlank

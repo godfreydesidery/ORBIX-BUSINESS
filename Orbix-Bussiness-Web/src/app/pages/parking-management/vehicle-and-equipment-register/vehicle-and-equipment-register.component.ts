@@ -158,7 +158,7 @@ export class VehicleEquipmentRegisterComponent {
     this.getAllActiveVehicleEquipments()
     this.getAllCompanyActiveVehicleEquipmentTypes()
     this.getAllBranchActiveParkingZones()
-    this.getAllVehicleEquipmentChasisNos()
+    //this.getAllVehicleEquipmentChasisNos()
   }
 
 
@@ -203,6 +203,7 @@ export class VehicleEquipmentRegisterComponent {
   showParking : boolean = false
 
   async searchVehicleEquipmentByChasisNo(chasisNo : string){
+
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
@@ -225,6 +226,11 @@ export class VehicleEquipmentRegisterComponent {
 
   chasisNos : String[] = []
   async getAllVehicleEquipmentChasisNos(){
+
+    if(this.chasisNos.length > 0){
+      return
+    }
+
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }

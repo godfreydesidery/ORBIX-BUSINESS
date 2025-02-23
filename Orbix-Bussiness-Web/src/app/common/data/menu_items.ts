@@ -531,6 +531,11 @@ export const menuItems = [
                 title: 'Maintenance',
                 url: '#',
                 routerLink: '/app/maintenance-management/maintenance'
+            },
+            { 
+                title: 'Verify',
+                url: '#',
+                routerLink: '/app/maintenance-management/maintenance-verify'
             }, 
             { 
                 title: 'Issue Type',
@@ -542,6 +547,23 @@ export const menuItems = [
                 url: '#',
                 routerLink: '/app/maintenance-management/service-specialist'
             },    
+        ]
+    },
+
+    {
+        title: 'Workshop',
+        icon: 'fa-cogs',
+        selected: false,
+        expanded: false,
+        //show : grant(['WRHOUSE-ACCESS']),
+        show : true,
+        order: 700,
+        subMenu: [     
+            { 
+                title: 'My Jobs',
+                url: '#',
+                routerLink: '/app/workshop/my-jobs'
+            }, 
         ]
     },
 

@@ -8,7 +8,11 @@ import org.springframework.data.jpa.repository.JpaRepository;
 public interface VehicleEquipmentRepository extends JpaRepository<VehicleEquipment, Long> {
 
 	List<VehicleEquipment> findAllByActiveTrue();
+	
+	List<VehicleEquipment> findTop2000ByActiveTrue();
 
-	Optional<VehicleEquipment> findByChasisNoAndActiveTrue(String chasisNo);
+	//Optional<VehicleEquipment> findByChasisNoAndActiveTrue(String chasisNo);
+	
+	Optional<VehicleEquipment> findFirstByChasisNoAndActiveTrue(String chasisNo);
 
 }
