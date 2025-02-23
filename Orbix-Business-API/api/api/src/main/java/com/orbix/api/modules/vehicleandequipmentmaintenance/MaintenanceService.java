@@ -12,7 +12,7 @@ public interface MaintenanceService {
 	List<MaintenanceResponseDTO> getRecentCheckedOut(HttpServletRequest request);
 	List<MaintenanceResponseDTO> getAllCheckedInMaintenances(HttpServletRequest request);	
 	MaintenanceResponseDTO get(Long id, HttpServletRequest request);
-	List<MaintenanceBillReceivableResponseDTO> getMaintenanceBillReceivables(Long id, HttpServletRequest request);
+	List<MaintenanceJobCardIssueBillReceivableResponseDTO> getMaintenanceJobCardIssueBillReceivables(Long id, HttpServletRequest request);
 	MaintenanceResponseDTO createMaintenance(MaintenanceRequestDTO maintenanceRequest, HttpServletRequest request);
 	MaintenanceResponseDTO updateMaintenance(MaintenanceRequestDTO maintenanceRequest, HttpServletRequest request);
 	

@@ -3,7 +3,7 @@ package com.orbix.api.modules.vehicleandequipmentmaintenance;
 import lombok.Data;
 
 @Data
-public class MaintenanceBillReceivableRequestDTO {
+public class MaintenanceJobCardIssueBillReceivableRequestDTO {
 	Long id;
 	String billingType;
 	double qty;

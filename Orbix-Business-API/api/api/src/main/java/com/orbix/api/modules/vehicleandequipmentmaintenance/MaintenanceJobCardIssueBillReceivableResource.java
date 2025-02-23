@@ -1,5 +1,5 @@
 package com.orbix.api.modules.vehicleandequipmentmaintenance;
 
-public class MaintenanceBillReceivableResource {
+public class MaintenanceJobCardIssueBillReceivableResource {
 
 }

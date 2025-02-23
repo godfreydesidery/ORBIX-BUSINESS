@@ -3,7 +3,7 @@ package com.orbix.api.modules.vehicleandequipmentmaintenance;
 import lombok.Data;
 
 @Data
-public class MaintenanceBillReceivableResponseDTO {
+public class MaintenanceJobCardIssueBillReceivableResponseDTO {
 	String id;
 	String description;
 	String startedAt;

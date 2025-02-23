@@ -57,7 +57,7 @@ public class MaintenanceServiceController implements MaintenanceService {
 	
 	private final BillReceivableRepository billReceivableRepository;
 	
-	private final MaintenanceBillReceivableRepository maintenanceBillReceivableRepository;
+	private final MaintenanceJobCardIssueBillReceivableRepository maintenanceJobCardIssueBillReceivableRepository;
 //	private final MaintenanceServiceBillReceivableRepository maintenanceServiceBillReceivableRepository;
 //	private final MaintenanceInvoiceReceivableRepository maintenanceInvoiceReceivableRepository;
 	
@@ -102,10 +102,10 @@ public class MaintenanceServiceController implements MaintenanceService {
 			
 			boolean cleared = true;
 			
-			List<MaintenanceBillReceivable> maintenanceBillReceivables = maintenanceBillReceivableRepository.findAllByMaintenance(maintenance);
-			if(!maintenanceBillReceivables.isEmpty() && cleared == true) {
-				for(MaintenanceBillReceivable maintenanceBillReceivable : maintenanceBillReceivables) {
-					if(!maintenanceBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
+			List<MaintenanceJobCardIssueBillReceivable> maintenanceJobCardIssueBillReceivables = maintenanceJobCardIssueBillReceivableRepository.findAllByMaintenanceJobCardIssue_MaintenanceJobCard_Maintenance(maintenance);
+			if(!maintenanceJobCardIssueBillReceivables.isEmpty() && cleared == true) {
+				for(MaintenanceJobCardIssueBillReceivable maintenanceJobCardIssueBillReceivable : maintenanceJobCardIssueBillReceivables) {
+					if(!maintenanceJobCardIssueBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
 						cleared = false;
 						break;
 					}
@@ -142,10 +142,10 @@ public class MaintenanceServiceController implements MaintenanceService {
 			
 			boolean cleared = true;
 			
-			List<MaintenanceBillReceivable> maintenanceBillReceivables = maintenanceBillReceivableRepository.findAllByMaintenance(maintenance);
-			if(!maintenanceBillReceivables.isEmpty() && cleared == true) {
-				for(MaintenanceBillReceivable maintenanceBillReceivable : maintenanceBillReceivables) {
-					if(!maintenanceBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
+			List<MaintenanceJobCardIssueBillReceivable> maintenanceJobCardIssueBillReceivables = maintenanceJobCardIssueBillReceivableRepository.findAllByMaintenanceJobCardIssue_MaintenanceJobCard_Maintenance(maintenance);
+			if(!maintenanceJobCardIssueBillReceivables.isEmpty() && cleared == true) {
+				for(MaintenanceJobCardIssueBillReceivable maintenanceJobCardIssueBillReceivable : maintenanceJobCardIssueBillReceivables) {
+					if(!maintenanceJobCardIssueBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
 						cleared = false;
 						break;
 					}
@@ -382,9 +382,9 @@ public class MaintenanceServiceController implements MaintenanceService {
 //		if(vehicleEquipmentType_.isEmpty()) throw new NotFoundException("Vehicle or equipment type not found");
 		
 		
-		List<MaintenanceBillReceivable> maintenanceBillReceivables = maintenanceBillReceivableRepository.findAllByMaintenance(maintenance_.get());
-		for(MaintenanceBillReceivable maintenanceBillReceivable : maintenanceBillReceivables) {
-			if(maintenanceBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.UNPAID)) {
+		List<MaintenanceJobCardIssueBillReceivable> maintenanceJobCardIssueBillReceivables = maintenanceJobCardIssueBillReceivableRepository.findAllByMaintenanceJobCardIssue_MaintenanceJobCard_Maintenance(maintenance_.get());
+		for(MaintenanceJobCardIssueBillReceivable maintenanceJobCardIssueBillReceivable : maintenanceJobCardIssueBillReceivables) {
+			if(maintenanceJobCardIssueBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.UNPAID)) {
 				throw new InvalidOperationException("Can not check out, bills  not cleared");
 			}
 		}
@@ -401,23 +401,23 @@ public class MaintenanceServiceController implements MaintenanceService {
 	}
 	
 	@Override
-	public List<MaintenanceBillReceivableResponseDTO> getMaintenanceBillReceivables(
+	public List<MaintenanceJobCardIssueBillReceivableResponseDTO> getMaintenanceJobCardIssueBillReceivables(
 			Long id, HttpServletRequest request) {
 		Optional<Maintenance> maintenance_ = maintenanceRepository.findById(id);
 		if(maintenance_.isEmpty()) {
 			throw new NotFoundException("Maintenance not found");
 		}
 		
-		List<MaintenanceBillReceivable> maintenanceBillReceivables = maintenanceBillReceivableRepository.findAllByMaintenance(maintenance_.get());
+		List<MaintenanceJobCardIssueBillReceivable> maintenanceJobCardIssueBillReceivables = maintenanceJobCardIssueBillReceivableRepository.findAllByMaintenanceJobCardIssue_MaintenanceJobCard_Maintenance(maintenance_.get());
 		
-		List<MaintenanceBillReceivableResponseDTO> maintenanceBillReceivableResponses = new ArrayList<>();
+		List<MaintenanceJobCardIssueBillReceivableResponseDTO> maintenanceJobCardIssueBillReceivableResponses = new ArrayList<>();
 		
-		for(MaintenanceBillReceivable maintenanceBillReceivable : maintenanceBillReceivables) {
-			maintenanceBillReceivableResponses.add(maintenanceBillReceivableDTOMapper(maintenanceBillReceivable));
+		for(MaintenanceJobCardIssueBillReceivable maintenanceJobCardIssueBillReceivable : maintenanceJobCardIssueBillReceivables) {
+			maintenanceJobCardIssueBillReceivableResponses.add(maintenanceJobCardIssueBillReceivableDTOMapper(maintenanceJobCardIssueBillReceivable));
 		}
-		if (maintenanceBillReceivableResponses.isEmpty()) return null;
+		if (maintenanceJobCardIssueBillReceivableResponses.isEmpty()) return null;
 		
-		return maintenanceBillReceivableResponses;
+		return maintenanceJobCardIssueBillReceivableResponses;
 	}
 	
 	private MaintenanceResponseDTO maintenanceResponseDTOMapper(Maintenance maintenance) {
@@ -471,9 +471,9 @@ public class MaintenanceServiceController implements MaintenanceService {
 		if(maintenance.getStatus().equals("CHECKED-OUT")) {
 			List<ServiceBillItem> items = new ArrayList<>();
 		
-			List<MaintenanceBillReceivable> pbs = maintenanceBillReceivableRepository.findAllByMaintenance(maintenance);
+			List<MaintenanceJobCardIssueBillReceivable> pbs = maintenanceJobCardIssueBillReceivableRepository.findAllByMaintenanceJobCardIssue_MaintenanceJobCard_Maintenance(maintenance);
 			int sn = 1;
-			for(MaintenanceBillReceivable pbr : pbs) {
+			for(MaintenanceJobCardIssueBillReceivable pbr : pbs) {
 				ServiceBillItem sbi = new ServiceBillItem();
 				sbi.setSn(sn);
 				sbi.setItem(pbr.getBillReceivable().getSummary());
@@ -488,20 +488,20 @@ public class MaintenanceServiceController implements MaintenanceService {
 		return maintenanceResponse;
 	}
 	
-	private MaintenanceBillReceivableResponseDTO maintenanceBillReceivableDTOMapper(MaintenanceBillReceivable maintenanceBillReceivable) {
+	private MaintenanceJobCardIssueBillReceivableResponseDTO maintenanceJobCardIssueBillReceivableDTOMapper(MaintenanceJobCardIssueBillReceivable maintenanceJobCardIssueBillReceivable) {
 		
-		MaintenanceBillReceivableResponseDTO maintenanceBillReceivableResponseDTO = new MaintenanceBillReceivableResponseDTO();
+		MaintenanceJobCardIssueBillReceivableResponseDTO maintenanceJobCardIssueBillReceivableResponseDTO = new MaintenanceJobCardIssueBillReceivableResponseDTO();
 		
-		maintenanceBillReceivableResponseDTO.setId(maintenanceBillReceivable.getId().toString());
-		maintenanceBillReceivableResponseDTO.setQty(String.valueOf(maintenanceBillReceivable.getQty()));
-		maintenanceBillReceivableResponseDTO.setPrice(String.valueOf(maintenanceBillReceivable.getPrice()));
-		maintenanceBillReceivableResponseDTO.setBillingType(maintenanceBillReceivable.getBillingType());
-		maintenanceBillReceivableResponseDTO.setDiscount(String.valueOf(maintenanceBillReceivable.getDiscount()));
-		maintenanceBillReceivableResponseDTO.setMaintenanceId(maintenanceBillReceivable.getMaintenance().getId().toString());
-		maintenanceBillReceivableResponseDTO.setAmount(String.valueOf(((maintenanceBillReceivable.getPrice() * maintenanceBillReceivable.getQty()) - maintenanceBillReceivable.getDiscount())));
-		maintenanceBillReceivableResponseDTO.setPayStatus(maintenanceBillReceivable.getBillReceivable().getPayStatus().toString());
+		maintenanceJobCardIssueBillReceivableResponseDTO.setId(maintenanceJobCardIssueBillReceivable.getId().toString());
+		maintenanceJobCardIssueBillReceivableResponseDTO.setQty(String.valueOf(maintenanceJobCardIssueBillReceivable.getQty()));
+		maintenanceJobCardIssueBillReceivableResponseDTO.setPrice(String.valueOf(maintenanceJobCardIssueBillReceivable.getPrice()));
+		maintenanceJobCardIssueBillReceivableResponseDTO.setBillingType(maintenanceJobCardIssueBillReceivable.getBillingType());
+		maintenanceJobCardIssueBillReceivableResponseDTO.setDiscount(String.valueOf(maintenanceJobCardIssueBillReceivable.getDiscount()));
+		maintenanceJobCardIssueBillReceivableResponseDTO.setMaintenanceId(maintenanceJobCardIssueBillReceivable.getMaintenanceJobCardIssue().getMaintenanceJobCard().getMaintenance().getId().toString());
+		maintenanceJobCardIssueBillReceivableResponseDTO.setAmount(String.valueOf(((maintenanceJobCardIssueBillReceivable.getPrice() * maintenanceJobCardIssueBillReceivable.getQty()) - maintenanceJobCardIssueBillReceivable.getDiscount())));
+		maintenanceJobCardIssueBillReceivableResponseDTO.setPayStatus(maintenanceJobCardIssueBillReceivable.getBillReceivable().getPayStatus().toString());
 				
-		return maintenanceBillReceivableResponseDTO;
+		return maintenanceJobCardIssueBillReceivableResponseDTO;
 		
 	}
 	

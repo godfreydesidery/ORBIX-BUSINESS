@@ -70,10 +70,10 @@ public class MaintenanceResource {
 	}
 	
 	@GetMapping("/maintenances/get_maintenance_bill_receivables")
-	public ResponseEntity<List<MaintenanceBillReceivableResponseDTO>>getMaintenanceBillReceivables(
+	public ResponseEntity<List<MaintenanceJobCardIssueBillReceivableResponseDTO>>getMaintenanceBillReceivables(
 			@RequestParam(name = "maintenance_id") Long id,
 			HttpServletRequest request){		
-		return ResponseEntity.ok().body(maintenanceService.getMaintenanceBillReceivables(id, request));		
+		return ResponseEntity.ok().body(maintenanceService.getMaintenanceJobCardIssueBillReceivables(id, request));		
 	}
 	
 	@PostMapping("/maintenances/create")
