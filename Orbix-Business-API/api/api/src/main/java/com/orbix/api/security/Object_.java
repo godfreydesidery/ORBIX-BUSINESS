@@ -21,7 +21,12 @@ public class Object_ {
 	public static String ROLE = "ROLE-ALL CREATE READ UPDATE";
 	
 	public static String RCPTN = "RCPTN-ACCESS";
+	public static String PKNG = "PKNG-ACCESS";
+	public static String MTNC = "MTNC-ACCESS";
 	public static String FINC = "FINC-ACCESS";
+	public static String FINCPKNG = "FINCPKNG-ACCESS";
+	public static String FINCSTRG = "FINCSTRG-ACCESS";
+	public static String FINCMTNC = "FINCMTNC-ACCESS";
 	public static String SHOP = "SHOP-ACCESS";
 	public static String WRHOUSE = "WRHOUSE-ACCESS";
 	public static String PRCMT = "PRCMT-ACCESS";

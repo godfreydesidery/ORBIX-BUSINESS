@@ -124,6 +124,18 @@ public class MaintenanceJobCardServiceController implements MaintenanceJobCardSe
 		maintenanceJobCardResponseDTO.setOwnerName(maintenanceJobCard.getMaintenance().getOwnerFirstName() + " " + maintenanceJobCard.getMaintenance().getOwnerLastName());
 		maintenanceJobCardResponseDTO.setVehicleEquipmentTypeName(maintenanceJobCard.getMaintenance().getVehicleEquipmentType().getName());
 		maintenanceJobCardResponseDTO.setVehicleEquipmentName(maintenanceJobCard.getMaintenance().getVehicleEquipmentName());
+		maintenanceJobCardResponseDTO.setChasisNo(
+			    Optional.ofNullable(maintenanceJobCard)
+			        .map(mjc -> mjc.getMaintenance())
+			        .map(maintenance -> maintenance.getChasisNo())
+			        .orElse("")
+			);
+		maintenanceJobCardResponseDTO.setOwnerPhoneNo(maintenanceJobCard.getMaintenance().getOwnerPhoneNo());
+		maintenanceJobCardResponseDTO.setHasKeys(
+			    (maintenanceJobCard != null && maintenanceJobCard.getMaintenance() != null && maintenanceJobCard.getMaintenance().isHasKeys()) 
+			    ? "Yes" 
+			    : "No"
+			);
 		// add others, on conditional
 		
 		List<MaintenanceJobCardIssueResponseDTO> maintenanceJobCardIssues = new ArrayList<>();

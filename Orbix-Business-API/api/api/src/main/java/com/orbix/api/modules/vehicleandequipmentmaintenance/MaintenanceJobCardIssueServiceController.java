@@ -10,6 +10,7 @@ import javax.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import com.orbix.api.api.commons.PayStatus;
+import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.DayService;
@@ -70,6 +71,10 @@ public class MaintenanceJobCardIssueServiceController implements MaintenanceJobC
 		MaintenanceJobCardIssue maintenanceJobCardIssue = new MaintenanceJobCardIssue();
 		
 		maintenanceJobCardIssue.setNo("MIS/TEMP-" + UUID.randomUUID());
+		
+		if(maintenanceJobCardRequest.getMaintenanceJobCardIssueRequest().noOfDays <= 0) {
+			throw new InvalidOperationException("Invalid no of days, Days can be 1 or more");
+		}
 		
 		maintenanceJobCardIssue.setMaintenanceJobCard(maintenanceJobCard);
 		maintenanceJobCardIssue.setMaintenanceIssueType(maintenanceIssueType);

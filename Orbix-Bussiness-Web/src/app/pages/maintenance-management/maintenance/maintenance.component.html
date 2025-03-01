@@ -82,6 +82,7 @@
                     <div class="col-md-6 card" *ngIf="maintenanceJobCardNo != ''">
                         <div class="row">
                             <div class="col-lg-12">
+                                <button class="pull-right" (click)="closeJobCard()">Close</button>
                                 <div style="text-align: center;"><h4>Job Card</h4></div>
                                 <div class="row">
                                     <div class="col-lg-6">
@@ -94,7 +95,7 @@
                                         <div><span>Owner Name:</span><b>{{ownerName}}</b></div>
                                     </div>
                                     <div class="col-lg-6">
-                                        <div><span>Chasis No:</span></div>
+                                        <div><span>Chasis No:</span><b>{{chasisNo}}</b></div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div><span>Vehicle Type:</span><b>{{vehicleEquipmentTypeName}}</b></div>
@@ -103,10 +104,10 @@
                                         <div><span>Vehicle:</span><b>{{vehicleEquipmentName}}</b></div>
                                     </div>
                                     <div class="col-lg-6">
-                                        <div><span>Contact:</span></div>
+                                        <div><span>Phone:</span><b>{{ownerPhoneNo}}</b></div>
                                     </div>
                                     <div class="col-lg-6">
-                                        <div><span>Keys:</span></div>
+                                        <div><span>Keys:</span><b>{{hasKeys}}</b></div>
                                     </div>
                                 </div>
                                 <br>
@@ -134,13 +135,8 @@
                                     </select>
                                 </div>                       
                             </div>
-                            
-                            
-                            
                         </div>
                         <div class="row">
-                            
-                            
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label>Technician</label>
@@ -218,6 +214,9 @@
                                     </div>
                 
                                 </div>
+                            </div>
+                            <div class="col-lg-12">
+                                <button class="btn btn-success btn-round-custom pull-right" (click)="openAllIssues()">Open All</button>
                             </div>
                         </div>
                     </div>

@@ -21,6 +21,9 @@ public class MaintenanceJobCardResponseDTO {
     String ownerName;
     String vehicleEquipmentName;
     String vehicleEquipmentTypeName;
+    String chasisNo;
+    String hasKeys;
+    String ownerPhoneNo;
     
     List<MaintenanceJobCardIssueResponseDTO> maintenanceJobCardIssues;
     

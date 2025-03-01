@@ -12,6 +12,8 @@ export interface IMaintenanceJobCard {
     vehicleEquipmentTypeName : string
     vehicleEquipmentName : string
     chasisNo : string
+    hasKeys : string
+    ownerPhoneNo : string
 
     sn : number
 

@@ -522,6 +522,19 @@ export class MaintenanceComponent {
     this.vehicleEquipmentName = data!.vehicleEquipmentName
     this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName
     this.ownerName = data!.ownerName
+    this.ownerPhoneNo = data!.ownerPhoneNo
+    this.chasisNo = data!.chasisNo
+    this.hasKeys = data!.hasKeys
+  }
+
+  closeJobCard(){
+    this.maintenanceJobCardId = null
+    this.maintenanceJobCardNo = ''
+    this.maintenanceId = null
+    this.maintenanceNo = ''
+    this.vehicleEquipmentName = ''
+    this.vehicleEquipmentTypeName = ''
+    this.ownerName = ''
   }
 
   clearJobCard() {
@@ -630,7 +643,7 @@ export class MaintenanceComponent {
     maintenanceJobCardIssueTypeName : string = ''
     maintenanceJobCardIssueSpecialistUser : string = ''
 
-    maintenanceJobCardIssuePrice : number = 0
+    maintenanceJobCardIssuePrice : number | string = ''
     maintenanceJobCardIssueNoOfDays : number = 1
 
     async createMaintenanceJobCardIssue(){
@@ -676,6 +689,8 @@ export class MaintenanceComponent {
             this.msg.showErrorMessage(error, 'Error')
           }
         )
+
+        this.clearIssueData()
         
     }
 
@@ -710,6 +725,55 @@ export class MaintenanceComponent {
           }
         )
 
+    }
+
+    async openAllIssues(){
+      for(let individualIssue of this.maintenanceJobCard.maintenanceJobCardIssues){
+
+        if(individualIssue.status != 'PENDING'){
+          continue
+        }
+
+        let options = {
+          headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+        }
+  
+        var issue = {
+          id : individualIssue.id,
+          no : individualIssue.no
+        }
+  
+        await this.http.post(API_URL + '/maintenance_job_card_issues/open', issue, options)
+          .toPromise()
+          .then(
+            data => {
+    
+              console.log(data)
+    
+              // this.msg.showSuccessMessage('Issue opened successifully')
+  
+              // this.createOrLoadMaintenanceJobCard(this.maintenanceId)
+    
+            }
+    
+          )
+          .catch(
+            error => {
+              console.log(error)
+              // this.msg.showErrorMessage(error, 'Error')
+            }
+          )
+      }
+      this.createOrLoadMaintenanceJobCard(this.maintenanceId)
+    }
+
+    clearIssueData(){  
+      this.maintenanceJobCardIssueName = ''
+      this.maintenanceJobCardIssueDescription = ''
+      this.maintenanceJobCardIssueTypeName = ''
+      this.maintenanceJobCardIssueSpecialistUser = ''
+      this.maintenanceJobCardIssuePrice = ''
+      this.maintenanceJobCardIssueNoOfDays = 1
     }
   
   

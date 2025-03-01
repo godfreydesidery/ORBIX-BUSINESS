@@ -522,6 +522,19 @@ documentHeader! : any
     this.vehicleEquipmentName = data!.vehicleEquipmentName
     this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName
     this.ownerName = data!.ownerName
+    this.ownerPhoneNo = data!.ownerPhoneNo
+    this.chasisNo = data!.chasisNo
+    this.hasKeys = data!.hasKeys
+  }
+
+  closeJobCard(){
+    this.maintenanceJobCardId = null
+    this.maintenanceJobCardNo = ''
+    this.maintenanceId = null
+    this.maintenanceNo = ''
+    this.vehicleEquipmentName = ''
+    this.vehicleEquipmentTypeName = ''
+    this.ownerName = ''
   }
 
   clearJobCard() {
@@ -697,6 +710,45 @@ documentHeader! : any
             console.log(data)
   
             this.msg.showSuccessMessage('Issue opened successifully')
+
+            this.createOrLoadMaintenanceJobCard(this.maintenanceId)
+  
+          }
+  
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+          }
+        )
+
+    }
+
+    async closeIssue(id : any, no : string){
+
+      if(await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to verify and close this issue?', 'question', 'Yes', 'No') == false){
+        return
+      }
+
+
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      }
+
+      var issue = {
+        id : id,
+        no : no
+      }
+
+      await this.http.post(API_URL + '/maintenance_job_card_issues/close', issue, options)
+        .toPromise()
+        .then(
+          data => {
+  
+            console.log(data)
+  
+            this.msg.showSuccessMessage('Issue closed successifully')
 
             this.createOrLoadMaintenanceJobCard(this.maintenanceId)
   

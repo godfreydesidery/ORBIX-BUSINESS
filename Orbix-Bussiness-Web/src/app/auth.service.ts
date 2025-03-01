@@ -218,6 +218,16 @@ export class AuthService {
     }
     return granted
   }
+
+
+  grant(privileges: string[]): boolean {
+    for (const privilege of privileges) {
+      if (this.checkPrivilege(privilege)) {
+        return true; 
+      }
+    }
+    return false; // Adjust return value based on logic
+  }
 }
 
 

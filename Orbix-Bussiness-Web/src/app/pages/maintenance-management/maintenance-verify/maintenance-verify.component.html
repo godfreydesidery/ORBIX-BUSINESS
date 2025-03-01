@@ -61,7 +61,7 @@
                                             <td>
                                                 <table class="table table-sm">
                                                     <tr>
-                                                        <td><button type="button" class="btn btn-warning btn-round-custom btn-sm text-nowrap" *ngIf="p.status === 'CHECKED-IN'" (click)="createOrLoadMaintenanceJobCard(p.id)" style="cursor: pointer; margin-left: 3px;">Job Card</button></td>
+                                                        <td><button type="button" class="btn btn-warning btn-round-custom btn-sm text-nowrap" *ngIf="p.status === 'CHECKED-IN'" (click)="createOrLoadMaintenanceJobCard(p.id)" style="cursor: pointer; margin-left: 3px;">View Jobs</button></td>
                                                     </tr>
                                                 </table>
                                             </td>
@@ -80,6 +80,7 @@
                     <div class="col-md-6 card" *ngIf="maintenanceJobCardNo != ''">
                         <div class="row">
                             <div class="col-lg-12">
+                                <button class="pull-right" (click)="closeJobCard()">Close</button>
                                 <div style="text-align: center;"><h4>Job Card</h4></div>
                                 <div class="row">
                                     <div class="col-lg-6">
@@ -92,7 +93,7 @@
                                         <div><span>Owner Name:</span><b>{{ownerName}}</b></div>
                                     </div>
                                     <div class="col-lg-6">
-                                        <div><span>Chasis No:</span></div>
+                                        <div><span>Chasis No:</span><b>{{chasisNo}}</b></div>
                                     </div>
                                     <div class="col-lg-6">
                                         <div><span>Vehicle Type:</span><b>{{vehicleEquipmentTypeName}}</b></div>
@@ -101,10 +102,10 @@
                                         <div><span>Vehicle:</span><b>{{vehicleEquipmentName}}</b></div>
                                     </div>
                                     <div class="col-lg-6">
-                                        <div><span>Contact:</span></div>
+                                        <div><span>Phone:</span><b>{{ownerPhoneNo}}</b></div>
                                     </div>
                                     <div class="col-lg-6">
-                                        <div><span>Keys:</span></div>
+                                        <div><span>Keys:</span><b>{{hasKeys}}</b></div>
                                     </div>
                                 </div>
                                 <br>
@@ -199,9 +200,8 @@
                                                     <td style="text-align: right;">{{m.price | currency : '':''}}</td> -->
                                                     <td>{{m.status}}</td>
                                                     <td>
-                                                        <button class="btn btn-success btn-sm btn-round-custom" *ngIf="m.status == 'OPEN'" (click)="loadIssue(m.id)" data-toggle="modal" data-target="#edit-modal"><i class="fa fa-edit" style="cursor: pointer;"></i> Edit</button>
+                                                        <button class="btn btn-success btn-sm btn-round-custom" *ngIf="m.status === 'OPEN'" (click)="closeIssue(m.id, m.no)">Verify</button>
                                                         <button class="btn btn-success btn-sm btn-round-custom" *ngIf="m.status == 'OPEN'" (click)="loadIssue(m.id)" data-toggle="modal" data-target="#view-modal"><i class="fa fa-eye" style="cursor: pointer;"></i> View</button>
-                                                        
                                                     </td>
                                                 </tr>
                                         </tbody> 
