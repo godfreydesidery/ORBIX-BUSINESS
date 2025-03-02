@@ -19,4 +19,13 @@ export interface IMaintenanceJobCardIssue{
     serviceSpecialist : string
     maintenanceNo : string
     equipmentReference : string
+
+    ownerName : string
+    chasisNo : string
+    phoneNo : string
+    keys : string
+    payment : string
+
+
+    sn : number
 }

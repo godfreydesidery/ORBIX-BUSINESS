@@ -232,6 +232,23 @@ public class MaintenanceJobCardIssueServiceController implements MaintenanceJobC
 		String ref = "Reg No: " + regNo + ", " + "Name: " + eqName + ", " + "Type: " + eqType;
 		maintenanceJobCardIssueResponseDTO.setEquipmentReference(ref);
 		
+		maintenanceJobCardIssueResponseDTO.setOwnerName(maintenanceJobCardIssue.getMaintenanceJobCard().getMaintenance().getOwnerFirstName() + " " + maintenanceJobCardIssue.getMaintenanceJobCard().getMaintenance().getOwnerLastName());
+		if(maintenanceJobCardIssue.getMaintenanceJobCard().getMaintenance().getChasisNo() != null) {
+			maintenanceJobCardIssueResponseDTO.setChasisNo(maintenanceJobCardIssue.getMaintenanceJobCard().getMaintenance().getChasisNo());
+		}else {
+			maintenanceJobCardIssueResponseDTO.setChasisNo("");
+		}
+		if(maintenanceJobCardIssue.getMaintenanceJobCard().getMaintenance().getOwnerPhoneNo() != null) {
+			maintenanceJobCardIssueResponseDTO.setPhoneNo(maintenanceJobCardIssue.getMaintenanceJobCard().getMaintenance().getOwnerPhoneNo());
+		}else {
+			maintenanceJobCardIssueResponseDTO.setPhoneNo("");
+		}
+		
+		if(maintenanceJobCardIssue.getMaintenanceJobCard().getMaintenance().isHasKeys() == true) {
+			maintenanceJobCardIssueResponseDTO.setKeys("YES");
+		}else {
+			maintenanceJobCardIssueResponseDTO.setKeys("NO");
+		}
 		
 		
 		//		maintenanceJobCardIssueResponseDTO.setMaintenanceNo(maintenanceJobCard.getMaintenance().getNo());

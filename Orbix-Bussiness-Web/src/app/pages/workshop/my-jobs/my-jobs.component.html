@@ -8,7 +8,7 @@
             </div>
             <div class="card-body widget-body"> 
                 <div class="table-responsive">
-                    <table class="table">
+                    <!-- <table class="table">
                         <thead>
                             <tr>
                                 <th>No</th>
@@ -34,7 +34,45 @@
                                 </tr>
                             }
                         </tbody>
+                    </table> -->
+
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>No</th>
+                                <th>Owner Name</th>
+                                <th>Chasis No</th>
+                                <th>Phone No</th>
+                                <th>Keys</th>
+                                <!-- <th>Payment</th> -->
+                                <th>Issue</th>
+                                <th>Description</th>
+                                <!-- <th>Comments</th> -->
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @for (job of maintenanceJobCardIssues; track job.id) {
+                                <tr>
+                                    <td>{{job.sn}}</td>
+                                    <td>{{job.ownerName}}</td>
+                                    <td>{{job.chasisNo}}</td>
+                                    <td>{{job.phoneNo}}</td>
+                                    <td>{{job.keys}}</td>
+                                    <!-- <td>{{job.payment}}</td> -->
+                                    <td>{{job.name}}</td>
+                                    <td>{{job.description}}</td>
+                                    <!-- <td>{{job.comments}}</td> -->
+                                    <td>
+                                        <button class="btn btn-success btn-sm btn-round-custom" (click)="loadIssue(job.id)" data-toggle="modal" data-target="#edit-modal"><i class="fa fa-edit" style="cursor: pointer;"></i> Edit</button>
+                                        <button class="btn btn-success btn-sm btn-round-custom" (click)="loadIssue(job.id)" data-toggle="modal" data-target="#view-modal"><i class="fa fa-eye" style="cursor: pointer;"></i> View</button>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                        
                     </table>
+
                 </div>
 
             </div>

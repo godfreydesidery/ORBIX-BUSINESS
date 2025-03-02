@@ -60,7 +60,9 @@ export class VehicleEquipmentRegisterComponent {
   selectedCity: number | null = null;
 
   onChange(event: any) {
-    console.log('Selected City ID:', event);
+    //console.log('Selected City ID:', event);
+
+    alert()
   }
 
   // Scroll the selected item into view

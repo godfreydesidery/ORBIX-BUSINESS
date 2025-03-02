@@ -192,6 +192,16 @@
                                     <datalist id="venamesaa">
                                         <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
                                     </datalist>
+
+                                    <!-- <ng-select [items]="vehicleEquipmentTypes" // To check later
+                                            bindLabel="id"
+                                            bindValue="name"
+                                            [(ngModel)]="vehicleEquipmentTypeName"
+                                            (change)="onChange($event)"
+                                            class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                                    </ng-select> -->
+
+
                                 </div>
                             </div>
                             <div class="col-lg-3">
@@ -333,9 +343,9 @@
                             </div>                      -->
                         </div>
 
-                        <h6>Agent Information</h6>
-                        <hr>
-                        <div class="row">
+                        <h6 *ngIf="currentService === 'Parking'">Agent Information</h6>
+                        <hr *ngIf="currentService === 'Parking'">
+                        <div class="row" *ngIf="currentService === 'Parking'">
                             <input type="hidden" [(ngModel)]="id">
                             <div class="col-lg-6">
                                 <div class="form-group">

@@ -30,4 +30,10 @@ public class MaintenanceJobCardIssueResponseDTO {
     String comments;
     
     String equipmentReference;
+    
+    String ownerName;
+    String chasisNo;
+    String phoneNo;
+    String keys;
+    String payment;
 }

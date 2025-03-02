@@ -566,7 +566,7 @@ export const menuItems = [
     },
 
     {
-        title: 'Workshop',
+        title: 'Technician',
         icon: 'fa-cogs',
         selected: false,
         expanded: false,
