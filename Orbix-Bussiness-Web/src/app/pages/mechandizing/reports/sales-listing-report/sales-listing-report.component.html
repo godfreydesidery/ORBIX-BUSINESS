@@ -46,7 +46,10 @@
                                     <td><b>SN</b></td>
                                     <td><b>Product Name</b></td>
                                     <td><b>Qty</b></td>
+                                    <td><b>Cost</b></td>
+                                    <td><b>Discount</b></td>
                                     <td><b>Amount</b></td>
+                                    <td><b>Profit</b></td>
                                     <td><b>Created By</b>
                                     <td><b>Date Time></b>
                                 </thead>
@@ -55,7 +58,10 @@
                                         <td>{{s.sn}}</td>
                                         <td>{{s.productName}}</td>
                                         <td>{{s.qty}}</td>
+                                        <td style="text-align: right;">{{s.cost | currency:'':''}}</td>
+                                        <td style="text-align: right;">{{s.discount | currency:'':''}}</td>
                                         <td style="text-align: right;">{{s.amount | currency:'':''}}</td>
+                                        <td style="text-align: right;">{{s.profit | currency:'':''}}</td>
                                         <td>{{s.createdBy}}</td>  
                                         <td>{{s.timeDate}}</td>                                      
                                     </tr>
@@ -63,7 +69,10 @@
                                 <tfoot>
                                     <tr>
                                         <td colspan="3"><b>Total</b></td>
-                                        <td style="text-align: right;"><b>{{total | currency:'':''}}</b></td>
+                                        <td style="text-align: right;"><b>{{totalCost | currency:'':''}}</b></td>
+                                        <td style="text-align: right;"><b>{{totalDiscount | currency:'':''}}</b></td>
+                                        <td style="text-align: right;"><b>{{totalAmount | currency:'':''}}</b></td>
+                                        <td style="text-align: right;"><b>{{totalProfit | currency:'':''}}</b></td>
                                         <td colspan="2"></td>
                                     </tr>
                                 </tfoot>

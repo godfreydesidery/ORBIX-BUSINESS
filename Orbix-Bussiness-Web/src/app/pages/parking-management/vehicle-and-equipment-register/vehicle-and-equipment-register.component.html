@@ -4,7 +4,25 @@
             <div class="card-header">
                 <span>Vehicle Register | {{ currentService ? currentService : 'No Service Selected' }}</span>
             </div>
+            
             <div class="card-body widget-body">
+                <!-- <div class="row">
+                    <div class="col-lg-3">
+
+                        <h3>Select a City</h3>
+                        <ng-select [items]="cities"
+                                bindLabel="name"
+                                bindValue="id"
+                                [(ngModel)]="selectedCity"
+                                (change)="onChange($event)"
+                                class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                        </ng-select>
+                    </div>
+                </div>
+                
+
+                <br><br>
+                <br><br><br><br> -->
                 <div class="alert alert-warning" role="alert" *ngIf="isServicesAllowed === false">
                     <strong>Warning!</strong> You do not have permission to offer services. Please contact the system administrator for assistance.
                 </div>
@@ -185,6 +203,7 @@
                                         <option value="white">White</option>
                                         <option value="red">Red</option>
                                         <option value="dark-blue">Dark Blue</option>
+                                        <option value="silver">Silver</option>
                                         <option value="yellow">Yellow</option>
                                         <option value="brown">Brown</option>
                                         <option value="blue">Blue</option>
@@ -680,7 +699,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-3">
+                            <div class="col-lg-3" *ngIf="currentService === 'Parking'">
                                 <div class="form-group">
                                     <label>Category</label>
                                     <select class="form-control" [(ngModel)]="vehicleEquipmentCategory">
@@ -691,7 +710,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-3">
+                            <div class="col-lg-3" *ngIf="currentService === 'Parking'">
                                 <div class="form-group">
                                     <label>Parking Zone</label>
                                     <select class="form-control" [(ngModel)]="parkingZoneName">
@@ -701,7 +720,7 @@
                                     </select>
                                 </div>
                             </div>
-                            <div class="col-lg-3">
+                            <div class="col-lg-3" *ngIf="currentService === 'Parking'">
                                 <div class="form-group">
                                     <label>Select Billing Type</label>
                                     <select class="form-control" [(ngModel)]="billingType">
@@ -762,8 +781,12 @@
 
                         <div class="row">
                             <div class="col-sm-12">
-                                <button type="button" class="btn btn-primary pull-right"
+                                <button type="button" class="btn btn-primary pull-right"  *ngIf="currentService === 'Parking'"
                                     (click)="saveParking()">Update</button>
+                            </div>
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-primary pull-right"  *ngIf="currentService === 'Maintenance'"
+                                    (click)="sendToMaintenance()">Semd to Maintenance</button>
                             </div>
                         </div>
                     </div>

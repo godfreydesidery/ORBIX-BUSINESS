@@ -125,19 +125,19 @@ documentHeader! : any
     ) {}
   
     ngOnInit(){
-      this.getAllPendingOrCheckedInMaintenances()   
+      this.getAllCheckedInMaintenancesWithOpenJobs()   
       this.getAllCompanyActiveVehicleAndEquipmentTypes()
       this.getAllCompanyActiveMaintenanceIssueTypes()
       this.getAllBranchServiceSpecialists()
     }
   
-    async getAllPendingOrCheckedInMaintenances(){
+    async getAllCheckedInMaintenancesWithOpenJobs(){
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
       this.maintenances = []
   
-      await this.http.get<IMaintenance[]>(API_URL+'/maintenances/get_all_pending_or_checked_in', options)
+      await this.http.get<IMaintenance[]>(API_URL+'/maintenances/get_all_checked_in_with_open_jobs', options)
       .toPromise()
       .then(
         data => {
@@ -300,7 +300,7 @@ documentHeader! : any
   
             console.log(data)
   
-            this.getAllPendingOrCheckedInMaintenances()
+            this.getAllCheckedInMaintenancesWithOpenJobs()
   
             this.msg.showSuccessMessage('Maintenance created successifully')
           }
@@ -322,7 +322,7 @@ documentHeader! : any
   
             console.log(data)
   
-            this.getAllPendingOrCheckedInMaintenances()
+            this.getAllCheckedInMaintenancesWithOpenJobs()
   
             this.msg.showSuccessMessage('Maintenance updated successifully')
   
@@ -356,7 +356,7 @@ documentHeader! : any
   
             console.log(data)
   
-            this.getAllPendingOrCheckedInMaintenances()
+            this.getAllCheckedInMaintenancesWithOpenJobs()
   
             this.msg.showSuccessMessage('Maintenance activated successifully')
   
@@ -392,7 +392,7 @@ documentHeader! : any
   
             console.log(data)
   
-            this.getAllPendingOrCheckedInMaintenances()
+            this.getAllCheckedInMaintenancesWithOpenJobs()
   
             this.msg.showSuccessMessage('Checked in Successifully')
   
@@ -431,7 +431,7 @@ documentHeader! : any
   
             console.log(data)
   
-            this.getAllPendingOrCheckedInMaintenances()
+            this.getAllCheckedInMaintenancesWithOpenJobs()
   
             this.msg.showSuccessMessage('Checked out Successifully')
             this.printGatePass()
@@ -461,7 +461,7 @@ documentHeader! : any
   
             console.log(data)
   
-            this.getAllPendingOrCheckedInMaintenances()
+            this.getAllCheckedInMaintenancesWithOpenJobs()
   
             this.msg.showSuccessMessage('Maintenance deactivated successifully')
   

@@ -76,12 +76,30 @@ public class MaintenanceServiceController implements MaintenanceService {
 	}
 
 	@Override
+	@Transactional // Because it fetches lazy loaded collections
 	public List<MaintenanceResponseDTO> getAllPendingOrCheckedInMaintenances(HttpServletRequest request) {
 		List<String> statuses = new ArrayList<>();
 		statuses.add("PENDING");
 		statuses.add("CHECKED-IN");
 		
 		List<Maintenance> maintenances = maintenanceRepository.findAllByStatusIn(statuses);
+		List<MaintenanceResponseDTO> maintenanceResponses = new ArrayList<>();
+
+		for(Maintenance maintenance : maintenances) {
+			maintenanceResponses.add(maintenanceResponseDTOMapper(maintenance));					
+		}		
+		return maintenanceResponses;
+	}
+	
+	@Override
+	@Transactional // Because it fetches lazy loaded collections
+	public List<MaintenanceResponseDTO> getAllCheckedInMaintenancesWithOpenJobs(HttpServletRequest request) {
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");  //Consider removing this status
+		statuses.add("CHECKED-IN");
+		
+		List<Maintenance> maintenances = maintenanceRepository.findAllByStatusInAndOpenMaintenanceJobCardIssues(statuses);
+		
 		List<MaintenanceResponseDTO> maintenanceResponses = new ArrayList<>();
 
 		for(Maintenance maintenance : maintenances) {

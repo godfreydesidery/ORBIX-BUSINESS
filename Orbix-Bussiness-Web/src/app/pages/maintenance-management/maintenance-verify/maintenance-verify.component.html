@@ -198,10 +198,10 @@
                                                     <td>{{m.serviceSpecialist}}</td>
                                                     <!-- <td>{{m.noOfDays}}</td>
                                                     <td style="text-align: right;">{{m.price | currency : '':''}}</td> -->
-                                                    <td>{{m.status}}</td>
+                                                    <td>{{ m.status === 'OPEN' ? 'SENT' : (m.status === 'CLOSED' ? 'CLOSED' : (m.status === 'PENDING' ? 'PENDING' : 'NONE')) }}</td>
                                                     <td>
                                                         <button class="btn btn-success btn-sm btn-round-custom" *ngIf="m.status === 'OPEN'" (click)="closeIssue(m.id, m.no)">Verify</button>
-                                                        <button class="btn btn-success btn-sm btn-round-custom" *ngIf="m.status == 'OPEN'" (click)="loadIssue(m.id)" data-toggle="modal" data-target="#view-modal"><i class="fa fa-eye" style="cursor: pointer;"></i> View</button>
+                                                        <button class="btn btn-primary btn-sm btn-round-custom" *ngIf="m.status == 'OPEN'" (click)="loadIssue(m.id)" data-toggle="modal" data-target="#view-modal"><i class="fa fa-eye" style="cursor: pointer;"></i> View</button>
                                                     </td>
                                                 </tr>
                                         </tbody> 
@@ -466,7 +466,7 @@
     <div class="modal-dialog modal-lg" role="document" style="top: 0;">
         <div class="modal-content">
             <div class="modal-header state modal-default">                                    
-                <h4 class="modal-title" id="modal-large-label">View Comment</h4>
+                <h4 class="modal-title" id="modal-large-label">View Comment from Technician</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
             </div>
             <div class="modal-body">

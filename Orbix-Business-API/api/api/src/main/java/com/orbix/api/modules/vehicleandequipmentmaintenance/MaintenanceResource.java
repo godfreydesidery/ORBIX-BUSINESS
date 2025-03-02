@@ -41,6 +41,11 @@ public class MaintenanceResource {
 		return ResponseEntity.ok().body(maintenanceService.getAllPendingOrCheckedInMaintenances(request));
 	}
 	
+	@GetMapping("/maintenances/get_all_checked_in_with_open_jobs")
+	public ResponseEntity<List<MaintenanceResponseDTO>>getAllCheckedInWithOpenJobs(HttpServletRequest request){
+		return ResponseEntity.ok().body(maintenanceService.getAllCheckedInMaintenancesWithOpenJobs(request));
+	}
+	
 	@GetMapping("/maintenances/get_all_checked_in")
 	public ResponseEntity<List<MaintenanceResponseDTO>>getAllCheckedIn(HttpServletRequest request){
 		return ResponseEntity.ok().body(maintenanceService.getAllCheckedInMaintenances(request));

@@ -150,6 +150,11 @@ export class MaintenanceComponent {
           console.log(data)
         }
       )
+      .catch(
+        error => {
+          console.log(error)
+        }
+      )
     }
   
     
@@ -765,6 +770,39 @@ export class MaintenanceComponent {
           )
       }
       this.createOrLoadMaintenanceJobCard(this.maintenanceId)
+    }
+
+    async removeIssue(id : any, no : string){
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      }
+
+      var issue = {
+        id : id,
+        no : no
+      }
+
+      await this.http.post(API_URL + '/maintenance_job_card_issues/remove', issue, options)
+        .toPromise()
+        .then(
+          data => {
+  
+            console.log(data)
+  
+            //this.msg.showSuccessMessage('Issue removed successifully')
+
+            this.createOrLoadMaintenanceJobCard(this.maintenanceId)
+  
+          }
+  
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+          }
+        )
+
     }
 
     clearIssueData(){  

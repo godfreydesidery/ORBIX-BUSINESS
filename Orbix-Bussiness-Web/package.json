@@ -22,7 +22,7 @@
     "@angular/platform-browser-dynamic": "18.1.1",
     "@angular/router": "18.1.1",
     "@auth0/angular-jwt": "^5.2.0",
-    "@ng-select/ng-select": "^14.1.0",
+    "@ng-select/ng-select": "^14.2.2",
     "@swimlane/ngx-datatable": "20.1.0",
     "@types/ckeditor": "4.9.10",
     "@types/dragula": "2.1.36",

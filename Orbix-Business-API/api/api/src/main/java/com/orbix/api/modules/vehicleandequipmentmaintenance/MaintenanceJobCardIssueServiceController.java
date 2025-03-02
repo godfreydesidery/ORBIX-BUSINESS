@@ -161,6 +161,26 @@ public class MaintenanceJobCardIssueServiceController implements MaintenanceJobC
 			throw new InvalidOperationException("Can only close an opened Job card issue");
 		}
 	}
+	
+	@Override
+	public MaintenanceJobCardIssueResponseDTO removeMaintenanceJobCardIssue(MaintenanceJobCardIssueRequestDTO jobCardIssue,
+			HttpServletRequest request) {
+		MaintenanceJobCardIssue maintenanceJobCardIssue = maintenanceJobCardIssueRepository.findById(jobCardIssue.getId())
+			    .orElseThrow(() -> new NotFoundException("MaintenanceJobCard issue not found with ID: " + jobCardIssue.getId()));
+		if(!maintenanceJobCardIssue.getNo().equals(jobCardIssue.getNo())) {
+			throw new InvalidOperationException("ID and number do not match");
+		}
+		if(maintenanceJobCardIssue.getStatus().equals("PENDING")) {
+			maintenanceJobCardIssueRepository.delete(maintenanceJobCardIssue); // Delete it
+
+			// Consider marking it as removed, instead of deleting it, not a good practice
+			
+			return null;
+		}else {
+			throw new InvalidOperationException("Can only close an opened Job card issue");
+		}
+	}
+	
 	@Override
 	public MaintenanceJobCardIssueResponseDTO reopenMaintenanceJobCardIssue(MaintenanceJobCardIssueRequestDTO jobCardIssue,
 			HttpServletRequest request) {

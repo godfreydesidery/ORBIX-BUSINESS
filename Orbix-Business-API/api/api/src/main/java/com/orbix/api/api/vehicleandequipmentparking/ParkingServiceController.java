@@ -270,6 +270,12 @@ public class ParkingServiceController implements ParkingService {
 	@Override
 	public ParkingResponseDTO createParking(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
 		
+		if (parkingRequest.getChasisNo() != null && !parkingRequest.getChasisNo().trim().isEmpty()) {
+		    if (parkingRepository.existsByChasisNoAndStatus(parkingRequest.getChasisNo(), "CHECKED-IN")) {
+		        throw new InvalidOperationException("Vehicle/Equipment with similar chasis number already checked in");
+		    }
+		}
+		
 		/**Validate data*/		
 		if(!validateParkingData(parkingRequest)) {
 			throw new InvalidEntryException("Validation failed");

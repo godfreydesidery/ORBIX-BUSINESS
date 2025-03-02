@@ -1,6 +1,7 @@
 package com.orbix.api.modules.vehicleandequipmentmaintenance;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -10,18 +11,24 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.Table;
+import javax.validation.Valid;
 import javax.validation.constraints.NotBlank;
 
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.orbix.api.api.vehicleandequipmentparking.Parking;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingZone;
 import com.orbix.api.api.vehicleandequipmentparking.VehicleEquipment;
 import com.orbix.api.api.vehicleandequipmentparking.VehicleEquipmentType;
 import com.orbix.api.modules.adminunits.Branch;
 import com.orbix.api.modules.identityandaccess.User;
+import com.orbix.api.modules.inventoryandprocurement.LpoDetail;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
@@ -140,4 +147,10 @@ public class Maintenance {
     @JoinColumn(name = "branch_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Branch branch;
+	
+	@OneToMany(targetEntity = MaintenanceJobCard.class, mappedBy = "maintenance", fetch = FetchType.LAZY, orphanRemoval = true)
+    @Valid
+    @JsonIgnoreProperties("maintenance")
+	@Fetch(FetchMode.SUBSELECT)
+    private List<MaintenanceJobCard> maintenanceJobCards; //do not enable this, it will cause loads leading to very poor performance and break
 }

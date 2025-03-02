@@ -220,6 +220,12 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		if(vehicleEquipmentRequest.getService().equals("PARKING")) {
 			// After creating, save also to parking
 			
+			if (vehicleEquipment.getChasisNo() != null && !vehicleEquipment.getChasisNo().trim().isEmpty()) {
+			    if (parkingRepository.existsByChasisNoAndStatus(vehicleEquipment.getChasisNo(), "CHECKED-IN")) {
+			        throw new InvalidOperationException("Vehicle/Equipment with similar chasis number already checked in");
+			    }
+			}
+			
 			ParkingRequestDTO parkingRequest = new ParkingRequestDTO();
 			
 //			Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(vehicleEquipmentRequest.getParkingZoneName(), branch_.get());

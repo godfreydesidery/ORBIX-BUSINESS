@@ -14,7 +14,10 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 	        "    ROW_NUMBER() OVER (ORDER BY s.created_date_time) AS sn, " +
 	        "    p.name AS productName, " +
 	        "    sd.qty AS qty, " +
+	        "    CAST((sd.qty * sd.cost_price_vat_incl) AS CHAR) AS cost, " +
 	        "    CAST((sd.qty * sd.selling_price_vat_incl - sd.discount) AS CHAR) AS amount, " +
+	        "    CAST((sd.discount) AS CHAR) AS discount, " +
+	        "    CAST(((sd.qty * sd.selling_price_vat_incl - sd.discount) - sd.qty * sd.cost_price_vat_incl) AS CHAR) AS profit, " +
 	        "    u.nickname AS createdBy, " +
 	        "    s.created_date_time AS timeDate " +
 	        "FROM sale_details sd " +
@@ -51,7 +54,10 @@ public interface SaleRepository extends JpaRepository<Sale, Long> {
 interface ISalesListing {	
 	String getProductName();
 	double getQty();
+	String getCost();
 	String getAmount();
+	String getDiscount();
+	String getProfit();
 	String getCreatedBy();
 	String getTimeDate();
 }
