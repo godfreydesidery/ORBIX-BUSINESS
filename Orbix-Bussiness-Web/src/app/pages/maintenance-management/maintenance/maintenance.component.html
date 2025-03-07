@@ -83,7 +83,7 @@
                         <div class="row">
                             <div class="col-lg-12">
                                 <button class="btn btn-danger btn-round-custom pull-right" (click)="closeJobCard()" style="margin-top: 10px;">Close</button>
-                                <div style="text-align: center;"><h4>Job Card</h4></div>
+                                <div style="text-align: center;"><h4 class="text-primary"><b>Job Card & Vehicle Details</b></h4></div>
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div><span>Job Card No:</span><b>{{maintenanceJobCardNo}}</b></div>
@@ -216,7 +216,7 @@
                                 </div>
                             </div>
                             <div class="col-lg-12">
-                                <button class="btn btn-success btn-round-custom pull-right" (click)="openAllIssues()">Send All</button>
+                                <button class="btn btn-success btn-round-custom pull-right" *ngIf="maintenanceJobCard.maintenanceJobCardIssues.length > 0" (click)="openAllIssues()">Send All</button>
                             </div>
                         </div>
                     </div>

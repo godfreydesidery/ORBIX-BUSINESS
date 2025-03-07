@@ -54,6 +54,109 @@
                             </div>
                         </div>
                     </div>
+
+                    <div class="col-lg-6">
+                        <div class="row" *ngIf="billReceivables.length > 0">
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <table class="table table-bordered table-sm">
+                                            <thead>
+                                                <tr>
+                                                    <td><b>#</b></td>
+                                                    <td><b>Descr</b></td>
+                                                    <td><b>Amount</b></td>
+                                                    <td><b>Paid</b></td>
+                                                    <td><b>Due</b></td>
+                                                </tr>
+                                            </thead>
+                                            <tbody>
+                                                <tr *ngFor="let b of billReceivables">
+                                                    <td>{{b.sn}}</td>
+                                                    <td>{{b.summary}}</td>
+                                                    <td style="text-align: right;">{{b.amount | currency:'':''}}</td>
+                                                    <td style="text-align: right;">{{b.paid | currency:'':''}}</td>
+                                                    <td style="text-align: right;">{{b.due | currency:'':''}}</td>
+                                                    
+                                                    <!-- <td style="text-align: center;"><input type="checkbox"></td> -->
+                                                </tr>
+                                                
+                                                <tr *ngIf="billReceivables.length > 0" style="font-weight: bold;">
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td style="text-align: right;"><b>Total</b></td>
+                                                    <td class="text-danger" style="text-align: right;"><b>{{totalBillReceivable | currency:'':''}}</b></td>                                        
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div class="alert alert-primary" *ngIf="billReceivables.length == 0">No Data</div>
+                                    </div>
+                                </div>
+                            </div>
+            
+            
+            
+                            <div class="col-sm-12">
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <table class="table">                            
+                                            <tbody>
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td>Select Payment Method</td>                                   
+                                                    <td style="text-align: right;">
+                                                        <table>
+                                                            <tr>
+                                                                <td style="text-align: left;">Mode</td>
+                                                                <td style="text-align: left;">Ref No</td>
+                                                            </tr>
+                                                            <tr>
+                                                                <td>
+                                                                    <select class="form-control" [(ngModel)] = "payCode">
+                                                                        <option>CASH</option>
+                                                                        <option>MPESA</option>
+                                                                        <option>TIGOPESA</option>
+                                                                        <option>HALOPESA</option>
+                                                                        <option>AIRTELMONEY</option>
+                                                                        <option>BANK</option>
+                                                                        <option>OTHER</option>
+                                                                    </select>
+                                                                </td>
+                                                                <td><input type="text" class="form-control" *ngIf="payCode != 'CASH'" [(ngModel)]="payRefNo"></td>
+                                                            </tr> 
+                                                        </table>
+                                                    </td>
+                                                    <td></td>
+                                                </tr>
+                                                <tr>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                    <td></td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
+                                        <div class="alert alert-primary" *ngIf="billReceivables.length == 0">No Data</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-12" style="text-align: center;">
+                                <button class="btn btn-outline-success btn-round-custom" *ngIf="billReceivables.length > 0" (click)="confirmBillsPayment()">Confirm Payment</button>
+                                <button class="btn btn-outline-primary btn-round-custom" (click)="printReceipt()">Print Receipt</button>
+                                <!-- <button class="btn btn-outline-danger btn-round-custom" (click)="checkOut()">Checkout</button> -->
+                            </div>
+            
+            
+            
+                        </div>
+                    </div>
+
+                    
+
                 </div>
             </div>
             <hr>
@@ -63,105 +166,11 @@
                 </div>
             </div>
             <hr>
-            <div class="row" *ngIf="billReceivables.length > 0">
-                <div class="col-sm-6">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <table class="table">
-                                <thead>
-                                    <tr>
-                                        <td>#</td>
-                                        <td>Descr</td>
-                                        <td>Amount</td>
-                                        <td>Paid</td>
-                                        <td>Due</td>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr *ngFor="let b of billReceivables">
-                                        <td>{{b.sn}}</td>
-                                        <td>{{b.summary}}</td>
-                                        <td style="text-align: right;">{{b.amount | currency:'':''}}</td>
-                                        <td style="text-align: right;">{{b.paid | currency:'':''}}</td>
-                                        <td style="text-align: right;">{{b.due | currency:'':''}}</td>
-                                        
-                                        <!-- <td style="text-align: center;"><input type="checkbox"></td> -->
-                                    </tr>
-                                    
-                                    <tr *ngIf="billReceivables.length > 0" style="font-weight: bold;">
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td style="text-align: right;"><b>Total</b></td>
-                                        <td style="text-align: right;"><b>{{totalBillReceivable | currency:'':''}}</b></td>                                        
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="alert alert-primary" *ngIf="billReceivables.length == 0">No Data</div>
-                        </div>
-                    </div>
-                </div>
-
-
-
-                <div class="col-sm-6">
-                    <div class="row">
-                        <div class="col-sm-12">
-                            <table class="table">                            
-                                <tbody>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td>Select Payment Method</td>                                   
-                                        <td style="text-align: right;">
-                                            <table>
-                                                <tr>
-                                                    <td style="text-align: left;">Mode</td>
-                                                    <td style="text-align: left;">Ref No</td>
-                                                </tr>
-                                                <tr>
-                                                    <td>
-                                                        <select class="form-control" [(ngModel)] = "payCode">
-                                                            <option>CASH</option>
-                                                            <option>MPESA</option>
-                                                            <option>TIGOPESA</option>
-                                                            <option>HALOPESA</option>
-                                                            <option>AIRTELMONEY</option>
-                                                            <option>BANK</option>
-                                                            <option>OTHER</option>
-                                                        </select>
-                                                    </td>
-                                                    <td><input type="text" class="form-control" *ngIf="payCode != 'CASH'" [(ngModel)]="payRefNo"></td>
-                                                </tr> 
-                                            </table>
-                                        </td>
-                                        <td></td>
-                                    </tr>
-                                    <tr>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                        <td></td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                            <div class="alert alert-primary" *ngIf="billReceivables.length == 0">No Data</div>
-                        </div>
-                    </div>
-                </div>
-
-
-
-            </div>
+            
 
             <div class="row">
                 <div class="col-md-6"></div>
-                <div class="col-md-6">
-                    <button class="btn btn-outline-success btn-round-custom" *ngIf="billReceivables.length > 0" (click)="confirmBillsPayment()">Confirm Payment</button>
-                    <button class="btn btn-outline-primary btn-round-custom" (click)="printReceipt()">Print Receipt</button>
-                    <!-- <button class="btn btn-outline-danger btn-round-custom" (click)="checkOut()">Checkout</button> -->
-                </div>
+                
             </div>
 
             <!-- <div class="row">

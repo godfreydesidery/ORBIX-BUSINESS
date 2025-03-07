@@ -176,11 +176,12 @@
                                         <span class="badge badge-warning" *ngIf="storage.status === 'PENDING'">{{storage.status}}</span>
                                         <span class="badge badge-primary" *ngIf="storage.status === 'APPROVED'">{{storage.status}}</span>
                                         <span class="badge badge-danger" *ngIf="storage.status === 'CANCELED'">{{storage.status}}</span>
+                                        <span class="badge badge-success" *ngIf="storage.status === 'CHECKED-IN'">{{storage.status}}</span>
 
                                     <td>
                                         <button class="btn btn-primary btn-round-custom" *ngIf="storage.status === 'PENDING'" (click)="getStorage(storage.id)" data-toggle="modal" data-target="#edit-modal">Edit</button>
                                         <button class="btn btn-success btn-round-custom" *ngIf="storage.status === 'PENDING'" (click)="checkIn(storage.id, storage.no, storage.goodName)" >Check-In</button>
-                                        <button class="btn btn-danger btn-round-custom" *ngIf="storage.status === 'CHECKED-IN'" (click)="checkOut(storage.id, storage.no, storage.goodName)" >Check-Out</button>
+                                        <button class="btn btn-warning btn-round-custom" *ngIf="storage.status === 'CHECKED-IN'" (click)="checkOut(storage.id, storage.no, storage.goodName)" >Check-Out</button>
                                     </td>
                                 </tr>
                             </tbody>

@@ -7,34 +7,8 @@
                 <span>My Job List</span>
             </div>
             <div class="card-body widget-body"> 
-                <div class="table-responsive">
-                    <!-- <table class="table">
-                        <thead>
-                            <tr>
-                                <th>No</th>
-                                <th>Maintenance#</th>
-                                <th>Name</th>
-                                <th>Description</th>
-                                <th>Reference</th>
-                                <th>Comments</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            @for (job of maintenanceJobCardIssues; track job.id) {
-                                <tr>
-                                    <td>{{job.no}}</td>
-                                    <td>{{job.maintenanceNo}}</td>
-                                    <td>{{job.name}}</td>
-                                    <td>{{job.description}}</td>
-                                    <td>{{job.equipmentReference}}</td>
-                                    <td>
-                                        <button class="btn btn-success btn-sm btn-round-custom" (click)="loadIssue(job.id)" data-toggle="modal" data-target="#edit-modal"><i class="fa fa-edit" style="cursor: pointer;"></i> Edit</button>
-                                        <button class="btn btn-success btn-sm btn-round-custom" (click)="loadIssue(job.id)" data-toggle="modal" data-target="#view-modal"><i class="fa fa-eye" style="cursor: pointer;"></i> View</button>
-                                    </td>
-                                </tr>
-                            }
-                        </tbody>
-                    </table> -->
+                <!-- <div class="table-responsive">
+                    
 
                     <table class="table">
                         <thead>
@@ -44,10 +18,8 @@
                                 <th>Chasis No</th>
                                 <th>Phone No</th>
                                 <th>Keys</th>
-                                <!-- <th>Payment</th> -->
                                 <th>Issue</th>
                                 <th>Description</th>
-                                <!-- <th>Comments</th> -->
                                 <th>Actions</th>
                             </tr>
                         </thead>
@@ -59,10 +31,8 @@
                                     <td>{{job.chasisNo}}</td>
                                     <td>{{job.phoneNo}}</td>
                                     <td>{{job.keys}}</td>
-                                    <!-- <td>{{job.payment}}</td> -->
                                     <td>{{job.name}}</td>
                                     <td>{{job.description}}</td>
-                                    <!-- <td>{{job.comments}}</td> -->
                                     <td>
                                         <button class="btn btn-success btn-sm btn-round-custom" (click)="loadIssue(job.id)" data-toggle="modal" data-target="#edit-modal"><i class="fa fa-edit" style="cursor: pointer;"></i> Edit</button>
                                         <button class="btn btn-success btn-sm btn-round-custom" (click)="loadIssue(job.id)" data-toggle="modal" data-target="#view-modal"><i class="fa fa-eye" style="cursor: pointer;"></i> View</button>
@@ -73,6 +43,79 @@
                         
                     </table>
 
+                </div> -->
+
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="table-responsive table-sm">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>SN</th>
+                                        <th>No</th>
+                                        <th>Owner Name</th>
+                                        <th>Chasis No</th>
+                                        <th>Vehicle Type</th>
+                                        <th>Contacts</th>
+                                        <th>Keys</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                            </table>
+                            <div class="row">
+                                <!-- <div class="col-sm-12" style="text-align: right;">
+                                    <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                                </div> -->
+                            </div>
+        
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="table-responsive table-sm">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>#</th>
+                                        <th>Issue</th>
+                                        <th>Description</th>
+                                        <th>Type</th>
+                                        <th>Comment</th>
+                                        <th>Days</th>
+                                        <th>Price</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <!-- <tbody>
+                                        <tr *ngFor="let m of maintenanceJobCard.maintenanceJobCardIssues">
+                                            <td>{{m.no}}</td>
+                                            <td>{{m.name}}</td>
+                                            <td>{{m.description}}</td>
+                                            <td>{{m.maintenanceIssueTypeName}}</td>
+                                            <td>{{m.serviceSpecialist}}</td>
+                                            <td>{{m.noOfDays}}</td>
+                                            <td style="text-align: right;">{{m.price | currency : '':''}}</td>
+                                            <td>{{ m.status === 'OPEN' ? 'SENT' : (m.status === 'CLOSED' ? 'CLOSED' : (m.status === 'PENDING' ? 'PENDING' : 'NONE')) }}</td>
+                                            <td>
+                                                <table>
+                                                    <tr>
+                                                        <td><button class="btn btn-success btn-sm btn-round-custom" *ngIf="m.status === 'PENDING'" (click)="openIssue(m.id, m.no)">Send</button></td>
+                                                        <td><button class="btn btn-danger btn-sm btn-round-custom" *ngIf="m.status === 'PENDING'" (click)="removeIssue(m.id, m.no)">Remove</button></td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                </tbody>  -->
+                            </table>
+                            <div class="row">
+                                <!-- <div class="col-sm-12" style="text-align: right;">
+                                    <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                                </div> -->
+                            </div>
+        
+                        </div>
+                    </div>
                 </div>
 
             </div>

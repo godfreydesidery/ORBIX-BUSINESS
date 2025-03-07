@@ -755,7 +755,7 @@ export class MaintenanceComponent {
     
               console.log(data)
     
-              // this.msg.showSuccessMessage('Issue opened successifully')
+            this.msg.showSuccessMessage('Sent successifully')
   
               // this.createOrLoadMaintenanceJobCard(this.maintenanceId)
     
@@ -769,7 +769,8 @@ export class MaintenanceComponent {
             }
           )
       }
-      this.createOrLoadMaintenanceJobCard(this.maintenanceId)
+      this.closeJobCard()
+      //await this.createOrLoadMaintenanceJobCard(this.maintenanceId)
     }
 
     async removeIssue(id : any, no : string){
