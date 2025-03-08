@@ -80,8 +80,9 @@
                     <div class="col-md-6 card" *ngIf="maintenanceJobCardNo != ''">
                         <div class="row">
                             <div class="col-lg-12">
-                                <button class="pull-right" (click)="closeJobCard()">Close</button>
-                                <div style="text-align: center;"><h4>Job Card</h4></div>
+                                <button class="pull-right btn btn-danger btn-round-custom" (click)="closeJobCard()">Close</button>
+                                <br>
+                                <div style="text-align: center;"><h4 class="text-primary"><b>Job Card & Vehicle Details</b></h4></div>
                                 <div class="row">
                                     <div class="col-lg-6">
                                         <div><span>Job Card No:</span><b>{{maintenanceJobCardNo}}</b></div>
@@ -200,8 +201,8 @@
                                                     <td style="text-align: right;">{{m.price | currency : '':''}}</td> -->
                                                     <td>{{ m.status === 'OPEN' ? 'SENT' : (m.status === 'CLOSED' ? 'CLOSED' : (m.status === 'PENDING' ? 'PENDING' : 'NONE')) }}</td>
                                                     <td>
-                                                        <button class="btn btn-success btn-sm btn-round-custom" *ngIf="m.status === 'OPEN'" (click)="closeIssue(m.id, m.no)">Verify</button>
                                                         <button class="btn btn-primary btn-sm btn-round-custom" *ngIf="m.status == 'OPEN'" (click)="loadIssue(m.id)" data-toggle="modal" data-target="#view-modal"><i class="fa fa-eye" style="cursor: pointer;"></i> View</button>
+                                                        <button class="btn btn-success btn-sm btn-round-custom" *ngIf="m.status === 'OPEN'" (click)="closeIssue(m.id, m.no)">Verify</button>
                                                     </td>
                                                 </tr>
                                         </tbody> 

@@ -27,7 +27,7 @@
                     <strong>Warning!</strong> You do not have permission to offer services. Please contact the system administrator for assistance.
                 </div>
                 <div class="row" *ngIf="currentServiceSelected === false">
-                    <div class="col-lg-3" *ngIf="isServicesAllowed === true">
+                    <div class="col-lg-3 offset-lg-4" *ngIf="isServicesAllowed === true">
                         <div class="form-group">
                             <label>Please Select Service</label>
                             <select class="form-control" [(ngModel)]="currentService">
@@ -795,8 +795,8 @@
                                     (click)="saveParking()">Update</button>
                             </div>
                             <div class="col-sm-12">
-                                <button type="button" class="btn btn-primary pull-right"  *ngIf="currentService === 'Maintenance'"
-                                    (click)="sendToMaintenance()">Semd to Maintenance</button>
+                                <button type="button" class="btn btn-primary pull-right btn-round-custom"  *ngIf="currentService === 'Maintenance'"
+                                    (click)="sendToMaintenance()">Send to Maintenance</button>
                             </div>
                         </div>
                     </div>
