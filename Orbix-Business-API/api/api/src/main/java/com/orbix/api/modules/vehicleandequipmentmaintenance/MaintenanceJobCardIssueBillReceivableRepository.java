@@ -12,5 +12,8 @@ public interface MaintenanceJobCardIssueBillReceivableRepository extends JpaRepo
 	List<MaintenanceJobCardIssueBillReceivable> findAllByMaintenanceJobCardIssue_MaintenanceJobCard_Maintenance(Maintenance maintenance);
 
 	Optional<MaintenanceJobCardIssueBillReceivable> findByBillReceivable(BillReceivable billReceivable);
+
+	List<MaintenanceJobCardIssueBillReceivable> findAllByMaintenanceJobCardIssue(
+			MaintenanceJobCardIssue maintenanceJobCardIssue);
 	
 }

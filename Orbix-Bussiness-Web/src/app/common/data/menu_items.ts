@@ -550,18 +550,7 @@ export const menuItems = [
                 show : true,
                 routerLink: '/app/maintenance-management/maintenance-verify'
             }, 
-            { 
-                title: 'Issue Type',
-                url: '#',
-                show : true,
-                routerLink: '/app/maintenance-management/maintenance-issue-type'
-            }, 
-            { 
-                title: 'Service Specialist',
-                url: '#',
-                show : true,
-                routerLink: '/app/maintenance-management/service-specialist'
-            },    
+              
         ]
     },
 
@@ -845,6 +834,27 @@ export const menuItems = [
                     // },                  
                 ]
             },
+            {
+                title: 'Maintenance Management',
+                url: '#',
+                show : true,
+                subMenu: [
+                    { 
+                        title: 'Issue Type',
+                        url: '#',
+                        show : true,
+                        routerLink: '/app/maintenance-management/maintenance-issue-type'
+                    }, 
+                    { 
+                        title: 'Service Specialist',
+                        url: '#',
+                        show : true,
+                        routerLink: '/app/maintenance-management/service-specialist'
+                    },             
+                ]
+            },
+
+              
             
             {
                 title: 'Inventory',

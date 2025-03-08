@@ -36,4 +36,5 @@ public class MaintenanceJobCardIssueResponseDTO {
     String phoneNo;
     String keys;
     String payment;
+    String payStatus;
 }

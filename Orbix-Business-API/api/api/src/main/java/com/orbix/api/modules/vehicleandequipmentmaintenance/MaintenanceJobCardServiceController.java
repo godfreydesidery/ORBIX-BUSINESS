@@ -14,6 +14,7 @@ import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.finance.BillReceivableRepository;
+import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserService;
 
 import lombok.RequiredArgsConstructor;
@@ -28,12 +29,14 @@ public class MaintenanceJobCardServiceController implements MaintenanceJobCardSe
 	private final MaintenanceJobCardRepository maintenanceJobCardRepository;
 	private final MaintenanceRepository maintenanceRepository;
 	
+	private final MaintenanceJobCardIssueBillReceivableRepository maintenanceJobCardIssueBillReceivableRepository;
+	
 	private final UserService userService;
 	private final DayService dayService;
 	
 	@Override
-	public MaintenanceJobCardResponseDTO showMaintenanceJobCard(MaintenanceJobCard maintenanceJobCard) {
-		return maintenanceJobCardResponseDTOMapper(maintenanceJobCard);
+	public MaintenanceJobCardResponseDTO showMaintenanceJobCard(MaintenanceJobCard maintenanceJobCard, User filterByUser) {
+		return maintenanceJobCardResponseDTOMapper(maintenanceJobCard, filterByUser);
 	}
 	
 	@Override
@@ -56,7 +59,7 @@ public class MaintenanceJobCardServiceController implements MaintenanceJobCardSe
 		
 		maintenanceJobCard = maintenanceJobCardRepository.save(maintenanceJobCard);
 		maintenanceJobCard.setNo("MJC/" + maintenanceJobCard.getId());
-		return maintenanceJobCardResponseDTOMapper(maintenanceJobCardRepository.save(maintenanceJobCard));
+		return maintenanceJobCardResponseDTOMapper(maintenanceJobCardRepository.save(maintenanceJobCard), null);
 	}
 
 	@Override
@@ -69,7 +72,7 @@ public class MaintenanceJobCardServiceController implements MaintenanceJobCardSe
 			maintenanceJobCard.setOpenedByUser(userService.getUser(request));
 			maintenanceJobCard.setOpenedDateTime(dayService.getTimeStamp());
 			maintenanceJobCard = maintenanceJobCardRepository.save(maintenanceJobCard);
-			return maintenanceJobCardResponseDTOMapper(maintenanceJobCard);
+			return maintenanceJobCardResponseDTOMapper(maintenanceJobCard, null);
 		}else {
 			throw new InvalidOperationException("Can only open a pending Job card");
 		}
@@ -85,7 +88,7 @@ public class MaintenanceJobCardServiceController implements MaintenanceJobCardSe
 			maintenanceJobCard.setClosedByUser(userService.getUser(request));
 			maintenanceJobCard.setClosedDateTime(dayService.getTimeStamp());
 			maintenanceJobCard = maintenanceJobCardRepository.save(maintenanceJobCard);
-			return maintenanceJobCardResponseDTOMapper(maintenanceJobCard);
+			return maintenanceJobCardResponseDTOMapper(maintenanceJobCard, null);
 		}else {
 			throw new InvalidOperationException("Can only open a pending Job card");
 		}
@@ -98,13 +101,13 @@ public class MaintenanceJobCardServiceController implements MaintenanceJobCardSe
 		if(maintenanceJobCard.getStatus().equals("CLOSED")) {
 			maintenanceJobCard.setStatus("OPEN");
 			maintenanceJobCard = maintenanceJobCardRepository.save(maintenanceJobCard);
-			return maintenanceJobCardResponseDTOMapper(maintenanceJobCard);
+			return maintenanceJobCardResponseDTOMapper(maintenanceJobCard, null);
 		}else {
 			throw new InvalidOperationException("Can only re-open a closed Job card");
 		}
 	}
 	
-	private MaintenanceJobCardResponseDTO maintenanceJobCardResponseDTOMapper(MaintenanceJobCard maintenanceJobCard) {
+	private MaintenanceJobCardResponseDTO maintenanceJobCardResponseDTOMapper(MaintenanceJobCard maintenanceJobCard, User filterUser) {
 		MaintenanceJobCardResponseDTO maintenanceJobCardResponseDTO = new MaintenanceJobCardResponseDTO();
 		
 		maintenanceJobCardResponseDTO.setId(maintenanceJobCard.getId().toString());
@@ -141,8 +144,19 @@ public class MaintenanceJobCardServiceController implements MaintenanceJobCardSe
 		List<MaintenanceJobCardIssueResponseDTO> maintenanceJobCardIssues = new ArrayList<>();
 		if(maintenanceJobCard.getMaintenanceJobCardIssues() != null) {
 			for(MaintenanceJobCardIssue maintenanceJobCardIssue : maintenanceJobCard.getMaintenanceJobCardIssues()) {
+				List<MaintenanceJobCardIssueBillReceivable> bls = maintenanceJobCardIssueBillReceivableRepository.findAllByMaintenanceJobCardIssue(maintenanceJobCardIssue);
+				String payStatus = "NA";
+				for(MaintenanceJobCardIssueBillReceivable bl : bls) {
+					payStatus = bl.getBillReceivable().getPayStatus().toString();
+				}
 				MaintenanceJobCardIssueResponseDTO issue = maintenanceJobCardIssueResponseDTOMapper(maintenanceJobCardIssue);
-				maintenanceJobCardIssues.add(issue);			
+				issue.setPayStatus(payStatus);
+				if(filterUser != null && maintenanceJobCardIssue.getServiceSpecialistUser() == filterUser) {
+					maintenanceJobCardIssues.add(issue);
+				}
+				if(filterUser == null) {
+					maintenanceJobCardIssues.add(issue);
+				}			
 			}
 			maintenanceJobCardResponseDTO.setMaintenanceJobCardIssues(maintenanceJobCardIssues);
 		}

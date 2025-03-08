@@ -25,6 +25,7 @@ export interface IMaintenanceJobCardIssue{
     phoneNo : string
     keys : string
     payment : string
+    payStatus : string
 
 
     sn : number

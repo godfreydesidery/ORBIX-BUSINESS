@@ -4,10 +4,13 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.orbix.api.modules.identityandaccess.User;
+
 public interface MaintenanceService {
 	List<MaintenanceResponseDTO> getAllMaintenances(HttpServletRequest request);	
 	List<MaintenanceResponseDTO> getAllPendingOrCheckedInMaintenances(HttpServletRequest request);	
-	List<MaintenanceResponseDTO> getAllCheckedInMaintenancesWithOpenJobs(HttpServletRequest request);	
+	List<MaintenanceResponseDTO> getAllCheckedInMaintenancesWithOpenJobs(HttpServletRequest request);
+	List<MaintenanceResponseDTO> getAllCheckedInMaintenancesWithOpenJobsAndMine(HttpServletRequest request);
 	List<MaintenanceResponseDTO> getAllCleared(HttpServletRequest request);
 	List<MaintenanceResponseDTO> getTodayCheckedOut(HttpServletRequest request);
 	List<MaintenanceResponseDTO> getRecentCheckedOut(HttpServletRequest request);
@@ -24,4 +27,6 @@ public interface MaintenanceService {
 	MaintenanceJobCardResponseDTO openMaintenanceJobCard(MaintenanceJobCard maintenanceJobCard, HttpServletRequest request);
 	MaintenanceJobCardResponseDTO closeMaintenanceJobCard(MaintenanceJobCard maintenanceJobCard, HttpServletRequest request);
 	MaintenanceJobCardResponseDTO reopenMaintenanceJobCard(MaintenanceJobCard maintenanceJobCard, HttpServletRequest request);
+	
+	MaintenanceJobCardResponseDTO loadMyJobCard(MaintenanceRequestDTO maintenanceRequest, HttpServletRequest request);
 }

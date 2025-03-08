@@ -27,6 +27,7 @@ import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.finance.BillReceivableRepository;
 import com.orbix.api.modules.finance.InvoiceReceivableDetailRepository;
 import com.orbix.api.modules.finance.InvoiceReceivableRepository;
+import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserService;
 
 import lombok.Data;
@@ -100,6 +101,26 @@ public class MaintenanceServiceController implements MaintenanceService {
 		
 		List<Maintenance> maintenances = maintenanceRepository.findAllByStatusInAndOpenMaintenanceJobCardIssues(statuses);
 		
+		List<MaintenanceResponseDTO> maintenanceResponses = new ArrayList<>();
+
+		for(Maintenance maintenance : maintenances) {
+			maintenanceResponses.add(maintenanceResponseDTOMapper(maintenance));					
+		}		
+		return maintenanceResponses;
+	}
+	
+	@Override
+	@Transactional // Because it fetches lazy loaded collections
+	public List<MaintenanceResponseDTO> getAllCheckedInMaintenancesWithOpenJobsAndMine(HttpServletRequest request) {
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");  //Consider removing this status
+		statuses.add("CHECKED-IN");
+		
+		User user = userService.getUser(request);
+		
+		List<Maintenance> maintenances = maintenanceRepository.findAllByStatusInAndOpenMaintenanceJobCardIssuesAndServiceSpecialistUser(statuses, user);
+		
+		//List<Maintenance> maintenances = maintenanceRepository.findAllByStatusInAndOpenMaintenanceJobCardIssues(statuses);
 		List<MaintenanceResponseDTO> maintenanceResponses = new ArrayList<>();
 
 		for(Maintenance maintenance : maintenances) {
@@ -546,9 +567,34 @@ public class MaintenanceServiceController implements MaintenanceService {
 			    .findFirstByMaintenanceAndStatusIn(maintenance, statuses);
 		
 		if(maintenanceJobCard_.isPresent()) {
-			return maintenanceJobCardService.showMaintenanceJobCard(maintenanceJobCard_.get());
+			return maintenanceJobCardService.showMaintenanceJobCard(maintenanceJobCard_.get(), null);
 		}else {
 			return maintenanceJobCardService.createMaintenanceJobCard(maintenanceRequest, request);
+		}		
+	}
+	
+	@Override
+	public MaintenanceJobCardResponseDTO loadMyJobCard(MaintenanceRequestDTO maintenanceRequest, HttpServletRequest request) {
+		// Find for any job card in the maintenance
+		
+		Maintenance maintenance = maintenanceRepository.findById(maintenanceRequest.getId())
+				.orElseThrow(() -> new NotFoundException("Maintenance not found"));
+		
+		if(!maintenance.getStatus().equals("CHECKED-IN")) {
+			throw new InvalidOperationException("Only allowed for checked in maintenances");
+		}
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");
+		statuses.add("OPEN");
+		
+		Optional<MaintenanceJobCard> maintenanceJobCard_ = maintenanceJobCardRepository
+			    .findFirstByMaintenanceAndStatusIn(maintenance, statuses);
+		
+		if(maintenanceJobCard_.isPresent()) {
+			return maintenanceJobCardService.showMaintenanceJobCard(maintenanceJobCard_.get(), userService.getUser(request));
+		}else {
+			return null;
 		}		
 	}
 

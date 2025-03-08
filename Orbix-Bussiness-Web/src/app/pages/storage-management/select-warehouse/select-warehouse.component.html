@@ -129,7 +129,7 @@
                         <div class="row">
                             <div class="col-lg-12" style="text-align: right;">
                                 <button class="btn btn-success btn-round-custom" (click)="saveStorage()">Save</button>
-                                <button class="btn btn-success btn-round-custom" *ngIf="id != null" (click)="checkIn(id, no, goodName)">Check In</button>
+                                <button class="btn btn-primary btn-round-custom" *ngIf="id != null" (click)="checkIn(id, no, goodName)">Check In</button>
                             </div>
                         </div>
                     </div>
@@ -180,7 +180,7 @@
 
                                     <td>
                                         <button class="btn btn-primary btn-round-custom" *ngIf="storage.status === 'PENDING'" (click)="getStorage(storage.id)" data-toggle="modal" data-target="#edit-modal">Edit</button>
-                                        <button class="btn btn-success btn-round-custom" *ngIf="storage.status === 'PENDING'" (click)="checkIn(storage.id, storage.no, storage.goodName)" >Check-In</button>
+                                        <button class="btn btn-primary btn-round-custom" *ngIf="storage.status === 'PENDING'" (click)="checkIn(storage.id, storage.no, storage.goodName)" >Check-In</button>
                                         <button class="btn btn-warning btn-round-custom" *ngIf="storage.status === 'CHECKED-IN'" (click)="checkOut(storage.id, storage.no, storage.goodName)" >Check-Out</button>
                                     </td>
                                 </tr>

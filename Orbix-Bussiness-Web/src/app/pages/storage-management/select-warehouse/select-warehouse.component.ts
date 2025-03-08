@@ -406,6 +406,7 @@ export class SelectWarehouseComponent {
           console.log(data)
           this.getAllCheckedInAndPendingStorages()
           this.msg.showSuccessMessage('Checked in Successifully')
+          this.mode = ''
         }
       )
       .catch(

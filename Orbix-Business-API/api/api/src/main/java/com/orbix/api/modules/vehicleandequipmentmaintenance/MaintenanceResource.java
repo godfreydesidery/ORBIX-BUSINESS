@@ -46,6 +46,11 @@ public class MaintenanceResource {
 		return ResponseEntity.ok().body(maintenanceService.getAllCheckedInMaintenancesWithOpenJobs(request));
 	}
 	
+	@GetMapping("/maintenances/get_all_checked_in_with_open_jobs_and_mine")
+	public ResponseEntity<List<MaintenanceResponseDTO>>getAllCheckedInWithOpenJobsAndMine(HttpServletRequest request){
+		return ResponseEntity.ok().body(maintenanceService.getAllCheckedInMaintenancesWithOpenJobsAndMine(request));
+	}
+	
 	@GetMapping("/maintenances/get_all_checked_in")
 	public ResponseEntity<List<MaintenanceResponseDTO>>getAllCheckedIn(HttpServletRequest request){
 		return ResponseEntity.ok().body(maintenanceService.getAllCheckedInMaintenances(request));
@@ -120,6 +125,15 @@ public class MaintenanceResource {
 			HttpServletRequest request){		
 		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/maintenances/create_maintenance_job_card").toUriString());
 		return ResponseEntity.created(uri).body(maintenanceService.createMaintenanceJobCard(maintenanceRequest, request));
+	}
+	
+	@PostMapping("/maintenances/create_maintenance_job_card_and_mine")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<MaintenanceJobCardResponseDTO>loadJobCardWithMyJobs(
+			@RequestBody MaintenanceRequestDTO maintenanceRequest,
+			HttpServletRequest request){		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/maintenances/create_maintenance_job_card_and_mine").toUriString());
+		return ResponseEntity.created(uri).body(maintenanceService.loadMyJobCard(maintenanceRequest, request));
 	}
 }
 

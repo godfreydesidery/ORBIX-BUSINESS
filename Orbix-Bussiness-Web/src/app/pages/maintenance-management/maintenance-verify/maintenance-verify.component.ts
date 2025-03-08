@@ -116,6 +116,9 @@ documentHeader! : any
     vehicleEquipmentTypeName : string = ''
     vehicleEquipmentName : string = ''
     ownerName : string = ''
+
+
+    issueTotalAmount : number = 0
   
     constructor(
       private http :HttpClient,

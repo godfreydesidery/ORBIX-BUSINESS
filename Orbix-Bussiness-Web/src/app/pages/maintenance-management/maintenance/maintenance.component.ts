@@ -116,6 +116,8 @@ export class MaintenanceComponent {
     vehicleEquipmentTypeName : string = ''
     vehicleEquipmentName : string = ''
     ownerName : string = ''
+
+    issueTotalAmount : number = 0
   
     constructor(
       private http :HttpClient,
@@ -164,12 +166,15 @@ export class MaintenanceComponent {
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
+
+      
       await this.http.get<IMaintenance>(API_URL+'/maintenances/get?id=' + id, options)
       .toPromise()
       .then(
         data => {
           this.startBillingAt = null
           this.showMaintenanceData(data!)
+
           console.log(data)
         }
       )
@@ -487,6 +492,7 @@ export class MaintenanceComponent {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
+    this.issueTotalAmount = 0
 
     this.clearJobCard()
 
@@ -500,6 +506,10 @@ export class MaintenanceComponent {
         data => {
 
           this.maintenanceJobCard = data!
+
+          this.maintenanceJobCard.maintenanceJobCardIssues.forEach(element => {
+            this.issueTotalAmount = this.issueTotalAmount + (+element.price)
+          })
 
           this.showJobCard(data!)
 

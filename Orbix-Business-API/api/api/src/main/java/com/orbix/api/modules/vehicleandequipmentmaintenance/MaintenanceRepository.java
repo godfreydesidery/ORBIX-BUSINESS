@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.orbix.api.api.vehicleandequipmentparking.VehicleEquipment;
+import com.orbix.api.modules.identityandaccess.User;
 
 public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> {
 
@@ -20,5 +21,7 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> 
 	
 	@Query("SELECT DISTINCT m FROM Maintenance m JOIN m.maintenanceJobCards mjc JOIN mjc.maintenanceJobCardIssues mjci WHERE mjci.status = 'OPEN' AND m.status IN :statuses")
 	List<Maintenance> findAllByStatusInAndOpenMaintenanceJobCardIssues(@Param("statuses") List<String> statuses);
-
+	
+	@Query("SELECT DISTINCT m FROM Maintenance m JOIN m.maintenanceJobCards mjc JOIN mjc.maintenanceJobCardIssues mjci WHERE mjci.status = 'OPEN' AND m.status IN :statuses AND mjci.serviceSpecialistUser = :user")
+	List<Maintenance> findAllByStatusInAndOpenMaintenanceJobCardIssuesAndServiceSpecialistUser(@Param("statuses") List<String> statuses, User user);
 }
