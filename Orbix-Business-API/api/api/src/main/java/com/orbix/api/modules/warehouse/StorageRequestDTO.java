@@ -46,4 +46,9 @@ public class StorageRequestDTO {
     double billingAmount;
     
     String startBillingAt;
+    
+    double width;
+    double length;
+    double height;
+    double weight;
 }

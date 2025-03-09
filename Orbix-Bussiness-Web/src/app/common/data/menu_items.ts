@@ -468,10 +468,6 @@ export const menuItems = [
                         title: 'Fast Moving Products',
                         routerLink: '/app/mechandizing/fast-moving-products-report'
                     },
-                    {
-                        title: 'Stock Card Report',
-                        routerLink: '/app/mechandizing/shop-product-stock-log'
-                    },
                 ]
             },
             

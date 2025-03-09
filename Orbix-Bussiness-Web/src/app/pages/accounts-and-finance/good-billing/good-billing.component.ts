@@ -442,8 +442,9 @@ export class GoodBillingComponent {
 
   confirmBillPayment() { }
 
-  refreshBillReceivables() {
-    this.getBillReceivables(this.storageId)
+  async refreshBillReceivables() {
+    this.billReceivables = []
+    await this.getBillReceivables(this.storageId)
   }
 
   refreshAmounts() {

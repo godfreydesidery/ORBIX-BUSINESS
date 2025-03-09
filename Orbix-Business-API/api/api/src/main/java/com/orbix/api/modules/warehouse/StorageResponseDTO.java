@@ -52,6 +52,11 @@ public class StorageResponseDTO {
     String billingType;
     String billingAmount;
     String billingStartAt;
+    
+    String width;
+    String length;
+    String height;
+    String weight;
 	
     List<ServiceBillItem> serviceBillItems;
 }

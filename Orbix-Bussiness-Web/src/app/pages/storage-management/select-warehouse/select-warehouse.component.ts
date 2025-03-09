@@ -252,7 +252,11 @@ export class SelectWarehouseComponent {
       comments: this.comments,
       goodName: this.goodName,
       goodDescription: this.goodDescription,
-      goodTypeName: this.goodTypeName
+      goodTypeName: this.goodTypeName,
+      length : this.length,
+      width : this.width,
+      height : this.height,
+      weight : this.weight
     }
 
 
@@ -317,6 +321,10 @@ export class SelectWarehouseComponent {
     this.goodName = data!.goodName
     this.goodDescription = data!.goodDescription
     this.goodTypeName = data!.goodTypeName
+    this.length = data!.length
+    this.width = data!.width
+    this.height = data!.height
+    this.weight = data!.weight
   }
 
   clearStorageData() {
@@ -339,6 +347,10 @@ export class SelectWarehouseComponent {
     this.goodName = ''
     this.goodDescription = ''
     this.comments = ''
+    this.length = 0
+    this.width = 0
+    this.height = 0
+    this.weight = 0
   }
 
 
@@ -350,6 +362,31 @@ export class SelectWarehouseComponent {
     this.storages = []
 
     await this.http.get<IStorage[]>(API_URL + '/storages/get_all_pending_or_checked_in_by_warehouse?warehouse_id=' + this.warehouseId, options)
+      .toPromise()
+      .then(
+        data => {
+          data?.reverse()
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.storages.push(element)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
+      .catch(error => {
+        console.log(error)
+      })
+  }
+
+  async getAllRecentCheckedOutStorages() {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    this.storages = []
+
+    await this.http.get<IStorage[]>(API_URL + '/storages/get_all_recent_checked_out_by_warehouse?warehouse_id=' + this.warehouseId, options)
       .toPromise()
       .then(
         data => {

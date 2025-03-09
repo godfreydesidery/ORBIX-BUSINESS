@@ -108,6 +108,26 @@ public class StorageServiceController implements StorageService {
 	}
 	
 	@Override
+	public List<StorageResponseDTO> getAllRecentCheckedOutStoragesByWarehouse(Long warehouseId, HttpServletRequest request) {
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-OUT");
+		
+		Warehouse warehouse = warehouseRepository.findById(warehouseId)
+		        .orElseThrow(() -> new NotFoundException("Warehouse not found"));
+		
+		LocalDateTime yesterday = LocalDateTime.now().minusHours(24);
+		List<Storage> storages = storageRepository.findAllByWarehouseAndStatusInAndCheckedOutDateTimeAfter(warehouse, statuses, yesterday);
+		
+		List<StorageResponseDTO> storageResponses = new ArrayList<>();
+
+		for(Storage storage : storages) {
+			storageResponses.add(storageResponseDTOMapper(storage));					
+		}		
+		return storageResponses;
+	}
+	
+	@Override
 	public List<StorageResponseDTO> getAllCleared(HttpServletRequest request) {
 		
 		List<String> statuses = new ArrayList<>();
@@ -258,6 +278,11 @@ public class StorageServiceController implements StorageService {
 
 		storage.setComments(storageRequest.getComments());
 		
+		storage.setWidth(storageRequest.getWidth());
+		storage.setLength(storageRequest.getLength());
+		storage.setHeight(storageRequest.getHeight());
+		storage.setWeight(storageRequest.getWeight());
+		
 		storage.setBillingType("DAILY");
 		storage.setBillingAmount(storageRequest.getBillingAmount());
 		
@@ -353,6 +378,11 @@ public class StorageServiceController implements StorageService {
 		
 		storage.setComments(storageRequest.getComments());
 		
+		storage.setWidth(storageRequest.getWidth());
+		storage.setLength(storageRequest.getLength());
+		storage.setHeight(storageRequest.getHeight());
+		storage.setWeight(storageRequest.getWeight());
+		
 //		storage.setWarehouse(warehouse_.get());
 		
 		storage.setBillingType(storageRequest.getBillingType());
@@ -377,6 +407,11 @@ public class StorageServiceController implements StorageService {
 		storageResponse.setOwnerPhoneNo(storage.getOwnerPhoneNo());
 		storageResponse.setOwnerEmail(storage.getOwnerEmail());
 		storageResponse.setOwnerAddress(storage.getOwnerAddress());
+		
+		storageResponse.setWidth(String.valueOf(storage.getWidth()));
+		storageResponse.setLength(String.valueOf(storage.getLength()));
+		storageResponse.setHeight(String.valueOf(storage.getHeight()));
+		storageResponse.setWeight(String.valueOf(storage.getWeight()));
 		
 		storageResponse.setBillingStartAt(
 			    Optional.ofNullable(storage.getStartBillingAt())

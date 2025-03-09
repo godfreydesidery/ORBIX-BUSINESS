@@ -63,3 +63,42 @@ export interface ISalesCashCollection {
 
   sn : number
 }
+
+
+export interface IStorageCashCollection {
+
+  amount : number
+  paymentType : string
+  cashierName : string
+  reason : string
+  goodName : string
+  ownerFirstName : string
+  ownerLastName : string
+  ownerPhoneNo : string
+  createdDateTime : string
+  days : number
+  discount : number
+
+  sn : number
+}
+
+export interface IMaintenanceCashCollection {
+
+  issueName : string
+  amount : number
+  paymentType : string
+  cashierName : string
+  reason : string
+  vehicleEquipmentCategory : string
+  vehicleEquipmentName : string
+  ownerFirstName : string
+  ownerLastName : string
+  cardNo : string
+  ownerPhoneNo : string
+  chasisNo : string
+  createdDateTime : string
+  days : number
+  discount : number
+
+  sn : number
+}

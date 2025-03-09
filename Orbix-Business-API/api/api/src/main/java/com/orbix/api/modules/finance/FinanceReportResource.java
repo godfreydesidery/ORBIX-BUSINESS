@@ -120,6 +120,38 @@ public class FinanceReportResource {
 
 	}
 	
+	@PostMapping("/finance_reports/get_storage_detailed_collections_by_dates")
+	public ResponseEntity<List<IStorageCollection>>getStorageDetailedCollectionByDates(
+			@RequestBody DateRange dateRange,
+	        @RequestParam(name = "nickname", required = false) String nickname,
+			HttpServletRequest request){
+		
+		List<IStorageCollection> collections;
+		
+		collections = collectionRepository.findStorageCollectionsBetweenDates(
+				dateRange.getFrom().atStartOfDay(),
+                dateRange.getTo().atStartOfDay().plusDays(1)
+				);
+	    return ResponseEntity.ok().body(collections);
+
+	}
+	
+	@PostMapping("/finance_reports/get_maintenance_detailed_collections_by_dates")
+	public ResponseEntity<List<IMaintenanceCollection>>getMaintenanceDetailedCollectionByDates(
+			@RequestBody DateRange dateRange,
+	        @RequestParam(name = "nickname", required = false) String nickname,
+			HttpServletRequest request){
+		
+		List<IMaintenanceCollection> collections;
+		
+		collections = collectionRepository.findMaintenanceCollectionsBetweenDates(
+				dateRange.getFrom().atStartOfDay(),
+                dateRange.getTo().atStartOfDay().plusDays(1)
+				);
+	    return ResponseEntity.ok().body(collections);
+
+	}
+	
 }
 
 @Data

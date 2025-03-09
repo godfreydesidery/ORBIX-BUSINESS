@@ -485,8 +485,9 @@ export class VehicleEquipmentBillingComponent {
 
   confirmBillPayment() { }
 
-  refreshBillReceivables() {
-    this.getBillReceivables(this.parkingId)
+  async refreshBillReceivables() {
+    this.billReceivables = []
+    await this.getBillReceivables(this.parkingId)
   }
 
   refreshAmounts() {

@@ -438,8 +438,9 @@ export class MaintenanceVehicleEquipmentBillingComponent {
 
   confirmBillPayment() { }
 
-  refreshBillReceivables() {
-    this.getBillReceivables(this.maintenanceId)
+  async refreshBillReceivables() {
+    this.billReceivables = []
+    await this.getBillReceivables(this.maintenanceId)
   }
 
   refreshAmounts() {

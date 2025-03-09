@@ -323,6 +323,67 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
 		    @Param("endDate") LocalDateTime endDate
 		);
 
+	@Query(
+		    value = "SELECT " +
+		            "brc.amount AS amount, " +  
+		            "c.pay_code AS payCode, " +
+		            "c.collection_date_time AS dateTime, " +
+		            "brc.reason AS reason, " +
+		            "p.good_name AS goodName, " +
+		            "p.owner_first_name AS ownerFirstName, " +
+		            "p.owner_last_name AS ownerLastName, " +
+		            "p.owner_phone_no AS ownerPhoneNo, " +
+		            "p.created_date_time AS createdDateTime, " +
+		            "pbr.qty AS days, " +
+		            "pbr.discount AS discount, " +
+		            "u.nickname AS cashierName " +
+		            "FROM bill_receivable_collections brc " +
+		            "JOIN collections c ON brc.collection_id = c.id " +
+		            "JOIN users u ON c.collected_by_user_id = u.id " +
+		            "JOIN bill_receivables br ON brc.bill_receivable_id = br.id " +
+		            "JOIN storage_bill_receivables pbr ON pbr.bill_receivable_id = br.id " +
+		            "JOIN storages p ON p.id = pbr.storage_id " +
+		            "WHERE c.collection_date_time BETWEEN :startDate AND :endDate", 
+		    nativeQuery = true
+		)
+		List<IStorageCollection> findStorageCollectionsBetweenDates(
+		    @Param("startDate") LocalDateTime startDate,
+		    @Param("endDate") LocalDateTime endDate
+		);
+	
+	@Query(
+		    value = "SELECT " +
+		            "bill_receivable_collections.amount AS amount, " +  
+		            "collections.pay_code AS payCode, " +
+		            "collections.collection_date_time AS dateTime, " +
+		            "bill_receivable_collections.reason AS reason, " +
+		            "maintenance_job_card_issues.name AS issueName, " +
+		            "maintenances.vehicle_equipment_category AS vehicleEquipmentCategory, " +
+		            "maintenances.vehicle_equipment_name AS vehicleEquipmentName, " +
+		            "maintenances.owner_first_name AS ownerFirstName, " +
+		            "maintenances.owner_last_name AS ownerLastName, " +
+		            "maintenances.card_no AS cardNo, " +
+		            "maintenances.owner_phone_no AS ownerPhoneNo, " +
+		            "maintenances.chasis_no AS chasisNo, " +
+		            "maintenances.created_date_time AS createdDateTime, " +
+		            "maintenance_job_card_issue_bill_receivables.qty AS days, " +
+		            "maintenance_job_card_issue_bill_receivables.discount AS discount, " +
+		            "users.nickname AS cashierName " +
+		            "FROM bill_receivable_collections " +
+		            "JOIN collections ON bill_receivable_collections.collection_id = collections.id " +
+		            "JOIN users ON collections.collected_by_user_id = users.id " +
+		            "JOIN bill_receivables ON bill_receivable_collections.bill_receivable_id = bill_receivables.id " +
+		            "JOIN maintenance_job_card_issue_bill_receivables ON maintenance_job_card_issue_bill_receivables.bill_receivable_id = bill_receivables.id " +
+		            "JOIN maintenance_job_card_issues ON maintenance_job_card_issues.id = maintenance_job_card_issue_bill_receivables.maintenance_job_card_issue_id " +
+		            "JOIN maintenance_job_cards ON maintenance_job_cards.id = maintenance_job_card_issues.maintenance_job_card_id " +
+		            "JOIN maintenances ON maintenances.id = maintenance_job_cards.maintenance_id " +
+		            "WHERE collections.collection_date_time BETWEEN :startDate AND :endDate", 
+		    nativeQuery = true
+		)
+		List<IMaintenanceCollection> findMaintenanceCollectionsBetweenDates(
+		    @Param("startDate") LocalDateTime startDate,
+		    @Param("endDate") LocalDateTime endDate
+		);
 
 }
 
@@ -377,6 +438,40 @@ interface ISalesCollection {
     String getDateTime();
     String getCreatedDateTime();
     double getQty();
+    double getDiscount();
+    String getCashierName();
+}
+
+interface IStorageCollection {
+    String getAmount();
+    String getPayCode();
+    String getDateTime();
+    String getReason();
+    String getGoodName();
+    String getOwnerFirstName();
+    String getOwnerLastName();
+    String getOwnerPhoneNo();
+    String getCreatedDateTime();
+    double getDays();
+    double getDiscount();
+    String getCashierName();
+}
+
+interface IMaintenanceCollection {
+	String getIssueName();
+    String getAmount();
+    String getPayCode();
+    String getDateTime();
+    String getReason();
+    String getVehicleEquipmentCategory();
+    String getVehicleEquipmentName();
+    String getOwnerFirstName();
+    String getOwnerLastName();
+    String getCardNo();
+    String getOwnerPhoneNo();
+    String getChasisNo();
+    String getCreatedDateTime();
+    double getDays();
     double getDiscount();
     String getCashierName();
 }
