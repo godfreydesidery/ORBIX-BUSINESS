@@ -151,6 +151,7 @@ public class MaintenanceJobCardServiceController implements MaintenanceJobCardSe
 				}
 				MaintenanceJobCardIssueResponseDTO issue = maintenanceJobCardIssueResponseDTOMapper(maintenanceJobCardIssue);
 				issue.setPayStatus(payStatus);
+				issue.setComments(maintenanceJobCardIssue.getComments());
 				if(filterUser != null && maintenanceJobCardIssue.getServiceSpecialistUser() == filterUser) {
 					maintenanceJobCardIssues.add(issue);
 				}
@@ -178,6 +179,8 @@ public class MaintenanceJobCardServiceController implements MaintenanceJobCardSe
 		maintenanceJobCardIssueResponseDTO.setPrice(String.valueOf(maintenanceJobCardIssue.getPrice()));
 		maintenanceJobCardIssueResponseDTO.setNoOfDays(String.valueOf(maintenanceJobCardIssue.getNoOfDays()));
 		maintenanceJobCardIssueResponseDTO.setServiceSpecialist(maintenanceJobCardIssue.getServiceSpecialistUser().getNickname());
+		
+		maintenanceJobCardIssueResponseDTO.setComments(maintenanceJobCardIssue.getComments());
 		
 //		maintenanceJobCardIssueResponseDTO.setMaintenanceNo(maintenanceJobCard.getMaintenance().getNo());
 //		maintenanceJobCardIssueResponseDTO.setCreatedBy(maintenanceJobCard.getCreatedByUser() != null ? maintenanceJobCard.getCreatedByUser().getNickname() : "");

@@ -726,7 +726,7 @@ export class MyJobsComponent {
   
       }
   
-      async closeIssue(id : any, no : string){
+      async doneIssue(id : any, no : string){
   
         if(await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to verify and close this issue?', 'question', 'Yes', 'No') == false){
           return
@@ -742,14 +742,14 @@ export class MyJobsComponent {
           no : no
         }
   
-        await this.http.post(API_URL + '/maintenance_job_card_issues/close', issue, options)
+        await this.http.post(API_URL + '/maintenance_job_card_issues/done', issue, options)
           .toPromise()
           .then(
             data => {
     
               console.log(data)
     
-              this.msg.showSuccessMessage('Issue closed successifully')
+              this.msg.showSuccessMessage('Success')
   
               this.createOrLoadMaintenanceJobCard(this.maintenanceId)
     
@@ -759,7 +759,8 @@ export class MyJobsComponent {
           .catch(
             error => {
               console.log(error)
-              this.msg.showErrorMessage(error, 'Error')
+              //this.msg.showErrorMessage(error, 'Error')
+              this.msg.showSimpleErrorMessage('Please Enter comment first')
             }
           )
   

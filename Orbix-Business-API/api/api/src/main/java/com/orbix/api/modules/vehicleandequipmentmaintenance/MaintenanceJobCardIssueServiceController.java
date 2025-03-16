@@ -163,6 +163,22 @@ public class MaintenanceJobCardIssueServiceController implements MaintenanceJobC
 	}
 	
 	@Override
+	public MaintenanceJobCardIssueResponseDTO doneMaintenanceJobCardIssue(MaintenanceJobCardIssueRequestDTO jobCardIssue,
+			HttpServletRequest request) {
+		MaintenanceJobCardIssue maintenanceJobCardIssue = maintenanceJobCardIssueRepository.findById(jobCardIssue.getId())
+			    .orElseThrow(() -> new NotFoundException("MaintenanceJobCard issue not found with ID: " + jobCardIssue.getId()));
+		if(!maintenanceJobCardIssue.getNo().equals(jobCardIssue.getNo())) {
+			throw new InvalidOperationException("ID and number do not match");
+		}
+		
+		if(maintenanceJobCardIssue.getComments().equals("") || maintenanceJobCardIssue.getComments().equals(null)) {
+			throw new InvalidEntryException("Please enter comment");
+		}
+		
+		return null;
+	}
+	
+	@Override
 	public MaintenanceJobCardIssueResponseDTO removeMaintenanceJobCardIssue(MaintenanceJobCardIssueRequestDTO jobCardIssue,
 			HttpServletRequest request) {
 		MaintenanceJobCardIssue maintenanceJobCardIssue = maintenanceJobCardIssueRepository.findById(jobCardIssue.getId())

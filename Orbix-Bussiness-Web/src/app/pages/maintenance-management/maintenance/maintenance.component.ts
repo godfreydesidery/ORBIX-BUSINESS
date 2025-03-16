@@ -765,7 +765,7 @@ export class MaintenanceComponent {
     
               console.log(data)
     
-            this.msg.showSuccessMessage('Sent successifully')
+            // this.msg.showSuccessMessage('Sent successifully')
   
               // this.createOrLoadMaintenanceJobCard(this.maintenanceId)
     
@@ -779,6 +779,7 @@ export class MaintenanceComponent {
             }
           )
       }
+      this.msg.showSuccessMessage('Success')
       this.closeJobCard()
       //await this.createOrLoadMaintenanceJobCard(this.maintenanceId)
     }

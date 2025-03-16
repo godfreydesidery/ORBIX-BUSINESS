@@ -13,4 +13,5 @@ public interface MaintenanceJobCardIssueService {
 	MaintenanceJobCardIssueResponseDTO removeMaintenanceJobCardIssue(MaintenanceJobCardIssueRequestDTO maintenanceJobCardIssueRequest, HttpServletRequest request);
 	List<MaintenanceJobCardIssueResponseDTO> getMyJobs(HttpServletRequest request);
 	MaintenanceJobCardIssueResponseDTO saveComments(MaintenanceJobCardIssueRequestDTO maintenanceJobCardIssueRequest, HttpServletRequest request);
+	MaintenanceJobCardIssueResponseDTO doneMaintenanceJobCardIssue(MaintenanceJobCardIssueRequestDTO maintenanceJobCardIssueRequest, HttpServletRequest request);
 }

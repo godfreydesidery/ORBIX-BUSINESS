@@ -195,7 +195,7 @@
                                     <td>{{storage.ownerIdNo}}</td>
                                     <td>{{storage.ownerIdType}}</td>
                                     <td><span class="badge badge-primary">{{storage.billingType}}</span></td>
-                                    <td style="text-align: right;"><span class="badge badge-danger">{{storage.billingAmount | currency:'':''}}</span></td>
+                                    <td class="text-danger" style="text-align: right;"><b>{{storage.billingAmount | currency:'':''}}</b></td>
                                     <td>
                                         <span class="badge badge-success" *ngIf="storage.status === 'PROCESSING'">{{storage.status}}</span>
                                         <span class="badge badge-warning" *ngIf="storage.status === 'PENDING'">{{storage.status}}</span>

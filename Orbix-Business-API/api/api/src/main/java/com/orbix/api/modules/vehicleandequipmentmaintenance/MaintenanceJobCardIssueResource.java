@@ -127,6 +127,15 @@ private final MaintenanceJobCardIssueService maintenanceJobCardIssueService;
 		return ResponseEntity.created(uri).body(maintenanceJobCardIssueService.removeMaintenanceJobCardIssue(maintenanceJobCardIssueRequest, request));
 	}
 	
+	@PostMapping("/maintenance_job_card_issues/done")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<MaintenanceJobCardIssueResponseDTO>done(
+			@RequestBody MaintenanceJobCardIssueRequestDTO maintenanceJobCardIssueRequest,
+			HttpServletRequest request){		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/maintenance_job_card_issues/done").toUriString());
+		return ResponseEntity.created(uri).body(maintenanceJobCardIssueService.doneMaintenanceJobCardIssue(maintenanceJobCardIssueRequest, request));
+	}
+	
 	@PostMapping("/maintenance_job_card_issues/save_comments")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<MaintenanceJobCardIssueResponseDTO>saveComments(
