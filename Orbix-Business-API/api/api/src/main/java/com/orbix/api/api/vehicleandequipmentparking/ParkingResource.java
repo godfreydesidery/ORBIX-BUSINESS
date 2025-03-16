@@ -100,6 +100,15 @@ public class ParkingResource {
 		return ResponseEntity.created(uri).body(parkingService.updateParking(parkingRequest, request));
 	}
 	
+	@PostMapping("/parkings/modify")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<ParkingResponseDTO>modify(
+			@RequestBody ParkingRequestDTO parkingRequest,
+			HttpServletRequest request){		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/parkings/modify").toUriString());
+		return ResponseEntity.created(uri).body(parkingService.modifyParking(parkingRequest, request));
+	}
+	
 	@PostMapping("/parkings/check_in")
 	public ResponseEntity<ParkingResponseDTO>checkIn(
 			@RequestBody ParkingRequestDTO parkingRequest,

@@ -128,6 +128,28 @@ public class MaintenanceServiceController implements MaintenanceService {
 		}		
 		return maintenanceResponses;
 	}
+	
+	@Override
+	@Transactional // Because it fetches lazy loaded collections
+	public List<MaintenanceResponseDTO> getAllCheckedInMaintenancesWithClosedJobsAndMine(HttpServletRequest request) {
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");  //Consider removing this status
+		statuses.add("CHECKED-IN");
+		statuses.add("CHECKED-OUT");
+		
+		User user = userService.getUser(request);
+		
+		LocalDateTime closedSince = LocalDateTime.now().minusHours(24);
+		List<Maintenance> maintenances = maintenanceRepository.findAllByStatusInAndClosedMaintenanceJobCardIssuesAndServiceSpecialistUser(statuses, user, closedSince);
+		
+		//List<Maintenance> maintenances = maintenanceRepository.findAllByStatusInAndOpenMaintenanceJobCardIssues(statuses);
+		List<MaintenanceResponseDTO> maintenanceResponses = new ArrayList<>();
+
+		for(Maintenance maintenance : maintenances) {
+			maintenanceResponses.add(maintenanceResponseDTOMapper(maintenance));					
+		}		
+		return maintenanceResponses;
+	}
 
 	@Override
 	public List<MaintenanceResponseDTO> getAllCleared(HttpServletRequest request) {
@@ -587,6 +609,32 @@ public class MaintenanceServiceController implements MaintenanceService {
 		List<String> statuses = new ArrayList<>();
 		statuses.add("PENDING");
 		statuses.add("OPEN");
+		
+		Optional<MaintenanceJobCard> maintenanceJobCard_ = maintenanceJobCardRepository
+			    .findFirstByMaintenanceAndStatusIn(maintenance, statuses);
+		
+		if(maintenanceJobCard_.isPresent()) {
+			return maintenanceJobCardService.showMaintenanceJobCard(maintenanceJobCard_.get(), userService.getUser(request));
+		}else {
+			return null;
+		}		
+	}
+	
+	@Override
+	public MaintenanceJobCardResponseDTO loadMyClosedJobCard(MaintenanceRequestDTO maintenanceRequest, HttpServletRequest request) {
+		// Find for any job card in the maintenance
+		
+		Maintenance maintenance = maintenanceRepository.findById(maintenanceRequest.getId())
+				.orElseThrow(() -> new NotFoundException("Maintenance not found"));
+		
+//		if(!maintenance.getStatus().equals("CHECKED-IN")) {
+//			throw new InvalidOperationException("Only allowed for checked in maintenances");
+//		}
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");
+		statuses.add("OPEN");
+		statuses.add("CLOSED");
 		
 		Optional<MaintenanceJobCard> maintenanceJobCard_ = maintenanceJobCardRepository
 			    .findFirstByMaintenanceAndStatusIn(maintenance, statuses);

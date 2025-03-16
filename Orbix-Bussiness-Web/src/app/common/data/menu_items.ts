@@ -565,6 +565,12 @@ export const menuItems = [
                 show : true,
                 routerLink: '/app/workshop/my-jobs'
             }, 
+            { 
+                title: 'Verified Jobs',
+                url: '#',
+                show : true,
+                routerLink: '/app/workshop/my-closed-jobs'
+            }, 
         ]
     },
 

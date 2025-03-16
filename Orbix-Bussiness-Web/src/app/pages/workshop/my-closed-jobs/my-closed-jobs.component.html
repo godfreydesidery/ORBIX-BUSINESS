@@ -157,19 +157,19 @@
                                                 <th>Issue</th>
                                                 <th>Description</th>
                                                 <th>Type</th>
-                                                <th>Comments</th>
-                                                <th>Pay Status</th>
-                                                <th>Action</th>
+                                                <!-- <th>Comments</th> -->
+                                                <th>Status</th>
+                                                <!-- <th>Pay Status</th> -->
                                             </tr>
                                         </thead>
                                         <tbody>
                                             <ng-container *ngFor="let m of maintenanceJobCard.maintenanceJobCardIssues">
-                                                <tr *ngIf="m.status != 'CLOSED'">
+                                                <tr *ngIf="m.status === 'CLOSED'">
                                                     <td>{{m.no}}</td>
                                                     <td>{{m.name}}</td>
                                                     <td>{{m.description}}</td>
                                                     <td>{{m.maintenanceIssueTypeName}}</td>
-                                                    <td style="text-align: center;">
+                                                    <!-- <td style="text-align: center;">
                                                         <span 
                                                             class="fa fa-file-text" 
                                                             [ngClass]="m.comments ? 'text-success' : 'text-primary'" 
@@ -178,20 +178,13 @@
                                                             data-target="#edit-modal" 
                                                             style="cursor: pointer;">
                                                         </span>                                        
-                                                        <!-- <span class="fa fa-file-text text-success" *ngIf="m.comments === '' || m.comments === null" (click)="loadIssue(m.id)" data-toggle="modal" data-target="#edit-modal" style="cursor: pointer;"></span>
-                                                        <span class="fa fa-file-text text-primary" *ngIf="m.comments != ''" (click)="loadIssue(m.id)" data-toggle="modal" data-target="#edit-modal" style="cursor: pointer;"></span> -->
-                                                        <!-- <span class="fa fa-file-text" (click)="loadIssue(m.id)" data-toggle="modal" data-target="#view-modal" style="cursor: pointer;"></span> -->
-                                                    </td>
-                                                    <td>{{m.payStatus}}</td>
-                                                    <td>
-                                                        <button class="btn btn-success btn-sm btn-round-custom" *ngIf="m.payStatus === 'PAID'" (click)="doneIssue(m.id, m.no)">Done</button>
-                                                    </td>
+                                                    </td> -->
+                                                    <td>{{m.status}}</td>
+                                                    <!-- <td>{{m.payStatus}}</td> -->
                                                 </tr>
                                             </ng-container>
                                         </tbody> 
                                     </table>
-                                    
-                
                                 </div>
                             </div>
                         </div>

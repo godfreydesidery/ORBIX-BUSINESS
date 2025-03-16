@@ -49,8 +49,9 @@
                                         <tr>
                                             <!-- <td><button class="btn btn-success btn-round-custom" (click)="getParkingBillReceivables(p.id)" data-toggle="modal" data-target="#parking-billing-modal">Parking</button></td>
                                             <td><button class="btn btn-success btn-round-custom" data-toggle="modal" data-target="#service-billing-modal">Service</button></td> -->
-                                            <td><button class="btn btn-primary btn-round-custom" (click)="get(p.id)" data-toggle="modal" data-target="#view-modal">View</button></td>
-                                            <td><button class="btn btn-success btn-round-custom" (click)="vehicleEquipmentBilling(p.id)" >Billing</button></td>
+                                            <td><button class="btn btn-warning btn-round-custom btn-sm" (click)="getBillView(p.id)" data-toggle="modal" data-target="#bill-view-modal">View Bill</button></td>
+                                            <td><button class="btn btn-primary btn-round-custom btn-sm" (click)="get(p.id)" data-toggle="modal" data-target="#view-modal">View</button></td>
+                                            <td><button class="btn btn-success btn-round-custom btn-sm" (click)="vehicleEquipmentBilling(p.id)" >Billing</button></td>
                                         </tr>
                                     </table>
                                 </td>
@@ -347,6 +348,44 @@
             <div class="modal-footer">
                 <!-- <button type="button" class="btn btn-primary" (click)="checkOut()">Check Out</button> -->
                 <!-- <button type="button" class="btn btn-primary">Print Gate Pass</button> -->
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="bill-view-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-sm" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Bill View</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped">
+                    <tr>
+                        <td>Bill Paid</td>
+                        <td style="text-align: right;">{{billPaid | currency:'':''}}</td>
+                    </tr>
+                    <tr>
+                        <td>Bill Generated</td>
+                        <td style="text-align: right;">{{billGenerated | currency:'':''}}</td>
+                    </tr>
+                    <tr>
+                        <td>Bill Not Generated</td>
+                        <td style="text-align: right;">{{billUngenerated | currency:'':''}}</td>
+                    </tr>
+                    <tr style="color: red; font-size: large;">
+                        <td><b>Bill Unpaid</b></td>
+                        <td style="text-align: right;"><b>{{billUnpaid | currency:'':''}}</b></td>
+                    </tr>
+                </table>
+                
+            </div>
+            
+            
+            <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>

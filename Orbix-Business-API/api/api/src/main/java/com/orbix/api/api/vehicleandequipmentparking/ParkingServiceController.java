@@ -477,6 +477,94 @@ public class ParkingServiceController implements ParkingService {
 		
 		return parkingResponseDTOMapper(parking);			
 	}
+	
+	@Override
+	public ParkingResponseDTO modifyParking(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
+		
+		Optional<Parking> parking_ = parkingRepository.findById(parkingRequest.getId());
+		if(parking_.isEmpty()) throw new NotFoundException("Parking not found in database");
+			
+		if(!parking_.get().getStatus().equals("CHECKED-IN")) throw new NotFoundException("Can not modify only checked-in parking can be modified");
+			
+		if(!validateParkingData(parkingRequest)) throw new InvalidEntryException("Could not validate data");
+			
+		Optional<Company> company_ = companyRepository.findById(userService.getUserCompany(request).getId());
+		if(company_.isEmpty()) throw new NotFoundException("Company not found");
+			
+		Optional<Branch> branch_ = branchRepository.findById(userService.getUserBranch(request).getId());
+		if(branch_.isEmpty()) throw new NotFoundException("Branch not found");
+			
+		Optional<VehicleEquipmentType> vehicleEquipmentType_ = vehicleEquipmentTypeRepository.findByNameAndCompany(parkingRequest.getVehicleEquipmentTypeName(), company_.get());
+		if(vehicleEquipmentType_.isEmpty()) throw new NotFoundException("Vehicle or equipment type not found");
+			
+		
+		if(vehicleEquipmentType_.get().getCompany().getId() != company_.get().getId()) 
+			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
+		
+		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), branch_.get());
+		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
+		
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		
+		if(!parkingBillReceivables.isEmpty()) {
+			throw new InvalidOperationException("Cannot proceed with modification as there are already existing bills.");
+		}
+		
+		Parking parking = parking_.get();
+		parking.setOwnerFirstName(parkingRequest.getOwnerFirstName());
+		parking.setOwnerMiddleName(parkingRequest.getOwnerMiddleName());
+		parking.setOwnerLastName(parkingRequest.getOwnerLastName());
+		parking.setOwnerCompanyName(parkingRequest.getOwnerCompanyName());
+		parking.setOwnerIdNo(parkingRequest.getOwnerIdNo());
+		parking.setOwnerIdType(parkingRequest.getOwnerIdType());
+		parking.setOwnerPhoneNo(parkingRequest.getOwnerPhoneNo());
+		parking.setOwnerEmail(parkingRequest.getOwnerEmail());
+		parking.setOwnerAddress(parkingRequest.getOwnerAddress());
+		parking.setAgentName(parkingRequest.getAgentName());
+		parking.setAgentAddress(parkingRequest.getAgentAddress());
+		parking.setAgentPhoneNo(parkingRequest.getAgentPhoneNo());
+		parking.setAgentEmail(parkingRequest.getAgentEmail());
+		parking.setTformNumber(parkingRequest.getTformNumber());
+		parking.setRegistrationNo(parkingRequest.getRegistrationNo());
+		parking.setChasisNo(parkingRequest.getChasisNo());
+		parking.setCardNo(parkingRequest.getCardNo());
+		parking.setLeftFrontLamp(parkingRequest.isLeftFrontLamp());
+		parking.setRightFrontLamp(parkingRequest.isRightFrontLamp());
+		parking.setLeftRearLamp(parkingRequest.isLeftRearLamp());
+		parking.setRightRearLamp(parkingRequest.isRightRearLamp());
+		parking.setLeftSideMirror(parkingRequest.isLeftSideMirror());
+		parking.setRightSideMirror(parkingRequest.isRightSideMirror());
+		parking.setLeftWiper(parkingRequest.isLeftWiper());
+		parking.setRightWiper(parkingRequest.isRightWiper());
+		parking.setBackWiper(parkingRequest.isBackWiper());
+		parking.setFuelCap(parkingRequest.isFuelCap());
+		parking.setSpareTire(parkingRequest.isSpareTire());
+		parking.setBattery(parkingRequest.isBattery());
+		parking.setStarter(parkingRequest.isStarter());
+		parking.setAerial(parkingRequest.isAerial());
+		parking.setWheelCap(parkingRequest.isWheelCap());
+		parking.setRoundMirror(parkingRequest.isRoundMirror());
+		parking.setTireIndicator(parkingRequest.isTireIndicator());
+		parking.setHasKeys(parkingRequest.isHasKeys());
+		parking.setDeviceStatus(parkingRequest.isDeviceStatus());
+		parking.setVehicleEquipmentType(vehicleEquipmentType_.get());
+		parking.setVehicleEquipmentCategory(parkingRequest.getVehicleEquipmentCategory());
+		
+		parking.setVehicleEquipmentName(vehicleEquipmentType_.get().getName()); // Look here later
+		parking.setVehicleEquipmentColor(parkingRequest.getVehicleEquipmentColor());
+		
+		parking.setComments(parkingRequest.getComments());
+		
+		
+		
+		parking.setParkingZone(parkingZone_.get());
+		
+		parking.setBillingType(parkingRequest.getBillingType());
+				
+		parking = parkingRepository.save(parking);
+		
+		return parkingResponseDTOMapper(parking);			
+	}
 
 	private ParkingResponseDTO parkingResponseDTOMapper(Parking parking) {
 		ParkingResponseDTO parkingResponse = new ParkingResponseDTO();

@@ -103,5 +103,13 @@ public class ParkingBillReceivableResource {
 	}
 	
 	
+	@GetMapping("/parking_bill_receivables/get_bill_view")
+	public ResponseEntity<BillViewResponseDTO> getBillView(
+			@RequestParam(name = "parking_id") Long parkingId,
+			HttpServletRequest request)
+			{			
+		return ResponseEntity.ok().body(parkingBillReceivableService.getBillView(parkingId, request));
+	}
+	
 	
 }

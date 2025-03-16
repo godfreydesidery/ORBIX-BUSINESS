@@ -18,6 +18,7 @@ public interface ParkingService {
 	List<ParkingBillReceivableResponseDTO> getParkingBillReceivables(Long id, HttpServletRequest request);
 	ParkingResponseDTO createParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	ParkingResponseDTO updateParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
+	ParkingResponseDTO modifyParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	
 	ParkingResponseDTO checkIn(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	ParkingResponseDTO checkOut(ParkingRequestDTO parkingRequest, HttpServletRequest request);

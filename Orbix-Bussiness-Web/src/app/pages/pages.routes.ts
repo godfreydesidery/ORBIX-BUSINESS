@@ -289,6 +289,12 @@ export const routes: Routes = [
         data : { breadcrumb : 'Workshop/My Jobs'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'workshop/my-closed-jobs',
+        loadComponent: () => import('./workshop/my-closed-jobs/my-closed-jobs.component').then(c => c.MyClosedJobsComponent),
+        data : { breadcrumb : 'Workshop/Verified Jobs'},
+        canActivate : [AuthGuard]
+      },
 
       /**Storage Management */
       {

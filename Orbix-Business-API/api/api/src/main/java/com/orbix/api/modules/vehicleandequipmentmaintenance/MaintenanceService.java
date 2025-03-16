@@ -11,6 +11,7 @@ public interface MaintenanceService {
 	List<MaintenanceResponseDTO> getAllPendingOrCheckedInMaintenances(HttpServletRequest request);	
 	List<MaintenanceResponseDTO> getAllCheckedInMaintenancesWithOpenJobs(HttpServletRequest request);
 	List<MaintenanceResponseDTO> getAllCheckedInMaintenancesWithOpenJobsAndMine(HttpServletRequest request);
+	List<MaintenanceResponseDTO> getAllCheckedInMaintenancesWithClosedJobsAndMine(HttpServletRequest request);
 	List<MaintenanceResponseDTO> getAllCleared(HttpServletRequest request);
 	List<MaintenanceResponseDTO> getTodayCheckedOut(HttpServletRequest request);
 	List<MaintenanceResponseDTO> getRecentCheckedOut(HttpServletRequest request);
@@ -29,4 +30,5 @@ public interface MaintenanceService {
 	MaintenanceJobCardResponseDTO reopenMaintenanceJobCard(MaintenanceJobCard maintenanceJobCard, HttpServletRequest request);
 	
 	MaintenanceJobCardResponseDTO loadMyJobCard(MaintenanceRequestDTO maintenanceRequest, HttpServletRequest request);
+	MaintenanceJobCardResponseDTO loadMyClosedJobCard(MaintenanceRequestDTO maintenanceRequest, HttpServletRequest request);
 }

@@ -187,19 +187,19 @@
                                         <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
                                     </select> -->
 
-                                    <input class="form-control" type="text" list="venamesaa"
+                                    <!-- <input class="form-control" type="text" list="venamesaa"
                                         [(ngModel)]="vehicleEquipmentTypeName" autocomplete="nope" />
                                     <datalist id="venamesaa">
                                         <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
-                                    </datalist>
+                                    </datalist> -->
 
-                                    <!-- <ng-select [items]="vehicleEquipmentTypes" // To check later
-                                            bindLabel="id"
+                                    <ng-select [items]="vehicleEquipmentTypes"
+                                            bindLabel="name"
                                             bindValue="name"
                                             [(ngModel)]="vehicleEquipmentTypeName"
-                                            (change)="onChange($event)"
+                                            appendTo="body"
                                             class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
-                                    </ng-select> -->
+                                    </ng-select>
 
 
                                 </div>
@@ -253,13 +253,26 @@
                 <!-- Start of content header for existing vehicle -->
                 <div class="row" *ngIf="mode === 'existing'">
                     <div class="col-lg-3">
-                        <span>Chasis No/ Reg No</span>
+                        <!-- <span>Chasis No/ Reg No</span>
                         <input class="form-control" type="text" list="nos" [(ngModel)]="chasisNo"
                             (change)="searchVehicleEquipmentByChasisNo(chasisNo)" />
                         <datalist id="nos">
                             <option *ngFor="let option of chasisNos" [value]="option">
-                        </datalist>
+                        </datalist> -->
+
+                        <ng-select [items]="chasisNos"
+                            [(ngModel)]="chasisNo"
+                            (change)="searchVehicleEquipmentByChasisNo($event)"
+                            appendTo="body"
+                            class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                        </ng-select>
                     </div>
+
+                    
+
+
+
+
                     <div class="col-lg-2">
                         <br>
                         <button class="btn btn-success btn-round-custom"
@@ -694,11 +707,19 @@
                                         <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
                                     </select> -->
 
-                                    <input class="form-control" type="text" list="venames"
+                                    <!-- <input class="form-control" type="text" list="venames"
                                         [(ngModel)]="vehicleEquipmentTypeName" />
                                     <datalist id="venames">
                                         <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
-                                    </datalist>
+                                    </datalist> -->
+
+                                    <ng-select [items]="vehicleEquipmentTypes"
+                                            bindLabel="name"
+                                            bindValue="name"
+                                            [(ngModel)]="vehicleEquipmentTypeName"
+                                            appendTo="body"
+                                            class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                                    </ng-select>
 
                                     <!-- <input class="form-control" type="text" list="nos" [(ngModel)]="chasisNo" (change)="searchVehicleEquipmentByChasisNo(chasisNo)"/>
                                     <datalist id="nos">
@@ -762,6 +783,7 @@
                                         <option value="white">White</option>
                                         <option value="red">Red</option>
                                         <option value="dark-blue">Dark Blue</option>
+                                        <option value="silver">Silver</option>
                                         <option value="yellow">Yellow</option>
                                         <option value="brown">Brown</option>
                                         <option value="blue">Blue</option>
@@ -901,11 +923,21 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Select Vehicle Type</label>
-                            <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
+                            <!-- <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
                                 <option></option>
                                 <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{
                                     option.name }}</option>
-                            </select>
+                            </select> -->
+
+                            <ng-select [items]="vehicleEquipmentTypes"
+                                    bindLabel="name"
+                                    bindValue="name"
+                                    [(ngModel)]="vehicleEquipmentTypeName"
+                                    appendTo="body"
+                                    class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                            </ng-select>
+
+
                         </div>
                     </div>
 
@@ -926,6 +958,7 @@
                                 <option value="white">White</option>
                                 <option value="red">Red</option>
                                 <option value="dark-blue">Dark Blue</option>
+                                <option value="silver">Silver</option>
                                 <option value="yellow">Yellow</option>
                                 <option value="brown">Brown</option>
                                 <option value="blue">Blue</option>
@@ -1055,12 +1088,22 @@
                                 <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
                             </select> -->
 
-                            <input class="form-control" type="text" list="vet" [(ngModel)]="vehicleEquipmentTypeName" />
+                            <!-- <input class="form-control" type="text" list="vet" [(ngModel)]="vehicleEquipmentTypeName" />
                             <datalist id="vet">
                                 <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
                                     {{ option.name }}
                                 </option>
-                            </datalist>
+                            </datalist> -->
+
+                            <ng-select [items]="vehicleEquipmentTypes"
+                                    bindLabel="name"
+                                    bindValue="name"
+                                    [(ngModel)]="vehicleEquipmentTypeName"
+                                    appendTo="body"
+                                    class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                            </ng-select>
+
+
                         </div>
                     </div>
 
@@ -1080,11 +1123,21 @@
                                 <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
                             </select> -->
 
-                            <input class="form-control" type="text" list="venamesa"
+                            <!-- <input class="form-control" type="text" list="venamesa"
                                 [(ngModel)]="vehicleEquipmentTypeName" />
                             <datalist id="venamesa">
                                 <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
-                            </datalist>
+                            </datalist> -->
+
+                            <ng-select [items]="vehicleEquipmentTypes"
+                                    bindLabel="name"
+                                    bindValue="name"
+                                    [(ngModel)]="vehicleEquipmentTypeName"
+                                    appendTo="body"
+                                    class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                            </ng-select>
+
+
                         </div>
                     </div>
                     <div class="col-lg-3">
@@ -1096,6 +1149,7 @@
                                 <option value="white">White</option>
                                 <option value="red">Red</option>
                                 <option value="dark-blue">Dark Blue</option>
+                                <option value="silver">Silver</option>
                                 <option value="yellow">Yellow</option>
                                 <option value="brown">Brown</option>
                                 <option value="blue">Blue</option>

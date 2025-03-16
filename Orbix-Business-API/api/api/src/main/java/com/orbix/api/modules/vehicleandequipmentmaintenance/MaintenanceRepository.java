@@ -24,4 +24,7 @@ public interface MaintenanceRepository extends JpaRepository<Maintenance, Long> 
 	
 	@Query("SELECT DISTINCT m FROM Maintenance m JOIN m.maintenanceJobCards mjc JOIN mjc.maintenanceJobCardIssues mjci WHERE mjci.status = 'OPEN' AND m.status IN :statuses AND mjci.serviceSpecialistUser = :user")
 	List<Maintenance> findAllByStatusInAndOpenMaintenanceJobCardIssuesAndServiceSpecialistUser(@Param("statuses") List<String> statuses, User user);
+	
+	@Query("SELECT DISTINCT m FROM Maintenance m JOIN m.maintenanceJobCards mjc JOIN mjc.maintenanceJobCardIssues mjci WHERE mjci.status = 'CLOSED' AND m.status IN :statuses AND mjci.serviceSpecialistUser = :user AND mjci.closedDateTime >= :closedSince")
+	List<Maintenance> findAllByStatusInAndClosedMaintenanceJobCardIssuesAndServiceSpecialistUser(@Param("statuses") List<String> statuses, User user, @Param("closedSince") LocalDateTime closedSince);
 }

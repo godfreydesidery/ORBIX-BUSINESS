@@ -18,4 +18,6 @@ public interface ParkingBillReceivableService {
 	public ParkingBillReceivableResponseDTO getParkingBillReceivable(Long id, HttpServletRequest request);
 	public ParkingServiceBillReceivableResponseDTO getServiceBillReceivable(Long id, HttpServletRequest request);
 	
+	public BillViewResponseDTO getBillView(Long parkingId, HttpServletRequest request);
+	
 }
