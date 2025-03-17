@@ -285,6 +285,27 @@ export class VehicleEquipmentRegisterComponent {
       )
   }
 
+  async searchVehicleEquipmentById(id: any) {
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.get<IVehicleEquipment>(API_URL + '/vehicle_equipments/get_by_id?id=' + id, options)
+      .toPromise()
+      .then(
+        data => {
+          this.showVehicleEquipmentData(data!)
+          console.log(data)
+          if (data!.parkingId != null) {
+            this.showParking = true
+            this.getParking(data!.parkingId)
+          } else {
+            this.showParking = false
+          }
+        }
+      )
+  }
+
 
   chasisNos: String[] = []
   async getAllVehicleEquipmentChasisNos() {
@@ -1136,6 +1157,40 @@ export class VehicleEquipmentRegisterComponent {
 
   // currentService : any = null
   // currentServiceSelected : boolean = false
+
+
+  searchTerm: string = '';
+    filteredVehicleEquipments: IVehicleEquipment[] = [];
+    selectedVehicleEquipment: IVehicleEquipment | null = null;
+    isDropdownOpen: boolean = false;
+    searchProducts(): void {
+      const options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      
+      }
+      this.filteredVehicleEquipments = [];
+      if (this.searchTerm.trim().length >= 4) {
+        this.http
+        //await this.http.get<IProduct[]>(API_URL+'/shop_products/get_products_by_shop_containing?product_name_like=' + searchKey + '&shop_id=' + this.shopId , options)
+          .get<IVehicleEquipment[]>(API_URL+'/vehicle_equipments/get_vehicle_equipments_chasis_no_containing?chasis_no_like=' + this.searchTerm, options)
+          .subscribe(
+            (data) => (this.filteredVehicleEquipments = data),
+            (error) => console.error('Error fetching products:', error)
+          );
+      } else {
+        this.filteredVehicleEquipments = [];
+      }
+    }
+
+    selectProduct(item: IVehicleEquipment): void {
+      this.selectedVehicleEquipment = item;
+      this.searchTerm = item.chasisNo;
+      this.isDropdownOpen = false;
+      
+      this.searchVehicleEquipmentById(item.id)
+      this.filteredVehicleEquipments = [];
+    }
+
 
 }
 function then(arg0: (data: any) => void): PromiseConstructor {

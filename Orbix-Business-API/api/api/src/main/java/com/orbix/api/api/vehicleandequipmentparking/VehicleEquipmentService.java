@@ -14,6 +14,8 @@ public interface VehicleEquipmentService {
 	VehicleEquipmentResponseDTO createVehicleEquipment(VehicleEquipmentRequestDTO vehicleEquipmentRequest, HttpServletRequest request);
 	VehicleEquipmentResponseDTO updateVehicleEquipment(VehicleEquipmentRequestDTO vehicleEquipmentRequest, HttpServletRequest request);
 	
+	List<VehicleEquipmentResponseDTO> getVehicleEquipmentByChasisNo(String chasisNoLike, HttpServletRequest request);
+	
 //	ApiCustomResponse activateVehicleEquipment(VehicleEquipmentRequestDTO vehicleEquipmentRequest, HttpServletRequest request);
 //	ApiCustomResponse deactivateVehicleEquipment(VehicleEquipmentRequestDTO vehicleEquipmentRequest, HttpServletRequest request);
 }

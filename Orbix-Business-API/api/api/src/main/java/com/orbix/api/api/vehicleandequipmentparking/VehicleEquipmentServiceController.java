@@ -18,6 +18,7 @@ import com.orbix.api.modules.adminunits.BranchRepository;
 import com.orbix.api.modules.adminunits.Company;
 import com.orbix.api.modules.adminunits.CompanyRepository;
 import com.orbix.api.modules.adminunits.DayService;
+import com.orbix.api.modules.adminunits.Shop;
 import com.orbix.api.modules.finance.BillReceivable;
 import com.orbix.api.modules.finance.BillReceivableRepository;
 import com.orbix.api.modules.finance.InvoiceReceivable;
@@ -25,6 +26,8 @@ import com.orbix.api.modules.finance.InvoiceReceivableDetail;
 import com.orbix.api.modules.finance.InvoiceReceivableDetailRepository;
 import com.orbix.api.modules.finance.InvoiceReceivableRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.modules.inventoryandprocurement.ProductResponseDTO;
+import com.orbix.api.modules.inventoryandprocurement.ShopProduct;
 import com.orbix.api.modules.vehicleandequipmentmaintenance.Maintenance;
 import com.orbix.api.modules.vehicleandequipmentmaintenance.MaintenanceRepository;
 import com.orbix.api.modules.vehicleandequipmentmaintenance.MaintenanceRequestDTO;
@@ -450,6 +453,25 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 	boolean validateVehicleEquipmentData(VehicleEquipmentRequestDTO vehicleEquipmentRequest) {
 		
 		return true;
+	}
+	
+	
+	@Override
+	public List<VehicleEquipmentResponseDTO> getVehicleEquipmentByChasisNo(String chasisNoLike, HttpServletRequest request) {
+		
+	    List<VehicleEquipment> vehicleEquipments = vehicleEquipmentRepository.findAllByBranchAndChasisNoContainingIgnoreCase(userService.getUserBranch(request), chasisNoLike);
+	    
+	    List<VehicleEquipmentResponseDTO> vehicleEquipmentResponses = new ArrayList<>();
+	    
+	    for(VehicleEquipment vehicleEquipment : vehicleEquipments) {
+	    	VehicleEquipmentResponseDTO vehicleEquipmentResponse = new VehicleEquipmentResponseDTO();
+	    	vehicleEquipmentResponse.setId(vehicleEquipment.getId().toString());
+	    	vehicleEquipmentResponse.setChasisNo(vehicleEquipment.getChasisNo());
+	    	vehicleEquipmentResponse.setVehicleEquipmentTypeName(vehicleEquipment.getVehicleEquipmentType().getName());
+	    	vehicleEquipmentResponse.setVehicleEquipmentColor(vehicleEquipment.getVehicleEquipmentColor());
+	    	vehicleEquipmentResponses.add(vehicleEquipmentResponse);
+	    }
+	    return vehicleEquipmentResponses;
 	}
 
 	

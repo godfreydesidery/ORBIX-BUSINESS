@@ -5,7 +5,7 @@
                 <span>Vehicle Register | {{ currentService ? currentService : 'No Service Selected' }}</span>
             </div>
             
-            <div class="card-body widget-body">
+            <div class="card-body widget-body min-vh-100">
                 <!-- <div class="row">
                     <div class="col-lg-3">
 
@@ -252,7 +252,7 @@
                 <!-- End of content header for new vehicle -->
                 <!-- Start of content header for existing vehicle -->
                 <div class="row" *ngIf="mode === 'existing'">
-                    <div class="col-lg-3">
+                    <div class="col-lg-3 dropdown"  style="position: relative; z-index: 1050;">
                         <!-- <span>Chasis No/ Reg No</span>
                         <input class="form-control" type="text" list="nos" [(ngModel)]="chasisNo"
                             (change)="searchVehicleEquipmentByChasisNo(chasisNo)" />
@@ -260,24 +260,63 @@
                             <option *ngFor="let option of chasisNos" [value]="option">
                         </datalist> -->
 
-                        <ng-select [items]="chasisNos"
+                        <!-- <ng-select [items]="filteredVehicleEquipments"
+                        bindLabel="chasisNo"
+                        bindValue="id"
                             [(ngModel)]="chasisNo"
                             (change)="searchVehicleEquipmentByChasisNo($event)"
                             appendTo="body"
                             class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
-                        </ng-select>
+                        </ng-select> -->
+
+                        <input
+                        type="text"
+                        id="productSearch"
+                        class="form-control"
+                        [(ngModel)]="searchTerm"
+                        (input)="searchProducts()"
+                        (focus)="isDropdownOpen = true"
+                        placeholder="Type to search products..."
+                        autocomplete="off"
+                        style="width: 100%"
+                      />
+                        <div
+                        class="dropdown-menu show mt-1"
+                        *ngIf="isDropdownOpen && filteredVehicleEquipments.length > 0"
+                        style="max-height: 200px; overflow-y: auto; width: 100%; margin-left: 10px;"
+                        >
+                            <button
+                            class="dropdown-item form-control"
+                            *ngFor="let vehicleEquipment of filteredVehicleEquipments"
+                            (click)="selectProduct(vehicleEquipment)"
+                            style="font-size: large;"
+                            >
+                            {{ vehicleEquipment.chasisNo }} | {{ vehicleEquipment.vehicleEquipmentTypeName }} | {{ vehicleEquipment.vehicleEquipmentColor }}
+                            </button>
+                      </div>
+
+
                     </div>
+
+
+                    <!-- <ng-select [items]="vehicleEquipmentTypes"
+                                            bindLabel="name"
+                                            bindValue="name"
+                                            [(ngModel)]="vehicleEquipmentTypeName"
+                                            appendTo="body"
+                                            class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                                    </ng-select> -->
 
                     
 
 
 
 
-                    <div class="col-lg-2">
+                    <!-- <div class="col-lg-2">
                         <br>
                         <button class="btn btn-success btn-round-custom"
                             (click)="searchVehicleEquipmentByChasisNo(chasisNo)">Search</button>
-                    </div>
+                    </div> -->
 
 
                 </div>
