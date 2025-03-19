@@ -197,7 +197,6 @@
                                             bindLabel="name"
                                             bindValue="name"
                                             [(ngModel)]="vehicleEquipmentTypeName"
-                                            appendTo="body"
                                             class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
                                     </ng-select>
 
@@ -252,7 +251,7 @@
                 <!-- End of content header for new vehicle -->
                 <!-- Start of content header for existing vehicle -->
                 <div class="row" *ngIf="mode === 'existing'">
-                    <div class="col-lg-3 dropdown"  style="position: relative; z-index: 1050;">
+                    <div class="col-lg-6 dropdown" style="position: relative; z-index: 1050;">
                         <!-- <span>Chasis No/ Reg No</span>
                         <input class="form-control" type="text" list="nos" [(ngModel)]="chasisNo"
                             (change)="searchVehicleEquipmentByChasisNo(chasisNo)" />
@@ -276,7 +275,7 @@
                         [(ngModel)]="searchTerm"
                         (input)="searchProducts()"
                         (focus)="isDropdownOpen = true"
-                        placeholder="Type to search products..."
+                        placeholder="Search By Chasis/Reg No..."
                         autocomplete="off"
                         style="width: 100%"
                       />
@@ -289,7 +288,6 @@
                             class="dropdown-item form-control"
                             *ngFor="let vehicleEquipment of filteredVehicleEquipments"
                             (click)="selectProduct(vehicleEquipment)"
-                            style="font-size: large;"
                             >
                             {{ vehicleEquipment.chasisNo }} | {{ vehicleEquipment.vehicleEquipmentTypeName }} | {{ vehicleEquipment.vehicleEquipmentColor }}
                             </button>
@@ -740,7 +738,7 @@
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>Select Vehicle Type</label>
+                                    <label>Select Vehicle Typee</label>
                                     <!-- <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
                                         <option></option>
                                         <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
@@ -756,7 +754,6 @@
                                             bindLabel="name"
                                             bindValue="name"
                                             [(ngModel)]="vehicleEquipmentTypeName"
-                                            appendTo="body"
                                             class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
                                     </ng-select>
 
@@ -972,7 +969,6 @@
                                     bindLabel="name"
                                     bindValue="name"
                                     [(ngModel)]="vehicleEquipmentTypeName"
-                                    appendTo="body"
                                     class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
                             </ng-select>
 
@@ -1138,7 +1134,6 @@
                                     bindLabel="name"
                                     bindValue="name"
                                     [(ngModel)]="vehicleEquipmentTypeName"
-                                    appendTo="body"
                                     class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
                             </ng-select>
 
@@ -1172,7 +1167,6 @@
                                     bindLabel="name"
                                     bindValue="name"
                                     [(ngModel)]="vehicleEquipmentTypeName"
-                                    appendTo="body"
                                     class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
                             </ng-select>
 

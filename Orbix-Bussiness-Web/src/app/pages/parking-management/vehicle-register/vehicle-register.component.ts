@@ -100,7 +100,7 @@ export class VehicleRegisterComponent {
 
   
 
-  startBillingAt : Date | null
+  startBillingAt : Date | null | string
 
   // Foreign keys
   parkingId: any = null
@@ -630,6 +630,7 @@ export class VehicleRegisterComponent {
      this.cardNo = data!.cardNo
 
      this.billingType = data!.billingType
+     this.startBillingAt = data!.billingStartAt
 
   }
 

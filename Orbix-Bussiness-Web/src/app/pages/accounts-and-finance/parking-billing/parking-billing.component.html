@@ -294,7 +294,7 @@
                                 <tr><td><b>Model/Type</b></td><td>{{vehicleEquipmentTypeName}}</td></tr>
                                 <tr><td><b>Chassis No</b></td><td>{{chasisNo}}</td></tr> 
                                 <tr><td><b>Billing Type</b></td><td>{{billingType}}</td></tr>
-                                <tr><td><b>Billing Start Date</b></td><td>{{billingStartAt}}</td></tr> 
+                                <tr><td><b>Billing Start Date</b></td><td style="color: red;"><b>{{billingStartAt}}</b></td></tr> 
                                 <!-- <tr><td><b>Billing Amount</b></td><td style="text-align: right;">{{billingAmount}}</td></tr>  -->
                                 <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}</td></tr>   
                                 <tr><td><b>Parking No</b></td><td>{{parkingNo}}</td></tr>   
@@ -359,7 +359,7 @@
     <div class="modal-dialog modal-sm" role="document" style="top: 0;">
         <div class="modal-content">
             <div class="modal-header state modal-default">                                    
-                <h4 class="modal-title" id="modal-large-label">Bill View</h4>
+                <h4 class="modal-title text-primary" id="modal-large-label"><b>View Bill Details</b></h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
             </div>
             <div class="modal-body">
@@ -376,9 +376,9 @@
                         <td>Bill Not Generated</td>
                         <td style="text-align: right;">{{billUngenerated | currency:'':''}}</td>
                     </tr>
-                    <tr style="color: red; font-size: large;">
-                        <td><b>Bill Unpaid</b></td>
-                        <td style="text-align: right;"><b>{{billUnpaid | currency:'':''}}</b></td>
+                    <tr>
+                        <td style="font-size: large;"><b>Bill Unpaid</b></td>
+                        <td style="font-size: large; color: red; text-align: right;"><b>{{billUnpaid | currency:'':''}}</b></td>
                     </tr>
                 </table>
                 
