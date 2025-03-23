@@ -7,7 +7,7 @@
             <div class="card-body widget-body"> 
                 <div class="row">
                     <div class="col-lg-12">
-                        <button type="button" class="btn btn-success btn-round-custom" (click)="refresh()">Refresh</button>
+                        <button type="button" class="btn btn-success btn-round-custom" (click)="refresh()"><i class="fa fa-refresh"></i> Refresh</button>
                     </div>
                 </div>
                 <hr>
@@ -17,8 +17,8 @@
                         <div><h4>Parking billing</h4></div>
                         <div class="row">
                             <div class="col-sm-12">
-                                <button type="button" class="btn btn-primary btn-round-custom" (click)="clearParkingBill()" (click)="saveParkingBill()">Bill to Current Date</button>
-                                <button type="button" class="btn btn-primary btn-round-custom" (click)="clearParkingBill()" data-toggle="modal" data-target="#parking-bill-to-future-modal">Bill to Future Date</button>
+                                <button type="button" class="btn btn-outline-primary btn-round-custom" (click)="clearParkingBill()" (click)="saveParkingBill()"><i class="fa fa-money"></i> Bill to Current Date</button>
+                                <button type="button" class="btn btn-outline-primary btn-round-custom" (click)="clearParkingBill()" data-toggle="modal" data-target="#parking-bill-to-future-modal"><i class="fa fa-money"></i> Bill to Future Date</button>
                             </div>
                         </div>
                         <div class="row">
@@ -46,7 +46,7 @@
                                             <td style="text-align: right;">{{p.amount | currency:'':''}}</td>
                                             <td>{{p.payStatus}}</td>
                                             <td>
-                                                <button class="btn btn-success btn-round-custom" (click)="getParkingBill(p.id)" data-toggle="modal" data-target="#parking-bill-modal">Discount</button>
+                                                <button class="btn btn-outline-primary btn-sm btn-round-custom text-nowrap" (click)="getParkingBill(p.id)" data-toggle="modal" data-target="#parking-bill-modal"><i class="fa fa-minus-circle"></i> Discount</button>
                                             </td>
                                         </tr>
                                     </tbody>
@@ -140,9 +140,9 @@
                         </div>
                         <div class="row">
                             <div class="col-md-12" style="text-align: center;">
-                                <button class="btn btn-outline-success btn-round-custom" *ngIf="billReceivables.length > 0" (click)="confirmBillsPayment()">Confirm Payment</button>
-                                <button class="btn btn-outline-primary btn-round-custom" (click)="printReceipt()">Print Receipt</button>
-                                <button class="btn btn-outline-danger btn-round-custom" (click)="checkOut()">Checkout</button>
+                                <button class="btn btn-outline-success btn-sm btn-round-custom" *ngIf="billReceivables.length > 0" (click)="confirmBillsPayment()"><i class="fa fa-check"></i> Confirm Payment</button>
+                                <button class="btn btn-outline-primary btn-sm btn-round-custom" (click)="printReceipt()"><i class="fa fa-print"></i> Print Receipt</button>
+                                <button class="btn btn-outline-danger btn-sm btn-round-custom" (click)="checkOut()"><i class="fa fa-sign-out"></i> Checkout</button>
                             </div>
                         </div>
                     </div>
@@ -194,7 +194,7 @@
             <hr>
             <div class="row">
                 <div class="col-sm-12" style="text-align: center;">
-                    <button class="btn btn-success btn-round-custom" (click)="refreshBillReceivables()" (click)="clearReceipt()" (click)="get(parkingId)">Go to Payment</button>
+                    <button class="btn btn-outline-success btn-round-custom" (click)="refreshBillReceivables()" (click)="clearReceipt()" (click)="get(parkingId)"><i class="fa fa-bank"></i> Go to Payment</button>
                 </div>
             </div>
 

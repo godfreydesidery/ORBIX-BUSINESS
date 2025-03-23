@@ -43,7 +43,7 @@ export class ParkingReportComponent {
   to : Date | string | null = null
 
   nickname = ''
-  payStatus = ''
+  payStatus = '--All--'
 
   constructor(
     private http :HttpClient,

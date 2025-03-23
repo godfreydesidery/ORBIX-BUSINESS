@@ -42,10 +42,10 @@
                 <div class="row" *ngIf="currentServiceSelected === true">
                     <div class="col-sm-12">
                         <button type="button" class="btn btn-outline-success btn-round-custom" (click)="setNewMode()"
-                            style="margin: 3px;">New Vehicle</button>
+                            style="margin: 3px;"><i class="fa fa-file"></i> New Vehicle</button>
                         <button type="button" class="btn btn-outline-success btn-round-custom"
                             (click)="setExistingMode()" (click)="getAllVehicleEquipmentChasisNos()"
-                            style="margin: 3px;">Existing Vehicle</button>
+                            style="margin: 3px;"><i class="fa fa-file-text"></i> Existing Vehicle</button>
                         <hr>
                     </div>
                 </div>
@@ -241,9 +241,9 @@
                     </div>
                     <div class="row">
                         <div class="col-sm-12">
-                            <button class="btn btn-success btn-round-custom" *ngIf="currentService === 'Parking'" (click)="saveForParking()">Register
+                            <button class="btn btn-success btn-round-custom" *ngIf="currentService === 'Parking'" (click)="saveForParking()"><i class="fa fa-pencil-square-o"></i> Register
                                 Parking</button>
-                            <button class="btn btn-success btn-round-custom" *ngIf="currentService === 'Maintenance'" (click)="saveForMaintenance()">Register
+                            <button class="btn btn-success btn-round-custom" *ngIf="currentService === 'Maintenance'" (click)="saveForMaintenance()"><i class="fa fa-pencil-square-o"></i> Register
                                 Maintenance</button>
                         </div>
                     </div>
@@ -849,8 +849,8 @@
 
                         <div class="row">
                             <div class="col-sm-12">
-                                <button type="button" class="btn btn-primary pull-right"  *ngIf="currentService === 'Parking'"
-                                    (click)="saveParking()">Update</button>
+                                <button type="button" class="btn btn-primary btn-round-custom pull-right"  *ngIf="currentService === 'Parking'"
+                                    (click)="saveParking()"><i class="fa fa-save"></i> Update</button>
                             </div>
                             <div class="col-sm-12">
                                 <button type="button" class="btn btn-primary pull-right btn-round-custom"  *ngIf="currentService === 'Maintenance'"

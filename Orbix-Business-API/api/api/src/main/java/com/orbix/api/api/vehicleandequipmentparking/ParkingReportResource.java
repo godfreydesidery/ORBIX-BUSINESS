@@ -237,7 +237,7 @@ public class ParkingReportResource {
 			parkingResponse.setPayStatus(payStatus);
 			parkingResponse.setPaidAmount(String.valueOf(paidAmount));
 			
-			if(paymentStatus.equals("")) {
+			if(paymentStatus.equals("") || paymentStatus.equals("--All--")) {
 				parkingResponses.add(parkingResponse);
 			}else {
 				if(paymentStatus.equals(payStatus)){
