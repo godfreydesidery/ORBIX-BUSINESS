@@ -35,6 +35,7 @@
     "datamaps": "0.5.9",
     "dragula": "3.7.3",
     "dropzone": "5.9.3",
+    "file-saver": "^2.0.5",
     "font-awesome": "4.7.0",
     "fullcalendar": "3.10.1",
     "jquery": "^3.4.1",
@@ -63,6 +64,7 @@
     "ts-helpers": "1.1.2",
     "tslib": "2.6.3",
     "widgster": "1.0.0",
+    "xlsx": "^0.18.5",
     "zone.js": "0.14.8"
   },
   "napa": {},
@@ -70,6 +72,7 @@
     "@angular-devkit/build-angular": "18.1.1",
     "@angular/cli": "18.1.1",
     "@angular/compiler-cli": "18.1.1",
+    "@types/file-saver": "^2.0.7",
     "@types/jasmine": "5.1.4",
     "@types/jquery": "^3.5.32",
     "@types/pdfmake": "^0.2.9",

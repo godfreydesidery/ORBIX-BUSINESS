@@ -41,9 +41,9 @@
                     </div>
                     <div class="col-lg-3">
                         <div class="form-group">
-                            <button class="btn btn-outline-success" (click)="getRegistationByDate(from, to)">Run Report</button>
-                            <button class="btn btn-outline-primary btn-round-custom" (click)="printParkingReport()" style="padding-left: 3px;">Print Report</button>
-                            <button class="btn btn-outline-primary btn-round-custom" (click)="printParkingReport()" style="padding-left: 3px;">Spreadsheet</button>
+                            <button class="btn btn-outline-success btn-round-custom" (click)="getRegistationByDate(from, to)">Run Report</button>
+                            <button class="btn btn-outline-success btn-round-custom" (click)="printParkingReport()" style="padding-left: 3px;"><i class="fa fa-file-pdf-o"></i> PDF</button>
+                            <button class="btn btn-outline-success btn-round-custom" (click)="exportToExcel()" style="padding-left: 3px;"><i class="fa fa-file-excel-o"></i> Excel</button>
                         </div>
                     </div>
                 </div>
