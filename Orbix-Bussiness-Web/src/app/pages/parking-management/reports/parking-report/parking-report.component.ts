@@ -40,6 +40,7 @@ export class ParkingReportComponent {
   to : Date | string | null = null
 
   nickname = ''
+  payStatus = ''
 
   constructor(
     private http :HttpClient,
@@ -81,7 +82,7 @@ export class ParkingReportComponent {
     this.parkingReports = []
     
 
-    await this.http.post<IParkingReport[]>(API_URL+'/parking_reports/get_parking_report?nickname=' + this.nickname, args, options)
+    await this.http.post<IParkingReport[]>(API_URL+'/parking_reports/get_parking_report?nickname=' + this.nickname + '&payment_status=' + this.payStatus, args, options)
         .toPromise()
         .then(
           data => {
@@ -308,6 +309,9 @@ export interface IParkingReport{
   status : string,
   keyStatus : string,
   createdBy : string
+
+  payStatus : string
+  paidAmount : number
 }
 
 

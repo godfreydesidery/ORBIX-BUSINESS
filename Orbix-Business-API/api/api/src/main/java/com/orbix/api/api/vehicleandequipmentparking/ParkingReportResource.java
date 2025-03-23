@@ -140,6 +140,7 @@ public class ParkingReportResource {
 	public ResponseEntity<List<ParkingResponseDTO>>getParkingReportByDateAndReceptionist(
 			@RequestBody DateRange dateRange,
 			@RequestParam(name = "nickname") String cashierName,
+			@RequestParam(name = "payment_status") String paymentStatus,
 			HttpServletRequest request){
 		
 		User user = null;
@@ -202,7 +203,48 @@ public class ParkingReportResource {
 			parkingResponse.setStatus(parking.getStatus());
 			parkingResponse.setCreatedBy(parking.getCreatedByUser().getNickname());
 			
-			parkingResponses.add(parkingResponse);
+			
+			// Get pay status
+			List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
+			
+			boolean inStartLimit = false;
+			boolean inEndLimit = false;
+			String payStatus = "Unpaid";
+			parkingResponse.setPayStatus("Unpaid");
+			double paidAmount = 0;
+			for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
+				if(parkingBillReceivable.getBillReceivable().getPayStatus().toString().equals("PAID")) {
+					paidAmount = paidAmount + parkingBillReceivable.getBillReceivable().getPaid();
+					if((parkingBillReceivable.getStartedAt().isEqual(dateRange.getFrom().atStartOfDay()) || parkingBillReceivable.getStartedAt().isAfter(dateRange.getFrom().atStartOfDay())) && parkingBillReceivable.getStartedAt().isBefore(dateRange.getTo().atStartOfDay().plusDays(1))) {
+						inStartLimit = true;
+						payStatus = "Partial";
+					}
+					if((parkingBillReceivable.getEndedAt().isEqual(dateRange.getTo().atStartOfDay()) || parkingBillReceivable.getEndedAt().isBefore(dateRange.getTo().atStartOfDay())) && parkingBillReceivable.getEndedAt().isAfter(dateRange.getFrom().atStartOfDay())) {
+						if(parking.getStatus().equals("CHECKED-OUT")) {
+							inEndLimit = true;
+						}else {
+							if (parkingBillReceivable.getEndedAt().isAfter(dateRange.getTo().atStartOfDay())) {
+								inEndLimit = true;
+							}
+						}
+						
+					}
+				}
+			}			
+			if(inStartLimit && inEndLimit) {
+				payStatus = "Paid";
+			}
+			parkingResponse.setPayStatus(payStatus);
+			parkingResponse.setPaidAmount(String.valueOf(paidAmount));
+			
+			if(paymentStatus.equals("")) {
+				parkingResponses.add(parkingResponse);
+			}else {
+				if(paymentStatus.equals(payStatus)){
+					parkingResponses.add(parkingResponse);
+				}
+			}
+			
 			sn++;
 			
 		}

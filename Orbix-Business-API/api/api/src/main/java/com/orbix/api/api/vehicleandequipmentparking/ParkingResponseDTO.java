@@ -89,5 +89,8 @@ public class ParkingResponseDTO {
     String billingAmount;
     String billingStartAt;
     
+    String payStatus;
+    String paidAmount;
+    
     List<ServiceBillItem> serviceBillItems;
 }

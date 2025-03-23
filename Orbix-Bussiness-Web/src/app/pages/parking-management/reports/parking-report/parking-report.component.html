@@ -30,9 +30,20 @@
                     </div>
                     <div class="col-lg-3">
                         <div class="form-group">
-                            <br><br>
+                            <label class="form-control">Pay Status</label>
+                            <select class="form-control" [(ngModel)]="payStatus">
+                                <option></option>
+                                <option>Paid</option>
+                                <option>Partial</option> 
+                                <option>Unpaid</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
                             <button class="btn btn-outline-success" (click)="getRegistationByDate(from, to)">Run Report</button>
                             <button class="btn btn-outline-primary btn-round-custom" (click)="printParkingReport()" style="padding-left: 3px;">Print Report</button>
+                            <button class="btn btn-outline-primary btn-round-custom" (click)="printParkingReport()" style="padding-left: 3px;">Spreadsheet</button>
                         </div>
                     </div>
                 </div>
@@ -52,6 +63,8 @@
                                     <td><b>Sub T1 Form</b></td>
                                     <td><b>Device Status</b></td>
                                     <td><b>Price</b></td>
+                                    <td><b>Pay Status</b></td>
+                                    <td><b>Paid Amount</b></td>
                                     <td><b>Start Date</b></td>
                                     <td><b>End Date</b></td>
                                     <td><b>Remarks</b></td>
@@ -75,7 +88,9 @@
                                         <td>{{r.chasisNo}}</td>
                                         <td>{{r.tformNumber}}</td>
                                         <td>{{r.deviceStatus}}</td>
-                                        <td>{{r.billingAmount}}</td>
+                                        <td style="text-align: right;">{{r.billingAmount | currency:'':''}}</td>
+                                        <td>{{r.payStatus}}</td>
+                                        <td style="text-align: right;">{{r.paidAmount | currency:'':''}}</td>
                                         <td>{{r.checkedInAt}}</td>
                                         <td>{{r.checkedOutAt}}</td>
                                         <td>{{r.status}}</td>
