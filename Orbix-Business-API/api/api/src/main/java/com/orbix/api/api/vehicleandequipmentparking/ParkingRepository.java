@@ -31,6 +31,12 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
 
 	List<Parking> findAllByCreatedDateTimeBetweenAndStatusIn(LocalDateTime atStartOfDay, LocalDateTime plusDays,
 			List<String> statuses);
+	
+	List<Parking> findAllByCheckedInByUserAndCheckedInDateTimeBetweenAndStatusIn(User user, LocalDateTime atStartOfDay,
+			LocalDateTime plusDays, List<String> statuses);
+	
+	List<Parking> findAllByCheckedInDateTimeBetweenAndStatusIn(LocalDateTime atStartOfDay, LocalDateTime plusDays,
+			List<String> statuses);
 
 	List<Parking> findAllByStatusInAndCheckedOutDateTimeBetween(List<String> statuses, LocalDateTime startOfYesterday,
 			LocalDateTime endOfYesterday);

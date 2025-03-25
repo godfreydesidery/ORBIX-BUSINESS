@@ -2,6 +2,7 @@ package com.orbix.api.api.vehicleandequipmentparking;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -63,13 +64,13 @@ public class ParkingReportResource {
 		List<String> regStatuses = new ArrayList<>();
 		regStatuses.add("CHECKED-IN");
 		regStatuses.add("CHECKED-OUT");
-		parkingTotalsResponse.setRegistered(String.valueOf(parkingRepository.countByDateRangeAndRegistered(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atStartOfDay().plusDays(1), regStatuses)));
+		parkingTotalsResponse.setRegistered(String.valueOf(parkingRepository.countByDateRangeAndRegistered(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atTime(LocalTime.MAX), regStatuses)));
 		
-		parkingTotalsResponse.setPaid(String.valueOf(parkingBillReceivableRepository.countByPayStatusAndDateRange(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atStartOfDay().plusDays(1))));
+		parkingTotalsResponse.setPaid(String.valueOf(parkingBillReceivableRepository.countByPayStatusAndDateRange(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atTime(LocalTime.MAX))));
 		
 		List<String> checkOutStatuses = new ArrayList<>();
 		checkOutStatuses.add("CHECKED-OUT");
-		parkingTotalsResponse.setCheckedOut(String.valueOf(parkingRepository.countByDateRangeAndCheckedOut(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atStartOfDay().plusDays(1), checkOutStatuses)));
+		parkingTotalsResponse.setCheckedOut(String.valueOf(parkingRepository.countByDateRangeAndCheckedOut(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atTime(LocalTime.MAX), checkOutStatuses)));
 		
 		parkingTotalsResponse.setCurrentUnpaid(String.valueOf(parkingRepository.countRegistered()));
 		parkingTotalsResponse.setCurrentTotalInYards(String.valueOf(parkingRepository.countRegistered()));
@@ -107,14 +108,14 @@ public class ParkingReportResource {
 			parkings = parkingRepository.findAllByCreatedByUserAndCreatedDateTimeBetweenAndStatusIn(
 			        user, 
 			        dateRange.getFrom().atStartOfDay(),
-			        dateRange.getTo().atStartOfDay().plusDays(1),
+			        dateRange.getTo().atTime(LocalTime.MAX),
 			        statuses
 			    );		
 					
 		}else {
 			parkings = parkingRepository.findAllByCreatedDateTimeBetweenAndStatusIn(
 			        dateRange.getFrom().atStartOfDay(),
-			        dateRange.getTo().atStartOfDay().plusDays(1),
+			        dateRange.getTo().atTime(LocalTime.MAX),
 			        statuses
 			    );	
 		}
@@ -159,17 +160,17 @@ public class ParkingReportResource {
 		statuses.add("CHECKED-OUT");
 		if(user != null) {
 			
-			parkings = parkingRepository.findAllByCreatedByUserAndCreatedDateTimeBetweenAndStatusIn(
+			parkings = parkingRepository.findAllByCheckedInByUserAndCheckedInDateTimeBetweenAndStatusIn(
 			        user, 
 			        dateRange.getFrom().atStartOfDay(),
-			        dateRange.getTo().atStartOfDay().plusDays(1),
+			        dateRange.getTo().atTime(LocalTime.MAX),
 			        statuses
 			    );		
 					
 		}else {
-			parkings = parkingRepository.findAllByCreatedDateTimeBetweenAndStatusIn(
+			parkings = parkingRepository.findAllByCheckedInDateTimeBetweenAndStatusIn(
 			        dateRange.getFrom().atStartOfDay(),
-			        dateRange.getTo().atStartOfDay().plusDays(1),
+			        dateRange.getTo().atTime(LocalTime.MAX),
 			        statuses
 			    );	
 		}
@@ -215,19 +216,16 @@ public class ParkingReportResource {
 			for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
 				if(parkingBillReceivable.getBillReceivable().getPayStatus().toString().equals("PAID")) {
 					paidAmount = paidAmount + parkingBillReceivable.getBillReceivable().getPaid();
-					if((parkingBillReceivable.getStartedAt().isEqual(dateRange.getFrom().atStartOfDay()) || parkingBillReceivable.getStartedAt().isAfter(dateRange.getFrom().atStartOfDay())) && parkingBillReceivable.getStartedAt().isBefore(dateRange.getTo().atStartOfDay().plusDays(1))) {
+					if((dateRange.getFrom().atStartOfDay().isBefore(parkingBillReceivable.getEndedAt())) && dateRange.getTo().atTime(LocalTime.MAX).isAfter(parkingBillReceivable.getStartedAt())) {	
 						inStartLimit = true;
 						payStatus = "Partial";
 					}
-					if((parkingBillReceivable.getEndedAt().isEqual(dateRange.getTo().atStartOfDay()) || parkingBillReceivable.getEndedAt().isBefore(dateRange.getTo().atStartOfDay())) && parkingBillReceivable.getEndedAt().isAfter(dateRange.getFrom().atStartOfDay())) {
-						if(parking.getStatus().equals("CHECKED-OUT")) {
+					if(parking.getStatus().equals("CHECKED-OUT")) {
+						inEndLimit = true;
+					}else {
+						if(dateRange.getTo().atTime(LocalTime.MAX).isAfter(parkingBillReceivable.getStartedAt()) && dateRange.getTo().atTime(LocalTime.MAX).isBefore(parkingBillReceivable.getEndedAt())) {
 							inEndLimit = true;
-						}else {
-							if (parkingBillReceivable.getEndedAt().isAfter(dateRange.getTo().atStartOfDay())) {
-								inEndLimit = true;
-							}
 						}
-						
 					}
 				}
 			}			
