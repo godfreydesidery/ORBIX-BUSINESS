@@ -555,6 +555,17 @@ public class ParkingServiceController implements ParkingService {
 		
 		parking.setComments(parkingRequest.getComments());
 		
+		if(parkingRequest.startBillingAt == null) {
+			parking.setStartBillingAt(dayService.getTimeStamp().toLocalDate().atStartOfDay()); // You can change this depending on user billing preferences
+		}else {
+			
+			//String dateString = "2024-10-26 15:30:45" ;
+			String dateString = parkingRequest.getStartBillingAt() + " 00:00:00";
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+			parking.setStartBillingAt(dateTime);
+		}	
+		
 		
 		
 		parking.setParkingZone(parkingZone_.get());
@@ -706,7 +717,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setCheckedInDateTime(dayService.getTimeStamp());
 		
 		if(parkingRequest.startBillingAt == null) {
-			parking.setStartBillingAt(dayService.getTimeStamp()); // You can change this depending on user billing preferences
+			parking.setStartBillingAt(dayService.getTimeStamp().toLocalDate().atStartOfDay()); // You can change this depending on user billing preferences
 		}else {
 			
 			//String dateString = "2024-10-26 15:30:45" ;

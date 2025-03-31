@@ -343,6 +343,10 @@ export class VehicleRegisterComponent {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
 
+    var startBillingAt = this.startBillingAt ? new Date(this.startBillingAt).toISOString().split('T')[0] : '';
+  
+  
+
     var parking = {
       id: this.parkingId,
       no: this.parkingNo,
@@ -402,6 +406,8 @@ export class VehicleRegisterComponent {
       cardNo : this.cardNo,
 
       billintType : this.billingType,
+
+      startBillingAt : startBillingAt,
 
       parkingZoneName : this.parkingZoneName
     }

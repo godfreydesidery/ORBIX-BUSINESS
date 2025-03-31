@@ -844,6 +844,34 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
             </div>
             <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Keys</label>
+                            <select class="form-control" [(ngModel)]="hasKeys">
+                                <option>YES</option>
+                                <option>NO</option>
+                            </select>
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Card No</label><br>
+                            <input class="form-control" type="tel" [(ngModel)]="cardNo" autocomplete="nope">
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Select Billing Start Date</label>
+                            <!-- <input type="date" class="form-control" [(ngModel)]="startBillingAt"> -->
+                            <input type="date" class="form-control" 
+                                [ngModel]="startBillingAt | date:'yyyy-MM-dd'"
+                                (ngModelChange)="startBillingAt = $event">
+                        </div>
+                    </div>
+                </div>
+
                 <h6>Driver/Owner Information</h6><hr>
                 <div class="row">
                     <!-- <input type="hidden" [(ngModel)]="parkingId"> -->
