@@ -3,8 +3,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
+import { JwtHelperService } from '@auth0/angular-jwt';
+import { NgSelectModule } from '@ng-select/ng-select';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { AuthService } from 'src/app/auth.service';
+import { IMaintenance } from 'src/app/domain/maintenance';
 import { IParking } from 'src/app/domain/parking';
 import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleEquipment } from 'src/app/domain/vehicle-equipment';
@@ -19,17 +22,75 @@ const API_URL = environment.apiUrl;
   standalone: true,
   imports: [
     CommonModule,
-    FormsModule
+    FormsModule,
+    NgSelectModule
   ],
   templateUrl: './vehicle-and-equipment-register.component.html',
   styleUrl: './vehicle-and-equipment-register.component.scss'
 })
 export class VehicleEquipmentRegisterComponent {
 
-  mode : string = ''
-  
-  id : any = null
-  no : string = ''
+
+
+  ///////////////////////////////
+
+  cities = [
+    { id: 1, name: 'New York' },
+    { id: 2, name: 'Los Angeles' },
+    { id: 3, name: 'Chicago' },
+    { id: 1, name: 'New York' },
+    { id: 2, name: 'Los Angeles' },
+    { id: 3, name: 'Chicago' },
+    { id: 1, name: 'New York' },
+    { id: 2, name: 'Los Angeles' },
+    { id: 3, name: 'Chicago' },
+    { id: 1, name: 'New York' },
+    { id: 2, name: 'Los Angeles' },
+    { id: 3, name: 'Chicago' },
+    { id: 1, name: 'New York' },
+    { id: 2, name: 'Los Angeles' },
+    { id: 3, name: 'Chicago' },
+    { id: 1, name: 'New York' },
+    { id: 2, name: 'Los Angeles' },
+    { id: 3, name: 'Chicago' },
+    { id: 1, name: 'New York' },
+    { id: 2, name: 'Los Angeles' },
+    { id: 3, name: 'Chicago' },
+  ];
+  selectedCity: number | null = null;
+
+  onChange(event: any) {
+    //console.log('Selected City ID:', event);
+
+    alert()
+  }
+
+  // Scroll the selected item into view
+  scrollToSelectedItem() {
+    const selectedOption = document.querySelector('.ng-option.selected');
+    if (selectedOption) {
+      selectedOption.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+  }
+
+
+
+  /////////////////////////////////
+
+
+
+
+
+
+
+  mode: string = ''
+
+  isServicesAllowed : boolean = true
+  currentService : any = null
+  currentServiceSelected : boolean = false
+
+  id: any = null
+  no: string = ''
 
   ownerFirstName: string = ''
   ownerMiddleName: string = ''
@@ -43,39 +104,27 @@ export class VehicleEquipmentRegisterComponent {
   registrationNo: string = ''
   chasisNo: string = ''
   cardNo: string = ''
-  image : any = null
+  image: any = null
 
-  comments : string = ''
+  comments: string = ''
 
 
-  vehicleEquipmentTypeName : string = ''
-  vehicleEquipmentName : string = ''
-  vehicleEquipmentColor : string = ''
-  active : string = 'Inactive'
+  vehicleEquipmentTypeName: string = ''
+  vehicleEquipmentName: string = ''
+  vehicleEquipmentColor: string = ''
+  active: string = 'Inactive'
 
-  companyId : string = ''
-  companyName : string = ''
-  branchId : string = ''
-  branchName : string = ''
+  companyId: string = ''
+  companyName: string = ''
+  branchId: string = ''
+  branchName: string = ''
 
   /**Colections */
-  vehicleEquipments : IVehicleEquipment[] = []
-  vehicleEquipmentTypes : IVehicleEquipmentType[] = []
+  vehicleEquipments: IVehicleEquipment[] = []
+  vehicleEquipmentTypes: IVehicleEquipmentType[] = []
 
-
-
-
-
-
-
-
-
-
-
-
-  
-  parkingId : any = null
-  parkingNo : string = ''
+  parkingId: any = null
+  parkingNo: string = ''
 
   // Owner information
   // ownerFirstName: string = ''
@@ -119,10 +168,10 @@ export class VehicleEquipmentRegisterComponent {
 
   // cardNo : string = ''
 
-  vehicleEquipmentCategory : string = 'IN-TRANSIT'
+  vehicleEquipmentCategory: string = 'IN-TRANSIT'
 
-  billingType : string = 'DAILY'
-  billingAmount : number = 0
+  billingType: string = 'DAILY'
+  billingAmount: number = 0
   //image: Byte[]
 
   status: string = "PENDING"
@@ -134,18 +183,18 @@ export class VehicleEquipmentRegisterComponent {
   // branchId: any = ''
   // companyId: any = ''
 
-  parkingZoneName : string = ''
+  parkingZoneName: string = ''
 
-  hasKeys : string = 'YES'
+  hasKeys: string = 'YES'
 
-  
+
 
   /**Collections */
-  parkings : IParking[] = []
+  parkings: IParking[] = []
 
   // vehicleEquipmentTypes  : IVehicleEquipmentType[] = []
 
-  parkingZones : IParkingZone[] = []
+  parkingZones: IParkingZone[] = []
 
 
 
@@ -159,232 +208,282 @@ export class VehicleEquipmentRegisterComponent {
 
 
   constructor(
-    private http :HttpClient,
-    private auth : AuthService,
-    private router : Router,
-    private msg : MsgBoxService
-  ) {}
+    private http: HttpClient,
+    private auth: AuthService,
+    private router: Router,
+    private msg: MsgBoxService
+  ) { }
 
   ngOnInit(): void {
     this.getAllActiveVehicleEquipments()
     this.getAllCompanyActiveVehicleEquipmentTypes()
     this.getAllBranchActiveParkingZones()
-    this.getAllVehicleEquipmentChasisNos()
+    //this.getAllVehicleEquipmentChasisNos()
+
+    this.checkGivenPrivileges(['PKNG-ACCESS', 'MTNC-ACCESS'])
   }
 
 
 
   async getAllActiveVehicleEquipments() {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
     this.vehicleEquipments = []
 
-    await this.http.get<IVehicleEquipment[]>(API_URL+'/vehicle_equipments/get_all_active', options)
-    .toPromise()
-    .then(
-      data => {
-        var sn = 1
-        data?.forEach(element => {
-          element.sn = sn
-          this.vehicleEquipments.push(element)
-          sn = sn + 1
-        })
-        console.log(data)
-      }
-    )
-  }
-
-  async get(id : any){
-
-    let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
-    }
-    await this.http.get<IVehicleEquipment>(API_URL+'/vehicle_equipments/get?id=' + id, options)
-    .toPromise()
-    .then(
-      data => {
-        this.showVehicleEquipmentData(data!)
-        console.log(data)
-      }
-    )
-  }
-
-
-  showParking : boolean = false
-
-  async searchVehicleEquipmentByChasisNo(chasisNo : string){
-    let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
-    }
-    await this.http.get<IVehicleEquipment>(API_URL+'/vehicle_equipments/get_by_chasis_no?chasis_no=' + chasisNo, options)
-    .toPromise()
-    .then(
-      data => {
-        this.showVehicleEquipmentData(data!)
-        console.log(data)
-        if(data!.parkingId != null){
-          this.showParking = true
-          this.getParking(data!.parkingId)
-        }else{
-          this.showParking = false
+    await this.http.get<IVehicleEquipment[]>(API_URL + '/vehicle_equipments/get_all_active', options)
+      .toPromise()
+      .then(
+        data => {
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.vehicleEquipments.push(element)
+            sn = sn + 1
+          })
+          console.log(data)
         }
-      }
-    )
+      )
+  }
+
+  async get(id: any) {
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.get<IVehicleEquipment>(API_URL + '/vehicle_equipments/get?id=' + id, options)
+      .toPromise()
+      .then(
+        data => {
+          this.showVehicleEquipmentData(data!)
+          console.log(data)
+        }
+      )
   }
 
 
-  chasisNos : String[] = []
-  async getAllVehicleEquipmentChasisNos(){
+  showParking: boolean = false
+
+  async searchVehicleEquipmentByChasisNo(chasisNo: string) {
+
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.get<IVehicleEquipment>(API_URL + '/vehicle_equipments/get_by_chasis_no?chasis_no=' + chasisNo, options)
+      .toPromise()
+      .then(
+        data => {
+          this.showVehicleEquipmentData(data!)
+          console.log(data)
+          if (data!.parkingId != null) {
+            this.showParking = true
+            this.getParking(data!.parkingId)
+          } else {
+            this.showParking = false
+          }
+        }
+      )
+  }
+
+  async searchVehicleEquipmentById(id: any) {
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.get<IVehicleEquipment>(API_URL + '/vehicle_equipments/get_by_id?id=' + id, options)
+      .toPromise()
+      .then(
+        data => {
+          this.showVehicleEquipmentData(data!)
+          console.log(data)
+          if (data!.parkingId != null) {
+            this.showParking = true
+            this.getParking(data!.parkingId)
+          } else {
+            this.showParking = false
+          }
+        }
+      )
+  }
+
+
+  chasisNos: String[] = []
+  async getAllVehicleEquipmentChasisNos() {
+
+    if (this.chasisNos.length > 0) {
+      return
+    }
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
     this.chasisNos = []
-    await this.http.get<string[]>(API_URL+'/vehicle_equipments/get_chasis_nos', options)
-    .toPromise()
-    .then(
-      data => {
-        this.chasisNos = data!
-        console.log(data)        
-      }
-    )
+    await this.http.get<string[]>(API_URL + '/vehicle_equipments/get_chasis_nos', options)
+      .toPromise()
+      .then(
+        data => {
+          this.chasisNos = data!
+          console.log(data)
+        }
+      )
   }
 
 
-  sendToParking(id : any){
-    if(this.parkingId === null){
+  sendToParking(id: any) {
+    if (this.parkingId === null) {
       // send to parking
       this.saveParking()
-    }else{
+    } else {
       // already sent to parking
     }
   }
 
+  saveForParking() {
+    this.save('PARKING')
+  }
+  saveForMaintenance() {
+    this.save('MAINTENANCE')
+  }
 
-  public async save() {
-    
+
+  public async save(service: string) {
+
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+
+    if (!(service === 'PARKING' || service === 'MAINTENANCE')) {
+      this.msg.showErrorMessage3('Service not specified')
+      return
     }
 
     var vehicleEquipment = {
-      id : this.id,
-      no : this.no,
-      ownerFirstName : this.ownerFirstName,
-      ownerMiddleName : this.ownerMiddleName,
-      ownerLastName : this.ownerLastName,
-      ownerCompanyName : this.ownerCompanyName,
-      ownerIdNo : this.ownerIdNo,
-      ownerIdType : this.ownerIdType,
-      ownerPhoneNo : this.ownerPhoneNo,
-      ownerEmail : this.ownerEmail,
-      ownerAddress : this.ownerAddress,
-      registrationNo : this.registrationNo,
-      chasisNo : this.chasisNo,
-      cardNo : this.cardNo,
-      vehicleEquipmentTypeName : this.vehicleEquipmentTypeName,
-      vehicleEquipmentColor : this.vehicleEquipmentColor,
-      vehicleEquipmentName : this.vehicleEquipmentName,
-      active : this.active,
-      companyId : this.companyId,
-      companyName : this.companyName,
-      branchId : this.branchId,
-      comments : this.comments,
-      hasKeys : this.hasKeys === 'YES' ? 1 : 0,
-      tformNumber : this.tformNumber,
+      id: this.id,
+      no: this.no,
+      ownerFirstName: this.ownerFirstName,
+      ownerMiddleName: this.ownerMiddleName,
+      ownerLastName: this.ownerLastName,
+      ownerCompanyName: this.ownerCompanyName,
+      ownerIdNo: this.ownerIdNo,
+      ownerIdType: this.ownerIdType,
+      ownerPhoneNo: this.ownerPhoneNo,
+      ownerEmail: this.ownerEmail,
+      ownerAddress: this.ownerAddress,
+      registrationNo: this.registrationNo,
+      chasisNo: this.chasisNo,
+      cardNo: this.cardNo,
+      vehicleEquipmentTypeName: this.vehicleEquipmentTypeName,
+      vehicleEquipmentColor: this.vehicleEquipmentColor,
+      vehicleEquipmentName: this.vehicleEquipmentName,
+      active: this.active,
+      companyId: this.companyId,
+      companyName: this.companyName,
+      branchId: this.branchId,
+      comments: this.comments,
+      hasKeys: this.hasKeys === 'YES' ? 1 : 0,
+      tformNumber: this.tformNumber,
 
-      agentName : this.agentName,
-      agentPhoneNo : this.agentPhoneNo,
-      agentEmail : this.agentEmail,
-      agentAddress : this.agentAddress,
-      deviceStatus : this.deviceStatus === 'YES' ? 1 : 0
+      agentName: this.agentName,
+      agentPhoneNo: this.agentPhoneNo,
+      agentEmail: this.agentEmail,
+      agentAddress: this.agentAddress,
+      deviceStatus: this.deviceStatus === 'YES' ? 1 : 0,
 
-
-      
-  }
-
-
-  if(this.ownerIdType != 'NONE' && this.ownerIdType === ''){
-    this.msg.showErrorMessage3('ID No is required')
-  }
-  if(this.ownerPhoneNo === ''){
-    this.msg.showErrorMessage3('Phone No is required')
-  }
-
-  if(this.id == null){
-
-    await this.http.post<IVehicleEquipment>(API_URL+'/vehicle_equipments/create', vehicleEquipment, options)
-    .toPromise()
-    .then(
-      data => {
-        console.log(data)
-        this.showVehicleEquipmentData(data!)
-        // this.getAllActiveVehicleEquipments()
-
-        this.msg.showSuccessMessage('Saved Successfully')
-
-        this.getParking(data!.parkingId)
-        this.mode = ''
-
-
-      }
-    )
-    .catch(
-      error => {
-        console.log(error)
-        this.msg.showErrorMessage(error, 'Error')
-      }
-    )
-
-  }else{
-
-    await this.http.post<IVehicleEquipment>(API_URL+'/vehicle_equipments/update', vehicleEquipment, options)
-    .toPromise()
-    .then(
-      data => {
-        console.log(data)
-        this.showVehicleEquipmentData(data!)
-        this.msg.showSuccessMessage('Updated Successfully')
-
-        this.getParking(data!.parkingId)
-
-        this.mode = ''
-      }
-    )
-    .catch(
-      error => {
-        console.log(error)
-        this.msg.showErrorMessage(error, 'Error')
-      }
-    )
-  }
-}
-
-async getAllCompanyActiveVehicleEquipmentTypes(){
-  let options = {
-    headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
-  }
-  this.vehicleEquipmentTypes = []
-
-  await this.http.get<IVehicleEquipmentType[]>(API_URL+'/vehicle_equipment_types/get_all_company_active', options)
-  .toPromise()
-  .then(
-    data => {
-      var sn = 1
-      data?.forEach(element => {
-        element.sn = sn
-        this.vehicleEquipmentTypes.push(element)
-        sn = sn + 1
-      })
-      console.log(data)
+      service: service,
     }
-  )
-}
+
+
+    if (this.ownerIdType != 'NONE' && this.ownerIdType === '') {
+      this.msg.showErrorMessage3('ID No is required')
+    }
+    if (this.ownerPhoneNo === '') {
+      this.msg.showErrorMessage3('Phone No is required')
+    }
+
+    if (this.id == null) {
+
+      await this.http.post<IVehicleEquipment>(API_URL + '/vehicle_equipments/create', vehicleEquipment, options)
+        .toPromise()
+        .then(
+          data => {
+            console.log(data)
+            this.showVehicleEquipmentData(data!)
+            // this.getAllActiveVehicleEquipments()
+
+            this.msg.showSuccessMessage('Saved Successfully')
+
+            if (data!.parkingId != null) {
+              this.getParking(data!.parkingId)
+            } else if (data!.maintenanceId != null) {
+              this.getMaintenance(data!.maintenanceId)
+            }
+
+            this.getParking(data!.parkingId)
+            this.mode = ''
+
+
+          }
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+          }
+        )
+
+    } else {
+
+      await this.http.post<IVehicleEquipment>(API_URL + '/vehicle_equipments/update', vehicleEquipment, options)
+        .toPromise()
+        .then(
+          data => {
+            console.log(data)
+            this.showVehicleEquipmentData(data!)
+            this.msg.showSuccessMessage('Updated Successfully')
+
+            if (data!.parkingId != null) {
+              this.getParking(data!.parkingId)
+            } else if (data!.maintenanceId != null) {
+              this.getMaintenance(data!.maintenanceId)
+            }
+
+            this.mode = ''
+          }
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+          }
+        )
+    }
+  }
+
+  async getAllCompanyActiveVehicleEquipmentTypes() {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    this.vehicleEquipmentTypes = []
+
+    await this.http.get<IVehicleEquipmentType[]>(API_URL + '/vehicle_equipment_types/get_all_company_active', options)
+      .toPromise()
+      .then(
+        data => {
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.vehicleEquipmentTypes.push(element)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
+  }
 
 
 
 
-  showVehicleEquipmentData(data : IVehicleEquipment){
+  showVehicleEquipmentData(data: IVehicleEquipment) {
     this.id = data.id
     this.no = data.no
     this.ownerFirstName = data.ownerFirstName
@@ -420,20 +519,20 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
     this.parkingId = data!.parkingId
 
-    
+
 
     console.log(data)
   }
 
 
-  clear(){
+  clear() {
     this.id = null
     this.no = ''
 
     this.ownerFirstName = ''
     this.ownerMiddleName = ''
     this.ownerLastName = ''
-    this.ownerCompanyName = '' 
+    this.ownerCompanyName = ''
     this.ownerIdNo = ''
     this.ownerIdType = ''
     this.ownerPhoneNo = ''
@@ -464,40 +563,55 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.deviceStatus = 'ATTACHED'
   }
 
-  setNewMode(){
+  setNewMode() {
     this.clearParkingData()
     this.clear()
     this.mode = 'new'
 
-    
+
   }
 
-  setExistingMode(){
+  setExistingMode() {
     this.clearParkingData()
     this.clear()
-    this.mode = 'existing'    
+    this.mode = 'existing'
   }
 
 
 
 
-  async getParking(id : any){
+  async getParking(id: any) {
 
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
-    await this.http.get<IParking>(API_URL+'/parkings/get?id=' + id, options)
-    .toPromise()
-    .then(
-      data => {
-        this.showParkingData(data!)
-        console.log(data)
-      }
-    )
+    await this.http.get<IParking>(API_URL + '/parkings/get?id=' + id, options)
+      .toPromise()
+      .then(
+        data => {
+          this.showParkingData(data!)
+          console.log(data)
+        }
+      )
+  }
+
+  async getMaintenance(id: any) {
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.get<IMaintenance>(API_URL + '/maintenances/get?id=' + id, options)
+      .toPromise()
+      .then(
+        data => {
+          this.showMaintenanceData(data!)
+          console.log(data)
+        }
+      )
   }
 
 
-  showParkingData(data : IParking){
+  showParkingData(data: IParking) {
     this.parkingId = data?.id;
     this.parkingNo = data!.no;
     this.ownerFirstName = data?.ownerFirstName;
@@ -542,15 +656,15 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
     this.tireIndicator = data?.tireIndicator == true ? 'YES' : 'NO'
     this.deviceStatus = data?.deviceStatus == true ? 'ATTACHED' : 'NOT-ATTACHED'
     this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName,
-    this.vehicleEquipmentColor = data!.vehicleEquipmentColor,
-    this.hasKeys = data!.hasKeys == true ? 'YES' : 'NO'
+      this.vehicleEquipmentColor = data!.vehicleEquipmentColor,
+      this.hasKeys = data!.hasKeys == true ? 'YES' : 'NO'
 
     this.vehicleEquipmentName = data!.vehicleEquipmentName,
 
-    this.vehicleEquipmentCategory = data!.vehicleEquipmentCategory
+      this.vehicleEquipmentCategory = data!.vehicleEquipmentCategory
 
     this.parkingZoneName = data!.parkingZoneName,
-    this.cardNo = data!.cardNo
+      this.cardNo = data!.cardNo
 
     this.comments = data!.comments
 
@@ -559,7 +673,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
   }
 
-  clearParkingData(){
+  clearParkingData() {
     this.showParking = false
     this.parkingId = null;
     this.parkingNo = ''
@@ -623,16 +737,112 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
 
 
 
+  showMaintenanceData(data: IMaintenance) {
+    this.parkingId = data?.id;
+    this.parkingNo = data!.no;
+    this.ownerFirstName = data?.ownerFirstName;
+    this.ownerMiddleName = data?.ownerMiddleName;
+    this.ownerLastName = data?.ownerLastName;
+    this.ownerCompanyName = data?.ownerCompanyName;
+    this.ownerIdNo = data?.ownerIdNo;
+    this.ownerIdType = data?.ownerIdType;
+    this.ownerPhoneNo = data?.ownerPhoneNo;
+    this.ownerEmail = data?.ownerEmail;
+    this.ownerAddress = data?.ownerAddress;
 
-  public async saveParking(){
+    // Vehicle or Equipment Information
+    this.registrationNo = data?.registrationNo;
+    this.chasisNo = data?.chasisNo;
+    this.leftFrontLamp = data?.leftFrontLamp == true ? 'YES' : 'NO'
+    this.rightFrontLamp = data?.rightFrontLamp == true ? 'YES' : 'NO'
+    this.leftRearLamp = data?.leftRearLamp == true ? 'YES' : 'NO'
+    this.rightRearLamp = data?.rightRearLamp == true ? 'YES' : 'NO'
+    this.leftSideMirror = data?.leftSideMirror == true ? 'YES' : 'NO'
+    this.rightSideMirror = data?.rightSideMirror == true ? 'YES' : 'NO'
+    this.leftWiper = data?.leftWiper == true ? 'YES' : 'NO'
+    this.rightWiper = data?.rightWiper == true ? 'YES' : 'NO'
+    this.backWiper = data?.backWiper == true ? 'YES' : 'NO'
+    this.fuelCap = data?.fuelCap == true ? 'YES' : 'NO'
+    this.spareTire = data?.spareTire == true ? 'YES' : 'NO'
+    this.battery = data?.battery == true ? 'YES' : 'NO'
+    this.starter = data?.starter == true ? 'YES' : 'NO'
+    this.aerial = data?.aerial == true ? 'YES' : 'NO'
+    this.wheelCap = data?.wheelCap == true ? 'YES' : 'NO'
+    this.roundMirror = data?.roundMirror == true ? 'YES' : 'NO'
+    this.tireIndicator = data?.tireIndicator == true ? 'YES' : 'NO'
+    this.deviceStatus = data?.deviceStatus == true ? 'ATTACHED' : 'NOT-ATTACHED'
+    this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName,
+      this.vehicleEquipmentColor = data!.vehicleEquipmentColor,
+      this.hasKeys = data!.hasKeys == true ? 'YES' : 'NO'
+
+    this.vehicleEquipmentName = data!.vehicleEquipmentName,
+
+      this.vehicleEquipmentCategory = data!.vehicleEquipmentCategory
+
+    this.cardNo = data!.cardNo
+
+    this.comments = data!.comments
+  }
+
+  clearMaintenanceData() {
+    this.showParking = false
+    this.parkingId = null;
+    this.parkingNo = ''
+    this.ownerFirstName = ''
+    this.ownerMiddleName = ''
+    this.ownerLastName = ''
+    this.ownerCompanyName = ''
+    this.ownerIdNo = ''
+    this.ownerIdType = ''
+    this.ownerPhoneNo = ''
+    this.ownerEmail = ''
+    this.ownerAddress = ''
+
+    // Vehicle or Equipment Information
+    this.registrationNo = ''
+    this.chasisNo = ''
+    this.leftFrontLamp = 'YES'
+    this.rightFrontLamp = 'YES'
+    this.leftRearLamp = 'YES'
+    this.rightRearLamp = 'YES'
+    this.leftSideMirror = 'YES'
+    this.rightSideMirror = 'YES'
+    this.leftWiper = 'YES'
+    this.rightWiper = 'YES'
+    this.backWiper = 'YES'
+    this.fuelCap = 'YES'
+    this.spareTire = 'YES'
+    this.battery = 'YES'
+    this.starter = 'YES'
+    this.aerial = 'YES'
+    this.wheelCap = 'YES'
+    this.roundMirror = 'YES'
+    this.tireIndicator = 'YES'
+    this.deviceStatus = 'ATTACHED'
+    this.vehicleEquipmentTypeName = ''
+    this.hasKeys = 'YES'
+
+    this.comments = ''
+
+    this.vehicleEquipmentName = ''
+    this.vehicleEquipmentColor = ''
+
+  }
+
+
+
+
+
+
+  public async saveParking() {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var parking = {
       id: this.parkingId,
       no: this.parkingNo,
-      vehicleEquipmentId : this.id,
+      vehicleEquipmentId: this.id,
       ownerFirstName: this.ownerFirstName,
       ownerMiddleName: this.ownerMiddleName,
       ownerLastName: this.ownerLastName,
@@ -643,7 +853,7 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
       ownerEmail: this.ownerEmail,
       ownerAddress: this.ownerAddress,
 
-      parkingZoneName : this.parkingZoneName,
+      parkingZoneName: this.parkingZoneName,
 
       // Agent Information
       agentName: this.agentName,
@@ -652,9 +862,9 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
       agentEmail: this.agentEmail,
       tformNumber: this.tformNumber,
 
-      billingType : this.billingType,
+      billingType: this.billingType,
 
-      billingAmount : this.billingAmount,
+      billingAmount: this.billingAmount,
 
       // Vehicle or Equipment Information
       registrationNo: this.registrationNo,
@@ -678,98 +888,308 @@ async getAllCompanyActiveVehicleEquipmentTypes(){
       roundMirror: this.roundMirror === 'YES' ? 1 : 0,
       tireIndicator: this.tireIndicator === 'YES' ? 1 : 0,
       deviceStatus: this.deviceStatus === 'ATTACHED' ? 1 : 0,
-      vehicleEquipmentTypeName : this.vehicleEquipmentTypeName,
-      hasKeys : this.hasKeys === 'YES' ? 1 : 0,
+      vehicleEquipmentTypeName: this.vehicleEquipmentTypeName,
+      hasKeys: this.hasKeys === 'YES' ? 1 : 0,
 
-      comments : this.comments,
+      comments: this.comments,
 
-      vehicleEquipmentCategory : this.vehicleEquipmentCategory,
+      vehicleEquipmentCategory: this.vehicleEquipmentCategory,
 
-      vehicleEquipmentName : this.vehicleEquipmentName,
+      vehicleEquipmentName: this.vehicleEquipmentName,
 
-      vehicleEquipmentColor : this.vehicleEquipmentColor,
+      vehicleEquipmentColor: this.vehicleEquipmentColor,
 
-      cardNo : this.cardNo,
+      cardNo: this.cardNo,
 
-      billintType : this.billingType
+      billintType: this.billingType
     }
 
     console.log(parking)
 
-    if(this.parkingId === null || this.parkingId === undefined || this.parkingId === ''){
+    if (this.parkingId === null || this.parkingId === undefined || this.parkingId === '') {
       /**Create new parking */
-      await this.http.post<IParking>(API_URL+'/parkings/create', parking, options)
-      .toPromise()
-      .then(
-        data => {
-          this.showParkingData(data!)
+      await this.http.post<IParking>(API_URL + '/parkings/create', parking, options)
+        .toPromise()
+        .then(
+          data => {
+            this.showParkingData(data!)
 
-          console.log(data)
+            console.log(data)
 
-          // this.getAllPendingOrCheckedInParkings()
+            // this.getAllPendingOrCheckedInParkings()
 
-          this.msg.showSuccessMessage('Parking created successifully')
+            this.msg.showSuccessMessage('Parking created successifully')
 
-        }
+          }
 
-      )
-      .catch(
-        error => {
-          console.log(error)
-          this.msg.showErrorMessage(error, 'Error')
-        }
-      )
-    }else{
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+          }
+        )
+    } else {
       /**Update an exiisting parking */
-      await this.http.post<IParking>(API_URL+'/parkings/update', parking, options)
-      .toPromise()
-      .then(
-        data => {
-          this.showParkingData(data!)
+      await this.http.post<IParking>(API_URL + '/parkings/update', parking, options)
+        .toPromise()
+        .then(
+          data => {
+            this.showParkingData(data!)
 
-          console.log(data)
+            console.log(data)
 
-          // this.getAllPendingOrCheckedInParkings()
+            // this.getAllPendingOrCheckedInParkings()
 
-          this.msg.showSuccessMessage('Parking updated successifully, Vehicle available for check in')
+            this.msg.showSuccessMessage('Parking updated successifully, Vehicle available for check in')
 
-          this.setNewMode()
-        }
+            this.setNewMode()
+          }
 
-      )
-      .catch(
-        error => {
-          console.log(error)
-          this.msg.showErrorMessage(error, 'Error')
-        }
-      )
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+          }
+        )
     }
+
+
+  }
+
+  // async saveMaintenance() {
+  //   let options = {
+  //     headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+  //   }
+
+  //   var maintenance = {
+  //     id: null,
+  //     no: null,
+  //     vehicleEquipmentId: this.id,
+  //     ownerFirstName: this.ownerFirstName,
+  //     ownerMiddleName: this.ownerMiddleName,
+  //     ownerLastName: this.ownerLastName,
+  //     ownerCompanyName: this.ownerCompanyName,
+  //     ownerIdNo: this.ownerIdNo,
+  //     ownerIdType: this.ownerIdType,
+  //     ownerPhoneNo: this.ownerPhoneNo,
+  //     ownerEmail: this.ownerEmail,
+  //     ownerAddress: this.ownerAddress,
+
+  //     parkingZoneName: this.parkingZoneName,
+
+  //     // Agent Information
+  //     agentName: this.agentName,
+  //     agentAddress: this.agentAddress,
+  //     agentPhoneNo: this.agentPhoneNo,
+  //     agentEmail: this.agentEmail,
+  //     tformNumber: this.tformNumber,
+
+  //     billingType: this.billingType,
+
+  //     billingAmount: this.billingAmount,
+
+  //     // Vehicle or Equipment Information
+  //     registrationNo: this.registrationNo,
+  //     chasisNo: this.chasisNo,
+
+  //     leftFrontLamp: this.leftFrontLamp === 'YES' ? 1 : 0,
+  //     rightFrontLamp: this.rightFrontLamp === 'YES' ? 1 : 0,
+  //     leftRearLamp: this.leftRearLamp === 'YES' ? 1 : 0,
+  //     rightRearLamp: this.rightRearLamp === 'YES' ? 1 : 0,
+  //     leftSideMirror: this.leftSideMirror === 'YES' ? 1 : 0,
+  //     rightSideMirror: this.rightSideMirror === 'YES' ? 1 : 0,
+  //     leftWiper: this.leftWiper === 'YES' ? 1 : 0,
+  //     rightWiper: this.rightWiper === 'YES' ? 1 : 0,
+  //     backWiper: this.backWiper === 'YES' ? 1 : 0,
+  //     fuelCap: this.fuelCap === 'YES' ? 1 : 0,
+  //     spareTire: this.spareTire === 'YES' ? 1 : 0,
+  //     battery: this.battery === 'YES' ? 1 : 0,
+  //     starter: this.starter === 'YES' ? 1 : 0,
+  //     aerial: this.aerial === 'YES' ? 1 : 0,
+  //     wheelCap: this.wheelCap === 'YES' ? 1 : 0,
+  //     roundMirror: this.roundMirror === 'YES' ? 1 : 0,
+  //     tireIndicator: this.tireIndicator === 'YES' ? 1 : 0,
+  //     deviceStatus: this.deviceStatus === 'ATTACHED' ? 1 : 0,
+  //     vehicleEquipmentTypeName: this.vehicleEquipmentTypeName,
+  //     hasKeys: this.hasKeys === 'YES' ? 1 : 0,
+
+  //     comments: this.comments,
+
+  //     vehicleEquipmentCategory: this.vehicleEquipmentCategory,
+
+  //     vehicleEquipmentName: this.vehicleEquipmentName,
+
+  //     vehicleEquipmentColor: this.vehicleEquipmentColor,
+
+  //     cardNo: this.cardNo,
+
+  //     billintType: this.billingType
+  //   }
+
+  //   //console.log(parking)
+
+  //   if (this.parkingId === null || this.parkingId === undefined || this.parkingId === '') {
+  //     /**Create new parking */
+  //     await this.http.post<IParking>(API_URL + '/maintenances/create', maintenance, options)
+  //       .toPromise()
+  //       .then(
+  //         data => {
+  //           this.showParkingData(data!)
+
+  //           console.log(data)
+
+  //           // this.getAllPendingOrCheckedInParkings()
+
+  //           this.msg.showSuccessMessage('Parking created successifully')
+
+  //         }
+
+  //       )
+  //       .catch(
+  //         error => {
+  //           console.log(error)
+  //           this.msg.showErrorMessage(error, 'Error')
+  //         }
+  //       )
+  //   } else {
+  //     /**Update an exiisting parking */
+  //     await this.http.post<IParking>(API_URL + '/parkings/update', parking, options)
+  //       .toPromise()
+  //       .then(
+  //         data => {
+  //           this.showParkingData(data!)
+
+  //           console.log(data)
+
+  //           // this.getAllPendingOrCheckedInParkings()
+
+  //           this.msg.showSuccessMessage('Parking updated successifully, Vehicle available for check in')
+
+  //           this.setNewMode()
+  //         }
+
+  //       )
+  //       .catch(
+  //         error => {
+  //           console.log(error)
+  //           this.msg.showErrorMessage(error, 'Error')
+  //         }
+  //       )
+  //   }
+  // }
+
+  sendToMaintenance(){
+    this.setNewMode()
   }
 
 
-  async getAllBranchActiveParkingZones(){
+  async getAllBranchActiveParkingZones() {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
     this.parkingZones = []
 
-    await this.http.get<IParkingZone[]>(API_URL+'/parking_zones/get_all_branch_active', options)
-    .toPromise()
-    .then(
-      data => {
-        var sn = 1
-        data?.forEach(element => {
-          element.sn = sn
-          this.parkingZones.push(element)
-          sn = sn + 1
-        })
-        console.log(data)
-      }
-    )
+    await this.http.get<IParkingZone[]>(API_URL + '/parking_zones/get_all_branch_active', options)
+      .toPromise()
+      .then(
+        data => {
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.parkingZones.push(element)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
   }
 
 
+  onOptionSelected(option: string) {
+    console.log('Selected:', option);
+  }
 
+  onInputChanged(value: string) {
+    console.log('Input changed:', value);
+  }
+
+
+  selectCurrentService(){
+    if(this.currentService === null || this.currentService === ''){
+      alert('Please select service')
+      return
+    }
+    this.currentServiceSelected = true
+  }
+
+  grant(privileges: string[]): boolean {
+    return this.auth.grant(privileges); // Adjust return value based on logic
+  }
+
+  checkGivenPrivileges(prevs : string[]){
+    var countOfAccess = 0
+    var pri = ''
+    for(let i = 0; i < prevs.length; i++){
+      if(this.auth.checkPrivilege(prevs[i])){
+        pri = prevs[i]
+        countOfAccess = countOfAccess + 1
+      }
+    }
+    if(countOfAccess > 1){
+      this.currentService = null
+      this.currentServiceSelected = false
+    }else if(countOfAccess === 0){
+      this.isServicesAllowed = false
+    }else if(countOfAccess === 1){
+      if(pri === 'PKNG-ACCESS'){
+        this.currentService = 'Parking'
+        this.currentServiceSelected = true
+      }else if(pri === 'MTNC-ACCESS'){
+        this.currentService = 'Maintenance'
+        this.currentServiceSelected = true
+      }
+      this.grant(prevs)
+    }
+    return
+  }
+
+  // currentService : any = null
+  // currentServiceSelected : boolean = false
+
+
+  searchTerm: string = '';
+    filteredVehicleEquipments: IVehicleEquipment[] = [];
+    selectedVehicleEquipment: IVehicleEquipment | null = null;
+    isDropdownOpen: boolean = false;
+    searchProducts(): void {
+      const options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      
+      }
+      this.filteredVehicleEquipments = [];
+      if (this.searchTerm.trim().length >= 4) {
+        this.http
+        //await this.http.get<IProduct[]>(API_URL+'/shop_products/get_products_by_shop_containing?product_name_like=' + searchKey + '&shop_id=' + this.shopId , options)
+          .get<IVehicleEquipment[]>(API_URL+'/vehicle_equipments/get_vehicle_equipments_chasis_no_containing?chasis_no_like=' + this.searchTerm, options)
+          .subscribe(
+            (data) => (this.filteredVehicleEquipments = data),
+            (error) => console.error('Error fetching products:', error)
+          );
+      } else {
+        this.filteredVehicleEquipments = [];
+      }
+    }
+
+    selectProduct(item: IVehicleEquipment): void {
+      this.selectedVehicleEquipment = item;
+      this.searchTerm = item.chasisNo;
+      this.isDropdownOpen = false;
+      
+      this.searchVehicleEquipmentById(item.id)
+      this.filteredVehicleEquipments = [];
+    }
 
 
 }

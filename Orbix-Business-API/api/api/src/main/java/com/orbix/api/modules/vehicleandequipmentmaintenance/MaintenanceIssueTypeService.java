@@ -1,0 +1,17 @@
+package com.orbix.api.modules.vehicleandequipmentmaintenance;
+
+import java.util.List;
+
+import javax.servlet.http.HttpServletRequest;
+
+import com.orbix.api.api.commons.ApiCustomResponse;
+
+public interface MaintenanceIssueTypeService {
+	List<MaintenanceIssueTypeResponseDTO> getAllMaintenanceIssueTypes(HttpServletRequest request);	
+	List<MaintenanceIssueTypeResponseDTO> getAllCompanyActiveMaintenanceIssueTypes(HttpServletRequest request);		
+	MaintenanceIssueTypeResponseDTO get(Long id, HttpServletRequest request);
+	MaintenanceIssueTypeResponseDTO createMaintenanceIssueType(MaintenanceIssueTypeRequestDTO maintenanceIssueTypeRequest, HttpServletRequest request);
+	MaintenanceIssueTypeResponseDTO updateMaintenanceIssueType(MaintenanceIssueTypeRequestDTO maintenanceIssueTypeRequest, HttpServletRequest request);
+	ApiCustomResponse activateMaintenanceIssueType(MaintenanceIssueTypeRequestDTO maintenanceIssueTypeRequest, HttpServletRequest request);
+	ApiCustomResponse deactivateMaintenanceIssueType(MaintenanceIssueTypeRequestDTO maintenanceIssueTypeRequest, HttpServletRequest request);
+}

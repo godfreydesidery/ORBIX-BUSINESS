@@ -485,8 +485,9 @@ export class VehicleEquipmentBillingComponent {
 
   confirmBillPayment() { }
 
-  refreshBillReceivables() {
-    this.getBillReceivables(this.parkingId)
+  async refreshBillReceivables() {
+    this.billReceivables = []
+    await this.getBillReceivables(this.parkingId)
   }
 
   refreshAmounts() {
@@ -1076,7 +1077,7 @@ export class VehicleEquipmentBillingComponent {
                 [{text : ' '}],
                 [{text : 'Issued At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
                 [{text : 'Checkout At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
-                [{text : 'Valid Until: ' + this.lastBillingDate, alignment : 'left', fontSize : 9, bold : true}],
+                [{text : 'Day Out: ' + this.lastBillingDate, alignment : 'left', fontSize : 9, bold : true}],
                 [{text : ' '}],
                 [{text : 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment : 'left', fontSize : 9, bold : true}],
                 [{text : ' '}],

@@ -284,15 +284,18 @@ export const menuItems = [
         subMenu: [
             {
                 title: 'Vehicle Register',
+                show : true,
                 routerLink: '/app/parking-management/vehicle-register'
             },
             {
                 title: 'Parking',
+                show : true,
                 routerLink: '/app/parking-management/parking'
             },
             {
                 title: 'Reports',
                 url: '#',
+                show : true,
                 subMenu: [
                     {
                         title: 'Vehicle Registration',
@@ -389,15 +392,28 @@ export const menuItems = [
             // },
             {
                 title: 'Parking Billing',
+                show : grant(['FINCPKNG-ACCESS']),
                 routerLink: '/app/accounts-and-finance/parking-billing'
             },
             {
                 title: 'Release Vehicles',
+                show : grant(['FINCPKNG-ACCESS']),
                 routerLink: '/app/accounts-and-finance/release-vehicle-equipment'
+            },
+            {
+                title: 'Storage Billing',
+                show : grant(['FINCSTRG-ACCESS']),
+                routerLink: '/app/accounts-and-finance/storage-billing'
+            },
+            {
+                title: 'Maintenance Billing',
+                show : grant(['FINCMTNC-ACCESS']),
+                routerLink: '/app/accounts-and-finance/maintenance-billing'
             },
             {
                 title: 'Reports',
                 url: '#',
+                show : true,
                 subMenu: [
                     {
                         title: 'Cashier Collections',
@@ -436,11 +452,13 @@ export const menuItems = [
             // },
             {
                 title: 'Select Shop',
+                show : true,
                 routerLink: '/app/mechandizing/select-shop'
             },
             {
                 title: 'Reports',
                 url: '#',
+                show : true,
                 subMenu: [
                     {
                         title: 'Sales Listing Report',
@@ -450,15 +468,113 @@ export const menuItems = [
                         title: 'Fast Moving Products',
                         routerLink: '/app/mechandizing/fast-moving-products-report'
                     },
-                    {
-                        title: 'Stock Card Report',
-                        routerLink: '/app/mechandizing/shop-product-stock-log'
-                    },
                 ]
             },
             
         ]
     },
+    {
+        title: 'Warehouse',
+        icon: 'fa-cogs',
+        selected: false,
+        expanded: false,
+        show : grant(['WRHOUSE-ACCESS']),
+        order: 700,
+        subMenu: [ 
+            // {
+            //     title: 'Sales',
+            //     url: '#',
+            //     subMenu: [
+            //         {
+            //             title: 'Sales List',
+            //             routerLink: '/app/blank'
+            //         },
+            //         {
+            //             title: 'Sales Order',
+            //             routerLink: '/app/blank'
+            //         },
+            //     ]
+            // },
+            // {
+            //     title: 'Inventory',
+            //     routerLink: '/app/blank'
+            // },
+            {
+                title: 'Select Warehouse',
+                show : true,
+                routerLink: '/app/storage-management/select-warehouse'
+            },
+            // {
+            //     title: 'Reports',
+            //     url: '#',
+            //     subMenu: [
+            //         {
+            //             title: 'Sales Listing Report',
+            //             routerLink: '/app/mechandizing/sales-listing-report'
+            //         },
+            //         {
+            //             title: 'Fast Moving Products',
+            //             routerLink: '/app/mechandizing/fast-moving-products-report'
+            //         },
+            //         {
+            //             title: 'Stock Card Report',
+            //             routerLink: '/app/mechandizing/shop-product-stock-log'
+            //         },
+            //     ]
+            // },
+            
+        ]
+    },
+    {
+        title: 'Maintenance Mngmt',
+        icon: 'fa-cogs',
+        selected: false,
+        expanded: false,
+        //show : grant(['WRHOUSE-ACCESS']),
+        show : true,
+        order: 700,
+        subMenu: [     
+            { 
+                title: 'Maintenance',
+                url: '#',
+                show : true,
+                routerLink: '/app/maintenance-management/maintenance'
+            },
+            { 
+                title: 'Verify',
+                url: '#',
+                show : true,
+                routerLink: '/app/maintenance-management/maintenance-verify'
+            }, 
+              
+        ]
+    },
+
+    {
+        title: 'Technician',
+        icon: 'fa-cogs',
+        selected: false,
+        expanded: false,
+        //show : grant(['WRHOUSE-ACCESS']),
+        show : true,
+        order: 700,
+        subMenu: [     
+            { 
+                title: 'My Jobs',
+                url: '#',
+                show : true,
+                routerLink: '/app/workshop/my-jobs'
+            }, 
+            { 
+                title: 'Verified Jobs',
+                url: '#',
+                show : true,
+                routerLink: '/app/workshop/my-closed-jobs'
+            }, 
+        ]
+    },
+
+    
     {
         title: 'Procurement',
         routerLink: ' ',
@@ -470,6 +586,7 @@ export const menuItems = [
         subMenu: [
             {
                 title: 'Suppliers',
+                show : true,
                 routerLink: '/app/procurement/suppliers'
             },
             // {
@@ -478,19 +595,23 @@ export const menuItems = [
             // },
             {
                 title: 'Supplier Product List',
+                show : true,
                 routerLink: '/app/procurement/supplier-price-list'
             },
             {
                 title: 'Local Purchase Order',
+                show : true,
                 routerLink: '/app/procurement/lpo'
             },
             {
                 title: 'Goods Received Note',
+                show : true,
                 routerLink: '/app/procurement/grn'
             },
             {
                 title: 'Reports',
                 url: '#',
+                show : true,
                 subMenu: [
                     {
                         title: 'Local Purchase Order',
@@ -523,15 +644,18 @@ export const menuItems = [
         subMenu: [
             {
                 title: 'Management Board',
+                show : true,
                 routerLink: '/app/management/management-board'
             },
             {
                 title: 'Cash Collections',
+                show : true,
                 routerLink: '/app/management/cash-collections'
             },            
             {
                 title: 'Reports',
                 url: '#',
+                show : true,
                 subMenu: [
                     {
                         title: 'Vehicle Registration',
@@ -622,6 +746,7 @@ export const menuItems = [
             {
                 title: 'Identity and Access',
                 url: '#',
+                show : true,
                 subMenu: [
                     {
                         title: 'User',
@@ -640,6 +765,7 @@ export const menuItems = [
             {
                 title: 'Admin Units',
                 url: '#',
+                show : true,
                 subMenu: [
                     {
                         title: 'Company',
@@ -675,6 +801,7 @@ export const menuItems = [
             {
                 title: 'Parking Management',
                 url: '#',
+                show : true,
                 subMenu: [
                     {
                         title: 'Parking Zone',
@@ -691,6 +818,47 @@ export const menuItems = [
                 ]
             },
             {
+                title: 'Storage Management',
+                url: '#',
+                show : true,
+                subMenu: [
+                    {
+                        title: 'Warehouse',
+                        routerLink: '/app/storage-management/warehouse'
+                    },
+                    {
+                        title: 'Good Types',
+                        routerLink: '/app/storage-management/good-type'
+                    },
+                    // {
+                    //     title: 'Vehicle Type',
+                    //     routerLink: '/app/parking-management/vehicle-and-equipment-type'
+                    // },                  
+                ]
+            },
+            {
+                title: 'Maintenance Management',
+                url: '#',
+                show : true,
+                subMenu: [
+                    { 
+                        title: 'Issue Type',
+                        url: '#',
+                        show : true,
+                        routerLink: '/app/maintenance-management/maintenance-issue-type'
+                    }, 
+                    { 
+                        title: 'Service Specialist',
+                        url: '#',
+                        show : true,
+                        routerLink: '/app/maintenance-management/service-specialist'
+                    },             
+                ]
+            },
+
+              
+            
+            {
                 title: 'Inventory',
                 routerLink: ' ',
                 icon: 'fa-money',
@@ -701,10 +869,12 @@ export const menuItems = [
                 subMenu: [
                     {
                         title: 'Product',
+                        show : true,
                         routerLink: '/app/inventory/product'
                     },
                     {
                         title: 'UOM',
+                        show : true,
                         routerLink: '/app/inventory/uom'
                     },
                               
@@ -739,6 +909,7 @@ export const menuItems = [
             {
                 title: 'Reports',
                 url: '#',
+                show : true,
                 subMenu: [
                     {
                         title: 'Vehicle Parking Report',

@@ -14,6 +14,7 @@ import { IParkingBillReceivable } from 'src/app/domain/bill-receivable';
 import { BrowserModule } from '@angular/platform-browser';
 import { Router, RouterModule } from '@angular/router';
 import { MsgBoxService } from '@services/custom/msg-box.service';
+import { IBillView } from 'src/app/domain/bill-view';
 
 const API_URL = environment.apiUrl;
 
@@ -328,6 +329,28 @@ export class ParkingBillingComponent {
       data => {
         this.startBillingAt = null
         this.showParkingData(data!)
+        console.log(data)
+      }
+    )
+  }
+
+  billPaid : number = 0
+  billGenerated : number = 0
+  billUngenerated : number = 0
+  billUnpaid : number = 0
+
+  async getBillView(id : any){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    await this.http.get<IBillView>(API_URL+'/parking_bill_receivables/get_bill_view?parking_id=' + id, options)
+    .toPromise()
+    .then(
+      data => {
+        this.billPaid = data!.billPaid
+        this.billGenerated = data!.billGenerated
+        this.billUngenerated = data!.billUngenerated
+        this.billUnpaid = data!.billUnpaid
         console.log(data)
       }
     )

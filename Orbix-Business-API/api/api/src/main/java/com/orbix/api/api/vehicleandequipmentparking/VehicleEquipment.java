@@ -59,8 +59,6 @@ public class VehicleEquipment {
 	private String vehicleEquipmentName;
 	private String vehicleEquipmentColor;
 	
-	
-	
 	/**Agent Information*/
 	private String agentName;
 	private String agentAddress;

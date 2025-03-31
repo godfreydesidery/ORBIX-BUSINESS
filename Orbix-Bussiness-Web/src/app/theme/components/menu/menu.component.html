@@ -26,7 +26,7 @@
                         </a>
                         <ul class="sidebar-sublist">
                             @for (subitem of item.subMenu; track $index) { 
-                                <li class="sidebar-sublist-item">            
+                                <li class="sidebar-sublist-item" *ngIf="subitem.show === true">            
         
                                     @if (subitem.subMenu) {
                                         <a [attr.href]="''" (click)="collapseMenu($event, item)" (mouseenter)="hoverItem($event, item)" class="sidebar-list-link subitem-submenu-link">

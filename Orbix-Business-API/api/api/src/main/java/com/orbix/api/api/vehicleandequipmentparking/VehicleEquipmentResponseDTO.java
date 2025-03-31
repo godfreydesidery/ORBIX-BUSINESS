@@ -44,4 +44,5 @@ public class VehicleEquipmentResponseDTO {
 	private String branchName;
 	
 	private String parkingId;
+	private String maintenanceId;
 }

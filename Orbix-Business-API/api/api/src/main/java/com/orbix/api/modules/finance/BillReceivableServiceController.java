@@ -24,6 +24,14 @@ import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.modules.vehicleandequipmentmaintenance.Maintenance;
+import com.orbix.api.modules.vehicleandequipmentmaintenance.MaintenanceJobCardIssueBillReceivable;
+import com.orbix.api.modules.vehicleandequipmentmaintenance.MaintenanceJobCardIssueBillReceivableRepository;
+import com.orbix.api.modules.vehicleandequipmentmaintenance.MaintenanceRepository;
+import com.orbix.api.modules.warehouse.Storage;
+import com.orbix.api.modules.warehouse.StorageBillReceivable;
+import com.orbix.api.modules.warehouse.StorageBillReceivableRepository;
+import com.orbix.api.modules.warehouse.StorageRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,8 +44,12 @@ public class BillReceivableServiceController implements BillReceivableService {
 	
 	private final BillReceivableRepository billReceivableRepository;
 	private final ParkingRepository parkingRepository;
+	private final StorageRepository storageRepository;
+	private final MaintenanceRepository maintenanceRepository;
 	private final ParkingBillReceivableRepository parkingBillReceivableRepository;
 	private final ParkingServiceBillReceivableRepository parkingServiceBillReceivableRepository;
+	private final StorageBillReceivableRepository storageBillReceivableRepository;
+	private final MaintenanceJobCardIssueBillReceivableRepository maintenanceJobCardIssueBillReceivableRepository;
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
 	
 	private final BillReceivableCollectionRepository billReceivableCollectionRepository;
@@ -101,6 +113,18 @@ public class BillReceivableServiceController implements BillReceivableService {
 				qty = parkingServiceBillReceivable.get().getQty();
 			} 
 			
+			Optional<StorageBillReceivable> storageBillReceivable = storageBillReceivableRepository.findByBillReceivable(billReceivable);
+			if(storageBillReceivable.isPresent()) {
+				billReceivableCollection.setReason("Goods Storage");
+				qty = storageBillReceivable.get().getQty();
+			}
+			
+			Optional<MaintenanceJobCardIssueBillReceivable> maintenanceJobCardIssueBillReceivable = maintenanceJobCardIssueBillReceivableRepository.findByBillReceivable(billReceivable);
+			if(maintenanceJobCardIssueBillReceivable.isPresent()) {
+				billReceivableCollection.setReason("V/Eq Maintenance");
+				qty = 1; //maintenanceJobCardIssueBillReceivable.get().getQty();
+			}
+			
 			billReceivableCollection = billReceivableCollectionRepository.save(billReceivableCollection);
 			billReceivable = billReceivableRepository.save(billReceivable);
 			billReceivable.setQty(qty); 
@@ -129,6 +153,32 @@ public class BillReceivableServiceController implements BillReceivableService {
 		for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
 			billReceivableResponses.add(billReceivableResponseDTOMapper(parkingServiceBillReceivable.getBillReceivable()));
 		}
+		return billReceivableResponses;
+	}
+	
+	@Override
+	public List<BillReceivableResponseDTO> getAllByStorage(Long storageId, HttpServletRequest request) {
+		Storage storage = storageRepository.findById(storageId)
+			    .orElseThrow(() -> new NotFoundException("Storage with ID " + storageId + " not found"));
+		
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage);
+		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
+		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
+			billReceivableResponses.add(billReceivableResponseDTOMapper(storageBillReceivable.getBillReceivable()));
+		}		
+		return billReceivableResponses;
+	}
+	
+	@Override
+	public List<BillReceivableResponseDTO> getAllByMaintenance(Long maintenanceId, HttpServletRequest request) {
+		Maintenance maintenance = maintenanceRepository.findById(maintenanceId)
+			    .orElseThrow(() -> new NotFoundException("Maintenance with ID " + maintenanceId + " not found"));
+		
+		List<MaintenanceJobCardIssueBillReceivable> maintenanceJobCardIssueBillReceivables = maintenanceJobCardIssueBillReceivableRepository.findAllByMaintenanceJobCardIssue_MaintenanceJobCard_Maintenance(maintenance);
+		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
+		for(MaintenanceJobCardIssueBillReceivable maintenanceJobCardIssueBillReceivable : maintenanceJobCardIssueBillReceivables) {
+			billReceivableResponses.add(billReceivableResponseDTOMapper(maintenanceJobCardIssueBillReceivable.getBillReceivable()));
+		}		
 		return billReceivableResponses;
 	}
 	

@@ -5,6 +5,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -22,6 +23,7 @@ import com.orbix.api.modules.finance.BillReceivable;
 import com.orbix.api.modules.finance.BillReceivableRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -376,7 +378,105 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		return valid;		
 	}
 
-
+	@Override
+	public BillViewResponseDTO getBillView(Long parkingId, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		Optional<Parking> parking_ = parkingRepository.findById(parkingId);
+		
+		if(parking_.isEmpty()) {
+			throw new NotFoundException("Parking not found");
+		}
+		
+		BillViewResponseDTO billResponse = new BillViewResponseDTO();
+		billResponse.setBillPaid("0");
+		billResponse.setBillGenerated("0");
+		billResponse.setBillUngenerated("0");
+		billResponse.setBillUnpaid("0");
+		
+		//////////////////////
+		
+//		billResponse.setBillPaid("10000");
+//		billResponse.setBillGenerated("10000");
+//		billResponse.setBillUngenerated("10000");
+//		billResponse.setBillUnpaid("10000");
+		
+		double totalPaid = 0;
+		double totalGenerated = 0;
+		double totalUngenerated = 0;
+		
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
+			if(parkingBillReceivable.getBillReceivable().getPayStatus().toString().equals("PAID")) {
+				totalPaid = totalPaid + parkingBillReceivable.getBillReceivable().getAmount();
+			}else if(parkingBillReceivable.getBillReceivable().getPayStatus().toString().equals("UNPAID")){
+				totalGenerated = totalGenerated + parkingBillReceivable.getBillReceivable().getAmount();
+			}
+		}
+		
+		totalUngenerated = this.getUngeneratedBill(parking_.get());
+		
+		
+		billResponse.setBillPaid(String.valueOf(totalPaid));
+		billResponse.setBillGenerated(String.valueOf(totalGenerated));
+		billResponse.setBillUngenerated(String.valueOf(totalUngenerated));
+		billResponse.setBillUnpaid(String.valueOf(totalGenerated + totalUngenerated));
+		
+		
+		return billResponse;
+	}
 	
+	private double getUngeneratedBill(Parking parking) {
+		
+		double bill = 0;
+		
+		List<ParkingBillReceivable> rcvs = parkingBillReceivableRepository.findAllByParking(parking);
+		
+		LocalDateTime fromDate = null;
+		LocalDateTime toDate = null;
+		double qty = 0;
+		
+		try {
+			if(rcvs.isEmpty()) {			
+				// Check for first billing date		
+				fromDate = parking.getStartBillingAt().toLocalDate().atStartOfDay();
+				
+				if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();	
+				
+				if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is before bill starting date");
+				
+				long dayCount = ChronoUnit.DAYS.between(fromDate, toDate);
+				
+				qty = dayCount;
+				
+			}else {
+				// Take the last bill
+				fromDate = rcvs.get(rcvs.size() - 1).getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
+				
+				if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
+				
+				if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is invalid" + toDate.toString() + fromDate.toString());
+				
+				long dayCount = ChronoUnit.DAYS.between(fromDate, toDate) + 1;
+				
+				qty = dayCount;
+				
+			}
+			
+			if(qty > 1) qty = qty - 1;
+			
+			bill = qty * parking.getBillingAmount();
+		}catch(Exception e) {
+			// Do nothing
+		}
+		
+		return bill;
+	}
+}
 
+@Data
+class BillViewResponseDTO {
+	String billPaid;
+	String billGenerated;
+	String billUngenerated;
+	String billUnpaid;
 }

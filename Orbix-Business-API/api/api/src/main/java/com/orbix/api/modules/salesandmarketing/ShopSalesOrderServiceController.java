@@ -285,11 +285,17 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 			
 			ShopProduct shopProduct = shopProductRepository.findByProductAndShop(shopSalesOrderDetail.getProduct(), shopSalesOrder.getShop()).orElseThrow();
 			
-			shopProduct.setCurrentStock(shopProduct.getCurrentStock() - shopSalesOrderDetail.getQty());
+			if(shopProduct.getCurrentStock() < shopSalesOrderDetail.getQty()) {
+				throw new InvalidOperationException("Exceeds available stock in product " + shopProduct.getProduct().getName());
+			}
+			
+			double newStock = shopProduct.getCurrentStock() - shopSalesOrderDetail.getQty();
+			
+			shopProduct.setCurrentStock(newStock);
 			
 			shopProduct = shopProductRepository.save(shopProduct);
 			
-			this.createShopProductLog(shopSalesOrder.getShop(), shopSalesOrderDetail.getProduct(), 0, shopSalesOrderDetail.getQty(), (shopProduct.getCurrentStock() - shopSalesOrderDetail.getQty()), userService.getUser(request), dayService.getTimeStamp(), "Shop sale");
+			this.createShopProductLog(shopSalesOrder.getShop(), shopSalesOrderDetail.getProduct(), 0, shopSalesOrderDetail.getQty(), newStock, userService.getUser(request), dayService.getTimeStamp(), "Shop sale");
 
 		}
 		saleRequest.setSaleDetails(saleDetails);

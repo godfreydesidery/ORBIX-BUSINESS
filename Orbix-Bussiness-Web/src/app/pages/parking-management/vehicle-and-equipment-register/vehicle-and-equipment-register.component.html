@@ -2,13 +2,50 @@
     <div class="col">
         <div widget class="card">
             <div class="card-header">
-                <span>Vehicle List</span>
+                <span>Vehicle Register | {{ currentService ? currentService : 'No Service Selected' }}</span>
             </div>
-            <div class="card-body widget-body"> 
-                <div class="row">
+            
+            <div class="card-body widget-body min-vh-100">
+                <!-- <div class="row">
+                    <div class="col-lg-3">
+
+                        <h3>Select a City</h3>
+                        <ng-select [items]="cities"
+                                bindLabel="name"
+                                bindValue="id"
+                                [(ngModel)]="selectedCity"
+                                (change)="onChange($event)"
+                                class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                        </ng-select>
+                    </div>
+                </div>
+                
+
+                <br><br>
+                <br><br><br><br> -->
+                <div class="alert alert-warning" role="alert" *ngIf="isServicesAllowed === false">
+                    <strong>Warning!</strong> You do not have permission to offer services. Please contact the system administrator for assistance.
+                </div>
+                <div class="row" *ngIf="currentServiceSelected === false">
+                    <div class="col-lg-3 offset-lg-4" *ngIf="isServicesAllowed === true">
+                        <div class="form-group">
+                            <label>Please Select Service</label>
+                            <select class="form-control" [(ngModel)]="currentService">
+                                <option></option>
+                                <option>Parking</option>
+                                <option>Maintenance</option>
+                            </select>
+                            <button type="button" class="btn btn-success btn-round-custom pull-right" (click)="selectCurrentService()">Select</button>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" *ngIf="currentServiceSelected === true">
                     <div class="col-sm-12">
-                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="setNewMode()" style="margin: 3px;">New Vehicle</button>
-                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="setExistingMode()" style="margin: 3px;">Existing Vehicle</button>
+                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="setNewMode()"
+                            style="margin: 3px;"><i class="fa fa-file"></i> New Vehicle</button>
+                        <button type="button" class="btn btn-outline-success btn-round-custom"
+                            (click)="setExistingMode()" (click)="getAllVehicleEquipmentChasisNos()"
+                            style="margin: 3px;"><i class="fa fa-file-text"></i> Existing Vehicle</button>
                         <hr>
                     </div>
                 </div>
@@ -20,7 +57,8 @@
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>First Name*</label>
-                                    <input class="form-control" type="text" [(ngModel)]="ownerFirstName" autocomplete="nope">
+                                    <input class="form-control" type="text" [(ngModel)]="ownerFirstName"
+                                        autocomplete="nope">
                                 </div>
                             </div>
                             <!-- <div class="col-lg-3">
@@ -32,7 +70,8 @@
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Last Name*</label>
-                                    <input class="form-control" type="text" [(ngModel)]="ownerLastName" autocomplete="nope">
+                                    <input class="form-control" type="text" [(ngModel)]="ownerLastName"
+                                        autocomplete="nope">
                                 </div>
                             </div>
                             <!-- <div class="col-lg-3">
@@ -41,7 +80,7 @@
                                     <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
                                 </div>
                             </div> -->
-                            
+
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>ID Type*</label>
@@ -56,19 +95,20 @@
                                         <option>NONE</option>
                                     </select>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>ID No*</label>
                                     <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
                                 </div>
-                            </div> 
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Phone No*</label>
-                                    <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
+                                    <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo"
+                                        autocomplete="nope">
                                 </div>
-                            </div> 
+                            </div>
                             <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Address</label>
@@ -76,15 +116,16 @@
                                 </div>
                             </div> -->
                         </div>
-                        <h6>Agent Information</h6><hr>
-                        <div class="row">
+                        <h6 *ngIf="currentService === 'Parking'"><b>Agent Information</b></h6>
+                        <hr *ngIf="currentService === 'Parking'">
+                        <div class="row" *ngIf="currentService === 'Parking'">
                             <input type="hidden" [(ngModel)]="id">
-                            <div class="col-lg-6">
+                            <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Agent Name</label>
                                     <input class="form-control" type="text" [(ngModel)]="agentName" autocomplete="nope">
                                 </div>
-                            </div>      
+                            </div>
                             <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Agent Address</label>
@@ -94,15 +135,16 @@
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Agent Phone</label>
-                                    <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo" autocomplete="nope">
+                                    <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo"
+                                        autocomplete="nope">
                                 </div>
-                            </div>   
-                            <div class="col-lg-3">
+                            </div>
+                            <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Agent Email</label>
                                     <input class="form-control" type="email" [(ngModel)]="agentEmail" autocomplete="nope">
                                 </div>
-                            </div>
+                            </div> -->
                         </div>
                         <p><b>Vehicle Information</b></p><br>
                         <div class="row">
@@ -118,13 +160,14 @@
                                     <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
                                 </div>
                             </div>
-                            
-                            <div class="col-lg-3">
+
+                            <div class="col-lg-3" *ngIf="currentService === 'Parking'">
                                 <div class="form-group">
                                     <label>Sub T1 Number</label>
-                                    <input class="form-control" type="text" [(ngModel)]="tformNumber" autocomplete="nope">
+                                    <input class="form-control" type="text" [(ngModel)]="tformNumber"
+                                        autocomplete="nope">
                                 </div>
-                            </div> 
+                            </div>
 
                             <div class="col-lg-3">
                                 <div class="form-group">
@@ -144,10 +187,20 @@
                                         <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
                                     </select> -->
 
-                                    <input class="form-control" type="text" list="venamesaa" [(ngModel)]="vehicleEquipmentTypeName" autocomplete="nope"/>
+                                    <!-- <input class="form-control" type="text" list="venamesaa"
+                                        [(ngModel)]="vehicleEquipmentTypeName" autocomplete="nope" />
                                     <datalist id="venamesaa">
                                         <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
-                                    </datalist>
+                                    </datalist> -->
+
+                                    <ng-select [items]="vehicleEquipmentTypes"
+                                            bindLabel="name"
+                                            bindValue="name"
+                                            [(ngModel)]="vehicleEquipmentTypeName"
+                                            class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                                    </ng-select>
+
+
                                 </div>
                             </div>
                             <div class="col-lg-3">
@@ -159,6 +212,7 @@
                                         <option value="white">White</option>
                                         <option value="red">Red</option>
                                         <option value="dark-blue">Dark Blue</option>
+                                        <option value="silver">Silver</option>
                                         <option value="yellow">Yellow</option>
                                         <option value="brown">Brown</option>
                                         <option value="blue">Blue</option>
@@ -178,7 +232,8 @@
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Comments</label>
-                                    <textarea class="form-control" [(ngModel)]="comments" autocomplete="nope"></textarea>
+                                    <textarea class="form-control" [(ngModel)]="comments"
+                                        autocomplete="nope"></textarea>
                                     <!-- <input class="form-control" type="text" [(ngModel)]="comments" autocomplete="nope"> -->
                                 </div>
                             </div>
@@ -186,25 +241,81 @@
                     </div>
                     <div class="row">
                         <div class="col-sm-12">
-                            <button class="btn btn-success btn-round-custom" (click)="save()">Register</button>
+                            <button class="btn btn-success btn-round-custom" *ngIf="currentService === 'Parking'" (click)="saveForParking()"><i class="fa fa-pencil-square-o"></i> Register
+                                Parking</button>
+                            <button class="btn btn-success btn-round-custom" *ngIf="currentService === 'Maintenance'" (click)="saveForMaintenance()"><i class="fa fa-pencil-square-o"></i> Register
+                                Maintenance</button>
                         </div>
                     </div>
                 </div>
                 <!-- End of content header for new vehicle -->
                 <!-- Start of content header for existing vehicle -->
                 <div class="row" *ngIf="mode === 'existing'">
-                    <div class="col-lg-3">
-                        <span>Chasis No/ Reg No</span>
-                        <input class="form-control" type="text" list="nos" [(ngModel)]="chasisNo" (change)="searchVehicleEquipmentByChasisNo(chasisNo)"/>
+                    <div class="col-lg-6 dropdown" style="position: relative; z-index: 1050;">
+                        <!-- <span>Chasis No/ Reg No</span>
+                        <input class="form-control" type="text" list="nos" [(ngModel)]="chasisNo"
+                            (change)="searchVehicleEquipmentByChasisNo(chasisNo)" />
                         <datalist id="nos">
                             <option *ngFor="let option of chasisNos" [value]="option">
-                        </datalist>
+                        </datalist> -->
+
+                        <!-- <ng-select [items]="filteredVehicleEquipments"
+                        bindLabel="chasisNo"
+                        bindValue="id"
+                            [(ngModel)]="chasisNo"
+                            (change)="searchVehicleEquipmentByChasisNo($event)"
+                            appendTo="body"
+                            class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                        </ng-select> -->
+
+                        <input
+                        type="text"
+                        id="productSearch"
+                        class="form-control"
+                        [(ngModel)]="searchTerm"
+                        (input)="searchProducts()"
+                        (focus)="isDropdownOpen = true"
+                        placeholder="Search By Chasis/Reg No..."
+                        autocomplete="off"
+                        style="width: 100%"
+                      />
+                        <div
+                        class="dropdown-menu show mt-1"
+                        *ngIf="isDropdownOpen && filteredVehicleEquipments.length > 0"
+                        style="max-height: 200px; overflow-y: auto; width: 100%; margin-left: 10px;"
+                        >
+                            <button
+                            class="dropdown-item form-control"
+                            *ngFor="let vehicleEquipment of filteredVehicleEquipments"
+                            (click)="selectProduct(vehicleEquipment)"
+                            >
+                            {{ vehicleEquipment.chasisNo }} | {{ vehicleEquipment.vehicleEquipmentTypeName }} | {{ vehicleEquipment.vehicleEquipmentColor }}
+                            </button>
+                      </div>
+
+
                     </div>
-                    <div class="col-lg-2">
+
+
+                    <!-- <ng-select [items]="vehicleEquipmentTypes"
+                                            bindLabel="name"
+                                            bindValue="name"
+                                            [(ngModel)]="vehicleEquipmentTypeName"
+                                            appendTo="body"
+                                            class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                                    </ng-select> -->
+
+                    
+
+
+
+
+                    <!-- <div class="col-lg-2">
                         <br>
-                        <button class="btn btn-success btn-round-custom" (click)="searchVehicleEquipmentByChasisNo(chasisNo)">Search</button>
-                    </div>
-                   
+                        <button class="btn btn-success btn-round-custom"
+                            (click)="searchVehicleEquipmentByChasisNo(chasisNo)">Search</button>
+                    </div> -->
+
 
                 </div>
                 <!-- End of content header for existing vehicle -->
@@ -213,15 +324,17 @@
                 <div class="row" *ngIf="id != null">
                     <div class="col-sm-12">
                         <hr>
-                        <h6>Driver/Owner Information</h6><hr>
+                        <h6>Driver/Owner Information</h6>
+                        <hr>
                         <div class="row">
                             <input type="hidden" [(ngModel)]="parkingId">
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>First Name</label>
-                                    <input class="form-control" type="text" [(ngModel)]="ownerFirstName" autocomplete="nope">
+                                    <input class="form-control" type="text" [(ngModel)]="ownerFirstName"
+                                        autocomplete="nope">
                                 </div>
-                            </div>     
+                            </div>
                             <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Middle Name(s)</label>
@@ -231,16 +344,17 @@
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Last Name</label>
-                                    <input class="form-control" type="text" [(ngModel)]="ownerLastName" autocomplete="nope">
+                                    <input class="form-control" type="text" [(ngModel)]="ownerLastName"
+                                        autocomplete="nope">
                                 </div>
-                            </div>   
+                            </div>
                             <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Company</label>
                                     <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
                                 </div>
                             </div>    -->
-                            
+
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>ID Type</label>
@@ -255,21 +369,22 @@
                                         <option>NONE</option>
                                     </select>
                                 </div>
-                            </div> 
+                            </div>
 
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>ID No</label>
                                     <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
                                 </div>
-                            </div> 
-                            
+                            </div>
+
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Phone No</label>
-                                    <input class="form-control" type="tel" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
+                                    <input class="form-control" type="tel" [(ngModel)]="ownerPhoneNo"
+                                        autocomplete="nope">
                                 </div>
-                            </div> 
+                            </div>
                             <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Email</label>
@@ -278,15 +393,16 @@
                             </div>                      -->
                         </div>
 
-                        <h6>Agent Information</h6><hr>
-                        <div class="row">
+                        <h6 *ngIf="currentService === 'Parking'">Agent Information</h6>
+                        <hr *ngIf="currentService === 'Parking'">
+                        <div class="row" *ngIf="currentService === 'Parking'">
                             <input type="hidden" [(ngModel)]="id">
                             <div class="col-lg-6">
                                 <div class="form-group">
                                     <label>Agent Name</label>
                                     <input class="form-control" type="text" [(ngModel)]="agentName" autocomplete="nope">
                                 </div>
-                            </div>      
+                            </div>
                             <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Agent Address</label>
@@ -296,31 +412,37 @@
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Agent Phone</label>
-                                    <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo" autocomplete="nope">
+                                    <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo"
+                                        autocomplete="nope">
                                 </div>
-                            </div>   
-                            <div class="col-lg-3">
+                            </div>
+                            <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Agent Email</label>
                                     <input class="form-control" type="email" [(ngModel)]="agentEmail" autocomplete="nope">
                                 </div>
-                            </div> 
+                            </div>  -->
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Sub T1 Number</label>
-                                    <input class="form-control" type="email" [(ngModel)]="tformNumber" autocomplete="nope">
+                                    <input class="form-control" type="email" [(ngModel)]="tformNumber"
+                                        autocomplete="nope">
                                 </div>
-                            </div> 
-                            
+                            </div>
+
                         </div>
-                        <h6>Vehicle Information</h6><hr>
+                        <h6>Vehicle Information</h6>
+                        <hr>
                         <div class="row">
-                            
+
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Front Lamp</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>Left</td><td>Right</td></thead>
+                                        <thead>
+                                            <td>Left</td>
+                                            <td>Right</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="leftFrontLamp">
@@ -334,15 +456,18 @@
                                                     <option>NO</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Rear Lamp</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>Left</td><td>Right</td></thead>
+                                        <thead>
+                                            <td>Left</td>
+                                            <td>Right</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="leftRearLamp">
@@ -356,15 +481,18 @@
                                                     <option>NO</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Side Mirror</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>Left</td><td>Right</td></thead>
+                                        <thead>
+                                            <td>Left</td>
+                                            <td>Right</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="leftSideMirror">
@@ -378,15 +506,18 @@
                                                     <option>NO</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Wipers</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>Left</td><td>Right</td></thead>
+                                        <thead>
+                                            <td>Left</td>
+                                            <td>Right</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="leftWiper">
@@ -400,15 +531,17 @@
                                                     <option>NO</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Back Wipers</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>|</td></thead>
+                                        <thead>
+                                            <td>|</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="backWiper">
@@ -416,15 +549,17 @@
                                                     <option>NO</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Fuel Cap</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>|</td></thead>
+                                        <thead>
+                                            <td>|</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="fuelCap">
@@ -432,15 +567,17 @@
                                                     <option>NO</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Spare Tires</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>|</td></thead>
+                                        <thead>
+                                            <td>|</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="spareTire">
@@ -448,15 +585,17 @@
                                                     <option>NO</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Battery</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>|</td></thead>
+                                        <thead>
+                                            <td>|</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="battery">
@@ -464,15 +603,17 @@
                                                     <option>NO</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Starter</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>|</td></thead>
+                                        <thead>
+                                            <td>|</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="starter">
@@ -480,7 +621,7 @@
                                                     <option>NO</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
@@ -488,7 +629,9 @@
                                 <div class="form-group">
                                     <label>Aerial</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>|</td></thead>
+                                        <thead>
+                                            <td>|</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="aerial">
@@ -496,15 +639,17 @@
                                                     <option>NO</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
-                            </div>  
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Wheel Cap</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>|</td></thead>
+                                        <thead>
+                                            <td>|</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="wheelCap">
@@ -512,15 +657,17 @@
                                                     <option>NO</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Round Mirror</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>|</td></thead>
+                                        <thead>
+                                            <td>|</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="roundMirror">
@@ -528,15 +675,17 @@
                                                     <option>NO</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Tire Indicator</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>|</td></thead>
+                                        <thead>
+                                            <td>|</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="tireIndicator">
@@ -544,7 +693,7 @@
                                                     <option>NO</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
@@ -552,7 +701,9 @@
                                 <div class="form-group">
                                     <label>Device Status</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>|</td></thead>
+                                        <thead>
+                                            <td>|</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="deviceStatus">
@@ -560,15 +711,17 @@
                                                     <option>NOT-ATTACHED</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Keys</label>
                                     <table class="table table-sm table-bordered">
-                                        <thead><td>|</td></thead>
+                                        <thead>
+                                            <td>|</td>
+                                        </thead>
                                         <tbody>
                                             <td>
                                                 <select class="form-control" [(ngModel)]="hasKeys">
@@ -576,7 +729,7 @@
                                                     <option>NO</option>
                                                 </select>
                                             </td>
-                                        </tbody>    
+                                        </tbody>
                                     </table>
                                 </div>
                             </div>
@@ -585,17 +738,24 @@
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>Select Vehicle Type</label>
+                                    <label>Select Vehicle Typee</label>
                                     <!-- <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
                                         <option></option>
                                         <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
                                     </select> -->
 
-
-                                    <input class="form-control" type="text" list="venames" [(ngModel)]="vehicleEquipmentTypeName"/>
+                                    <!-- <input class="form-control" type="text" list="venames"
+                                        [(ngModel)]="vehicleEquipmentTypeName" />
                                     <datalist id="venames">
                                         <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
-                                    </datalist>
+                                    </datalist> -->
+
+                                    <ng-select [items]="vehicleEquipmentTypes"
+                                            bindLabel="name"
+                                            bindValue="name"
+                                            [(ngModel)]="vehicleEquipmentTypeName"
+                                            class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                                    </ng-select>
 
                                     <!-- <input class="form-control" type="text" list="nos" [(ngModel)]="chasisNo" (change)="searchVehicleEquipmentByChasisNo(chasisNo)"/>
                                     <datalist id="nos">
@@ -605,8 +765,8 @@
 
                                 </div>
                             </div>
-                            
-                            <div class="col-lg-3">
+
+                            <div class="col-lg-3" *ngIf="currentService === 'Parking'">
                                 <div class="form-group">
                                     <label>Category</label>
                                     <select class="form-control" [(ngModel)]="vehicleEquipmentCategory">
@@ -615,25 +775,26 @@
                                         <option>LOCAL</option>
                                     </select>
                                 </div>
-                            </div> 
+                            </div>
 
-                            <div class="col-lg-3">
+                            <div class="col-lg-3" *ngIf="currentService === 'Parking'">
                                 <div class="form-group">
                                     <label>Parking Zone</label>
                                     <select class="form-control" [(ngModel)]="parkingZoneName">
                                         <option></option>
-                                        <option *ngFor="let option of parkingZones" [value]="option.name">{{ option.name }}</option>
+                                        <option *ngFor="let option of parkingZones" [value]="option.name">{{ option.name
+                                            }}</option>
                                     </select>
                                 </div>
-                            </div> 
-                            <div class="col-lg-3">
+                            </div>
+                            <div class="col-lg-3" *ngIf="currentService === 'Parking'">
                                 <div class="form-group">
                                     <label>Select Billing Type</label>
                                     <select class="form-control" [(ngModel)]="billingType">
                                         <option>DAILY</option>
                                     </select>
                                 </div>
-                            </div> 
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Chasis No/ Reg No</label>
@@ -658,6 +819,7 @@
                                         <option value="white">White</option>
                                         <option value="red">Red</option>
                                         <option value="dark-blue">Dark Blue</option>
+                                        <option value="silver">Silver</option>
                                         <option value="yellow">Yellow</option>
                                         <option value="brown">Brown</option>
                                         <option value="blue">Blue</option>
@@ -676,33 +838,40 @@
                             </div>
 
 
-                            
+
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Vehicle Image</label>
                                     <input class="form-control" type="file" autocomplete="nope">
                                 </div>
-                            </div>  
+                            </div>
                         </div>
 
                         <div class="row">
                             <div class="col-sm-12">
-                                <button type="button" class="btn btn-primary pull-right" (click)="saveParking()">Update</button>
+                                <button type="button" class="btn btn-primary btn-round-custom pull-right"  *ngIf="currentService === 'Parking'"
+                                    (click)="saveParking()"><i class="fa fa-save"></i> Update</button>
+                            </div>
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-primary pull-right btn-round-custom"  *ngIf="currentService === 'Maintenance'"
+                                    (click)="sendToMaintenance()">Send to Maintenance</button>
                             </div>
                         </div>
-                    </div>                    
+                    </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
 
-<div class="modal fade" id="new-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+<div class="modal fade" id="new-modal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="modal-large-label" style="top: 0;">
     <div class="modal-dialog modal-xl" role="document" style="top: 0;">
         <div class="modal-content">
-            <div class="modal-header state modal-default">                                    
+            <div class="modal-header state modal-default">
                 <h4 class="modal-title" id="modal-large-label">Add Vehicle</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
             </div>
             <div class="modal-body">
                 <p><b>Owner Information</b></p><br>
@@ -731,7 +900,7 @@
                             <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
                         </div>
                     </div> -->
-                    
+
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>ID Type*</label>
@@ -746,19 +915,19 @@
                                 <option>NONE</option>
                             </select>
                         </div>
-                    </div> 
+                    </div>
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>ID No*</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
                         </div>
-                    </div> 
+                    </div>
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Phone No</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
                         </div>
-                    </div> 
+                    </div>
                     <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label>Address</label>
@@ -790,17 +959,28 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Select Vehicle Type</label>
-                            <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
+                            <!-- <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
                                 <option></option>
-                                <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
-                            </select>
+                                <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{
+                                    option.name }}</option>
+                            </select> -->
+
+                            <ng-select [items]="vehicleEquipmentTypes"
+                                    bindLabel="name"
+                                    bindValue="name"
+                                    [(ngModel)]="vehicleEquipmentTypeName"
+                                    class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                            </ng-select>
+
+
                         </div>
                     </div>
 
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Vehicle Name</label>
-                            <input class="form-control" type="text" [(ngModel)]="vehicleEquipmentName" autocomplete="nope">
+                            <input class="form-control" type="text" [(ngModel)]="vehicleEquipmentName"
+                                autocomplete="nope">
                         </div>
                     </div>
 
@@ -813,6 +993,7 @@
                                 <option value="white">White</option>
                                 <option value="red">Red</option>
                                 <option value="dark-blue">Dark Blue</option>
+                                <option value="silver">Silver</option>
                                 <option value="yellow">Yellow</option>
                                 <option value="brown">Brown</option>
                                 <option value="blue">Blue</option>
@@ -825,6 +1006,7 @@
                                 <option value="orange">Orange</option>
                                 <option value="azul">Azul</option>
                                 <option value="tomato">Tomato</option>
+                                <option value="silver">Silver</option>
                                 <option value="multicolour">Multicolour</option>
                             </select>
                         </div>
@@ -833,8 +1015,8 @@
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" (click)="save()">Register and Process Parking</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <!-- <button type="button" class="btn btn-primary" (click)="save()">Register and Process Parking</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button> -->
             </div>
         </div>
     </div>
@@ -842,12 +1024,14 @@
 
 
 
-<div class="modal fade" id="edit-and-send-to-parking-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+<div class="modal fade" id="edit-and-send-to-parking-modal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="modal-large-label" style="top: 0;">
     <div class="modal-dialog modal-xl" role="document" style="top: 0;">
         <div class="modal-content">
-            <div class="modal-header state modal-default">                                    
+            <div class="modal-header state modal-default">
                 <h4 class="modal-title" id="modal-large-label">Edit Vehicle</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
             </div>
             <div class="modal-body">
                 <p><b>Owner Information</b></p><br>
@@ -881,7 +1065,7 @@
                             <label>ID No*</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
                         </div>
-                    </div> 
+                    </div>
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>ID Type*</label>
@@ -896,13 +1080,13 @@
                                 <option>NONE</option>
                             </select>
                         </div>
-                    </div> 
+                    </div>
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Phone No</label>
                             <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
                         </div>
-                    </div> 
+                    </div>
                     <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label>Address</label>
@@ -939,17 +1123,29 @@
                                 <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
                             </select> -->
 
-                            <input class="form-control" type="text" list="venam" [(ngModel)]="vehicleEquipmentTypeName"/>
-                                    <datalist id="venam">
-                                        <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
-                                    </datalist>
+                            <!-- <input class="form-control" type="text" list="vet" [(ngModel)]="vehicleEquipmentTypeName" />
+                            <datalist id="vet">
+                                <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
+                                    {{ option.name }}
+                                </option>
+                            </datalist> -->
+
+                            <ng-select [items]="vehicleEquipmentTypes"
+                                    bindLabel="name"
+                                    bindValue="name"
+                                    [(ngModel)]="vehicleEquipmentTypeName"
+                                    class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                            </ng-select>
+
+
                         </div>
                     </div>
 
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Vehicle Name</label>
-                            <input class="form-control" type="text" [(ngModel)]="vehicleEquipmentName" autocomplete="nope">
+                            <input class="form-control" type="text" [(ngModel)]="vehicleEquipmentName"
+                                autocomplete="nope">
                         </div>
                     </div>
 
@@ -961,10 +1157,20 @@
                                 <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
                             </select> -->
 
-                            <input class="form-control" type="text" list="venamesa" [(ngModel)]="vehicleEquipmentTypeName"/>
-                                    <datalist id="venamesa">
-                                        <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
-                                    </datalist>
+                            <!-- <input class="form-control" type="text" list="venamesa"
+                                [(ngModel)]="vehicleEquipmentTypeName" />
+                            <datalist id="venamesa">
+                                <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
+                            </datalist> -->
+
+                            <ng-select [items]="vehicleEquipmentTypes"
+                                    bindLabel="name"
+                                    bindValue="name"
+                                    [(ngModel)]="vehicleEquipmentTypeName"
+                                    class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                            </ng-select>
+
+
                         </div>
                     </div>
                     <div class="col-lg-3">
@@ -976,6 +1182,7 @@
                                 <option value="white">White</option>
                                 <option value="red">Red</option>
                                 <option value="dark-blue">Dark Blue</option>
+                                <option value="silver">Silver</option>
                                 <option value="yellow">Yellow</option>
                                 <option value="brown">Brown</option>
                                 <option value="blue">Blue</option>
@@ -993,23 +1200,14 @@
                         </div>
                     </div>
 
-                
+
                 </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" *ngIf='id != null' (click)="save()">Update</button>
+                <!-- <button type="button" class="btn btn-primary" *ngIf='id != null' (click)="save()">Update</button>
                 <button type="button" class="btn btn-primary" *ngIf='id != null'>Send to Parking</button>
-                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button> -->
             </div>
         </div>
     </div>
 </div>
-
-
-
-
-
-
-
-
-

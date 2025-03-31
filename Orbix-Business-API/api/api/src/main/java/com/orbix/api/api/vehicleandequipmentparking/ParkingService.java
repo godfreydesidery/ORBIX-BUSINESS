@@ -12,11 +12,13 @@ public interface ParkingService {
 	List<ParkingResponseDTO> getAllPendingOrCheckedInParkings(HttpServletRequest request);	
 	List<ParkingResponseDTO> getAllCleared(HttpServletRequest request);
 	List<ParkingResponseDTO> getTodayCheckedOut(HttpServletRequest request);
+	List<ParkingResponseDTO> getRecentCheckedOut(HttpServletRequest request);
 	List<ParkingResponseDTO> getAllCheckedInParkings(HttpServletRequest request);	
 	ParkingResponseDTO get(Long id, HttpServletRequest request);
 	List<ParkingBillReceivableResponseDTO> getParkingBillReceivables(Long id, HttpServletRequest request);
 	ParkingResponseDTO createParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	ParkingResponseDTO updateParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
+	ParkingResponseDTO modifyParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	
 	ParkingResponseDTO checkIn(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	ParkingResponseDTO checkOut(ParkingRequestDTO parkingRequest, HttpServletRequest request);

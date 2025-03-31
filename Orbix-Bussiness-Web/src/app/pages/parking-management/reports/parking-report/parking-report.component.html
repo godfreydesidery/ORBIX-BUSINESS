@@ -19,7 +19,7 @@
                             <input type="date" class="form-control" [(ngModel)]="to">
                         </div>
                     </div>
-                    <div class="col-lg-3">
+                    <!-- <div class="col-lg-3">
                         <div class="form-group">
                             <label class="form-control">Cashier Name</label>
                             <select class="form-control" [(ngModel)]="nickname">
@@ -27,12 +27,23 @@
                                 <option *ngFor="let cashier of userNames">{{cashier}}</option>
                             </select>
                         </div>
+                    </div> -->
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="form-control">Payment Status</label>
+                            <select class="form-control" [(ngModel)]="payStatus">
+                                <option>--All--</option>
+                                <option>Paid</option>
+                                <option>Partial</option> 
+                                <option>Unpaid</option>
+                            </select>
+                        </div>
                     </div>
                     <div class="col-lg-3">
                         <div class="form-group">
-                            <br><br>
-                            <button class="btn btn-outline-success" (click)="getRegistationByDate(from, to)">Run Report</button>
-                            <button class="btn btn-outline-primary btn-round-custom" (click)="printParkingReport()" style="padding-left: 3px;">Print Report</button>
+                            <button class="btn btn-outline-success btn-round-custom" (click)="getRegistationByDate(from, to)"><i class="fa fa-refresh"></i> Run Report</button>
+                            <button class="btn btn-outline-success btn-round-custom" (click)="printParkingReport()" style="padding-left: 3px;"><i class="fa fa-file-pdf-o"></i> PDF</button>
+                            <button class="btn btn-outline-success btn-round-custom" (click)="exportToExcel()" style="padding-left: 3px;"><i class="fa fa-file-excel-o"></i> Excel</button>
                         </div>
                     </div>
                 </div>
@@ -52,6 +63,8 @@
                                     <td><b>Sub T1 Form</b></td>
                                     <td><b>Device Status</b></td>
                                     <td><b>Price</b></td>
+                                    <td><b>Pay Status</b></td>
+                                    <td><b>Paid Amount</b></td>
                                     <td><b>Start Date</b></td>
                                     <td><b>End Date</b></td>
                                     <td><b>Remarks</b></td>
@@ -75,7 +88,9 @@
                                         <td>{{r.chasisNo}}</td>
                                         <td>{{r.tformNumber}}</td>
                                         <td>{{r.deviceStatus}}</td>
-                                        <td>{{r.billingAmount}}</td>
+                                        <td style="text-align: right;">{{r.billingAmount | currency:'':''}}</td>
+                                        <td>{{r.payStatus}}</td>
+                                        <td style="text-align: right;">{{r.paidAmount | currency:'':''}}</td>
                                         <td>{{r.checkedInAt}}</td>
                                         <td>{{r.checkedOutAt}}</td>
                                         <td>{{r.status}}</td>

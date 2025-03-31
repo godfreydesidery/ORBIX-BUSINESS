@@ -16,6 +16,9 @@ import { ICashCollection, IParkingCashCollection, IParkingServiceCashCollection 
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
 
+import * as XLSX from 'xlsx';
+import * as FileSaver from 'file-saver';
+
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
@@ -40,6 +43,7 @@ export class ParkingReportComponent {
   to : Date | string | null = null
 
   nickname = ''
+  payStatus = '--All--'
 
   constructor(
     private http :HttpClient,
@@ -81,7 +85,7 @@ export class ParkingReportComponent {
     this.parkingReports = []
     
 
-    await this.http.post<IParkingReport[]>(API_URL+'/parking_reports/get_parking_report?nickname=' + this.nickname, args, options)
+    await this.http.post<IParkingReport[]>(API_URL+'/parking_reports/get_parking_report?nickname=' + this.nickname + '&payment_status=' + this.payStatus, args, options)
         .toPromise()
         .then(
           data => {
@@ -130,6 +134,10 @@ export class ParkingReportComponent {
   }
 
   print = async () => {
+    if (this.parkingReports.length === 0) {
+      this.msg.showErrorMessage3('No data to export');
+      return;
+    }
     this.documentHeader = await this.data.getDocumentHeader();
     const title = 'Vehicle Registration Report';
     const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
@@ -197,6 +205,10 @@ export class ParkingReportComponent {
 
 
   printParkingReport = async () => {
+    if (this.parkingReports.length === 0) {
+      this.msg.showErrorMessage3('No data to export');
+      return;
+    }
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Vehicle Parking Report';
     const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
@@ -279,6 +291,64 @@ export class ParkingReportComponent {
   };
 
 
+  
+
+  
+
+  exportToExcel(): void {
+    if (this.parkingReports.length === 0) {
+      this.msg.showErrorMessage3('No data to export');
+      return;
+    }
+
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.parkingReports.map((item)=>({
+    'S/N': item.sn,
+    'Category': item.vehicleEquipmentCategory,
+    'Type': item.vehicleEquipmentTypeName,
+    'Owner Name': `${item.ownerFirstName} ${item.ownerLastName}`,
+    'Phone': item.ownerPhoneNo,
+    'Card Number': item.cardNo,
+    'Chasis Number': item.chasisNo,
+    'T-Form Number': item.tformNumber,
+    'Device Status': item.deviceStatus,
+    'Billing Amount': Number(item.billingAmount),
+    'Pay Status': item.payStatus,
+    'Paid Amount': Number(item.paidAmount),
+    'Checked In': item.checkedInAt,
+    'Checked Out': item.checkedOutAt,
+    'Status': item.status
+    })));
+    const workbook: XLSX.WorkBook = {
+      Sheets: { 'Report': worksheet },
+      SheetNames: ['Report']
+    };
+
+    const excelBuffer: any = XLSX.write(workbook, {
+      bookType: 'xlsx',
+      type: 'array'
+    });
+
+    const fileName = 'Vehicle Parking Report ' + this.from + ' - ' + this.to + '.xlsx';
+    this.saveAsExcelFile(excelBuffer, fileName);
+
+    // const blob = new Blob([excelBuffer], {
+    //   type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    // });
+  
+    // const url = window.URL.createObjectURL(blob);
+    // window.open(url); // Try to open in new tab (Excel MIME handler might catch it)
+  
+    // saveAs(blob, 'vehicle-report.xlsx'); // Also prompt user to save/download
+  }
+
+  private saveAsExcelFile(buffer: any, fileName: string): void {
+    const data: Blob = new Blob([buffer], {
+      type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet;charset=UTF-8'
+    });
+    FileSaver.saveAs(data, fileName);
+  }
+
+
 
 }
 
@@ -308,6 +378,9 @@ export interface IParkingReport{
   status : string,
   keyStatus : string,
   createdBy : string
+
+  payStatus : string
+  paidAmount : number
 }
 
 

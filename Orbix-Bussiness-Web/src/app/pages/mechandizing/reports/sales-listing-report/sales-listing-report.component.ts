@@ -61,7 +61,10 @@ documentHeader! : any
     }
 
     salesListings : ISalesListing[] = []
-    total : number = 0
+    totalCost : number = 0
+    totalDiscount : number = 0
+    totalAmount : number = 0
+    totalProfit : number = 0
 
   async getSalesListingByDate(from : Date | string | null, to : Date | string | null) {
     if(from == null || to == null) {
@@ -79,7 +82,10 @@ documentHeader! : any
     }
 
     this.salesListings = []
-    this.total = 0
+    this.totalCost = 0
+    this.totalDiscount = 0
+    this.totalAmount = 0
+    this.totalProfit = 0
     
 
     await this.http.post<ISalesListing[]>(API_URL+'/sales_reports/get_sales_listing_report_by_dates', args, options)
@@ -90,10 +96,16 @@ documentHeader! : any
             this.salesListings = data!
 
             var sn = 1
-            this.total = 0
+            this.totalCost = 0
+            this.totalDiscount = 0
+            this.totalAmount = 0
+            this.totalProfit = 0
             this.salesListings.forEach(element => {
               element.sn = sn
-              this.total = this.total + (+element.amount)
+              this.totalCost = this.totalCost + (+element.cost)
+              this.totalDiscount = this.totalDiscount + (+element.discount)
+              this.totalAmount = this.totalAmount + (+element.amount)
+              this.totalProfit = this.totalProfit + (+element.profit)
               sn = sn + 1
             })
 
@@ -161,7 +173,10 @@ documentHeader! : any
     const from = this.from?.toString();
     const to = this.to?.toString();
     var logo : any = ''
-    var total : number = 0
+    var totalAmount : number = 0
+    var totalCost : number = 0
+    var totalDiscount : number = 0
+    var totalProfit : number = 0
     var discount : number = 0
     var tax : number = 0
 
@@ -174,7 +189,10 @@ documentHeader! : any
       { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Product Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Qty', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Cost', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Discount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Profit', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Sold By', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Date Time', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true }
     ]);
@@ -183,13 +201,19 @@ documentHeader! : any
 
 
     this.salesListings.forEach(element => {
-      total += Number(element.amount) || 0;
+      totalAmount += Number(element.amount) || 0;
+      totalProfit += Number(element.profit) || 0;
+      totalCost += Number(element.cost) || 0;
+      totalDiscount += Number(element.discount) || 0;
 
       report.push([
         { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.productName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.qty || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: (Number(element.cost) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+        { text: (Number(element.discount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
         { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+        { text: (Number(element.profit) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
         { text: element.createdBy || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.timeDate || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       ])
@@ -199,14 +223,17 @@ documentHeader! : any
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       { text: 'Total', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: (Number(total) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: true },
+      { text: (Number(totalCost) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: true },
+      { text: (Number(totalDiscount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: true },
+      { text: (Number(totalAmount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: true },
+      { text: (Number(totalProfit) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: true },
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },        
     ])
 
     const docDefinition : any = {
       header: '',
-      pageOrientation: 'potrait', // Set the orientation to landscape
+      pageOrientation: 'landscape', // Set the orientation to landscape
       footer: function (currentPage: { toString: () => string; }, pageCount: string) {
         return currentPage.toString() + " of " + pageCount;
       },
@@ -224,7 +251,7 @@ documentHeader! : any
           //layout : 'noBorders',
           table : {
               headerRows : 1,
-              widths : [30, 140, 40, 70, 80, 100],                
+              widths : [30, 120, 40, 70, 50, 70, 80, 70, 80],                
               body : report
           }
         },                   
@@ -239,6 +266,9 @@ export interface ISalesListing {
   productName : string
   qty : string
   amount : string
+  cost : string
+  discount : string
+  profit : string
   createdBy : string
   timeDate : string
 }

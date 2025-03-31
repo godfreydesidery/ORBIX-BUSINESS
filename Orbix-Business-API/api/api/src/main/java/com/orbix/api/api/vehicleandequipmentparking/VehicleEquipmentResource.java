@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.exceptions.InvalidOperationException;
+import com.orbix.api.modules.inventoryandprocurement.ProductResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,11 +40,25 @@ public class VehicleEquipmentResource {
 		return ResponseEntity.ok().body(vehicleEquipmentService.getAllActiveVehicleEquipments(request));
 	}
 	
+	@GetMapping("/vehicle_equipments/get_by_id")
+	public ResponseEntity<VehicleEquipmentResponseDTO>getById(
+			@RequestParam(name = "id") Long id,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(vehicleEquipmentService.get(id, request));
+	}
+	
 	@GetMapping("/vehicle_equipments/get_by_chasis_no")
 	public ResponseEntity<VehicleEquipmentResponseDTO>getByChasisNo(
 			@RequestParam(name = "chasis_no") String chasisNo,
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(vehicleEquipmentService.getByChasisNo(chasisNo, request));
+	}
+	
+	@GetMapping("/vehicle_equipments/get_maintenance_by_chasis_no")
+	public ResponseEntity<VehicleEquipmentResponseDTO>getMaintenanceByChasisNo(
+			@RequestParam(name = "chasis_no") String chasisNo,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(vehicleEquipmentService.getMaintenanceByChasisNo(chasisNo, request));
 	}
 	
 	@GetMapping("/vehicle_equipments/get_chasis_nos")
@@ -77,5 +92,14 @@ public class VehicleEquipmentResource {
 			HttpServletRequest request){		
 		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/vehicle_equipments/update").toUriString());
 		return ResponseEntity.created(uri).body(vehicleEquipmentService.updateVehicleEquipment(vehicleEquipmentRequest, request));
+	}
+	
+	@GetMapping("/vehicle_equipments/get_vehicle_equipments_chasis_no_containing")
+	public ResponseEntity<List<VehicleEquipmentResponseDTO>>getAllVehicleEquipmentsContaining(
+			@RequestParam(name = "chasis_no_like")String chasisNoLike,
+			HttpServletRequest request){
+
+		return ResponseEntity.ok().body(vehicleEquipmentService.getVehicleEquipmentByChasisNo(chasisNoLike, request));
+
 	}
 }

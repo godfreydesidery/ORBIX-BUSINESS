@@ -160,7 +160,7 @@ export class ReleaseVehicleEquipmentComponent {
     }
     this.parkings = []
 
-    await this.http.get<IParking[]>(API_URL+'/parkings/get_today_checked_out', options)
+    await this.http.get<IParking[]>(API_URL+'/parkings/get_recent_checked_out', options)
     .toPromise()
     .then(
       data => {

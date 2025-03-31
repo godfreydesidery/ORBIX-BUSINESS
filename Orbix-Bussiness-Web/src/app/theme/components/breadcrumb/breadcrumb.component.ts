@@ -27,7 +27,7 @@ export class BreadcrumbComponent {
             if (event instanceof NavigationEnd) {
                 this.breadcrumbs = [];
                 this.parseRoute(this._router.routerState.snapshot.root);
-                this.title = "Orbix Bussiness";
+                this.title = "Davaghan";
                 this.breadcrumbs.forEach(breadcrumb => {
                     this.title += ' > ' + breadcrumb.name;
                 })

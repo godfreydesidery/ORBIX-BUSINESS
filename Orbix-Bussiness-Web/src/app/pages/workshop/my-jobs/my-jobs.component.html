@@ -1,0 +1,467 @@
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>Maintenance Vehicle and Equipment List</span>
+            </div>
+            <div class="card-body widget-body">
+                
+                <div class="row">
+                    <div class="col-md-6 card">
+
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <!-- <button type="button" class="btn btn-outline-success btn-round-custom" (click)="clearMaintenanceData()" data-toggle="modal" data-target="#maintenanceZone-modal">New Vehicle</button> -->
+                                <br><br>
+                            </div>
+                        </div>
+        
+                        <div class="row">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                            </div>
+                        </div>
+        
+                        <br>    
+        
+                        <div class="table-responsive table-sm">
+                            <table class="table">
+                                <thead>
+                                    <tr>
+                                        <th>SN</th>
+                                        <th>No</th>
+                                        <th>Owner Name</th>
+                                        <th>Chasis No</th>
+                                        <th>Vehicle Type</th>
+                                        <th>Contacts</th>
+                                        <th>Keys</th>
+                                        <th>Status</th>
+                                        <th>Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                        <tr *ngFor="let p of maintenances | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                            <td>{{p.sn}}</td>
+                                            <td>{{p.no}}</td>
+                                            <td>{{p.ownerFirstName}} {{p.ownerLastName}}</td>
+                                            <td><b style="color: rgb(228, 85, 8);">{{p.chasisNo}}</b></td>
+                                            <td><b class="text-primary">{{p.vehicleEquipmentTypeName}}</b></td>
+                                            <td>{{p.ownerPhoneNo}}</td>
+                                            <td>
+                                                <span class="badge badge-success" *ngIf="p.hasKeys">{{ p.hasKeys ? 'Yes' : 'No' }}</span>
+                                                <span class="badge badge-danger" *ngIf="!p.hasKeys">{{ p.hasKeys ? 'Yes' : 'No' }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-warning" *ngIf="p.status === 'PENDING'">{{p.status}}</span>
+                                                <span class="badge badge-success" *ngIf="p.status === 'CHECKED-IN'">{{p.status}}</span>
+                                                <span class="badge badge-danger" *ngIf="p.status === 'CHECKED-OUT'">{{p.status}}</span>
+                                            </td>                                    
+                                            <td>
+                                                <table class="table table-sm">
+                                                    <tr>
+                                                        <td><button type="button" class="btn btn-warning btn-round-custom btn-sm text-nowrap" *ngIf="p.status === 'CHECKED-IN'" (click)="createOrLoadMaintenanceJobCard(p.id)" style="cursor: pointer; margin-left: 3px;">View Jobs</button></td>
+                                                    </tr>
+                                                </table>
+                                            </td>
+                                        </tr>
+                                </tbody> 
+                            </table>
+                            <div class="row">
+                                <div class="col-sm-12" style="text-align: right;">
+                                    <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                                </div>
+                            </div>
+        
+                        </div>
+
+                    </div>
+                    <div class="col-md-6 card" *ngIf="maintenanceJobCardNo != ''">
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <br>
+                                <button class="pull-right btn btn-danger btn-round-custom" (click)="closeJobCard()">Close</button>
+                            </div>
+                        </div>
+                        <!-- <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Issue</label>
+                                    <input type="text" class="form-control" [(ngModel)]="maintenanceJobCardIssueName">
+                                </div>
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Issue Description</label>
+                                    <textarea class="form-control" [(ngModel)]="maintenanceJobCardIssueDescription"></textarea>
+                                </div>                       
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Issue Type</label>
+                                    <select class="form-control" [(ngModel)]="maintenanceJobCardIssueTypeName">
+                                        <option></option>
+                                        <option *ngFor="let maintenanceIssueType of maintenanceIssueTypes">{{maintenanceIssueType.name}}</option>
+                                    </select>
+                                </div>                       
+                            </div>
+                            
+                            
+                            
+                        </div>
+                        <div class="row">
+                            
+                            
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Technician</label>
+                                    <select class="form-control" [(ngModel)]="maintenanceJobCardIssueSpecialistUser">
+                                        <option></option>
+                                        <option *ngFor="let serviceSpecialist of serviceSpecialists">{{serviceSpecialist.nickname}}</option>
+                                    </select>
+                                </div>                       
+                            </div>
+                            <div class="col-lg-6">
+                                <div class="row">
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label>Days</label>
+                                            <input class="form-control" type="text" [(ngModel)]="maintenanceJobCardIssueNoOfDays" autocomplete="nope">
+                                        </div>                       
+                                    </div>
+                                    <div class="col-lg-6">
+                                        <div class="form-group">
+                                            <label>Price</label>
+                                            <input class="form-control" type="text" [(ngModel)]="maintenanceJobCardIssuePrice" autocomplete="nope">
+                                        </div>                       
+                                    </div>
+                                </div>
+                            </div>
+                            
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <button class="btn btn-success btn-round-custom pull-right" (click)="createMaintenanceJobCardIssue()">Add</button>
+                            </div>
+                        </div> -->
+                        <div class="row">
+                            <div class="col-lg-12">
+                                <br>
+                                <div style="text-align: center;"><h4 class="text-primary"><b>Vehicle Issues</b></h4></div>
+                                <div class="table-responsive table-sm">
+                                    <table class="table">
+                                        <thead>
+                                            <tr>
+                                                <th>#</th>
+                                                <th>Issue</th>
+                                                <th>Description</th>
+                                                <th>Type</th>
+                                                <th>Comments</th>
+                                                <th>Pay Status</th>
+                                                <th>Action</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <ng-container *ngFor="let m of maintenanceJobCard.maintenanceJobCardIssues">
+                                                <tr *ngIf="m.status != 'CLOSED'">
+                                                    <td>{{m.no}}</td>
+                                                    <td>{{m.name}}</td>
+                                                    <td>{{m.description}}</td>
+                                                    <td>{{m.maintenanceIssueTypeName}}</td>
+                                                    <td style="text-align: center;">
+                                                        <span 
+                                                            class="fa fa-file-text" 
+                                                            [ngClass]="m.comments ? 'text-success' : 'text-primary'" 
+                                                            (click)="loadIssue(m.id)" 
+                                                            data-toggle="modal" 
+                                                            data-target="#edit-modal" 
+                                                            style="cursor: pointer;">
+                                                        </span>                                        
+                                                        <!-- <span class="fa fa-file-text text-success" *ngIf="m.comments === '' || m.comments === null" (click)="loadIssue(m.id)" data-toggle="modal" data-target="#edit-modal" style="cursor: pointer;"></span>
+                                                        <span class="fa fa-file-text text-primary" *ngIf="m.comments != ''" (click)="loadIssue(m.id)" data-toggle="modal" data-target="#edit-modal" style="cursor: pointer;"></span> -->
+                                                        <!-- <span class="fa fa-file-text" (click)="loadIssue(m.id)" data-toggle="modal" data-target="#view-modal" style="cursor: pointer;"></span> -->
+                                                    </td>
+                                                    <td>{{m.payStatus}}</td>
+                                                    <td>
+                                                        <button class="btn btn-success btn-sm btn-round-custom" *ngIf="m.payStatus === 'PAID'" (click)="doneIssue(m.id, m.no)">Done</button>
+                                                    </td>
+                                                </tr>
+                                            </ng-container>
+                                        </tbody> 
+                                    </table>
+                                    
+                
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="check-out-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Vehicle Check Out</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+
+
+            <div class="modal-body">
+                <hr>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <p><b>Driver/Owner Information</b></p>
+                            </thead>
+                            <tbody>
+                                <tr><td><b>First Name</b></td><td>{{ownerFirstName}}</td></tr>
+                                <!-- <tr><td><b>Middle Name</b></td><td>{{ownerMiddleName}}</td></tr> -->
+                                <tr><td><b>Last Name</b></td><td>{{ownerLastName}}</td></tr> 
+                                <tr><td><b>ID Type</b></td><td>{{ownerIdType}}</td></tr>
+                                <tr><td><b>ID No</b></td><td>{{ownerIdNo}}</td></tr>   
+                                <tr><td><b>Phone No</b></td><td>{{ownerPhoneNo}}</td></tr>   
+                                <!-- <tr><td><b>Email</b></td><td>{{ownerEmail}}</td></tr>     -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <p><b>Maintenance Information</b></p>
+                            </thead>
+                            <tbody>
+                                <tr><td><b>Maintenance No</b></td><td>{{maintenanceNo}}</td></tr>
+                                <tr><td><b>Model/Type</b></td><td>{{vehicleEquipmentTypeName}}</td></tr>
+                                <tr><td><b>Color</b></td><td>{{vehicleEquipmentColor}}</td></tr>
+                                <tr><td><b>Keys</b></td><td>{{hasKeys}}</td></tr>  
+                                <tr><td><b>Card No</b></td><td>{{cardNo}}</td></tr>    
+                                <tr><td><b>Status</b></td><td>{{status}}</td></tr>    
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <p><b>Check List</b></p>
+                            </thead>
+                            <tbody>
+                                <tr><td><b>Front Lamps</b></td><td><span>L: {{leftFrontLamp}}</span><span> R: {{rightFrontLamp}}</span></td></tr>
+                                <tr><td><b>Rear Lamps</b></td><td><span>L: {{leftRearLamp}}</span><span> R: {{rightRearLamp}}</span></td></tr>
+                                <tr><td><b>Front Indicators</b></td><td><span>L: {{leftFrontLamp}}</span><span> R: {{rightFrontLamp}}</span></td></tr>
+                                <tr><td><b>Rear Indicators</b></td><td><span>L: {{leftRearLamp}}</span><span> R: {{rightRearLamp}}</span></td></tr>
+                                <tr><td><b>Side Mirrors</b></td><td><span>L: {{leftSideMirror}}</span><span> R: {{rightSideMirror}}</span></td></tr>
+                                <tr><td><b>Wipers</b></td><td><span>L: {{leftWiper}}</span><span> R: {{rightWiper}}</span></td></tr> 
+                                <tr><td><b>Back Wipers</b></td><td>{{backWiper}}</td></tr> 
+                                <tr><td><b>Fuel Cap</b></td><td>{{fuelCap}}</td></tr> 
+                                <tr><td><b>Spare Tyre</b></td><td>{{spareTire}}</td></tr>  
+                                <tr><td><b>Battery</b></td><td>{{battery}}</td></tr> 
+                                <tr><td><b>Starter</b></td><td>{{starter}}</td></tr>  
+                                <tr><td><b>Aerial</b></td><td>{{aerial}}</td></tr> 
+                                <tr><td><b>Wheel Cap</b></td><td>{{wheelCap}}</td></tr> 
+                                <tr><td><b>Round Mirror</b></td><td>{{roundMirror}}</td></tr> 
+                                <tr><td><b>Tire Indicator</b></td><td>{{tireIndicator}}</td></tr> 
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" (click)="checkOut()">Check Out</button>
+                <!-- <button type="button" class="btn btn-primary">Print Gate Pass</button> -->
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="check-in-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Complete Registration</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Keys</label>
+                            <select class="form-control" [(ngModel)]="hasKeys">
+                                <option>YES</option>
+                                <option>NO</option>
+                            </select>
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Card No</label><br>
+                            <input class="form-control" type="tel" [(ngModel)]="cardNo" autocomplete="nope">
+                        </div>
+                    </div> 
+                    <!-- <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Maintenance Zone</label>
+                            <select class="form-control" [(ngModel)]="maintenanceZoneName">
+                                <option></option>
+                                <option *ngFor="let option of maintenanceZones" [value]="option.name">{{ option.name }}</option>
+                            </select>
+                        </div>
+                    </div> -->
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Select Billing Start Date</label>
+                            <input type="date" class="form-control" [(ngModel)]="startBillingAt">
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <p><b>Driver/Owner Information</b></p>
+                            </thead>
+                            <tbody>
+                                <tr><td><b>First Name</b></td><td>{{ownerFirstName}}</td></tr>
+                                <!-- <tr><td><b>Middle Name</b></td><td>{{ownerMiddleName}}</td></tr> -->
+                                <tr><td><b>Last Name</b></td><td>{{ownerLastName}}</td></tr> 
+                                <tr><td><b>ID Type</b></td><td>{{ownerIdType}}</td></tr>
+                                <tr><td><b>ID No</b></td><td>{{ownerIdNo}}</td></tr>   
+                                <tr><td><b>Phone No</b></td><td>{{ownerPhoneNo}}</td></tr>   
+                                <!-- <tr><td><b>Email</b></td><td>{{ownerEmail}}</td></tr>     -->
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <p><b>Maintenance Information</b></p>
+                            </thead>
+                            <tbody>
+                                <tr><td><b>Model/Type</b></td><td>{{vehicleEquipmentTypeName}}</td></tr>
+                                <tr><td><b>Color</b></td><td>{{vehicleEquipmentColor}}</td></tr>
+                                <tr><td><b>Maintenance No</b></td><td>{{maintenanceNo}}</td></tr>   
+                                <tr><td><b>Keys</b></td><td>{{hasKeys}}</td></tr>  
+                                <tr><td><b>Card No</b></td><td>{{cardNo}}</td></tr>    
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <p><b>Check List</b></p>
+                            </thead>
+                            <tbody>
+                                <tr><td><b>Front Lamps</b></td><td><span>L: {{leftFrontLamp}}</span><span> R: {{rightFrontLamp}}</span></td></tr>
+                                <tr><td><b>Rear Lamps</b></td><td><span>L: {{leftRearLamp}}</span><span> R: {{rightRearLamp}}</span></td></tr>
+                                <tr><td><b>Front Indicators</b></td><td><span>L: {{leftFrontLamp}}</span><span> R: {{rightFrontLamp}}</span></td></tr>
+                                <tr><td><b>Rear Indicators</b></td><td><span>L: {{leftRearLamp}}</span><span> R: {{rightRearLamp}}</span></td></tr>
+                                <tr><td><b>Side Mirrors</b></td><td><span>L: {{leftSideMirror}}</span><span> R: {{rightSideMirror}}</span></td></tr>
+                                <tr><td><b>Wipers</b></td><td><span>L: {{leftWiper}}</span><span> R: {{rightWiper}}</span></td></tr> 
+                                <tr><td><b>Back Wipers</b></td><td>{{backWiper}}</td></tr> 
+                                <tr><td><b>Fuel Cap</b></td><td>{{fuelCap}}</td></tr> 
+                                <tr><td><b>Spare Tyre</b></td><td>{{spareTire}}</td></tr>  
+                                <tr><td><b>Battery</b></td><td>{{battery}}</td></tr> 
+                                <tr><td><b>Starter</b></td><td>{{starter}}</td></tr>  
+                                <tr><td><b>Aerial</b></td><td>{{aerial}}</td></tr> 
+                                <tr><td><b>Wheel Cap</b></td><td>{{wheelCap}}</td></tr> 
+                                <tr><td><b>Round Mirror</b></td><td>{{roundMirror}}</td></tr> 
+                                <tr><td><b>Tire Indicator</b></td><td>{{tireIndicator}}</td></tr> 
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Complete and Check In</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="checkout-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Create Service Bills</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+
+
+            
+
+            <br>
+            
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="edit-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-lg" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Add/Edit Comment</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <textarea class="form-control" [(ngModel)]="issueComments" placeholder="Comments" style="background-color: white; min-height: 10cm;"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" (click)="saveComments()" data-dismiss="modal">Save</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="view-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-lg" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">View Comment from Technician</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="form-group">
+                            <textarea class="form-control" [(ngModel)]="issueComments" placeholder="Comments" readonly style="background-color: white; min-height: 10cm;"></textarea>
+                        </div>
+                    </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

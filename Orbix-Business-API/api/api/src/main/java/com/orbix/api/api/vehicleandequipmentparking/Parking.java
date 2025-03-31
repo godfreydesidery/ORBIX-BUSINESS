@@ -32,7 +32,6 @@ import lombok.ToString;
 @NoArgsConstructor 
 @AllArgsConstructor
 @Table(name = "parkings")
-
 public class Parking {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

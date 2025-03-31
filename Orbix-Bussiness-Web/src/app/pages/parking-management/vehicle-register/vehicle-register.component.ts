@@ -100,7 +100,7 @@ export class VehicleRegisterComponent {
 
   
 
-  startBillingAt : Date | null
+  startBillingAt : Date | null | string
 
   // Foreign keys
   parkingId: any = null
@@ -337,6 +337,109 @@ export class VehicleRegisterComponent {
     }
   }
 
+
+  public async modify(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    var startBillingAt = this.startBillingAt ? new Date(this.startBillingAt).toISOString().split('T')[0] : '';
+  
+  
+
+    var parking = {
+      id: this.parkingId,
+      no: this.parkingNo,
+      ownerFirstName: this.ownerFirstName,
+      ownerMiddleName: this.ownerMiddleName,
+      ownerLastName: this.ownerLastName,
+      ownerCompanyName: this.ownerCompanyName,
+      ownerIdNo: this.ownerIdNo,
+      ownerIdType: this.ownerIdType,
+      ownerPhoneNo: this.ownerPhoneNo,
+      ownerEmail: this.ownerEmail,
+      ownerAddress: this.ownerAddress,
+
+      // Agent Information
+      agentName: this.agentName,
+      agentAddress: this.agentAddress,
+      agentPhoneNo: this.agentPhoneNo,
+      agentEmail: this.agentEmail,
+      tformNumber: this.tformNumber,
+
+      billingType : this.billingType,
+
+      comments : this.comments,
+
+      billingAmount : this.billingAmount,
+
+      // Vehicle or Equipment Information
+      registrationNo: this.registrationNo,
+      chasisNo: this.chasisNo,
+
+      leftFrontLamp: this.leftFrontLamp === 'YES' ? 1 : 0,
+      rightFrontLamp: this.rightFrontLamp === 'YES' ? 1 : 0,
+      leftRearLamp: this.leftRearLamp === 'YES' ? 1 : 0,
+      rightRearLamp: this.rightRearLamp === 'YES' ? 1 : 0,
+      leftSideMirror: this.leftSideMirror === 'YES' ? 1 : 0,
+      rightSideMirror: this.rightSideMirror === 'YES' ? 1 : 0,
+      leftWiper: this.leftWiper === 'YES' ? 1 : 0,
+      rightWiper: this.rightWiper === 'YES' ? 1 : 0,
+      backWiper: this.backWiper === 'YES' ? 1 : 0,
+      fuelCap: this.fuelCap === 'YES' ? 1 : 0,
+      spareTire: this.spareTire === 'YES' ? 1 : 0,
+      battery: this.battery === 'YES' ? 1 : 0,
+      starter: this.starter === 'YES' ? 1 : 0,
+      aerial: this.aerial === 'YES' ? 1 : 0,
+      wheelCap: this.wheelCap === 'YES' ? 1 : 0,
+      roundMirror: this.roundMirror === 'YES' ? 1 : 0,
+      tireIndicator: this.tireIndicator === 'YES' ? 1 : 0,
+      hasKeys : this.hasKeys === 'YES' ? 1 : 0,
+      vehicleEquipmentTypeName : this.vehicleEquipmentTypeName,
+
+      deviceStatus : this.deviceStatus === 'ATTACHED' ? 1 : 0,
+
+      vehicleEquipmentCategory : this.vehicleEquipmentCategory,
+
+      vehicleEquipmentColor : this.vehicleEquipmentColor,
+
+      cardNo : this.cardNo,
+
+      billintType : this.billingType,
+
+      startBillingAt : startBillingAt,
+
+      parkingZoneName : this.parkingZoneName
+    }
+
+    console.log(parking)
+
+    /**Modify an exiisting parking */
+    await this.http.post<IParking>(API_URL+'/parkings/modify', parking, options)
+    .toPromise()
+    .then(
+      data => {
+        this.showParkingData(data!)
+
+        console.log(data)
+
+        this.getAllPendingOrCheckedInParkings()
+
+        this.msg.showSuccessMessage('Parking modified successifully')
+
+      }
+
+    )
+    .catch(
+      error => {
+        console.log(error)
+        this.msg.showErrorMessage(error, 'Error')
+      }
+    )
+
+    
+  }
+
   
 
   async activate(id : any){
@@ -533,6 +636,7 @@ export class VehicleRegisterComponent {
      this.cardNo = data!.cardNo
 
      this.billingType = data!.billingType
+     this.startBillingAt = data!.billingStartAt
 
   }
 
@@ -726,6 +830,11 @@ export class VehicleRegisterComponent {
       ]     
     };
     pdfMake.createPdf(docDefinition).print()
+  }
+
+
+  grant(privileges: string[]): boolean {
+    return this.auth.grant(privileges); // Adjust return value based on logic
   }
 
 }

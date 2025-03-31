@@ -43,4 +43,6 @@ public class VehicleEquipmentRequestDTO {
 	private String branchName;
 	
 	private String parkingZoneName;
+	
+	private String service;
 }

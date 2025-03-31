@@ -28,6 +28,7 @@ public class Operation {
 	 public static String CREATE = "CREATE";
 	 public static String READ = "READ";
 	 public static String UPDATE = "UPDATE";
+	 public static String MODIFY = "MODIFY";
 	 public static String DELETE = "DELETE";
 	 public static String CANCEL = "CANCEL";
 	 public static String REJECT = "REJECT";

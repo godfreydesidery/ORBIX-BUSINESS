@@ -178,6 +178,53 @@ public class ParkingServiceController implements ParkingService {
 	}
 	
 	@Override
+	public List<ParkingResponseDTO> getRecentCheckedOut(HttpServletRequest request) {
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-OUT");
+		
+		// Calculate the range
+		LocalDateTime now = dayService.getTimeStamp(); //LocalDateTime.now();
+		LocalDateTime before = now.minusHours(24);
+
+
+		List<Parking> parkings = parkingRepository.findAllByStatusInAndCheckedOutDateTimeBetween(statuses, before, now);
+		
+		//List<Parking> parkings = parkingRepository.findAllByStatusInAndCheckedOutBetween(statuses, LocalDateTime.now().);
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+
+		for(Parking parking : parkings) {
+			
+			boolean cleared = true;
+			
+			List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
+			if(!parkingBillReceivables.isEmpty() && cleared == true) {
+				for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
+					if(!parkingBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
+						cleared = false;
+						break;
+					}
+				}
+			}
+			
+			List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking);
+			if(!parkingServiceBillReceivables.isEmpty() && cleared == true) {
+				for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
+					if(!parkingServiceBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
+						cleared = false;
+						break;
+					}
+				}
+			}
+			
+			
+			if(cleared) parkingResponses.add(parkingResponseDTOMapper(parking));	
+							
+		}		
+		return parkingResponses;
+	}
+	
+	@Override
 	public List<ParkingResponseDTO> getAllCheckedInParkings(HttpServletRequest request) {
 		
 		List<String> statuses = new ArrayList<>();
@@ -194,11 +241,11 @@ public class ParkingServiceController implements ParkingService {
 
 	@Override
 	public ParkingResponseDTO get(Long id, HttpServletRequest request) {		
-	Optional<Parking> parking_ = parkingRepository.findById(id);
-	if(parking_.isEmpty()) {
-		throw new NotFoundException("Parking not found");
-	}		
-	return parkingResponseDTOMapper(parking_.get());	
+		Optional<Parking> parking_ = parkingRepository.findById(id);
+		if(parking_.isEmpty()) {
+			throw new NotFoundException("Parking not found");
+		}		
+		return parkingResponseDTOMapper(parking_.get());	
 	}
 	
 	@Override
@@ -222,6 +269,12 @@ public class ParkingServiceController implements ParkingService {
 
 	@Override
 	public ParkingResponseDTO createParking(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
+		
+		if (parkingRequest.getChasisNo() != null && !parkingRequest.getChasisNo().trim().isEmpty()) {
+		    if (parkingRepository.existsByChasisNoAndStatus(parkingRequest.getChasisNo(), "CHECKED-IN")) {
+		        throw new InvalidOperationException("Vehicle/Equipment with similar chasis number already checked in");
+		    }
+		}
 		
 		/**Validate data*/		
 		if(!validateParkingData(parkingRequest)) {
@@ -424,6 +477,105 @@ public class ParkingServiceController implements ParkingService {
 		
 		return parkingResponseDTOMapper(parking);			
 	}
+	
+	@Override
+	public ParkingResponseDTO modifyParking(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
+		
+		Optional<Parking> parking_ = parkingRepository.findById(parkingRequest.getId());
+		if(parking_.isEmpty()) throw new NotFoundException("Parking not found in database");
+			
+		if(!parking_.get().getStatus().equals("CHECKED-IN")) throw new NotFoundException("Can not modify only checked-in parking can be modified");
+			
+		if(!validateParkingData(parkingRequest)) throw new InvalidEntryException("Could not validate data");
+			
+		Optional<Company> company_ = companyRepository.findById(userService.getUserCompany(request).getId());
+		if(company_.isEmpty()) throw new NotFoundException("Company not found");
+			
+		Optional<Branch> branch_ = branchRepository.findById(userService.getUserBranch(request).getId());
+		if(branch_.isEmpty()) throw new NotFoundException("Branch not found");
+			
+		Optional<VehicleEquipmentType> vehicleEquipmentType_ = vehicleEquipmentTypeRepository.findByNameAndCompany(parkingRequest.getVehicleEquipmentTypeName(), company_.get());
+		if(vehicleEquipmentType_.isEmpty()) throw new NotFoundException("Vehicle or equipment type not found");
+			
+		
+		if(vehicleEquipmentType_.get().getCompany().getId() != company_.get().getId()) 
+			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
+		
+		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), branch_.get());
+		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
+		
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		
+		if(!parkingBillReceivables.isEmpty()) {
+			throw new InvalidOperationException("Cannot proceed with modification as there are already existing bills.");
+		}
+		
+		Parking parking = parking_.get();
+		parking.setOwnerFirstName(parkingRequest.getOwnerFirstName());
+		parking.setOwnerMiddleName(parkingRequest.getOwnerMiddleName());
+		parking.setOwnerLastName(parkingRequest.getOwnerLastName());
+		parking.setOwnerCompanyName(parkingRequest.getOwnerCompanyName());
+		parking.setOwnerIdNo(parkingRequest.getOwnerIdNo());
+		parking.setOwnerIdType(parkingRequest.getOwnerIdType());
+		parking.setOwnerPhoneNo(parkingRequest.getOwnerPhoneNo());
+		parking.setOwnerEmail(parkingRequest.getOwnerEmail());
+		parking.setOwnerAddress(parkingRequest.getOwnerAddress());
+		parking.setAgentName(parkingRequest.getAgentName());
+		parking.setAgentAddress(parkingRequest.getAgentAddress());
+		parking.setAgentPhoneNo(parkingRequest.getAgentPhoneNo());
+		parking.setAgentEmail(parkingRequest.getAgentEmail());
+		parking.setTformNumber(parkingRequest.getTformNumber());
+		parking.setRegistrationNo(parkingRequest.getRegistrationNo());
+		parking.setChasisNo(parkingRequest.getChasisNo());
+		parking.setCardNo(parkingRequest.getCardNo());
+		parking.setLeftFrontLamp(parkingRequest.isLeftFrontLamp());
+		parking.setRightFrontLamp(parkingRequest.isRightFrontLamp());
+		parking.setLeftRearLamp(parkingRequest.isLeftRearLamp());
+		parking.setRightRearLamp(parkingRequest.isRightRearLamp());
+		parking.setLeftSideMirror(parkingRequest.isLeftSideMirror());
+		parking.setRightSideMirror(parkingRequest.isRightSideMirror());
+		parking.setLeftWiper(parkingRequest.isLeftWiper());
+		parking.setRightWiper(parkingRequest.isRightWiper());
+		parking.setBackWiper(parkingRequest.isBackWiper());
+		parking.setFuelCap(parkingRequest.isFuelCap());
+		parking.setSpareTire(parkingRequest.isSpareTire());
+		parking.setBattery(parkingRequest.isBattery());
+		parking.setStarter(parkingRequest.isStarter());
+		parking.setAerial(parkingRequest.isAerial());
+		parking.setWheelCap(parkingRequest.isWheelCap());
+		parking.setRoundMirror(parkingRequest.isRoundMirror());
+		parking.setTireIndicator(parkingRequest.isTireIndicator());
+		parking.setHasKeys(parkingRequest.isHasKeys());
+		parking.setDeviceStatus(parkingRequest.isDeviceStatus());
+		parking.setVehicleEquipmentType(vehicleEquipmentType_.get());
+		parking.setVehicleEquipmentCategory(parkingRequest.getVehicleEquipmentCategory());
+		
+		parking.setVehicleEquipmentName(vehicleEquipmentType_.get().getName()); // Look here later
+		parking.setVehicleEquipmentColor(parkingRequest.getVehicleEquipmentColor());
+		
+		parking.setComments(parkingRequest.getComments());
+		
+		if(parkingRequest.startBillingAt == null) {
+			parking.setStartBillingAt(dayService.getTimeStamp().toLocalDate().atStartOfDay()); // You can change this depending on user billing preferences
+		}else {
+			
+			//String dateString = "2024-10-26 15:30:45" ;
+			String dateString = parkingRequest.getStartBillingAt() + " 00:00:00";
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+			parking.setStartBillingAt(dateTime);
+		}	
+		
+		
+		
+		parking.setParkingZone(parkingZone_.get());
+		
+		parking.setBillingType(parkingRequest.getBillingType());
+				
+		parking = parkingRepository.save(parking);
+		
+		return parkingResponseDTOMapper(parking);			
+	}
 
 	private ParkingResponseDTO parkingResponseDTOMapper(Parking parking) {
 		ParkingResponseDTO parkingResponse = new ParkingResponseDTO();
@@ -565,7 +717,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setCheckedInDateTime(dayService.getTimeStamp());
 		
 		if(parkingRequest.startBillingAt == null) {
-			parking.setStartBillingAt(dayService.getTimeStamp()); // You can change this depending on user billing preferences
+			parking.setStartBillingAt(dayService.getTimeStamp().toLocalDate().atStartOfDay()); // You can change this depending on user billing preferences
 		}else {
 			
 			//String dateString = "2024-10-26 15:30:45" ;

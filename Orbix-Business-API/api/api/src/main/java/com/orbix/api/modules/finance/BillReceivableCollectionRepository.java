@@ -48,9 +48,6 @@ public interface BillReceivableCollectionRepository extends JpaRepository<BillRe
 	    @Param("endDate") LocalDateTime endDate,
 	    @Param("cashierNickname") String cashierNickname
 	);
-
-
-
 }
 
 interface ICashierCollection {

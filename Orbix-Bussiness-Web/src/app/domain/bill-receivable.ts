@@ -55,3 +55,25 @@ export interface IServiceBillReceivable {
     sn : number
 
 }
+
+export interface IStorageBillReceivable {
+    id : any
+    startedAt : Date
+    endedAt : Date
+    description : string
+    billingType : string
+    qty : number
+    price : number
+
+    discount : number
+
+    amount : number
+
+    storageId : string
+    billReceivableId : string
+
+    payStatus : string
+
+    sn : number
+
+}

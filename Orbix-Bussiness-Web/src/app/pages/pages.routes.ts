@@ -251,6 +251,76 @@ export const routes: Routes = [
 
       /**End of Parking Management */
 
+      //Maintenance Management
+      /**Start of Maintenance management */
+      {
+        path : 'maintenance-management/maintenance',
+        loadComponent: () => import('./maintenance-management/maintenance/maintenance.component').then(c => c.MaintenanceComponent),
+        data : { breadcrumb : 'Maintenance Management/Maintenance'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'maintenance-management/maintenance-verify',
+        loadComponent: () => import('./maintenance-management/maintenance-verify/maintenance-verify.component').then(c => c.MaintenanceVerifyComponent),
+        data : { breadcrumb : 'Maintenance Management/Maintenance Verify'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'maintenance-management/maintenance-issue-type',
+        loadComponent: () => import('./maintenance-management/maintenance-issue-type/maintenance-issue-type.component').then(c => c.MaintenanceIssueTypeComponent),
+        data : { breadcrumb : 'Maintenance Management/Maintenance Issue Type'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'maintenance-management/service-specialist',
+        loadComponent: () => import('./maintenance-management/service-specialist/service-specialist.component').then(c => c.ServiceSpecialistComponent),
+        data : { breadcrumb : 'Maintenance Management/Service Specialist'},
+        canActivate : [AuthGuard]
+      },
+      /**End of Maintenance Management */
+
+      /**Workshop */
+
+
+      /**End of Workshop */
+      {
+        path : 'workshop/my-jobs',
+        loadComponent: () => import('./workshop/my-jobs/my-jobs.component').then(c => c.MyJobsComponent),
+        data : { breadcrumb : 'Workshop/My Jobs'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'workshop/my-closed-jobs',
+        loadComponent: () => import('./workshop/my-closed-jobs/my-closed-jobs.component').then(c => c.MyClosedJobsComponent),
+        data : { breadcrumb : 'Workshop/Verified Jobs'},
+        canActivate : [AuthGuard]
+      },
+
+      /**Storage Management */
+      {
+        path : 'storage-management/warehouse',
+        loadComponent: () => import('./storage-management/warehouse/warehouse.component').then(c => c.WarehouseComponent),
+        data : { breadcrumb : 'Storage Management/Warehouse'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'storage-management/good-type',
+        loadComponent: () => import('./storage-management/good-type/good-type.component').then(c => c.GoodTypeComponent),
+        data : { breadcrumb : 'Storage Management/Good Types'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'storage-management/select-warehouse',
+        loadComponent: () => import('./storage-management/select-warehouse/select-warehouse.component').then(c => c.SelectWarehouseComponent),
+        data : { breadcrumb : 'Warehouse/Select Warehouse'},
+        canActivate : [AuthGuard]
+      },
+
+
+
+      /**End Storage Management */
+
 
       {
         path : 'accounts-and-finance/invoices/receivable-invoice-list',
@@ -279,15 +349,39 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
       {
+        path : 'accounts-and-finance/storage-billing',
+        loadComponent: () => import('./accounts-and-finance/storage-billing/storage-billing.component').then(c => c.StorageBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Storage Billing'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'accounts-and-finance/vehicle-equipment-billing',
         loadComponent: () => import('./accounts-and-finance/vehicle-equipment-billing/vehicle-equipment-billing.component').then(c => c.VehicleEquipmentBillingComponent),
         data : { breadcrumb : 'Accounts & Finance | Vehicle & Equipment Billing'},
         canActivate : [AuthGuard]
       },
       {
+        path : 'accounts-and-finance/good-billing',
+        loadComponent: () => import('./accounts-and-finance/good-billing/good-billing.component').then(c => c.GoodBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Good Storage Billing'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'accounts-and-finance/release-vehicle-equipment',
         loadComponent: () => import('./accounts-and-finance/release-vehicle-equipment/release-vehicle-equipment.component').then(c => c.ReleaseVehicleEquipmentComponent),
         data : { breadcrumb : 'Accounts & Finance | Release Vehicle & Equipment'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'accounts-and-finance/maintenance-billing',
+        loadComponent: () => import('./accounts-and-finance/maintenance-billing/maintenance-billing.component').then(c => c.MaintenanceBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Maintenance Billing'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'accounts-and-finance/maintenance-vehicle-equipment-billing',
+        loadComponent: () => import('./accounts-and-finance/maintenance-vehicle-equipment-billing/maintenance-vehicle-equipment-billing.component').then(c => c.MaintenanceVehicleEquipmentBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Maintenance Veh/Eq Billing'},
         canActivate : [AuthGuard]
       },
 

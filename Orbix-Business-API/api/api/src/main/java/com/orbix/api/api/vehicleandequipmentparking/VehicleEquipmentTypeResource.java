@@ -29,9 +29,9 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class VehicleEquipmentTypeResource {
 	
-private final VehicleEquipmentTypeService vehicleEquipmentTypeService;
-private final UserService userService;
-private final VehicleEquipmentTypeRepository vehicleEquipmentTypeRepository;
+	private final VehicleEquipmentTypeService vehicleEquipmentTypeService;
+	private final UserService userService;
+	private final VehicleEquipmentTypeRepository vehicleEquipmentTypeRepository;
 	
 	@GetMapping("/vehicle_equipment_types")
 	public ResponseEntity<List<VehicleEquipmentTypeResponseDTO>>getAll(HttpServletRequest request){
