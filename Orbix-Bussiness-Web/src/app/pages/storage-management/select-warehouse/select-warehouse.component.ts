@@ -77,7 +77,7 @@ export class SelectWarehouseComponent {
   height: number = 0 // In cm
   startBillingAt: Date | null = null
   status: string = ''
-  billingType: string = ''
+  billingType: string = 'FLAT-RATE'
   billingAmount: number | null = null
   initialQty: number = 0
   currentQty: number = 0
@@ -256,7 +256,8 @@ export class SelectWarehouseComponent {
       length : this.length,
       width : this.width,
       height : this.height,
-      weight : this.weight
+      weight : this.weight,
+      initialQty : this.initialQty
     }
 
 

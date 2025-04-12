@@ -26,4 +26,6 @@ public interface StorageService {
 //	ApiCustomResponse deactivateStorage(StorageRequestDTO storageRequest, HttpServletRequest request);
 	
 	StorageBillReceivableResponseDTO createStorageBillReceivable(Long storageId, LocalDateTime startedAt, LocalDateTime endedAt, String billingType, double qty, double price, double discount, int autoBilling, HttpServletRequest request);
+
+	StorageCustomBillDetail showStorageCustomBillDetail(Long storageId, HttpServletRequest request);
 }

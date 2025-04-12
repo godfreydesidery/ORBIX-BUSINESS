@@ -29,6 +29,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class StorageResource {
 	private final StorageService storageService;
+	private final StorageBillReceivableService storageBillReceivableService;
 	
 	private final StorageBillReceivableRepository storageBillReceivableRepository;
 	
@@ -157,8 +158,33 @@ public class StorageResource {
 		return ResponseEntity.created(uri).body(storageService.createStorageBillReceivable(storageBillReceivableRequest.getStorageId(), startedAt, endedAt, storageBillReceivableRequest.getBillingType(), storageBillReceivableRequest.getQty(), storageBillReceivableRequest.getPrice(), storageBillReceivableRequest.getDiscount(), storageBillReceivableRequest.getAutoBilling(), request));
 	}
 	
+	@PostMapping("/storages/create_storage_custom_bill_receivable")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<StorageBillReceivableResponseDTO>createStorageCustomBillReceivable(
+			@RequestBody StorageBillReceivableRequestDTO storageBillReceivableRequest,
+			HttpServletRequest request){		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/storages/create").toUriString());
+		
+//		String dateString = storageBillReceivableRequest.getStartedAt() + " 00:00:00";
+//		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//		LocalDateTime startedAt = LocalDateTime.parse(dateString, formatter);
+//		dateString = storageBillReceivableRequest.getEndedAt() + " 00:00:00";
+//		LocalDateTime endedAt = LocalDateTime.parse(dateString, formatter);
 
+		
+		return ResponseEntity.created(uri).body(storageBillReceivableService.createStorageCustomBillReceivable(storageBillReceivableRequest, request));
+	}
 	
+
+	@GetMapping("/storages/get_custom_bill_item")
+	public ResponseEntity<StorageCustomBillDetail>getCustomBill(
+			@RequestParam(name = "storage_id") Long storageId,
+			HttpServletRequest request){
+		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/storages/create").toUriString());
+		
+		return ResponseEntity.created(uri).body(storageService.showStorageCustomBillDetail(storageId, request));
+	}
 	
 	
 	

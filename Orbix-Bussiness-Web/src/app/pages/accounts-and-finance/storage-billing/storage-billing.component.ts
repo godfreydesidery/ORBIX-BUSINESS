@@ -128,6 +128,8 @@ page: number = 1; // Initialize the current page to 1
 
   warehouseName : string = ''
 
+  initialQty : number = 0
+
 
 
 
@@ -320,6 +322,8 @@ page: number = 1; // Initialize the current page to 1
     this.billingAmount = data?.billingAmount
     this.billingStartAt = data?.billingStartAt
 
+    this.initialQty = data?.initialQty
+
     this.goodName = data!.goodName
 
     this.goodTypeName = data!.goodTypeName
@@ -349,6 +353,8 @@ page: number = 1; // Initialize the current page to 1
     this.billingStartAt = ''
     this.goodTypeName = ''
 
+    this.initialQty = 0
+
     this.goodName = ''
 
     this.goodCategory = ''
@@ -361,3 +367,4 @@ page: number = 1; // Initialize the current page to 1
   }
 
 }
+

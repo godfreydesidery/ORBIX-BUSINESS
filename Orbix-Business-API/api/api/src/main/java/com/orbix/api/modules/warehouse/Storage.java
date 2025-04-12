@@ -78,8 +78,8 @@ public class Storage {
 	private String billingType;
 	private double billingAmount;
 	
-	private int initialQty = 1;
-	private int currentQty = 1;
+	private double initialQty = 1;
+	private double currentQty = 1;
 	
 	@ManyToOne(targetEntity = Warehouse.class, fetch = FetchType.EAGER,  optional = true)
     @JoinColumn(name = "warehouse_id", nullable = true , updatable = true)

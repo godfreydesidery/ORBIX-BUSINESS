@@ -116,6 +116,14 @@
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
+                                    <label>Select Billing Type</label>
+                                    <select class="form-control" [(ngModel)]="billingType">
+                                        <option>FLAT-RATE</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
                                     <label>Good Description</label>
                                     <textarea class="form-control" [(ngModel)]="goodDescription" autocomplete="nope"></textarea>
                                 </div>
@@ -142,6 +150,12 @@
                                 <div class="form-group">
                                     <label>Weight(kg)</label>
                                     <input class="form-control" type="number" [(ngModel)]="weight" autocomplete="nope" min="0">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Qty</label>
+                                    <input class="form-control" type="number" [(ngModel)]="initialQty" autocomplete="nope" min="0">
                                 </div>
                             </div>
                             <div class="col-lg-3">

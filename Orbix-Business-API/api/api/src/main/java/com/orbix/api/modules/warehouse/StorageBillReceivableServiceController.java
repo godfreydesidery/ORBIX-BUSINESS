@@ -1,5 +1,6 @@
 package com.orbix.api.modules.warehouse;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
@@ -188,6 +189,65 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		storageBillReceivable.setDiscount(storageBillReceivableRequest.getDiscount());
 		storageBillReceivable = storageBillReceivableRepository.save(storageBillReceivable);
 		
+		return storageBillReceivableDTOMapper(storageBillReceivable);
+	}
+	
+	@Override
+	public StorageBillReceivableResponseDTO createStorageCustomBillReceivable(
+			StorageBillReceivableRequestDTO storageBillReceivableRequest,
+			HttpServletRequest request) {
+		
+		Storage storage = storageRepository.findById(storageBillReceivableRequest.getStorageId())
+                .orElseThrow(() -> new NotFoundException("Storage not found."));
+		
+		if(!storage.getBillingType().equals("FLAT-RATE")) {
+			throw new InvalidOperationException("This is only for flat rate");
+		}
+		
+		List<StorageBillReceivable> rcvs = storageBillReceivableRepository.findAllByStorage(storage);
+		
+		double paidQty = 0;
+		
+		for(StorageBillReceivable sbr : rcvs) {
+			paidQty = paidQty + sbr.getQty();
+		}
+		
+		double qty = storageBillReceivableRequest.getQty();
+		
+		if(qty > (storage.getInitialQty() - paidQty)) {
+			throw new InvalidOperationException("Qty to be paid must not be more than available qty");
+		}
+		
+		BillReceivable billReceivable = new BillReceivable();
+		billReceivable.setNo(String.valueOf(Math.random()));
+		billReceivable.setAmount((storage.getBillingAmount() * qty) - storageBillReceivableRequest.getDiscount());
+		billReceivable.setPaid(0);
+		billReceivable.setQty(qty);
+		billReceivable.setDue((storage.getBillingAmount() * qty) - storageBillReceivableRequest.getDiscount());
+		billReceivable.setBranch(storage.getBranch());
+		billReceivable.setCreatedDateTime(dayService.getTimeStamp());
+		
+		billReceivable.setPayStatus(PayStatus.UNPAID);
+		billReceivable.setSummary("Storage bill for storage#: " + storage.getNo());
+		
+		billReceivable = billReceivableRepository.save(billReceivable);
+		billReceivable.setNo("BR" + billReceivable.getId().toString());
+		billReceivable = billReceivableRepository.save(billReceivable);
+		
+		StorageBillReceivable storageBillReceivable = new StorageBillReceivable();
+		
+		LocalDate today = LocalDate.now();
+		storageBillReceivable.setStartedAt(today.atStartOfDay());
+		storageBillReceivable.setEndedAt(today.atTime(23, 59, 59));
+		
+		storageBillReceivable.setPrice(storage.getBillingAmount());
+		storageBillReceivable.setQty(qty);
+		storageBillReceivable.setDiscount(storageBillReceivableRequest.getDiscount());
+		storageBillReceivable.setBillReceivable(billReceivable);
+		storageBillReceivable.setStorage(storage);
+		
+		storageBillReceivable = storageBillReceivableRepository.save(storageBillReceivable);
+
 		return storageBillReceivableDTOMapper(storageBillReceivable);
 	}
 	

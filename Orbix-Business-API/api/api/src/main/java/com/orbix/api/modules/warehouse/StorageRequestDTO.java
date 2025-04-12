@@ -51,4 +51,5 @@ public class StorageRequestDTO {
     double length;
     double height;
     double weight;
+    double initialQty;
 }

@@ -283,7 +283,13 @@ public class StorageServiceController implements StorageService {
 		storage.setHeight(storageRequest.getHeight());
 		storage.setWeight(storageRequest.getWeight());
 		
-		storage.setBillingType("DAILY");
+		storage.setBillingType("DAILY");		
+		if(storageRequest.getBillingType().equals("FLAT-RATE")) {
+			storage.setInitialQty(storageRequest.getInitialQty());
+			storage.setCurrentQty(storageRequest.getInitialQty());
+			storage.setBillingType("FLAT-RATE");
+		}
+		
 		storage.setBillingAmount(storageRequest.getBillingAmount());
 		
 		//storage.setImage(storageRequest.getImage());
@@ -412,6 +418,7 @@ public class StorageServiceController implements StorageService {
 		storageResponse.setLength(String.valueOf(storage.getLength()));
 		storageResponse.setHeight(String.valueOf(storage.getHeight()));
 		storageResponse.setWeight(String.valueOf(storage.getWeight()));
+		storageResponse.setInitialQty(String.valueOf(storage.getInitialQty()));
 		
 		storageResponse.setBillingStartAt(
 			    Optional.ofNullable(storage.getStartBillingAt())
@@ -608,14 +615,22 @@ public class StorageServiceController implements StorageService {
 		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage_.get());
 		LocalDateTime lastDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
 		LocalDateTime lastBillDate = LocalDateTime.now().toLocalDate().atStartOfDay();
+		double billedQty = 0;
 		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
+			billedQty = billedQty + storageBillReceivable.getQty();
 			if(storageBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.UNPAID)) {
 				throw new InvalidOperationException("Can not check out, bills  not cleared");
 			}
 			lastBillDate = storageBillReceivable.getEndedAt();
 		}
-		if(lastBillDate.isBefore(lastDate)) {
+		if(lastBillDate.isBefore(lastDate) && (!storage_.get().getBillingType().equals("FLAT-RATE"))) {
 			throw new InvalidOperationException("Could not checkout. Some storage days have not been billed. Please generate and clear bills");
+		}
+		
+		if(storage_.get().getBillingType().equals("FLAT-RATE")) {
+			if(billedQty < storage_.get().getInitialQty()) {
+				throw new InvalidOperationException("Could not check out. Billed qty is less than total qty, for flat rate");
+			}
 		}
 		
 		Storage storage = storage_.get();
@@ -769,6 +784,31 @@ public class StorageServiceController implements StorageService {
 		
 		return null;
 	}
+
+	@Override
+	public StorageCustomBillDetail showStorageCustomBillDetail(Long storageId, HttpServletRequest request) {
+		
+		Storage storage = storageRepository.findById(storageId)
+		        .orElseThrow(() -> new NotFoundException("Storage not found"));
+		
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findByStorage(storage);
+		StorageCustomBillDetail storageCustomBillDetail = new StorageCustomBillDetail();
+		
+		storageCustomBillDetail.setTotalQty(storage.getInitialQty());
+		double billedQty = 0;
+		
+		for(StorageBillReceivable sbr : storageBillReceivables) {
+			billedQty = billedQty + sbr.getQty();
+		}
+		
+		storageCustomBillDetail.setBilledQty(billedQty);
+		
+		storageCustomBillDetail.setUnbilledQty(storage.getInitialQty() - billedQty);
+		
+		storageCustomBillDetail.setBillingRate(storage.getBillingAmount());
+		
+		return storageCustomBillDetail;
+	}
 }
 
 @Data
@@ -778,4 +818,12 @@ class ServiceBillItem {
 	double qty;
 	String payStatus;
 	double amount;
+}
+
+@Data
+class StorageCustomBillDetail{
+	double totalQty;
+	double billedQty;
+	double unbilledQty;
+	double billingRate;
 }

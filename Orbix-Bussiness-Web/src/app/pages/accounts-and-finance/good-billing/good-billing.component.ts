@@ -159,6 +159,38 @@ export class GoodBillingComponent {
   }
 
 
+  qty : number = 0
+  async createStorageCustomBill(){
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    var customBill = {
+      storageId : this.storageId,
+      qty : this.qty,
+      
+    }
+
+    await this.http.post<IStorageBillReceivable>(API_URL+'/storages/create_storage_custom_bill_receivable', customBill, options)  
+    .toPromise()
+    .then(
+      data => {
+        this.getStorageBillReceivables(this.storageId)
+        this.msg.showSuccessMessage('Storage bill created successfully')
+        console.log(data)
+      }   
+    )
+    .catch(
+      error => {
+        this.msg.showErrorMessage(error, 'Error')
+        console.log(error)
+      }
+    )
+
+
+  }
+
 
   async saveStorageBill() { 
       if(await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to save this storage bill?', 'question', 'Yes', 'No') == false){
@@ -855,6 +887,48 @@ export class GoodBillingComponent {
     this.warehouseName = ''
 
     this.billingType = ''
+  } 
+
+  totalQty : number = 0
+  billedQty : number = 0
+  unbilledQty : number = 0
+  billingRate : number = 0
+
+  totalBillingAmount : number = 0
+
+  async getStorageCustomBillingDetails(){
+    let options = { 
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    this.totalQty = 0
+    this.billedQty = 0
+    this.unbilledQty = 0
+    this.billingRate = 0
+    this.qty = 0
+
+    await this.http.get<IStorageCustomBillDetail>(API_URL+'/storages/get_custom_bill_item?storage_id=' + this.storageId, options)
+    .toPromise()
+    .then(
+      data => {
+
+        this.totalQty = data!.totalQty
+        this.billedQty = data!.billedQty
+        this.unbilledQty = data!.unbilledQty
+        this.billingRate = data!.billingRate
+        
+        console.log(data)
+      }
+    )
+  }
+
+  calcBillAmount(){
+    if(this.qty > this.unbilledQty){
+      this.qty = 0
+    }else if(this.qty < 0){
+      this.qty = 0
+    }
+    this.totalBillingAmount = this.qty * this.billingRate
   }
 
 
@@ -1016,4 +1090,20 @@ export interface IBillReceivableCollection {
 
 interface IModel{
   stringData : string
+}
+
+
+// @Data
+// class StorageCustomBillDetail{
+// 	double totalQty;
+// 	double billedQty;
+// 	double unbilledQty;
+// 	double billingRate;
+// }
+
+interface IStorageCustomBillDetail{
+  totalQty : number
+  billedQty : number
+  unbilledQty : number
+  billingRate : number
 }
