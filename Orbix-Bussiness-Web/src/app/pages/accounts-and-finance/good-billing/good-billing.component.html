@@ -19,7 +19,7 @@
                             <div class="col-sm-12">
                                 <!-- <button type="button" class="btn btn-primary btn-round-custom" (click)="clearStorageBill()" (click)="saveStorageBill()">Bill to Current Date</button>
                                 <button type="button" class="btn btn-primary btn-round-custom" (click)="clearStorageBill()" data-toggle="modal" data-target="#storage-bill-to-future-modal">Bill to Future Date</button> -->
-                                <button type="button" class="btn btn-primary btn-round-custom" (click)="getStorageCustomBillingDetails()" data-toggle="modal" data-target="#storage-custom-bill-modal">Storage Custom Billing</button>
+                                <button type="button" class="btn btn-outline-primary btn-round-custom" (click)="getStorageCustomBillingDetails()" data-toggle="modal" data-target="#storage-custom-bill-modal"><i class="fa fa-money"></i> Storage Custom Billing</button>
                             </div>
                         </div>
                         <div class="row">
@@ -165,7 +165,7 @@
             <hr>
             <div class="row">
                 <div class="col-sm-12" style="text-align: center;">
-                    <button class="btn btn-success btn-round-custom" (click)="refreshBillReceivables()" (click)="clearReceipt()" (click)="get(storageId)">Go to Payment</button>
+                    <button class="btn btn-outline-success btn-round-custom" (click)="refreshBillReceivables()" (click)="clearReceipt()" (click)="get(storageId)"><i class="fa fa-bank"></i> Go to Payment</button>
                 </div>
             </div>
             <hr>
@@ -567,7 +567,7 @@
             </div>
             <div class="modal-body">
 
-                <table class="table table-striped table-sm">
+                <table class="table table-striped table-sm table-bordered">
                     <tbody>
                         <tr><td>Total Qty</td><td>{{totalQty}}</td></tr>
                         <tr><td>Billed Qty</td><td>{{billedQty}}</td></tr>

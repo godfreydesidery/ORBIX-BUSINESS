@@ -218,10 +218,15 @@
                                         <span class="badge badge-success" *ngIf="storage.status === 'CHECKED-IN'">{{storage.status}}</span>
                                         <span class="badge badge-danger" *ngIf="storage.status === 'CHECKED-OUT'">{{storage.status}}</span>
 
-                                    <td>
-                                        <button class="btn btn-primary btn-round-custom" *ngIf="storage.status === 'PENDING'" (click)="getStorage(storage.id)" data-toggle="modal" data-target="#edit-modal">Edit</button>
-                                        <button class="btn btn-primary btn-round-custom" *ngIf="storage.status === 'PENDING'" (click)="checkIn(storage.id, storage.no, storage.goodName)" >Check-In</button>
-                                        <button class="btn btn-warning btn-round-custom" *ngIf="storage.status === 'CHECKED-IN'" (click)="checkOut(storage.id, storage.no, storage.goodName)" >Check-Out</button>
+                                    <td class="d-flex flex-wrap gap-2">
+                                        <div class="d-flex flex-row flex-wrap align-items-center gap-2">
+                                            <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="getStorage(storage.id)" data-toggle="modal" data-target="#edit-modal">Edit</button>
+                                            <button class="btn btn-primary btn-round-custom btn-sm" (click)="get(storage.id)" data-toggle="modal" data-target="#view-modal">View</button>
+                                            <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleaseDetail(storage.id)" data-toggle="modal" data-target="#storage-good-release-modal">Release</button>
+                                            <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleases(storage.id)" data-toggle="modal" data-target="#storage-good-releases-modal">Releases</button>
+                                            <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="checkIn(storage.id, storage.no, storage.goodName)" >Check-In</button>
+                                            <button class="btn btn-warning btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="checkOut(storage.id, storage.no, storage.goodName)" >Check-Out</button>
+                                        </div>
                                     </td>
                                 </tr>
                             </tbody>
@@ -473,6 +478,155 @@
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal">Check In</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="view-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">View</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+
+
+            <div class="modal-body">
+                <hr>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm table-bordered">
+                            <thead>
+                                <p><b>Owner Information</b></p>
+                            </thead>
+                            <tbody>
+                                <tr><td><b>First Name</b></td><td>{{ownerFirstName}}</td></tr>
+                                <!-- <tr><td><b>Middle Name</b></td><td>{{ownerMiddleName}}</td></tr> -->
+                                <tr><td><b>Last Name</b></td><td>{{ownerLastName}}</td></tr> 
+                                <tr><td><b>ID Type</b></td><td>{{ownerIdType}}</td></tr>
+                                <tr><td><b>ID No</b></td><td>{{ownerIdNo}}</td></tr>   
+                                <tr><td><b>Phone No</b></td><td>{{ownerPhoneNo}}</td></tr>   
+                                <tr><td><b>Email</b></td><td>{{ownerEmail}}</td></tr>    
+                            </tbody>
+                            
+                            
+                        </table>
+                    </div>
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm table-bordered">
+                            <thead>
+                                <p><b>Storage Information</b></p>
+                            </thead>
+                            <tbody>
+                                <tr><td><b>Storage No</b></td><td>{{no}}</td></tr>
+                                <tr><td><b>Good Name</b></td><td>{{goodName}}</td></tr>
+                                <tr><td><b>Good Type</b></td><td>{{goodTypeName}}</td></tr>
+                                <tr><td><b>Initial Qty</b></td><td>{{initialQty}}</td></tr>
+                                <tr><td><b>Billing Type</b></td><td>{{billingType}}</td></tr>
+                                <tr><td><b>Billing Start Date</b></td><td>{{startBillingAt}}</td></tr> 
+                                <!-- <tr><td><b>Billing Amount</b></td><td style="text-align: right;">{{billingAmount}}</td></tr>  -->
+                                <tr><td><b>Warehouse</b></td><td>{{warehouseName}}</td></tr>   
+                                <tr><td><b>Storage No</b></td><td>{{no}}</td></tr>   
+                                <tr><td><b>Status</b></td><td>{{status}}</td></tr>    
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm">
+                            
+                        </table>
+                    </div>
+                    <!-- <div class="col-lg-12">
+                        <p><b>Gate Pass Valid Until</b></p>
+                        <input type="date" class="form-control" [(ngModel)]="validUntilDate">
+                        
+                    </div> -->
+                    <div class="col-lg-12">
+                        <p><b>Comments</b></p>
+                        <textarea class="form-control" placeholder="Comments" [(ngModel)]="comments" readonly style="background-color: white;"></textarea>
+
+                        <!-- <input type="text" class="form-control" placeholder="Comments" [(ngModel)]="comments" readonly> -->
+                        
+                    </div>
+                </div>
+            </div>
+            
+            <div class="modal-footer">
+                <!-- <button type="button" class="btn btn-primary" (click)="checkOut()">Check Out</button> -->
+                <!-- <button type="button" class="btn btn-primary">Print Gate Pass</button> -->
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="storage-good-release-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-md" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Release Goods</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+
+                <table class="table table-striped table-sm table-bordered">
+                    <tbody>
+                        <tr><td>Initial Qty</td><td>{{originalQty}}</td></tr>
+                        <tr><td>Current Qty</td><td>{{availableQty}}</td></tr>
+                        <tr><td>Released Qty</td><td>{{releasedQty}}</td></tr>
+                        <tr><td>Available for Release</td><td>{{availableForRelease}}</td></tr>
+                        <tr><td>Enter Qty to be release</td><td><input class="form-control" [(ngModel)]="qtyToRelease" style="text-align: center;"></td></tr>
+                    </tbody>
+                </table>
+              
+                <div class="row">
+                    <div class="col-lg-12">
+                        <button type="button" class="btn btn-primary btn-round-custom" (click)="createStorageGoodRelease()" data-dismiss="modal">Confirm Release</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="storage-good-releases-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-lg" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">View Releases</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+
+                <table class="table table-striped table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Release No</th>
+                            <th>Released Date</th>
+                            <th>Released Qty</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let release of releases">
+                            <td>{{release.no}}</td>
+                            <td>{{release.releaseDate | date: 'dd-MM-yyyy'}}</td>
+                            <td>{{release.qty}}</td>
+                            <td><button class="btn btn-success btn-round-custom btn-sm" (click)="printStorageGoodReleaseNote(release.id)">Print Release Note</button></td>
+                        </tr>
+                    </tbody>
+                    
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

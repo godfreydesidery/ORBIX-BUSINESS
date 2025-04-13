@@ -19,6 +19,7 @@ import { IStorage } from 'src/app/domain/storage';
 import { IGoodType } from 'src/app/domain/good-type';
 import { error } from 'src/custom-packages/util';
 
+import * as pdfMake from 'pdfmake/build/pdfmake';
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
@@ -38,6 +39,13 @@ const API_URL = environment.apiUrl;
   styleUrl: './select-warehouse.component.scss'
 })
 export class SelectWarehouseComponent {
+
+  documentHeader! : any
+
+  from : Date | string | null = null
+  to : Date | string | null = null
+
+  nickname = ''
 
   page: number = 1; // Initialize the current page to 1
 
@@ -84,6 +92,7 @@ export class SelectWarehouseComponent {
   warehouseId: any = null
   goodTypeId: any = null
   goodTypeName: string = ''
+  warehouseName : string = ''
 
   storages: IStorage[] = []
   goodTypes: IGoodType[] = []
@@ -341,7 +350,7 @@ export class SelectWarehouseComponent {
     this.ownerPhoneNo = ''
     this.ownerEmail = ''
     this.ownerAddress = ''
-    this.billingType = 'DAILY'
+    this.billingType = 'FLAT-RATE'
     this.billingAmount = null
     this.goodTypeId = null
     this.goodTypeName = ''
@@ -423,6 +432,22 @@ export class SelectWarehouseComponent {
         this.msg.showErrorMessage(error, 'Error')
       })
   }
+
+  async get(id : any){
+  
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      }
+      await this.http.get<IStorage>(API_URL+'/storages/get?id=' + id, options)
+      .toPromise()
+      .then(
+        data => {
+          this.startBillingAt = null
+          this.showStorageData(data!)
+          console.log(data)
+        }
+      )
+    }
 
   async checkIn(id: any, no: string, descr: string) {
     if (await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to check in storage no: ' + no + ' - ' + descr + '?', 'question', 'Yes', 'No') == false) {
@@ -534,4 +559,300 @@ export class SelectWarehouseComponent {
   //         }
   //       )
   //   }
+
+
+  originalQty : number = 0
+  availableQty : number = 0
+  releasedQty : number = 0
+  availableForRelease : number = 0
+
+  qtyToRelease : number = 0
+
+  currentStorageId : any = null
+
+  async getStorageGoodReleaseDetail(storageId : any){
+      let options = { 
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      }
+  
+      this.originalQty = 0
+      this.availableQty = 0
+      this.releasedQty = 0
+      this.availableForRelease = 0
+
+      this.currentStorageId = null
+
+      this.qtyToRelease = 0
+  
+      await this.http.get<IStorageGoodReleaseDetail>(API_URL+'/storage_good_releases/get_storage_good_release_detail?storage_id=' + storageId, options)
+      .toPromise()
+      .then(
+        data => {
+
+          this.currentStorageId = storageId
+  
+          this.originalQty = data!.initialQty
+          this.availableQty = data!.currentQty
+          this.releasedQty = data!.releasedQty
+          this.availableForRelease = data!.availableForRelease
+
+          this.qtyToRelease = 0
+          
+          console.log(data)
+        }
+      )
+    }
+
+
+    async createStorageGoodRelease(){
+  
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      }
+  
+      var storageGoodRelease = {
+        storageId : this.currentStorageId,
+        qty : this.qtyToRelease,
+        
+      }
+  
+      await this.http.post<IStorageGoodReleaseDetail>(API_URL+'/storage_good_releases/create_storage_good_release', storageGoodRelease, options)  
+      .toPromise()
+      .then(
+        data => {
+          //this.getStorageBillReceivables(this.storageId)
+          this.msg.showSuccessMessage('Success')
+          console.log(data)
+        }   
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+          console.log(error)
+        }
+      )
+  
+  
+    }
+
+    releases : IStorageGoodRelease[] = []
+
+    async getStorageGoodReleases(storageId : any){
+      let options = { 
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      }
+      this.releases = []
+  
+      await this.http.get<IStorageGoodRelease[]>(API_URL+'/storage_good_releases/get_by_storage?storage_id=' + storageId, options)
+      .toPromise()
+      .then(
+        data => {
+
+          this.releases = data!.slice().reverse()
+          console.log(data)
+        }
+      )
+    }
+
+  //   String id;
+	// String no;
+	// String qty;
+	// String status;
+	// String storageId;
+	// String releaseDate;
+	// //
+	// String clientName;
+	// String goodName;
+	// String unitPrice;
+	// String total;
+
+
+  storageGoodReleaseId : any
+  storageGoodReleaseNo : string = ''
+  storageGoodReleaseQty : number = 0
+  storageGoodReleaseStatus : string = ''
+  storageGoodReleaseStorageId : string = ''
+  storageGoodReleaseReleaseDate : string = ''
+  storageGoodReleaseClientName : string = ''
+  storageGoodReleaseGoodName : string = ''
+  storageGoodReleaseUnitPrice : string = ''
+  storageGoodReleaseTotal : string = ''
+
+    async getStorageGoodRelease(id : any){
+      let options = { 
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      }
+
+      this.storageGoodReleaseId = null
+      this.storageGoodReleaseNo = ''
+      this.storageGoodReleaseQty = 0
+      this.storageGoodReleaseStatus = ''
+      this.storageGoodReleaseStorageId = ''
+      this.storageGoodReleaseReleaseDate = ''
+      this.storageGoodReleaseClientName = ''
+      this.storageGoodReleaseGoodName = ''
+      this.storageGoodReleaseUnitPrice = ''
+      this.storageGoodReleaseTotal = ''
+  
+      await this.http.get<IStorageGoodRelease>(API_URL+'/storage_good_releases/get?id=' + id, options)
+      .toPromise()
+      .then(
+        data => {
+
+          this.storageGoodReleaseId = data!.id
+          this.storageGoodReleaseNo = data!.no
+          this.storageGoodReleaseQty = data!.qty
+          this.storageGoodReleaseStatus = data!.status
+          this.storageGoodReleaseStorageId = data!.storageId
+          this.storageGoodReleaseReleaseDate = data!.releaseDate
+          this.storageGoodReleaseClientName = data!.clientName
+          this.storageGoodReleaseGoodName = data!.goodName
+          this.storageGoodReleaseUnitPrice = data!.unitPrice
+          this.storageGoodReleaseTotal = data!.total
+
+          console.log(data)
+        }
+      )
+    }
+
+    async printStorageGoodReleaseNote(id : any){
+      await this.getStorageGoodRelease(id)
+
+      this.documentHeader = await this.data.getDocumentHeader()
+        const title = 'Gate Pass - Storage Release'
+
+        // Define document structure
+        const docDefinition: any = {
+          header: '',
+          pageOrientation: 'potrait',
+          footer: (currentPage: any, pageCount: any) => ({
+            text: `${currentPage} of ${pageCount}`,
+            alignment: 'center',
+            fontSize: 8,
+          }),
+          content: [
+            // Document Header
+            {
+              columns: [this.documentHeader],
+              margin: [0, 0, 0, 10]
+            },
+      
+            // Title
+            {
+              text: title,
+              fontSize: 16,
+              bold: true,
+              alignment: 'left',
+              margin: [0, 10, 0, 20],
+            },
+      
+            // No and Date
+            {
+              columns: [
+                {
+                  text: 'No: ' + this.storageGoodReleaseNo,
+                  fontSize: 12,
+                  width: '50%',
+                },
+                {
+                  text: 'Date: ____________',
+                  alignment: 'right',
+                  fontSize: 12,
+                  width: '50%',
+                },
+              ],
+              margin: [0, 0, 0, 10],
+            },
+      
+            // Client Name
+            {
+              text: 'Client Name: ' + this.storageGoodReleaseClientName,
+              fontSize: 12,
+              margin: [0, 0, 0, 15],
+            },
+      
+            // Table Header
+            {
+              columns: [
+                { text: 'Description', bold: true, fontSize: 12, width: '30%' },
+                { text: 'Qty', bold: true, fontSize: 12, width: '20%' },
+                { text: 'Unit Price', bold: true, fontSize: 12, width: '25%', alignment: 'right' },
+                { text: 'Total', bold: true, fontSize: 12, width: '25%', alignment: 'right' },
+              ],
+              margin: [0, 0, 0, 5],
+            },
+      
+            // Table Row
+            {
+              columns: [
+                { text: this.storageGoodReleaseGoodName, fontSize: 11, width: '25%' },
+                { text: this.storageGoodReleaseQty, fontSize: 11, width: '25%' },
+                { text: this.getTzFormatCurrency(this.storageGoodReleaseUnitPrice), fontSize: 11, alignment: 'right', width: '25%' },
+                { text: this.getTzFormatCurrency(this.storageGoodReleaseTotal), fontSize: 11, alignment: 'right', width: '25%' },
+              ],
+              margin: [0, 0, 0, 10],
+            },
+      
+            // Total Section
+            {
+              columns: [
+                { text: '', width: '50%' },
+                {
+                  text: 'Total (TZS): ' + this.getTzFormatCurrency(this.storageGoodReleaseTotal),
+                  fontSize: 12,
+                  bold: true,
+                  alignment: 'right',
+                  width: '50%',
+                },
+              ],
+              margin: [0, 10, 0, 20],
+            },
+            {text : ''},
+            {text : ''},
+            {
+              text: 'Served By: _________________________',
+              fontSize: 12,
+              margin: [0, 0, 0, 15],
+            },
+          ],
+        };
+      
+        pdfMake.createPdf(docDefinition).print();
+
+    }
+
+    getTzFormatCurrency(value: any) {
+      return new Intl.NumberFormat('en-TZ', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(value);
+    }
+
+    
+
+
+
+
+
+
+}
+
+interface IStorageGoodReleaseDetail{
+  initialQty : number
+  currentQty : number
+  releasedQty : number
+  availableForRelease : number
+}
+
+interface IStorageGoodRelease{
+  id : any
+  no : string
+  qty : number
+  status : string
+  storageId : any
+  releaseDate : string
+  clientName : string
+  goodName : string
+  unitPrice : string
+  total : string
 }
