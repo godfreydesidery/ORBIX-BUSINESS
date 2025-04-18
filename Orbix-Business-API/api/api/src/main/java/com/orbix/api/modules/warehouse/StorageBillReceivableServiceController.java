@@ -1,5 +1,6 @@
 package com.orbix.api.modules.warehouse;
 
+import java.time.Duration;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -38,6 +39,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 	private final StorageBillReceivableRepository storageBillReceivableRepository;
 	private final StorageRepository storageRepository;
 	private final BillReceivableRepository billReceivableRepository;
+	private final StorageGoodReleaseRepository storageGoodReleaseRepository;
 	private final DayService dayService;
 
 	@Override
@@ -200,30 +202,48 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		Storage storage = storageRepository.findById(storageBillReceivableRequest.getStorageId())
                 .orElseThrow(() -> new NotFoundException("Storage not found."));
 		
+		LocalDateTime startBillingAt = storage.getStartBillingAt();
+		double noOfDays = (long) Math.ceil((double) Duration.between(startBillingAt, LocalDateTime.now()).toHours() / 24);
+		if(noOfDays <=0 ) {
+			noOfDays = 1;
+		}
+		
 		if(!storage.getBillingType().equals("FLAT-RATE")) {
 			throw new InvalidOperationException("This is only for flat rate");
 		}
 		
 		List<StorageBillReceivable> rcvs = storageBillReceivableRepository.findAllByStorage(storage);
 		
-		double paidQty = 0;
+		double billedQty = 0;
 		
 		for(StorageBillReceivable sbr : rcvs) {
-			paidQty = paidQty + sbr.getQty();
+			billedQty = billedQty + sbr.getQty();
+		}
+		
+		List<StorageGoodRelease> sgrs = storageGoodReleaseRepository.findAllByStorage(storage);
+		
+		double releasedQty = 0;
+		
+		for(StorageGoodRelease sgr : sgrs) {
+			releasedQty = releasedQty + sgr.getQty();
+		}
+		
+		if(billedQty != releasedQty) {
+			throw new InvalidOperationException("Can not process bill, billed items must be cleared and released first");
 		}
 		
 		double qty = storageBillReceivableRequest.getQty();
 		
-		if(qty > (storage.getInitialQty() - paidQty)) {
+		if(qty > (storage.getCurrentQty() - billedQty)) {
 			throw new InvalidOperationException("Qty to be paid must not be more than available qty");
 		}
 		
 		BillReceivable billReceivable = new BillReceivable();
 		billReceivable.setNo(String.valueOf(Math.random()));
-		billReceivable.setAmount((storage.getBillingAmount() * qty) - storageBillReceivableRequest.getDiscount());
+		billReceivable.setAmount((storage.getBillingAmount() * qty * noOfDays) - storageBillReceivableRequest.getDiscount());
 		billReceivable.setPaid(0);
 		billReceivable.setQty(qty);
-		billReceivable.setDue((storage.getBillingAmount() * qty) - storageBillReceivableRequest.getDiscount());
+		billReceivable.setDue((storage.getBillingAmount() * qty * noOfDays) - storageBillReceivableRequest.getDiscount());
 		billReceivable.setBranch(storage.getBranch());
 		billReceivable.setCreatedDateTime(dayService.getTimeStamp());
 		
@@ -242,6 +262,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		
 		storageBillReceivable.setPrice(storage.getBillingAmount());
 		storageBillReceivable.setQty(qty);
+		storageBillReceivable.setNoOfDays(noOfDays);
 		storageBillReceivable.setDiscount(storageBillReceivableRequest.getDiscount());
 		storageBillReceivable.setBillReceivable(billReceivable);
 		storageBillReceivable.setStorage(storage);

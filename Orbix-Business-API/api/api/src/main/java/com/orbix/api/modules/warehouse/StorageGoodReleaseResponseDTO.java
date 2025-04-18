@@ -15,4 +15,6 @@ public class StorageGoodReleaseResponseDTO {
 	String goodName;
 	String unitPrice;
 	String total;
+	String clientAddress;
+	String clientPhoneNo;
 }

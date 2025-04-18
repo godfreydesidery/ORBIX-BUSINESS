@@ -65,8 +65,12 @@ public class StorageGoodReleaseServiceController implements StorageGoodReleaseSe
 		
 		qtyCanRelease = cleared - qtyReleased;
 		
-		if(qtyToRelease > qtyCanRelease) {
-			throw new InvalidOperationException("Releasing more than qty available for release");
+//		if(qtyToRelease > qtyCanRelease) {
+//			throw new InvalidOperationException("Releasing more than qty available for release");
+//		}
+		
+		if(qtyToRelease != qtyCanRelease) {
+			throw new InvalidOperationException("Release quantity must match the available quantity for release.");
 		}
 		
 		storage.setCurrentQty(storage.getCurrentQty() - qtyToRelease);
@@ -159,8 +163,28 @@ public class StorageGoodReleaseServiceController implements StorageGoodReleaseSe
 			        ? storageGoodRelease.getApprovedDateTime().toString()
 			        : ""
 			);
+		
 		storageGoodReleaseResponse.setClientName(storageGoodRelease.getStorage().getOwnerFirstName() + " " + storageGoodRelease.getStorage().getOwnerLastName());;
 		storageGoodReleaseResponse.setGoodName(storageGoodRelease.getStorage().getGoodName());
+		if (storageGoodRelease.getStorage() != null) {
+		    Storage storage = storageGoodRelease.getStorage();
+
+		    if (storage.getOwnerAddress() != null) {
+		        storageGoodReleaseResponse.setClientAddress(storage.getOwnerAddress());
+		    } else {
+		        storageGoodReleaseResponse.setClientAddress(null); // or skip setting
+		    }
+
+		    if (storage.getOwnerPhoneNo() != null) {
+		        storageGoodReleaseResponse.setClientPhoneNo(storage.getOwnerPhoneNo());
+		    } else {
+		        storageGoodReleaseResponse.setClientPhoneNo(null); // or skip setting
+		    }
+
+		} else {
+		    storageGoodReleaseResponse.setClientAddress(null);
+		    storageGoodReleaseResponse.setClientPhoneNo(null);
+		}
 		storageGoodReleaseResponse.setUnitPrice(String.valueOf(storageGoodRelease.getStorage().getBillingAmount()));
 		storageGoodReleaseResponse.setTotal(String.valueOf((storageGoodRelease.getQty() * storageGoodRelease.getStorage().getBillingAmount())));
 		return storageGoodReleaseResponse;

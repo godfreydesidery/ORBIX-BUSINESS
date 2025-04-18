@@ -37,6 +37,7 @@ public class StorageBillReceivable {
 	private LocalDateTime endedAt;
 	
 	private String billingType = "";
+	private double noOfDays = 1;
 	@Column(nullable = false)
 	private double qty;
 	@Column(nullable = false)

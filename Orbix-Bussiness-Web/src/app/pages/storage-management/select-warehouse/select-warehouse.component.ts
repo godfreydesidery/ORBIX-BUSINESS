@@ -20,6 +20,7 @@ import { IGoodType } from 'src/app/domain/good-type';
 import { error } from 'src/custom-packages/util';
 
 import * as pdfMake from 'pdfmake/build/pdfmake';
+import { IServiceBillItem } from 'src/app/domain/maintenance';
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
@@ -207,6 +208,10 @@ export class SelectWarehouseComponent {
 
   setExisting() {
     this.mode = 'existing'
+  }
+
+  setReleased() {
+    this.mode = 'released'
   }
 
   async getAllCompanyActiveGoodTypes() {
@@ -674,10 +679,14 @@ export class SelectWarehouseComponent {
   storageGoodReleaseStorageId : string = ''
   storageGoodReleaseReleaseDate : string = ''
   storageGoodReleaseClientName : string = ''
+  storageGoodReleaseClientAddress : string = ''
+  storageGoodReleaseClientPhoneNo : string = ''
   storageGoodReleaseGoodName : string = ''
   storageGoodReleaseUnitPrice : string = ''
   storageGoodReleaseTotal : string = ''
 
+  billItems : IServiceBillItem[] = []
+  billItem : IServiceBillItem
     async getStorageGoodRelease(id : any){
       let options = { 
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
@@ -690,9 +699,13 @@ export class SelectWarehouseComponent {
       this.storageGoodReleaseStorageId = ''
       this.storageGoodReleaseReleaseDate = ''
       this.storageGoodReleaseClientName = ''
+      this.storageGoodReleaseClientAddress = ''
+      this.storageGoodReleaseClientPhoneNo = ''
       this.storageGoodReleaseGoodName = ''
       this.storageGoodReleaseUnitPrice = ''
       this.storageGoodReleaseTotal = ''
+
+      this.billItems = []
   
       await this.http.get<IStorageGoodRelease>(API_URL+'/storage_good_releases/get?id=' + id, options)
       .toPromise()
@@ -706,13 +719,29 @@ export class SelectWarehouseComponent {
           this.storageGoodReleaseStorageId = data!.storageId
           this.storageGoodReleaseReleaseDate = data!.releaseDate
           this.storageGoodReleaseClientName = data!.clientName
+          this.storageGoodReleaseClientAddress = data!.clientAddress
+          this.storageGoodReleaseClientPhoneNo = data!.clientPhoneNo
           this.storageGoodReleaseGoodName = data!.goodName
           this.storageGoodReleaseUnitPrice = data!.unitPrice
           this.storageGoodReleaseTotal = data!.total
 
+          this.billItems = []
+
+          this.billItem = {
+            sn: 1,
+            item: this.storageGoodReleaseGoodName,
+            qty: this.storageGoodReleaseQty,
+            amount: Number(this.storageGoodReleaseTotal)
+          } as IServiceBillItem;
+          
+          this.billItems.push(this.billItem)
+
           console.log(data)
         }
       )
+      .catch(error => {
+        console.log(error)
+      })
     }
 
     async printStorageGoodReleaseNote(id : any){
@@ -821,6 +850,146 @@ export class SelectWarehouseComponent {
 
     }
 
+    async printReleaseNote(id : any){
+      await this.getStorageGoodRelease(id)
+      await this.printGatePassRcpt(this.billItems, this.storageGoodReleaseNo, 0, id)
+    }
+
+
+    printGatePassRcpt = async (billItems : IServiceBillItem[], receiptNo :string, cash : number, id: any) => {
+    
+        //await this.get(this.parkingId)
+        //await this.getStorageGoodRelease(id)
+        //await this.getLastBillingDate(this.parkingId)
+    
+        var companyName = localStorage.getItem('company-name')!
+    
+        var header = ''
+        var footer = ''
+        var title  = 'Cargo Gate Pass'
+        var total : number = 0
+        var discount : number = 0
+        var tax : number = 0
+    
+        // var address : any = await this.data.getReceiptHeader(receiptNo)
+        var address : any = await this.data.getBranchReceiptHeaderWithNoTinAndVrn(receiptNo)
+       
+        var receipt = [
+          [
+            {text : 'SN', fontSize : 8, bold : true}, 
+            {text : 'Item', fontSize : 8, bold : true},
+            {text : 'Qty', fontSize : 8, bold : true},
+            {text : 'Amount', fontSize : 8, bold : true},
+          ]
+        ] 
+        
+        var sn = 0
+    
+        billItems.forEach((element) => {
+          total = total + (+element.amount)
+          sn = sn + 1
+          var item = [
+            {text : sn.toString(), fontSize : 8, bold : false}, 
+            {text : element.item, fontSize : 8, bold : false},
+            {text : element.qty.toString(), fontSize : 8, bold : false},
+            {text : (element.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 8, alignment : 'right', bold : false},
+          ]
+          receipt.push(item)
+        })
+        var detailSummary = [
+          {text : ' ', fontSize : 8, bold : false},
+          {text : 'Total', fontSize : 9, bold : true},
+          {text : ' ', fontSize : 8, bold : false},
+          {text : total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', bold : true},
+        ]
+        receipt.push(detailSummary)
+        
+    
+        const docDefinition = {
+          header: '',
+          
+          //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
+            content : [
+              {
+                layout : 'noBorders',
+                table : address
+              }, 
+              
+              
+              
+              {
+                layout : 'noBorders',
+                table : {
+                  headerRows : 0,
+                  widths : [210],
+                  body : [
+                    [{text : '=============================='}],
+                  ]
+                }
+              },          
+              {
+                layout : 'noBorders',
+                table : {
+                  headerRows : 0,
+                  widths : [200],
+                  body : [
+                    [{text : title, alignment : 'center', fontSize : 9, bold : true}],
+                   [{text : 'Client Name: ' + this.storageGoodReleaseClientName, alignment : 'left', fontSize : 9, bold : false}],
+                   [{text : 'Client Address: ' + this.storageGoodReleaseClientAddress, alignment : 'left', fontSize : 9, bold : false}],
+                   [{text : 'Phone No: ' + this.storageGoodReleaseClientPhoneNo, alignment : 'left', fontSize : 9, bold : false}],
+                    [{text : '________________________________'}],
+                    [{text : 'Payment Details', alignment : 'center', fontSize : 9, bold : true}],
+                    [{text : ' ', alignment : 'center', fontSize : 9, bold : true}],
+                  ]
+                }
+              },   
+              {
+                layout : 'noBorders',
+                table : {
+                    headerRows : 1,
+                    widths : [15, 100, 15, 50],
+                    body : receipt
+                }
+              },
+              {
+                layout : 'noBorders',
+                table : {
+                  headerRows : 0,
+                  widths : [200],
+                  body : [
+                    [{text : ' '}],
+                    // [{text : 'Cashier Comments', alignment : 'left', fontSize : 9, bold : true}],
+                    //[{text : this.comments, alignment : 'left', fontSize : 9, bold : false}],
+                    [{text : 'Issued At: ' + this.storageGoodReleaseReleaseDate, alignment : 'left', fontSize : 9, bold : true}],
+                    //[{text : 'Checkout At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
+                    //[{text : 'Day Out: ' + this.lastBillingDate, alignment : 'left', fontSize : 9, bold : true}],
+                    [{text : ' '}],
+                    [{text : 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment : 'left', fontSize : 9, bold : true}],
+                    [{text : ' '}],
+                    [{text : 'Signature: ......................'}],
+                  ]
+                }
+              },   
+              {
+                layout : 'noBorders',
+                table : {
+                  headerRows : 0,
+                  widths : [210],
+                  body : [
+                    [{text : '=============================='}],
+                    [{text : 'Developed By @Davaghana', fontSize : 10, bold : true, alignment : 'center'}],
+                    [{text : '***End of Document***', fontSize : 9, alignment : 'center'}]
+                  ]
+                }
+              },
+            ],
+            pageMargins: 10,
+          }
+          const win = window.open('', "tempWinForPdf")
+          pdfMake.createPdf(docDefinition).print({}, win)
+          //win!.onfocus = function () { setTimeout(function () { win!.close(); }, 10000); } //set to 10 seconds
+      }
+
     getTzFormatCurrency(value: any) {
       return new Intl.NumberFormat('en-TZ', {
         minimumFractionDigits: 2,
@@ -852,6 +1021,8 @@ interface IStorageGoodRelease{
   storageId : any
   releaseDate : string
   clientName : string
+  clientAddress : string
+  clientPhoneNo : string
   goodName : string
   unitPrice : string
   total : string

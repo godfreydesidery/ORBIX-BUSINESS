@@ -572,6 +572,7 @@
                         <tr><td>Total Qty</td><td>{{totalQty}}</td></tr>
                         <tr><td>Billed Qty</td><td>{{billedQty}}</td></tr>
                         <tr><td>Unbilled Qty</td><td>{{unbilledQty}}</td></tr>
+                        <tr><td>Days</td><td>{{noOfDays}}</td></tr>
                         <tr><td>Billing Rate &#64; Unit</td><td style="text-align: right;">{{billingRate | currency:'':''}}</td></tr>
                         <tr><td>Enter Qty to be billed</td><td><input class="form-control" [(ngModel)]="qty" (input)="calcBillAmount()" style="text-align: center;"></td></tr>
                         <tr><td>Bill Amount</td><td style="text-align: right;">{{totalBillingAmount | currency:'':''}}</td></tr>

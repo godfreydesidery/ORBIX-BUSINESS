@@ -893,6 +893,7 @@ export class GoodBillingComponent {
   billedQty : number = 0
   unbilledQty : number = 0
   billingRate : number = 0
+  noOfDays : number = 0
 
   totalBillingAmount : number = 0
 
@@ -905,6 +906,7 @@ export class GoodBillingComponent {
     this.billedQty = 0
     this.unbilledQty = 0
     this.billingRate = 0
+    this.noOfDays = 0
     this.qty = 0
 
     await this.http.get<IStorageCustomBillDetail>(API_URL+'/storages/get_custom_bill_item?storage_id=' + this.storageId, options)
@@ -916,6 +918,7 @@ export class GoodBillingComponent {
         this.billedQty = data!.billedQty
         this.unbilledQty = data!.unbilledQty
         this.billingRate = data!.billingRate
+        this.noOfDays = data!.noOfDays
         
         console.log(data)
       }
@@ -928,7 +931,7 @@ export class GoodBillingComponent {
     }else if(this.qty < 0){
       this.qty = 0
     }
-    this.totalBillingAmount = this.qty * this.billingRate
+    this.totalBillingAmount = this.qty * this.billingRate * this.noOfDays
   }
 
 
@@ -1106,4 +1109,5 @@ interface IStorageCustomBillDetail{
   billedQty : number
   unbilledQty : number
   billingRate : number
+  noOfDays : number
 }

@@ -31,6 +31,7 @@
                     <button class="btn btn-success btn-round-custom" (click)="setNew()">New Good</button>
                     <button class="btn btn-success btn-round-custom" (click)="setExisting()" (click)="getAllCheckedInAndPendingStorages()">Goods List</button>
                     <button class="btn btn-success btn-round-custom" (click)="setExisting()" (click)="getAllRecentCheckedOutStorages()">Checked Out</button>
+                    <button class="btn btn-success btn-round-custom" (click)="setReleased()" (click)="getAllCheckedInAndPendingStorages()">Released List</button>
                 </div>
                 <div class="col-lg-12" *ngIf="mode === 'new'">
                     <div class="col-sm-12">
@@ -193,6 +194,75 @@
                                     <th>Owner Name</th>
                                     <th>Owner ID</th>
                                     <th>ID Type</th>
+                                    <th>Qty</th>
+                                    <th>Billing Type</th>
+                                    <th>Price</th>
+                                    <th>Check Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let storage of storages | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index">
+                                    <td>{{storage.sn}}</td>
+                                    <td>{{storage.no}}</td>
+                                    <td>{{storage.goodName}}</td>
+                                    <td>{{storage.goodDescription}}</td>
+                                    <td>{{storage.ownerFirstName}} {{storage.ownerMiddleName}} {{storage.ownerLastName}}</td>
+                                    <td>{{storage.ownerIdNo}}</td>
+                                    <td>{{storage.ownerIdType}}</td>
+                                    <td><b>{{storage.initialQty}}/{{storage.currentQty}}</b></td>
+                                    <td><span class="badge badge-primary">{{storage.billingType}}</span></td>
+                                    <td class="text-danger" style="text-align: right;"><b>{{storage.billingAmount | currency:'':''}}</b></td>
+                                    <td>
+                                        <span class="badge badge-success" *ngIf="storage.status === 'PROCESSING'">{{storage.status}}</span>
+                                        <span class="badge badge-warning" *ngIf="storage.status === 'PENDING'">{{storage.status}}</span>
+                                        <span class="badge badge-primary" *ngIf="storage.status === 'APPROVED'">{{storage.status}}</span>
+                                        <span class="badge badge-danger" *ngIf="storage.status === 'CANCELED'">{{storage.status}}</span>
+                                        <span class="badge badge-success" *ngIf="storage.status === 'CHECKED-IN'">{{storage.status}}</span>
+                                        <span class="badge badge-danger" *ngIf="storage.status === 'CHECKED-OUT'">{{storage.status}}</span>
+
+                                    <td class="d-flex flex-wrap gap-2">
+                                        <div class="d-flex flex-row flex-wrap align-items-center gap-2">
+                                            <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="getStorage(storage.id)" data-toggle="modal" data-target="#edit-modal">Edit</button>
+                                            <button class="btn btn-primary btn-round-custom btn-sm" (click)="get(storage.id)" data-toggle="modal" data-target="#view-modal">View</button>
+                                            <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleaseDetail(storage.id)" data-toggle="modal" data-target="#storage-good-release-modal">Release</button>
+                                            <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleases(storage.id)" data-toggle="modal" data-target="#storage-good-releases-modal">Releases</button> -->
+                                            <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="checkIn(storage.id, storage.no, storage.goodName)" >Check-In</button>
+                                            <button class="btn btn-warning btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="checkOut(storage.id, storage.no, storage.goodName)" >Check-Out</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <pagination-controls class="pull-right" (pageChange)="page = $event"></pagination-controls>
+                            </div>
+                        </div>
+                    </div>                   
+                </div>
+
+
+                <div class="col-lg-12" *ngIf="mode === 'released'">
+                    <div class="row">
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="table-responsive">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>SN</th>
+                                    <th>No</th> 
+                                    <th>Good Name</th>
+                                    <th>Good Description</th>
+                                    <th>Owner Name</th>
+                                    <th>Owner ID</th>
+                                    <th>ID Type</th>
                                     <th>Billing Type</th>
                                     <th>Price</th>
                                     <th>Check Status</th>
@@ -220,12 +290,12 @@
 
                                     <td class="d-flex flex-wrap gap-2">
                                         <div class="d-flex flex-row flex-wrap align-items-center gap-2">
-                                            <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="getStorage(storage.id)" data-toggle="modal" data-target="#edit-modal">Edit</button>
+                                            <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="getStorage(storage.id)" data-toggle="modal" data-target="#edit-modal">Edit</button> -->
                                             <button class="btn btn-primary btn-round-custom btn-sm" (click)="get(storage.id)" data-toggle="modal" data-target="#view-modal">View</button>
-                                            <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleaseDetail(storage.id)" data-toggle="modal" data-target="#storage-good-release-modal">Release</button>
+                                            <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleaseDetail(storage.id)" data-toggle="modal" data-target="#storage-good-release-modal">Release</button> -->
                                             <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleases(storage.id)" data-toggle="modal" data-target="#storage-good-releases-modal">Releases</button>
-                                            <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="checkIn(storage.id, storage.no, storage.goodName)" >Check-In</button>
-                                            <button class="btn btn-warning btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="checkOut(storage.id, storage.no, storage.goodName)" >Check-Out</button>
+                                            <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="checkIn(storage.id, storage.no, storage.goodName)" >Check-In</button>
+                                            <button class="btn btn-warning btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="checkOut(storage.id, storage.no, storage.goodName)" >Check-Out</button> -->
                                         </div>
                                     </td>
                                 </tr>
@@ -238,6 +308,8 @@
                         </div>
                     </div>                   
                 </div>
+
+
             </div>
         </div>
     </div>
@@ -619,10 +691,9 @@
                             <td>{{release.no}}</td>
                             <td>{{release.releaseDate | date: 'dd-MM-yyyy'}}</td>
                             <td>{{release.qty}}</td>
-                            <td><button class="btn btn-success btn-round-custom btn-sm" (click)="printStorageGoodReleaseNote(release.id)">Print Release Note</button></td>
+                            <td><button class="btn btn-success btn-round-custom btn-sm" (click)="printReleaseNote(release.id)">Print Release Note</button></td>
                         </tr>
                     </tbody>
-                    
                 </table>
             </div>
             <div class="modal-footer">

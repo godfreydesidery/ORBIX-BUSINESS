@@ -1,5 +1,6 @@
 package com.orbix.api.modules.warehouse;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -445,6 +446,8 @@ public class StorageServiceController implements StorageService {
 		storageResponse.setGoodTypeName(storage.getGoodType().getName());
 		storageResponse.setGoodName(storage.getGoodName());
 		storageResponse.setGoodDescription(storage.getGoodDescription());
+		storageResponse.setInitialQty(String.valueOf(storage.getInitialQty()));
+		storageResponse.setCurrentQty(String.valueOf(storage.getCurrentQty()));
 		
 		storageResponse.setWarehouseName(
 				storage.getWarehouse() != null && storage.getWarehouse().getName() != null
@@ -791,6 +794,12 @@ public class StorageServiceController implements StorageService {
 		Storage storage = storageRepository.findById(storageId)
 		        .orElseThrow(() -> new NotFoundException("Storage not found"));
 		
+		LocalDateTime startBillingAt = storage.getStartBillingAt();
+		double noOfDays = (long) Math.ceil((double) Duration.between(startBillingAt, LocalDateTime.now()).toHours() / 24);
+		if(noOfDays <=0 ) {
+			noOfDays = 1;
+		}
+		
 		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findByStorage(storage);
 		StorageCustomBillDetail storageCustomBillDetail = new StorageCustomBillDetail();
 		
@@ -806,6 +815,7 @@ public class StorageServiceController implements StorageService {
 		storageCustomBillDetail.setUnbilledQty(storage.getInitialQty() - billedQty);
 		
 		storageCustomBillDetail.setBillingRate(storage.getBillingAmount());
+		storageCustomBillDetail.setNoOfDays(noOfDays);
 		
 		return storageCustomBillDetail;
 	}
@@ -826,4 +836,5 @@ class StorageCustomBillDetail{
 	double billedQty;
 	double unbilledQty;
 	double billingRate;
+	double noOfDays;
 }
