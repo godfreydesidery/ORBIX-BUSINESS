@@ -284,11 +284,17 @@ public class StorageServiceController implements StorageService {
 		storage.setHeight(storageRequest.getHeight());
 		storage.setWeight(storageRequest.getWeight());
 		
-		storage.setBillingType("DAILY");		
-		if(storageRequest.getBillingType().equals("FLAT-RATE")) {
+//		storage.setBillingType("DAILY");		
+		if(storageRequest.getBillingType().equals("DAILY")) {
+			storage.setInitialQty(storageRequest.getInitialQty());
+			storage.setCurrentQty(storageRequest.getInitialQty());
+			storage.setBillingType("DAILY");
+		}else if(storageRequest.getBillingType().equals("FLAT-RATE")) {
 			storage.setInitialQty(storageRequest.getInitialQty());
 			storage.setCurrentQty(storageRequest.getInitialQty());
 			storage.setBillingType("FLAT-RATE");
+		}else {
+			throw new InvalidOperationException("Invalid Billing Type");
 		}
 		
 		storage.setBillingAmount(storageRequest.getBillingAmount());

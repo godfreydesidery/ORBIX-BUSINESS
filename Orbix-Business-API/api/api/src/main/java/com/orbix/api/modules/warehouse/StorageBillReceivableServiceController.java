@@ -207,11 +207,10 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		if(noOfDays <=0 ) {
 			noOfDays = 1;
 		}
-		
-		if(!storage.getBillingType().equals("FLAT-RATE")) {
-			throw new InvalidOperationException("This is only for flat rate");
+		if(storage.getBillingType().equals("FLAT-RATE")) {
+			noOfDays = 1;
 		}
-		
+				
 		List<StorageBillReceivable> rcvs = storageBillReceivableRepository.findAllByStorage(storage);
 		
 		double billedQty = 0;
@@ -240,10 +239,18 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		
 		BillReceivable billReceivable = new BillReceivable();
 		billReceivable.setNo(String.valueOf(Math.random()));
-		billReceivable.setAmount((storage.getBillingAmount() * qty * noOfDays) - storageBillReceivableRequest.getDiscount());
 		billReceivable.setPaid(0);
 		billReceivable.setQty(qty);
-		billReceivable.setDue((storage.getBillingAmount() * qty * noOfDays) - storageBillReceivableRequest.getDiscount());
+		if(storage.getBillingType().equals("DAILY")) {
+			billReceivable.setAmount((storage.getBillingAmount() * qty * noOfDays) - storageBillReceivableRequest.getDiscount());
+			billReceivable.setDue((storage.getBillingAmount() * qty * noOfDays) - storageBillReceivableRequest.getDiscount());
+		}else if(storage.getBillingType().equals("FLAT-RATE")) {
+			billReceivable.setAmount((storage.getBillingAmount() * qty) - storageBillReceivableRequest.getDiscount());
+			billReceivable.setDue((storage.getBillingAmount() * qty) - storageBillReceivableRequest.getDiscount());
+		}else {
+			throw new InvalidOperationException("Invalid Billing Type");
+		}
+		
 		billReceivable.setBranch(storage.getBranch());
 		billReceivable.setCreatedDateTime(dayService.getTimeStamp());
 		

@@ -935,6 +935,86 @@ export class GoodBillingComponent {
   }
 
 
+  ////////////////////////////////////////
+
+
+
+  originalQty : number = 0
+        availableQty : number = 0
+        releasedQty : number = 0
+        availableForRelease : number = 0
+      
+        qtyToRelease : number = 0
+      
+        currentStorageId : any = null
+      
+        async getStorageGoodReleaseDetail(storageId : any){
+            let options = { 
+              headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+            }
+        
+            this.originalQty = 0
+            this.availableQty = 0
+            this.releasedQty = 0
+            this.availableForRelease = 0
+      
+            this.currentStorageId = null
+      
+            this.qtyToRelease = 0
+        
+            await this.http.get<IStorageGoodReleaseDetail>(API_URL+'/storage_good_releases/get_storage_good_release_detail?storage_id=' + storageId, options)
+            .toPromise()
+            .then(
+              data => {
+      
+                this.currentStorageId = storageId
+        
+                this.originalQty = data!.initialQty
+                this.availableQty = data!.currentQty
+                this.releasedQty = data!.releasedQty
+                this.availableForRelease = data!.availableForRelease
+      
+                this.qtyToRelease = 0
+                
+                console.log(data)
+              }
+            )
+          }
+      
+      
+          async createStorageGoodRelease(){
+        
+            let options = {
+              headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+            }
+        
+            var storageGoodRelease = {
+              storageId : this.currentStorageId,
+              qty : this.qtyToRelease,
+              
+            }
+        
+            await this.http.post<IStorageGoodReleaseDetail>(API_URL+'/storage_good_releases/create_storage_good_release', storageGoodRelease, options)  
+            .toPromise()
+            .then(
+              data => {
+                //this.getStorageBillReceivables(this.storageId)
+                this.msg.showSuccessMessage('Success')
+                console.log(data)
+              }   
+            )
+            .catch(
+              error => {
+                this.msg.showErrorMessage(error, 'Error')
+                console.log(error)
+              }
+            )
+        
+        
+          }
+  
+
+
 
   ///////////////////////////////////
 
@@ -1075,8 +1155,364 @@ export class GoodBillingComponent {
 
 
 
-
+  releases : IStorageGoodRelease[] = []
   
+      async getStorageGoodReleases(storageId : any){
+        let options = { 
+          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+        }
+        this.releases = []
+    
+        await this.http.get<IStorageGoodRelease[]>(API_URL+'/storage_good_releases/get_by_storage?storage_id=' + storageId, options)
+        .toPromise()
+        .then(
+          data => {
+  
+            this.releases = data!.slice().reverse()
+            console.log(data)
+          }
+        )
+      }
+  
+    //   String id;
+    // String no;
+    // String qty;
+    // String status;
+    // String storageId;
+    // String releaseDate;
+    // //
+    // String clientName;
+    // String goodName;
+    // String unitPrice;
+    // String total;
+  
+  
+    storageGoodReleaseId : any
+    storageGoodReleaseNo : string = ''
+    storageGoodReleaseQty : number = 0
+    storageGoodReleaseStatus : string = ''
+    storageGoodReleaseStorageId : string = ''
+    storageGoodReleaseReleaseDate : string = ''
+    storageGoodReleaseClientName : string = ''
+    storageGoodReleaseClientAddress : string = ''
+    storageGoodReleaseClientPhoneNo : string = ''
+    storageGoodReleaseGoodName : string = ''
+    storageGoodReleaseUnitPrice : string = ''
+    storageGoodReleaseTotal : string = ''
+  
+    billItems : IServiceBillItem[] = []
+    billItem : IServiceBillItem
+      async getStorageGoodRelease(id : any){
+        let options = { 
+          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+        }
+  
+        this.storageGoodReleaseId = null
+        this.storageGoodReleaseNo = ''
+        this.storageGoodReleaseQty = 0
+        this.storageGoodReleaseStatus = ''
+        this.storageGoodReleaseStorageId = ''
+        this.storageGoodReleaseReleaseDate = ''
+        this.storageGoodReleaseClientName = ''
+        this.storageGoodReleaseClientAddress = ''
+        this.storageGoodReleaseClientPhoneNo = ''
+        this.storageGoodReleaseGoodName = ''
+        this.storageGoodReleaseUnitPrice = ''
+        this.storageGoodReleaseTotal = ''
+  
+        this.billItems = []
+    
+        await this.http.get<IStorageGoodRelease>(API_URL+'/storage_good_releases/get?id=' + id, options)
+        .toPromise()
+        .then(
+          data => {
+  
+            this.storageGoodReleaseId = data!.id
+            this.storageGoodReleaseNo = data!.no
+            this.storageGoodReleaseQty = data!.qty
+            this.storageGoodReleaseStatus = data!.status
+            this.storageGoodReleaseStorageId = data!.storageId
+            this.storageGoodReleaseReleaseDate = data!.releaseDate
+            this.storageGoodReleaseClientName = data!.clientName
+            this.storageGoodReleaseClientAddress = data!.clientAddress
+            this.storageGoodReleaseClientPhoneNo = data!.clientPhoneNo
+            this.storageGoodReleaseGoodName = data!.goodName
+            this.storageGoodReleaseUnitPrice = data!.unitPrice
+            this.storageGoodReleaseTotal = data!.total
+  
+            this.billItems = []
+  
+            this.billItem = {
+              sn: 1,
+              item: this.storageGoodReleaseGoodName,
+              qty: this.storageGoodReleaseQty,
+              amount: Number(this.storageGoodReleaseTotal)
+            } as IServiceBillItem;
+            
+            this.billItems.push(this.billItem)
+  
+            console.log(data)
+          }
+        )
+        .catch(error => {
+          console.log(error)
+        })
+      }
+  
+      async printStorageGoodReleaseNote(id : any){
+        await this.getStorageGoodRelease(id)
+  
+        this.documentHeader = await this.data.getDocumentHeader()
+          const title = 'Gate Pass - Storage Release'
+  
+          // Define document structure
+          const docDefinition: any = {
+            header: '',
+            pageOrientation: 'potrait',
+            footer: (currentPage: any, pageCount: any) => ({
+              text: `${currentPage} of ${pageCount}`,
+              alignment: 'center',
+              fontSize: 8,
+            }),
+            content: [
+              // Document Header
+              {
+                columns: [this.documentHeader],
+                margin: [0, 0, 0, 10]
+              },
+        
+              // Title
+              {
+                text: title,
+                fontSize: 16,
+                bold: true,
+                alignment: 'left',
+                margin: [0, 10, 0, 20],
+              },
+        
+              // No and Date
+              {
+                columns: [
+                  {
+                    text: 'No: ' + this.storageGoodReleaseNo,
+                    fontSize: 12,
+                    width: '50%',
+                  },
+                  {
+                    text: 'Date: ____________',
+                    alignment: 'right',
+                    fontSize: 12,
+                    width: '50%',
+                  },
+                ],
+                margin: [0, 0, 0, 10],
+              },
+        
+              // Client Name
+              {
+                text: 'Client Name: ' + this.storageGoodReleaseClientName,
+                fontSize: 12,
+                margin: [0, 0, 0, 15],
+              },
+        
+              // Table Header
+              {
+                columns: [
+                  { text: 'Description', bold: true, fontSize: 12, width: '30%' },
+                  { text: 'Qty', bold: true, fontSize: 12, width: '20%' },
+                  { text: 'Unit Price', bold: true, fontSize: 12, width: '25%', alignment: 'right' },
+                  { text: 'Total', bold: true, fontSize: 12, width: '25%', alignment: 'right' },
+                ],
+                margin: [0, 0, 0, 5],
+              },
+        
+              // Table Row
+              {
+                columns: [
+                  { text: this.storageGoodReleaseGoodName, fontSize: 11, width: '25%' },
+                  { text: this.storageGoodReleaseQty, fontSize: 11, width: '25%' },
+                  { text: this.getTzFormatCurrency(this.storageGoodReleaseUnitPrice), fontSize: 11, alignment: 'right', width: '25%' },
+                  { text: this.getTzFormatCurrency(this.storageGoodReleaseTotal), fontSize: 11, alignment: 'right', width: '25%' },
+                ],
+                margin: [0, 0, 0, 10],
+              },
+        
+              // Total Section
+              {
+                columns: [
+                  { text: '', width: '50%' },
+                  {
+                    text: 'Total (TZS): ' + this.getTzFormatCurrency(this.storageGoodReleaseTotal),
+                    fontSize: 12,
+                    bold: true,
+                    alignment: 'right',
+                    width: '50%',
+                  },
+                ],
+                margin: [0, 10, 0, 20],
+              },
+              {text : ''},
+              {text : ''},
+              {
+                text: 'Served By: _________________________',
+                fontSize: 12,
+                margin: [0, 0, 0, 15],
+              },
+            ],
+          };
+        
+          pdfMake.createPdf(docDefinition).print();
+  
+      }
+
+      printGatePassNote = async (billItems : IServiceBillItem[], receiptNo :string, cash : number, id: any) => {
+          
+              //await this.get(this.parkingId)
+              //await this.getStorageGoodRelease(id)
+              //await this.getLastBillingDate(this.parkingId)
+          
+              var companyName = localStorage.getItem('company-name')!
+          
+              var header = ''
+              var footer = ''
+              var title  = 'Cargo Gate Pass'
+              var total : number = 0
+              var discount : number = 0
+              var tax : number = 0
+          
+              // var address : any = await this.data.getReceiptHeader(receiptNo)
+              var address : any = await this.data.getBranchReceiptHeaderWithNoTinAndVrn(receiptNo)
+             
+              var receipt = [
+                [
+                  {text : 'SN', fontSize : 8, bold : true}, 
+                  {text : 'Item', fontSize : 8, bold : true},
+                  {text : 'Qty', fontSize : 8, bold : true},
+                  {text : 'Amount', fontSize : 8, bold : true},
+                ]
+              ] 
+              
+              var sn = 0
+          
+              billItems.forEach((element) => {
+                total = total + (+element.amount)
+                sn = sn + 1
+                var item = [
+                  {text : sn.toString(), fontSize : 8, bold : false}, 
+                  {text : element.item, fontSize : 8, bold : false},
+                  {text : element.qty.toString(), fontSize : 8, bold : false},
+                  {text : (element.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 8, alignment : 'right', bold : false},
+                ]
+                receipt.push(item)
+              })
+              var detailSummary = [
+                {text : ' ', fontSize : 8, bold : false},
+                {text : 'Total', fontSize : 9, bold : true},
+                {text : ' ', fontSize : 8, bold : false},
+                {text : total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', bold : true},
+              ]
+              receipt.push(detailSummary)
+              
+          
+              const docDefinition = {
+                header: '',
+                
+                //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
+                  content : [
+                    {
+                      layout : 'noBorders',
+                      table : address
+                    }, 
+                    
+                    
+                    
+                    {
+                      layout : 'noBorders',
+                      table : {
+                        headerRows : 0,
+                        widths : [210],
+                        body : [
+                          [{text : '=============================='}],
+                        ]
+                      }
+                    },          
+                    {
+                      layout : 'noBorders',
+                      table : {
+                        headerRows : 0,
+                        widths : [200],
+                        body : [
+                          [{text : title, alignment : 'center', fontSize : 9, bold : true}],
+                         [{text : 'Client Name: ' + this.storageGoodReleaseClientName, alignment : 'left', fontSize : 9, bold : false}],
+                         [{text : 'Client Address: ' + this.storageGoodReleaseClientAddress, alignment : 'left', fontSize : 9, bold : false}],
+                         [{text : 'Phone No: ' + this.storageGoodReleaseClientPhoneNo, alignment : 'left', fontSize : 9, bold : false}],
+                          [{text : '________________________________'}],
+                          [{text : 'Payment Details', alignment : 'center', fontSize : 9, bold : true}],
+                          [{text : ' ', alignment : 'center', fontSize : 9, bold : true}],
+                        ]
+                      }
+                    },   
+                    {
+                      layout : 'noBorders',
+                      table : {
+                          headerRows : 1,
+                          widths : [15, 100, 15, 50],
+                          body : receipt
+                      }
+                    },
+                    {
+                      layout : 'noBorders',
+                      table : {
+                        headerRows : 0,
+                        widths : [200],
+                        body : [
+                          [{text : ' '}],
+                          // [{text : 'Cashier Comments', alignment : 'left', fontSize : 9, bold : true}],
+                          //[{text : this.comments, alignment : 'left', fontSize : 9, bold : false}],
+                          [{text : 'Issued At: ' + this.storageGoodReleaseReleaseDate, alignment : 'left', fontSize : 9, bold : true}],
+                          //[{text : 'Checkout At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
+                          //[{text : 'Day Out: ' + this.lastBillingDate, alignment : 'left', fontSize : 9, bold : true}],
+                          [{text : ' '}],
+                          [{text : 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment : 'left', fontSize : 9, bold : true}],
+                          [{text : ' '}],
+                          [{text : 'Signature: ......................'}],
+                        ]
+                      }
+                    },   
+                    {
+                      layout : 'noBorders',
+                      table : {
+                        headerRows : 0,
+                        widths : [210],
+                        body : [
+                          [{text : '=============================='}],
+                          [{text : 'Developed By @Davaghana', fontSize : 10, bold : true, alignment : 'center'}],
+                          [{text : '***End of Document***', fontSize : 9, alignment : 'center'}]
+                        ]
+                      }
+                    },
+                  ],
+                  pageMargins: 10,
+                }
+                const win = window.open('', "tempWinForPdf")
+                pdfMake.createPdf(docDefinition).print({}, win)
+                //win!.onfocus = function () { setTimeout(function () { win!.close(); }, 10000); } //set to 10 seconds
+            }
+  
+      async printReleaseNote(id : any){
+        await this.getStorageGoodRelease(id)
+        await this.printGatePassNote(this.billItems, this.storageGoodReleaseNo, 0, id)
+      }
+
+      getTzFormatCurrency(value: any) {
+        return new Intl.NumberFormat('en-TZ', {
+          minimumFractionDigits: 2,
+          maximumFractionDigits: 2
+        }).format(value);
+      }
+
+
+
 
 }
 
@@ -1111,3 +1547,28 @@ interface IStorageCustomBillDetail{
   billingRate : number
   noOfDays : number
 }
+
+
+interface IStorageGoodReleaseDetail{
+  initialQty : number
+  currentQty : number
+  releasedQty : number
+  availableForRelease : number
+}
+
+interface IStorageGoodRelease{
+  id : any
+  no : string
+  qty : number
+  status : string
+  storageId : any
+  releaseDate : string
+  clientName : string
+  clientAddress : string
+  clientPhoneNo : string
+  goodName : string
+  unitPrice : string
+  total : string
+}
+
+

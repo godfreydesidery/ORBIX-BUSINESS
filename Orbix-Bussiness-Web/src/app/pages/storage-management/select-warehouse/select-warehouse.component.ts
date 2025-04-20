@@ -86,7 +86,7 @@ export class SelectWarehouseComponent {
   height: number = 0 // In cm
   startBillingAt: Date | null = null
   status: string = ''
-  billingType: string = 'FLAT-RATE'
+  billingType: string = 'DAILY'
   billingAmount: number | null = null
   initialQty: number = 0
   currentQty: number = 0
@@ -355,7 +355,7 @@ export class SelectWarehouseComponent {
     this.ownerPhoneNo = ''
     this.ownerEmail = ''
     this.ownerAddress = ''
-    this.billingType = 'FLAT-RATE'
+    this.billingType = 'DAILY'
     this.billingAmount = null
     this.goodTypeId = null
     this.goodTypeName = ''

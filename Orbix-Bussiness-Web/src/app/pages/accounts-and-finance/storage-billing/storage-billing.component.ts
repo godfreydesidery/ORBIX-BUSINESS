@@ -129,6 +129,7 @@ page: number = 1; // Initialize the current page to 1
   warehouseName : string = ''
 
   initialQty : number = 0
+  currentQty : number = 0
 
 
 
@@ -323,6 +324,7 @@ page: number = 1; // Initialize the current page to 1
     this.billingStartAt = data?.billingStartAt
 
     this.initialQty = data?.initialQty
+    this.currentQty = data?.currentQty
 
     this.goodName = data!.goodName
 
@@ -354,6 +356,7 @@ page: number = 1; // Initialize the current page to 1
     this.goodTypeName = ''
 
     this.initialQty = 0
+    this.currentQty = 0
 
     this.goodName = ''
 
@@ -366,5 +369,109 @@ page: number = 1; // Initialize the current page to 1
     this.comments = ''
   }
 
+
+
+
+  /////////////////////////
+
+
+
+  originalQty : number = 0
+      availableQty : number = 0
+      releasedQty : number = 0
+      availableForRelease : number = 0
+    
+      qtyToRelease : number = 0
+    
+      currentStorageId : any = null
+    
+      async getStorageGoodReleaseDetail(storageId : any){
+          let options = { 
+            headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+          }
+      
+          this.originalQty = 0
+          this.availableQty = 0
+          this.releasedQty = 0
+          this.availableForRelease = 0
+    
+          this.currentStorageId = null
+    
+          this.qtyToRelease = 0
+      
+          await this.http.get<IStorageGoodReleaseDetail>(API_URL+'/storage_good_releases/get_storage_good_release_detail?storage_id=' + storageId, options)
+          .toPromise()
+          .then(
+            data => {
+    
+              this.currentStorageId = storageId
+      
+              this.originalQty = data!.initialQty
+              this.availableQty = data!.currentQty
+              this.releasedQty = data!.releasedQty
+              this.availableForRelease = data!.availableForRelease
+    
+              this.qtyToRelease = 0
+              
+              console.log(data)
+            }
+          )
+        }
+    
+    
+        async createStorageGoodRelease(){
+      
+          let options = {
+            headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+          }
+      
+          var storageGoodRelease = {
+            storageId : this.currentStorageId,
+            qty : this.qtyToRelease,
+            
+          }
+      
+          await this.http.post<IStorageGoodReleaseDetail>(API_URL+'/storage_good_releases/create_storage_good_release', storageGoodRelease, options)  
+          .toPromise()
+          .then(
+            data => {
+              //this.getStorageBillReceivables(this.storageId)
+              this.msg.showSuccessMessage('Success')
+              console.log(data)
+            }   
+          )
+          .catch(
+            error => {
+              this.msg.showErrorMessage(error, 'Error')
+              console.log(error)
+            }
+          )
+      
+      
+        }
+
+}
+
+
+interface IStorageGoodReleaseDetail{
+  initialQty : number
+  currentQty : number
+  releasedQty : number
+  availableForRelease : number
+}
+
+interface IStorageGoodRelease{
+  id : any
+  no : string
+  qty : number
+  status : string
+  storageId : any
+  releaseDate : string
+  clientName : string
+  clientAddress : string
+  clientPhoneNo : string
+  goodName : string
+  unitPrice : string
+  total : string
 }
 

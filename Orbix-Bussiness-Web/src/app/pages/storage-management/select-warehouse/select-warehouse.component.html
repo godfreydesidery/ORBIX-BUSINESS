@@ -30,7 +30,7 @@
                 <div class="col-lg-12">
                     <button class="btn btn-success btn-round-custom" (click)="setNew()">New Good</button>
                     <button class="btn btn-success btn-round-custom" (click)="setExisting()" (click)="getAllCheckedInAndPendingStorages()">Goods List</button>
-                    <button class="btn btn-success btn-round-custom" (click)="setExisting()" (click)="getAllRecentCheckedOutStorages()">Checked Out</button>
+                    <!-- <button class="btn btn-success btn-round-custom" (click)="setExisting()" (click)="getAllRecentCheckedOutStorages()">Checked Out</button> -->
                     <button class="btn btn-success btn-round-custom" (click)="setReleased()" (click)="getAllCheckedInAndPendingStorages()">Released List</button>
                 </div>
                 <div class="col-lg-12" *ngIf="mode === 'new'">
@@ -119,6 +119,7 @@
                                 <div class="form-group">
                                     <label>Select Billing Type</label>
                                     <select class="form-control" [(ngModel)]="billingType">
+                                        <option>DAILY</option>
                                         <option>FLAT-RATE</option>
                                     </select>
                                 </div>
@@ -190,11 +191,12 @@
                                     <th>SN</th>
                                     <th>No</th> 
                                     <th>Good Name</th>
-                                    <th>Good Description</th>
+                                    <!-- <th>Good Description</th> -->
                                     <th>Owner Name</th>
                                     <th>Owner ID</th>
                                     <th>ID Type</th>
-                                    <th>Qty</th>
+                                    <th>Initial Qty</th>
+                                    <th>Current Qty</th>
                                     <th>Billing Type</th>
                                     <th>Price</th>
                                     <th>Check Status</th>
@@ -206,11 +208,12 @@
                                     <td>{{storage.sn}}</td>
                                     <td>{{storage.no}}</td>
                                     <td>{{storage.goodName}}</td>
-                                    <td>{{storage.goodDescription}}</td>
+                                    <!-- <td>{{storage.goodDescription}}</td> -->
                                     <td>{{storage.ownerFirstName}} {{storage.ownerMiddleName}} {{storage.ownerLastName}}</td>
                                     <td>{{storage.ownerIdNo}}</td>
                                     <td>{{storage.ownerIdType}}</td>
-                                    <td><b>{{storage.initialQty}}/{{storage.currentQty}}</b></td>
+                                    <td><b style="color: red;">{{storage.initialQty}}</b></td>
+                                    <td><b style="color: red;">{{storage.currentQty}}</b></td>
                                     <td><span class="badge badge-primary">{{storage.billingType}}</span></td>
                                     <td class="text-danger" style="text-align: right;"><b>{{storage.billingAmount | currency:'':''}}</b></td>
                                     <td>
@@ -225,10 +228,10 @@
                                         <div class="d-flex flex-row flex-wrap align-items-center gap-2">
                                             <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="getStorage(storage.id)" data-toggle="modal" data-target="#edit-modal">Edit</button>
                                             <button class="btn btn-primary btn-round-custom btn-sm" (click)="get(storage.id)" data-toggle="modal" data-target="#view-modal">View</button>
-                                            <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleaseDetail(storage.id)" data-toggle="modal" data-target="#storage-good-release-modal">Release</button>
+                                            <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleaseDetail(storage.id)" data-toggle="modal" data-target="#storage-good-release-modal">Release</button> -->
                                             <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleases(storage.id)" data-toggle="modal" data-target="#storage-good-releases-modal">Releases</button> -->
                                             <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="checkIn(storage.id, storage.no, storage.goodName)" >Check-In</button>
-                                            <button class="btn btn-warning btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="checkOut(storage.id, storage.no, storage.goodName)" >Check-Out</button>
+                                            <!-- <button class="btn btn-warning btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="checkOut(storage.id, storage.no, storage.goodName)" >Check-Out</button> -->
                                         </div>
                                     </td>
                                 </tr>
