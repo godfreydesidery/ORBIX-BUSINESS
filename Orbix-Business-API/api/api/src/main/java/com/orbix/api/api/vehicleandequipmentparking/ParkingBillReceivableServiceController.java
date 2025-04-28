@@ -114,8 +114,8 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		if(rcvs.isEmpty()) {			
 			// Check for first billing date		
 			fromDate = parking.getStartBillingAt().toLocalDate().atStartOfDay();
-			
-			if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();	
+			// temporary solution, timezone issue, billing
+			if(toDate == null) toDate = (LocalDateTime.now().plusHours(3)).plusDays(1).toLocalDate().atStartOfDay();	
 			
 			if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is before bill starting date");
 			
@@ -126,8 +126,8 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		}else {
 			// Take the last bill
 			fromDate = rcvs.get(rcvs.size() - 1).getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
-			
-			if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
+			// temporary solution, timezone issue, billing
+			if(toDate == null) toDate = (LocalDateTime.now().plusHours(3)).plusDays(1).toLocalDate().atStartOfDay();
 			
 			if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is invalid" + toDate.toString() + fromDate.toString());
 			
@@ -437,10 +437,10 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		
 		try {
 			if(rcvs.isEmpty()) {			
-				// Check for first billing date		
+				// Check for first billing date	// also check issue with timezone, this is temporary solution	
 				fromDate = parking.getStartBillingAt().toLocalDate().atStartOfDay();
 				
-				if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();	
+				if(toDate == null) toDate = (LocalDateTime.now().plusHours(3)).plusDays(1).toLocalDate().atStartOfDay();	
 				
 				if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is before bill starting date");
 				
@@ -452,7 +452,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 				// Take the last bill
 				fromDate = rcvs.get(rcvs.size() - 1).getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
 				
-				if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
+				if(toDate == null) toDate = (LocalDateTime.now().plusHours(3)).plusDays(1).toLocalDate().atStartOfDay();
 				
 				if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is invalid" + toDate.toString() + fromDate.toString());
 				

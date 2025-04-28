@@ -84,7 +84,7 @@ export class SelectWarehouseComponent {
   length: number = 0 // In cm
   width: number = 0 // In cm
   height: number = 0 // In cm
-  startBillingAt: Date | null = null
+  startBillingAt: Date | null | string = null
   status: string = ''
   billingType: string = 'DAILY'
   billingAmount: number | null = null
@@ -271,7 +271,8 @@ export class SelectWarehouseComponent {
       width : this.width,
       height : this.height,
       weight : this.weight,
-      initialQty : this.initialQty
+      initialQty : this.initialQty,
+      startBillingAt : this.startBillingAt
     }
 
 
@@ -340,6 +341,7 @@ export class SelectWarehouseComponent {
     this.width = data!.width
     this.height = data!.height
     this.weight = data!.weight
+    this.startBillingAt = data!.billingStartAt
   }
 
   clearStorageData() {
@@ -366,6 +368,7 @@ export class SelectWarehouseComponent {
     this.width = 0
     this.height = 0
     this.weight = 0
+    this.startBillingAt = null
   }
 
 

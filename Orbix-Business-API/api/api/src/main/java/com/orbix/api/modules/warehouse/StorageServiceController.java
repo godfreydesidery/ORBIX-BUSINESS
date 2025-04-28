@@ -299,6 +299,19 @@ public class StorageServiceController implements StorageService {
 		
 		storage.setBillingAmount(storageRequest.getBillingAmount());
 		
+		if(storageRequest.startBillingAt == null) {
+			storage.setStartBillingAt(dayService.getTimeStamp()); // You can change this depending on user billing preferences
+		}else {			
+			//String dateString = "2024-10-26 15:30:45" ;
+			String dateString = storageRequest.getStartBillingAt() + " 00:00:00";
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+			storage.setStartBillingAt(dateTime);			
+			if(dateTime.isAfter(dayService.getTimeStamp())) {
+				throw new InvalidOperationException("The selected date cannot be in the future. Please choose today or an earlier date.");
+			}				
+		}	
+		
 		//storage.setImage(storageRequest.getImage());
 		storage.setStatus("PENDING");
 		storage.setGoodType(goodType_.get());
@@ -400,6 +413,22 @@ public class StorageServiceController implements StorageService {
 		
 		storage.setBillingType(storageRequest.getBillingType());
 		storage.setBillingAmount(storageRequest.getBillingAmount());
+		
+		if(storageRequest.startBillingAt != null) {			
+			LocalDateTime dateTime;
+			String raw = storageRequest.getStartBillingAt();
+			if (raw.contains("T")) {
+			    dateTime = LocalDateTime.parse(raw);
+			} else {
+			    String dateString = raw + " 00:00:00";
+			    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			    dateTime = LocalDateTime.parse(dateString, formatter);
+			}			
+			if(dateTime.isAfter(dayService.getTimeStamp())) {
+				throw new InvalidOperationException("The selected date cannot be in the future. Please choose today or an earlier date.");
+			}
+			storage.setStartBillingAt(dateTime);
+		}
 				
 		storage = storageRepository.save(storage);
 		
@@ -512,15 +541,15 @@ public class StorageServiceController implements StorageService {
 		storage.setCheckedInByUser(userService.getUser(request));
 		storage.setCheckedInDateTime(dayService.getTimeStamp());
 		
-		if(storageRequest.startBillingAt == null) {
-			storage.setStartBillingAt(dayService.getTimeStamp()); // You can change this depending on user billing preferences
-		}else {			
-			//String dateString = "2024-10-26 15:30:45" ;
-			String dateString = storageRequest.getStartBillingAt() + " 00:00:00";
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
-			storage.setStartBillingAt(dateTime);
-		}		
+//		if(storageRequest.startBillingAt == null) {
+//			storage.setStartBillingAt(dayService.getTimeStamp()); // You can change this depending on user billing preferences
+//		}else {			
+//			//String dateString = "2024-10-26 15:30:45" ;
+//			String dateString = storageRequest.getStartBillingAt() + " 00:00:00";
+//			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+//			storage.setStartBillingAt(dateTime);
+//		}		
 		storage = storageRepository.save(storage);
 		
 //		//generate bill, for day 1 depending on billing type
