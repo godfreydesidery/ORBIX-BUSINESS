@@ -182,8 +182,8 @@ export class UserComponent {
       .catch(
         error => {
           console.log(error);
-          //this.msgBox.showErrorMessage(error, 'Could not update user')
           this.msg.showErrorMessage(error, 'Could not update user')
+          //this.msg.showErrorMessage3(error['message'])
         }
       )  
     }

@@ -555,8 +555,7 @@ export const menuItems = [
         icon: 'fa-cogs',
         selected: false,
         expanded: false,
-        //show : grant(['WRHOUSE-ACCESS']),
-        show : true,
+        show : grant(['TCHN-ACCESS']),
         order: 700,
         subMenu: [     
             { 

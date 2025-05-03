@@ -23,6 +23,7 @@ public class Object_ {
 	public static String RCPTN = "RCPTN-ACCESS";
 	public static String PKNG = "PKNG-ACCESS MODIFY";
 	public static String MTNC = "MTNC-ACCESS";
+	public static String TCHN = "TCHN-ACCESS";
 	public static String FINC = "FINC-ACCESS";
 	public static String FINCPKNG = "FINCPKNG-ACCESS";
 	public static String FINCSTRG = "FINCSTRG-ACCESS";
