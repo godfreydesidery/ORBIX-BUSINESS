@@ -40,6 +40,7 @@ export interface IServiceBillItem{
     sn : number
     item : string
     qty : number
+    noOfDays : number
     payStatus : string
     amount : number
 }

@@ -316,6 +316,12 @@ export const routes: Routes = [
         data : { breadcrumb : 'Warehouse/Select Warehouse'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'storage-management/cash-collections',
+        loadComponent: () => import('./storage-management/storage-cash-collection/storage-cash-collection.component').then(c => c.StorageCashCollectionComponent),
+        data : { breadcrumb : 'Warehouse/Cash Collections'},
+        canActivate : [AuthGuard]
+      },
 
 
 

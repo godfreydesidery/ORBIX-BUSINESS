@@ -81,7 +81,6 @@ public class StorageGoodReleaseServiceController implements StorageGoodReleaseSe
 		
 		storageGoodRelease.setNo(storage.getNo() + Math.random());
 		storageGoodRelease.setQty(qtyToRelease);
-		
 		storageGoodRelease.setStatus("APPROVED");
 		storageGoodRelease.setStorage(storage);
 		storageGoodRelease.setCreatedByUser(userService.getUser(request));

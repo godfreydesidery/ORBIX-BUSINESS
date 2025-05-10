@@ -481,48 +481,22 @@ export const menuItems = [
         show : grant(['WRHOUSE-ACCESS']),
         order: 700,
         subMenu: [ 
-            // {
-            //     title: 'Sales',
-            //     url: '#',
-            //     subMenu: [
-            //         {
-            //             title: 'Sales List',
-            //             routerLink: '/app/blank'
-            //         },
-            //         {
-            //             title: 'Sales Order',
-            //             routerLink: '/app/blank'
-            //         },
-            //     ]
-            // },
-            // {
-            //     title: 'Inventory',
-            //     routerLink: '/app/blank'
-            // },
             {
                 title: 'Select Warehouse',
                 show : true,
                 routerLink: '/app/storage-management/select-warehouse'
             },
-            // {
-            //     title: 'Reports',
-            //     url: '#',
-            //     subMenu: [
-            //         {
-            //             title: 'Sales Listing Report',
-            //             routerLink: '/app/mechandizing/sales-listing-report'
-            //         },
-            //         {
-            //             title: 'Fast Moving Products',
-            //             routerLink: '/app/mechandizing/fast-moving-products-report'
-            //         },
-            //         {
-            //             title: 'Stock Card Report',
-            //             routerLink: '/app/mechandizing/shop-product-stock-log'
-            //         },
-            //     ]
-            // },
-            
+            {
+                title: 'Reports',
+                url: '#',
+                show : true,
+                subMenu: [
+                    {
+                        title: 'Collection Report',
+                        routerLink: '/app/storage-management/cash-collections'
+                    } 
+                ]
+            },
         ]
     },
     {

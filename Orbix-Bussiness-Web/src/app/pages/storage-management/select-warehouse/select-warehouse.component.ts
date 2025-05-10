@@ -398,6 +398,31 @@ export class SelectWarehouseComponent {
       })
   }
 
+  async getAllCheckedInStorages() {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    this.storages = []
+
+    await this.http.get<IStorage[]>(API_URL + '/storages/get_all_checked_in_by_warehouse?warehouse_id=' + this.warehouseId, options)
+      .toPromise()
+      .then(
+        data => {
+          data?.reverse()
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.storages.push(element)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
+      .catch(error => {
+        console.log(error)
+      })
+  }
+
   async getAllRecentCheckedOutStorages() {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)

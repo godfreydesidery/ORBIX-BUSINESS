@@ -109,6 +109,24 @@ public class StorageServiceController implements StorageService {
 	}
 	
 	@Override
+	public List<StorageResponseDTO> getAllCheckedInStoragesByWarehouse(Long warehouseId, HttpServletRequest request) {
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+		
+		Warehouse warehouse = warehouseRepository.findById(warehouseId)
+		        .orElseThrow(() -> new NotFoundException("Warehouse not found"));
+		
+		List<Storage> storages = storageRepository.findAllByWarehouseAndStatusIn(warehouse, statuses);
+		List<StorageResponseDTO> storageResponses = new ArrayList<>();
+
+		for(Storage storage : storages) {
+			storageResponses.add(storageResponseDTOMapper(storage));					
+		}		
+		return storageResponses;
+	}
+	
+	@Override
 	public List<StorageResponseDTO> getAllRecentCheckedOutStoragesByWarehouse(Long warehouseId, HttpServletRequest request) {
 		
 		List<String> statuses = new ArrayList<>();
@@ -284,6 +302,11 @@ public class StorageServiceController implements StorageService {
 		storage.setHeight(storageRequest.getHeight());
 		storage.setWeight(storageRequest.getWeight());
 		
+		if(storageRequest.getBillingAmount() <= 0) throw new InvalidOperationException("Price can not be zero");	
+		storage.setBillingAmount(storageRequest.getBillingAmount());
+		
+		if(storageRequest.getInitialQty() <= 0) throw new InvalidOperationException("Qty can not be zero");
+				
 //		storage.setBillingType("DAILY");		
 		if(storageRequest.getBillingType().equals("DAILY")) {
 			storage.setInitialQty(storageRequest.getInitialQty());
@@ -297,7 +320,6 @@ public class StorageServiceController implements StorageService {
 			throw new InvalidOperationException("Invalid Billing Type");
 		}
 		
-		storage.setBillingAmount(storageRequest.getBillingAmount());
 		
 		if(storageRequest.startBillingAt == null) {
 			storage.setStartBillingAt(dayService.getTimeStamp()); // You can change this depending on user billing preferences
@@ -414,7 +436,7 @@ public class StorageServiceController implements StorageService {
 		storage.setBillingType(storageRequest.getBillingType());
 		storage.setBillingAmount(storageRequest.getBillingAmount());
 		
-		if(storageRequest.startBillingAt != null) {			
+		if(storageRequest.startBillingAt != null && storage.getStatus().equals("PENDING")) {		
 			LocalDateTime dateTime;
 			String raw = storageRequest.getStartBillingAt();
 			if (raw.contains("T")) {
@@ -830,7 +852,7 @@ public class StorageServiceController implements StorageService {
 		        .orElseThrow(() -> new NotFoundException("Storage not found"));
 		
 		LocalDateTime startBillingAt = storage.getStartBillingAt();
-		double noOfDays = (long) Math.ceil((double) Duration.between(startBillingAt, LocalDateTime.now()).toHours() / 24);
+		double noOfDays = (long) Math.floor((double) Duration.between(startBillingAt, LocalDateTime.now()).toHours() / 24);
 		if(noOfDays <=0 ) {
 			noOfDays = 1;
 		}

@@ -203,7 +203,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
                 .orElseThrow(() -> new NotFoundException("Storage not found."));
 		
 		LocalDateTime startBillingAt = storage.getStartBillingAt();
-		double noOfDays = (long) Math.ceil((double) Duration.between(startBillingAt, LocalDateTime.now()).toHours() / 24);
+		double noOfDays = (long) Math.floor((double) Duration.between(startBillingAt, LocalDateTime.now()).toHours() / 24);
 		if(noOfDays <=0 ) {
 			noOfDays = 1;
 		}
@@ -233,7 +233,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		
 		double qty = storageBillReceivableRequest.getQty();
 		
-		if(qty > (storage.getCurrentQty() - billedQty)) {
+		if(qty > (storage.getCurrentQty())) {
 			throw new InvalidOperationException("Qty to be paid must not be more than available qty");
 		}
 		
@@ -287,6 +287,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		storageBillReceivableResponseDTO.setDescription("Storage bill " + storageBillReceivable.getStartedAt().toString() + " to "  + storageBillReceivable.getEndedAt().toString());
 		storageBillReceivableResponseDTO.setPrice(String.valueOf(storageBillReceivable.getPrice()));
 		storageBillReceivableResponseDTO.setQty(String.valueOf(storageBillReceivable.getQty()));
+		storageBillReceivableResponseDTO.setNoOfDays(String.valueOf(storageBillReceivable.getNoOfDays()));
 		storageBillReceivableResponseDTO.setStartedAt(String.valueOf(storageBillReceivable.getStartedAt()));
 		storageBillReceivableResponseDTO.setEndedAt(String.valueOf(storageBillReceivable.getEndedAt()));
 		storageBillReceivableResponseDTO.setPayStatus(storageBillReceivable.getBillReceivable().getPayStatus().toString());

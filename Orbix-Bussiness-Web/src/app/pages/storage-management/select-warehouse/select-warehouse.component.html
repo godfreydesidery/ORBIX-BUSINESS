@@ -28,10 +28,10 @@
             </div>
             <div class="row" *ngIf="warehouseLoaded == true">
                 <div class="col-lg-12">
-                    <button class="btn btn-success btn-round-custom" (click)="setNew()">New Good</button>
-                    <button class="btn btn-success btn-round-custom" (click)="setExisting()" (click)="getAllCheckedInAndPendingStorages()">Goods List</button>
+                    <button class="btn btn-outline-primary btn-round-custom" (click)="setNew()"><i class="fa fa-pencil-square-o"></i> New Good</button>
+                    <button class="btn btn-outline-primary btn-round-custom" (click)="setExisting()" (click)="getAllCheckedInAndPendingStorages()"><i class="fa fa-list"></i> Goods List</button>
                     <!-- <button class="btn btn-success btn-round-custom" (click)="setExisting()" (click)="getAllRecentCheckedOutStorages()">Checked Out</button> -->
-                    <button class="btn btn-success btn-round-custom" (click)="setReleased()" (click)="getAllCheckedInAndPendingStorages()">Released List</button>
+                    <button class="btn btn-outline-primary btn-round-custom" (click)="setReleased()" (click)="getAllCheckedInStorages()"><i class="fa fa-sign-out"></i> Released List</button>
                 </div>
                 <div class="col-lg-12" *ngIf="mode === 'new'">
                     <div class="col-sm-12">
@@ -232,11 +232,11 @@
 
                                     <td class="d-flex flex-wrap gap-2">
                                         <div class="d-flex flex-row flex-wrap align-items-center gap-2">
-                                            <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="getStorage(storage.id)" data-toggle="modal" data-target="#edit-modal">Edit</button>
-                                            <button class="btn btn-primary btn-round-custom btn-sm" (click)="get(storage.id)" data-toggle="modal" data-target="#view-modal">View</button>
+                                            <button class="btn btn-warning btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING' || storage.status === 'CHECKED-IN'" (click)="getStorage(storage.id)" data-toggle="modal" data-target="#edit-modal"><i class="fa fa-cogs"></i> Edit</button>
+                                            <button class="btn btn-primary btn-round-custom btn-sm" (click)="get(storage.id)" data-toggle="modal" data-target="#view-modal"><i class="fa fa-eye"></i> View</button>
                                             <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleaseDetail(storage.id)" data-toggle="modal" data-target="#storage-good-release-modal">Release</button> -->
                                             <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleases(storage.id)" data-toggle="modal" data-target="#storage-good-releases-modal">Releases</button> -->
-                                            <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="checkIn(storage.id, storage.no, storage.goodName)" >Check-In</button>
+                                            <button class="btn btn-success btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="checkIn(storage.id, storage.no, storage.goodName)" ><i class="fa fa-sign-in"></i> Check-In</button>
                                             <!-- <button class="btn btn-warning btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="checkOut(storage.id, storage.no, storage.goodName)" >Check-Out</button> -->
                                         </div>
                                     </td>
@@ -300,13 +300,15 @@
                                     <td class="d-flex flex-wrap gap-2">
                                         <div class="d-flex flex-row flex-wrap align-items-center gap-2">
                                             <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="getStorage(storage.id)" data-toggle="modal" data-target="#edit-modal">Edit</button> -->
-                                            <button class="btn btn-primary btn-round-custom btn-sm" (click)="get(storage.id)" data-toggle="modal" data-target="#view-modal">View</button>
+                                            <button class="btn btn-primary btn-round-custom btn-sm" (click)="get(storage.id)" data-toggle="modal" data-target="#view-modal"><i class="fa fa-eye"></i> View</button>
                                             <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleaseDetail(storage.id)" data-toggle="modal" data-target="#storage-good-release-modal">Release</button> -->
-                                            <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleases(storage.id)" data-toggle="modal" data-target="#storage-good-releases-modal">Releases</button>
+                                            <button class="btn btn-danger btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleases(storage.id)" data-toggle="modal" data-target="#storage-good-releases-modal"><i class="fa fa-sign-out"></i> Releases</button>
                                             <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'PENDING'" (click)="checkIn(storage.id, storage.no, storage.goodName)" >Check-In</button>
                                             <button class="btn btn-warning btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="checkOut(storage.id, storage.no, storage.goodName)" >Check-Out</button> -->
                                         </div>
                                     </td>
+
+                                 
                                 </tr>
                             </tbody>
                         </table>
@@ -428,7 +430,7 @@
                                     <input class="form-control" type="number" [(ngModel)]="billingAmount" autocomplete="nope" min="0">
                                 </div>
                             </div>
-                            <div class="col-lg-3">
+                            <div class="col-lg-3" *ngIf="status === 'PENDING'">
                                 <div class="form-group">
                                     <label>Start Billing At</label>
                                     <input class="form-control" type="date" [(ngModel)]="startBillingAt" autocomplete="nope" min="0" style="text-align: center; font-weight: bold;">

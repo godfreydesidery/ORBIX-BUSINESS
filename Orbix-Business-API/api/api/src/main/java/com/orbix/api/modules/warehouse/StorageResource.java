@@ -52,6 +52,13 @@ public class StorageResource {
 		return ResponseEntity.ok().body(storageService.getAllPendingOrCheckedInStoragesByWarehouse(warehouseId, request));
 	}
 	
+	@GetMapping("/storages/get_all_checked_in_by_warehouse")
+	public ResponseEntity<List<StorageResponseDTO>>getAllCheckedInByWarehouse(
+			@RequestParam(name = "warehouse_id") Long warehouseId,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(storageService.getAllCheckedInStoragesByWarehouse(warehouseId, request));
+	}
+	
 	@GetMapping("/storages/get_all_recent_checked_out_by_warehouse")
 	public ResponseEntity<List<StorageResponseDTO>>getAllRecentCheckedOutByWarehouse(
 			@RequestParam(name = "warehouse_id") Long warehouseId,

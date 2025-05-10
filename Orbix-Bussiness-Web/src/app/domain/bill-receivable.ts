@@ -63,6 +63,7 @@ export interface IStorageBillReceivable {
     description : string
     billingType : string
     qty : number
+    noOfDays : number
     price : number
 
     discount : number

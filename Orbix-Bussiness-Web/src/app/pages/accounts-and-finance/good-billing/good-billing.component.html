@@ -32,6 +32,7 @@
                                             <td>Description</td>
                                             <td>Price&#64;</td> 
                                             <td>Qty</td>
+                                            <td>Days</td>
                                             <td>Discount</td>
                                             <td>Total</td>
                                             <td>Status</td>
@@ -44,6 +45,7 @@
                                             <td>Storage From {{p.startedAt}} To {{p.endedAt}} </td>
                                             <td style="text-align: right;">{{p.price | currency:'':''}}</td>
                                             <td>{{p.qty}}</td>
+                                            <td>{{p.noOfDays}}</td>
                                             <td style="text-align: right;">{{p.discount | currency:'':''}}</td>
                                             <td style="text-align: right;">{{p.amount | currency:'':''}}</td>
                                             <td>{{p.payStatus}}</td>

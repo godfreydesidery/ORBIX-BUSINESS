@@ -10,6 +10,7 @@ public class StorageBillReceivableResponseDTO {
 	String endedAt;
 	String billingType;
 	String qty;
+	String noOfDays;
 	String price;
 	
 	String discount;

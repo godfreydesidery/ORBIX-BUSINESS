@@ -939,7 +939,7 @@ export class GoodBillingComponent {
 
 
 
-  originalQty : number = 0
+        originalQty : number = 0
         availableQty : number = 0
         releasedQty : number = 0
         availableForRelease : number = 0
@@ -974,7 +974,7 @@ export class GoodBillingComponent {
                 this.releasedQty = data!.releasedQty
                 this.availableForRelease = data!.availableForRelease
       
-                this.qtyToRelease = 0
+                this.qtyToRelease = this.availableForRelease
                 
                 console.log(data)
               }
@@ -1001,6 +1001,7 @@ export class GoodBillingComponent {
                 //this.getStorageBillReceivables(this.storageId)
                 this.msg.showSuccessMessage('Success')
                 console.log(data)
+                this.printReleaseNote(data!.id)
               }   
             )
             .catch(
@@ -1246,6 +1247,7 @@ export class GoodBillingComponent {
               sn: 1,
               item: this.storageGoodReleaseGoodName,
               qty: this.storageGoodReleaseQty,
+              noOfDays: data!.noOfDays,
               amount: Number(this.storageGoodReleaseTotal)
             } as IServiceBillItem;
             
@@ -1386,9 +1388,8 @@ export class GoodBillingComponent {
               var receipt = [
                 [
                   {text : 'SN', fontSize : 8, bold : true}, 
-                  {text : 'Item', fontSize : 8, bold : true},
+                  {text : 'Good Name', fontSize : 8, bold : true},
                   {text : 'Qty', fontSize : 8, bold : true},
-                  {text : 'Amount', fontSize : 8, bold : true},
                 ]
               ] 
               
@@ -1401,19 +1402,10 @@ export class GoodBillingComponent {
                   {text : sn.toString(), fontSize : 8, bold : false}, 
                   {text : element.item, fontSize : 8, bold : false},
                   {text : element.qty.toString(), fontSize : 8, bold : false},
-                  {text : (element.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 8, alignment : 'right', bold : false},
                 ]
                 receipt.push(item)
               })
-              var detailSummary = [
-                {text : ' ', fontSize : 8, bold : false},
-                {text : 'Total', fontSize : 9, bold : true},
-                {text : ' ', fontSize : 8, bold : false},
-                {text : total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', bold : true},
-              ]
-              receipt.push(detailSummary)
               
-          
               const docDefinition = {
                 header: '',
                 
@@ -1447,7 +1439,7 @@ export class GoodBillingComponent {
                          [{text : 'Client Address: ' + this.storageGoodReleaseClientAddress, alignment : 'left', fontSize : 9, bold : false}],
                          [{text : 'Phone No: ' + this.storageGoodReleaseClientPhoneNo, alignment : 'left', fontSize : 9, bold : false}],
                           [{text : '________________________________'}],
-                          [{text : 'Payment Details', alignment : 'center', fontSize : 9, bold : true}],
+                          [{text : 'Goods Details', alignment : 'center', fontSize : 9, bold : true}],
                           [{text : ' ', alignment : 'center', fontSize : 9, bold : true}],
                         ]
                       }
@@ -1456,7 +1448,7 @@ export class GoodBillingComponent {
                       layout : 'noBorders',
                       table : {
                           headerRows : 1,
-                          widths : [15, 100, 15, 50],
+                          widths : [25, 120, 35],
                           body : receipt
                       }
                     },
@@ -1469,7 +1461,8 @@ export class GoodBillingComponent {
                           [{text : ' '}],
                           // [{text : 'Cashier Comments', alignment : 'left', fontSize : 9, bold : true}],
                           //[{text : this.comments, alignment : 'left', fontSize : 9, bold : false}],
-                          [{text : 'Issued At: ' + this.storageGoodReleaseReleaseDate, alignment : 'left', fontSize : 9, bold : true}],
+                          [{text : 'Released Date: ' + this.storageGoodReleaseReleaseDate.substring(0, 10), alignment : 'left', fontSize : 9, bold : true}],
+                          [{text : 'Released Time: ' + this.storageGoodReleaseReleaseDate.substring(11), alignment : 'left', fontSize : 9, bold : true}],
                           //[{text : 'Checkout At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
                           //[{text : 'Day Out: ' + this.lastBillingDate, alignment : 'left', fontSize : 9, bold : true}],
                           [{text : ' '}],
@@ -1550,6 +1543,7 @@ interface IStorageCustomBillDetail{
 
 
 interface IStorageGoodReleaseDetail{
+  id: any
   initialQty : number
   currentQty : number
   releasedQty : number
@@ -1560,6 +1554,7 @@ interface IStorageGoodRelease{
   id : any
   no : string
   qty : number
+  noOfDays : number
   status : string
   storageId : any
   releaseDate : string

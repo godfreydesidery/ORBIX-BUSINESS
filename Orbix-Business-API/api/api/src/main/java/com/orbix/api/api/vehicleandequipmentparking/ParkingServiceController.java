@@ -340,7 +340,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setRoundMirror(parkingRequest.isRoundMirror());
 		parking.setTireIndicator(parkingRequest.isTireIndicator());
 		parking.setHasKeys(true);
-		parking.setDeviceStatus(true);
+		parking.setDeviceStatus(parkingRequest.isDeviceStatus());
 		
 		parking.setComments(parkingRequest.getComments());
 		
@@ -563,7 +563,7 @@ public class ParkingServiceController implements ParkingService {
 			String dateString = parkingRequest.getStartBillingAt() + " 00:00:00";
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
-			parking.setStartBillingAt(dateTime);
+			parking.setStartBillingAt(dateTime.plusDays(1));
 		}	
 		
 		
@@ -848,7 +848,6 @@ public class ParkingServiceController implements ParkingService {
 		
 		Parking parking = parking_.get();
 		parking.setStatus("CHECKED-OUT");
-		parking.setCardNo(parkingRequest.getCardNo());
 		parking.setCheckedOutByUser(userService.getUser(request));
 		parking.setCheckedOutDateTime(dayService.getTimeStamp());
 		
