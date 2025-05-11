@@ -271,8 +271,11 @@ public class ParkingServiceController implements ParkingService {
 	public ParkingResponseDTO createParking(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
 		
 		if (parkingRequest.getChasisNo() != null && !parkingRequest.getChasisNo().trim().isEmpty()) {
-		    if (parkingRepository.existsByChasisNoAndStatus(parkingRequest.getChasisNo(), "CHECKED-IN")) {
-		        throw new InvalidOperationException("Vehicle/Equipment with similar chasis number already checked in");
+			List<String> statuses = new ArrayList<>();
+			statuses.add("PENDING");
+			statuses.add("CHECKED-IN");
+		    if (parkingRepository.existsByChasisNoAndStatusIn(parkingRequest.getChasisNo(), statuses)) {
+		        throw new InvalidOperationException("Chasis number already exist");
 		    }
 		}
 		

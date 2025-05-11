@@ -342,6 +342,8 @@ export class SelectWarehouseComponent {
     this.height = data!.height
     this.weight = data!.weight
     this.startBillingAt = data!.billingStartAt
+    this.warehouseName = data!.warehouseName
+    this.status = data!.status
   }
 
   clearStorageData() {
@@ -369,6 +371,8 @@ export class SelectWarehouseComponent {
     this.height = 0
     this.weight = 0
     this.startBillingAt = null
+    this.warehouseName = ''
+    this.status = ''
   }
 
 
@@ -475,6 +479,7 @@ export class SelectWarehouseComponent {
       .toPromise()
       .then(
         data => {
+          this.clearStorageData()
           this.startBillingAt = null
           this.showStorageData(data!)
           console.log(data)
@@ -1027,6 +1032,9 @@ export class SelectWarehouseComponent {
 
     
 
+    grant(privileges: string[]): boolean {
+      return this.auth.grant(privileges); // Adjust return value based on logic
+    }
 
 
 

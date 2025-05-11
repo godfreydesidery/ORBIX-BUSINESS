@@ -41,7 +41,9 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
 	List<Parking> findAllByStatusInAndCheckedOutDateTimeBetween(List<String> statuses, LocalDateTime startOfYesterday,
 			LocalDateTime endOfYesterday);
 
-	boolean existsByChasisNoAndStatus(String chasisNo, String string);
+	//boolean existsByChasisNoAndStatus(String chasisNo, String string);
+
+	boolean existsByChasisNoAndStatusIn(String chasisNo, List<String> statuses);
 
 	
 

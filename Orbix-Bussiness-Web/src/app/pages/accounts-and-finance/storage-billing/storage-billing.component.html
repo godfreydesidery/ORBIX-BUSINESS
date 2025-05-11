@@ -14,7 +14,7 @@
                     </div>
                 </div>
                 <br>    
-                <div class="table-responsive table-sm">
+                <div class="table-responsive table-striped table-sm table-bordered">
                     <table class="table">
                         <thead>
                             <tr>
@@ -38,7 +38,7 @@
                                 <td>{{storage.goodTypeName}}</td>
                                 <td>{{storage.warehouseName}}</td>
                                 <td>{{storage.ownerPhoneNo}}</td>  
-                                <td><b>{{storage.initialQty}}/{{storage.currentQty}}</b></td>                          
+                                <td class="text-danger"><b>{{storage.initialQty}}/{{storage.currentQty}}</b></td>                          
                                 <td><span class="badge badge-primary">{{storage.billingType}}</span></td>
                                 <td style="text-align: right;"><span class="badge badge-danger">{{storage.billingAmount | currency:'':''}}</span></td>
                                 

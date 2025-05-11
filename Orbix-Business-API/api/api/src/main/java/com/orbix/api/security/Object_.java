@@ -30,6 +30,7 @@ public class Object_ {
 	public static String FINCMTNC = "FINCMTNC-ACCESS";
 	public static String SHOP = "SHOP-ACCESS";
 	public static String WRHOUSE = "WRHOUSE-ACCESS";
+	public static String STRG = "STRG-UPDATE";
 	public static String PRCMT = "PRCMT-ACCESS";
 	public static String MNGNT = "MNGNT-ACCESS";
 	

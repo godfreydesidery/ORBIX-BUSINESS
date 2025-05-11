@@ -215,7 +215,7 @@ export class VehicleEquipmentRegisterComponent {
   ) { }
 
   ngOnInit(): void {
-    this.getAllActiveVehicleEquipments()
+    //this.getAllActiveVehicleEquipments()
     this.getAllCompanyActiveVehicleEquipmentTypes()
     this.getAllBranchActiveParkingZones()
     //this.getAllVehicleEquipmentChasisNos()
@@ -225,26 +225,26 @@ export class VehicleEquipmentRegisterComponent {
 
 
 
-  async getAllActiveVehicleEquipments() {
-    let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
-    }
-    this.vehicleEquipments = []
+  // async getAllActiveVehicleEquipments() {
+  //   let options = {
+  //     headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+  //   }
+  //   this.vehicleEquipments = []
 
-    await this.http.get<IVehicleEquipment[]>(API_URL + '/vehicle_equipments/get_all_active', options)
-      .toPromise()
-      .then(
-        data => {
-          var sn = 1
-          data?.forEach(element => {
-            element.sn = sn
-            this.vehicleEquipments.push(element)
-            sn = sn + 1
-          })
-          console.log(data)
-        }
-      )
-  }
+  //   await this.http.get<IVehicleEquipment[]>(API_URL + '/vehicle_equipments/get_all_active', options)
+  //     .toPromise()
+  //     .then(
+  //       data => {
+  //         var sn = 1
+  //         data?.forEach(element => {
+  //           element.sn = sn
+  //           this.vehicleEquipments.push(element)
+  //           sn = sn + 1
+  //         })
+  //         console.log(data)
+  //       }
+  //     )
+  // }
 
   async get(id: any) {
 
