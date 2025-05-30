@@ -919,6 +919,9 @@ export class GoodBillingComponent {
         this.unbilledQty = data!.unbilledQty
         this.billingRate = data!.billingRate
         this.noOfDays = data!.noOfDays
+        this.qty = data!.unbilledQty // set defauult to unbilled qty
+
+        this.calcBillAmount()
         
         console.log(data)
       }

@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -17,14 +18,12 @@ import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
-import com.orbix.api.modules.adminunits.BranchRepository;
-import com.orbix.api.modules.adminunits.CompanyRepository;
 import com.orbix.api.modules.adminunits.DayService;
-import com.orbix.api.modules.adminunits.SystemProfileRepository;
 import com.orbix.api.modules.finance.BillReceivable;
 import com.orbix.api.modules.finance.BillReceivableRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
 
+import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -279,6 +278,104 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		return storageBillReceivableDTOMapper(storageBillReceivable);
 	}
 	
+	@Override
+	public BillViewResponseDTO getBillView(Long storageId, HttpServletRequest request) {
+		// TODO Auto-generated method stub
+		Optional<Storage> storage_ = storageRepository.findById(storageId);
+		
+		if(storage_.isEmpty()) {
+			throw new NotFoundException("Storage not found");
+		}
+		
+		BillViewResponseDTO billResponse = new BillViewResponseDTO();
+		billResponse.setBillPaid("0");
+		billResponse.setBillGenerated("0");
+		billResponse.setBillUngenerated("0");
+		billResponse.setBillUnpaid("0");
+		
+		//////////////////////
+		
+//		billResponse.setBillPaid("10000");
+//		billResponse.setBillGenerated("10000");
+//		billResponse.setBillUngenerated("10000");
+//		billResponse.setBillUnpaid("10000");
+		
+		double totalPaid = 0;
+		double totalGenerated = 0;
+		double totalUngenerated = 0;
+		
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage_.get());
+		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
+			if(storageBillReceivable.getBillReceivable().getPayStatus().toString().equals("PAID")) {
+				totalPaid = totalPaid + storageBillReceivable.getBillReceivable().getAmount();
+			}else if(storageBillReceivable.getBillReceivable().getPayStatus().toString().equals("UNPAID")){
+				totalGenerated = totalGenerated + storageBillReceivable.getBillReceivable().getAmount();
+			}
+		}
+		
+		totalUngenerated = this.getUngeneratedBill(storage_.get());
+		
+		
+		billResponse.setBillPaid(String.valueOf(totalPaid));
+		billResponse.setBillGenerated(String.valueOf(totalGenerated));
+		billResponse.setBillUngenerated(String.valueOf(totalUngenerated));
+		billResponse.setBillUnpaid(String.valueOf(totalGenerated + totalUngenerated));
+		
+		
+		return billResponse;
+	}
+	
+	private double getUngeneratedBill(Storage storage) {
+		
+		double bill = 0;
+		
+		List<StorageBillReceivable> rcvs = storageBillReceivableRepository.findAllByStorage(storage);
+		
+		LocalDateTime fromDate = null;
+		LocalDateTime toDate = null;
+		double qty = 0;
+		
+		try {
+			if(rcvs.isEmpty()) {			
+				// Check for first billing date	// also check issue with timezone, this is temporary solution	
+				fromDate = storage.getStartBillingAt().toLocalDate().atStartOfDay();
+				
+				if(toDate == null) toDate = (LocalDateTime.now().plusHours(3)).plusDays(1).toLocalDate().atStartOfDay();	
+				
+				if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is before bill starting date");
+				
+				long dayCount = ChronoUnit.DAYS.between(fromDate, toDate);
+				
+				qty = dayCount;
+				
+			}else {
+				// Take the last bill
+				fromDate = rcvs.get(rcvs.size() - 1).getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
+				
+				if(toDate == null) toDate = (LocalDateTime.now().plusHours(3)).plusDays(1).toLocalDate().atStartOfDay();
+				
+				if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is invalid" + toDate.toString() + fromDate.toString());
+				
+				long dayCount = ChronoUnit.DAYS.between(fromDate, toDate) + 1;
+				
+				qty = dayCount;
+				
+			}
+			
+			if(qty > 1) qty = qty - 1;
+			
+			bill = qty * storage.getBillingAmount() * storage.getCurrentQty();
+			if(storage.getBillingType().equals("FLAT-RATE")) {
+				bill = qty * storage.getBillingAmount();
+			}
+			
+		}catch(Exception e) {
+			// Do nothing
+		}
+		
+		return bill;
+	}
+	
 	private StorageBillReceivableResponseDTO storageBillReceivableDTOMapper(StorageBillReceivable storageBillReceivable) {
 		
 		StorageBillReceivableResponseDTO storageBillReceivableResponseDTO = new StorageBillReceivableResponseDTO();
@@ -309,4 +406,12 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		
 		return valid;		
 	}
+}
+
+@Data
+class BillViewResponseDTO {
+	String billPaid;
+	String billGenerated;
+	String billUngenerated;
+	String billUnpaid;
 }

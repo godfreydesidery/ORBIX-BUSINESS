@@ -11,4 +11,6 @@ public interface StorageBillReceivableService {
 	public StorageBillReceivableResponseDTO updateStorageBillReceivable(StorageBillReceivableRequestDTO storageBillReceivableRequestDTO, HttpServletRequest request);
 	public StorageBillReceivableResponseDTO createStorageCustomBillReceivable(StorageBillReceivableRequestDTO storageBillReceivableRequestDTO, HttpServletRequest request);
 	public StorageBillReceivableResponseDTO getStorageBillReceivable(Long id, HttpServletRequest request);
+	
+	public BillViewResponseDTO getBillView(Long storageId, HttpServletRequest request);
 }

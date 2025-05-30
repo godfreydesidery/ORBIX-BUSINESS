@@ -80,8 +80,9 @@ export class CashierCollectionComponent {
 
     this.cashierCollections = []
     this.totalCollections = 0
-    
 
+    if(this.nickname === '--All--') this.nickname = ''
+    
     await this.http.post<ICashierCollection[]>(API_URL+'/finance_reports/get_cashier_collections_by_dates?nickname=' + this.nickname, args, options)
         .toPromise()
         .then(

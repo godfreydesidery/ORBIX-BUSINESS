@@ -47,8 +47,10 @@
                                         <tr>
                                             <!-- <td><button class="btn btn-success btn-round-custom" (click)="getStorageBillReceivables(p.id)" data-toggle="modal" data-target="#storage-billing-modal">Storage</button></td>
                                             <td><button class="btn btn-success btn-round-custom" data-toggle="modal" data-target="#service-billing-modal">Service</button></td> -->
-                                            <td><button class="btn btn-primary btn-round-custom" (click)="get(storage.id)" data-toggle="modal" data-target="#view-modal">View <i class="fa fa-eye"></i></button></td>
-                                            <td><button class="btn btn-success btn-round-custom" (click)="storageBilling(storage.id)" >Billing <i class="fa fa-money"></i></button></td>
+                                            <td><button class="btn btn-warning btn-round-custom btn-sm text-nowrap" (click)="getBillView(storage.id)" data-toggle="modal" data-target="#bill-view-modal"><i class="fa fa-eye-slash"></i> View Bill</button></td>
+                                            <td><button class="btn btn-primary btn-round-custom btn-sm text-nowrap" (click)="get(storage.id)" data-toggle="modal" data-target="#view-modal"><i class="fa fa-eye"> View</i></button></td>
+                                            <td><button class="btn btn-success btn-round-custom btn-sm text-nowrap" (click)="storageBilling(storage.id)" ><i class="fa fa-money"> Billing</i></button></td>
+                                            <td><button class="btn btn-danger btn-round-custom btn-sm text-nowrap" *ngIf="storage.currentQty == 0" (click)="checkOut(storage.id)"><i class="fa fa-sign-out"> Checkout</i></button></td>
                                             <!-- <td><button class="btn btn-primary btn-round-custom btn-sm" *ngIf="storage.status === 'CHECKED-IN'" (click)="getStorageGoodReleaseDetail(storage.id)" data-toggle="modal" data-target="#storage-good-release-modal">Release</button></td> -->
                                         </tr>
                                     </table>
@@ -281,6 +283,44 @@
                     </div>
                 </div>
             </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="bill-view-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-sm" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title text-primary" id="modal-large-label"><b>View Bill Details</b></h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped">
+                    <tr>
+                        <td>Bill Paid</td>
+                        <td style="text-align: right;">{{billPaid | currency:'':''}}</td>
+                    </tr>
+                    <tr>
+                        <td>Bill Generated</td>
+                        <td style="text-align: right;">{{billGenerated | currency:'':''}}</td>
+                    </tr>
+                    <tr>
+                        <td>Bill Not Generated</td>
+                        <td style="text-align: right;">{{billUngenerated | currency:'':''}}</td>
+                    </tr>
+                    <tr>
+                        <td style="font-size: large;"><b>Bill Unpaid</b></td>
+                        <td style="font-size: large; color: red; text-align: right;"><b>{{billUnpaid | currency:'':''}}</b></td>
+                    </tr>
+                </table>
+                
+            </div>
+            
+            
             <div class="modal-footer">
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>

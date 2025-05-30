@@ -300,8 +300,8 @@ export const menuItems = [
                     {
                         title: 'Vehicle Registration',
                         routerLink: '/app/management/vehicle-registration-report'
-                    } 
-                ]
+                    }
+                ],
             }
 
         ]
@@ -416,9 +416,13 @@ export const menuItems = [
                 show : true,
                 subMenu: [
                     {
-                        title: 'Cashier Collections',
+                        title: 'Parking Collections',
                         routerLink: '/app/management/cashier-collections'
-                    }, 
+                    },
+                    {
+                        title: 'Warehouse Collection',
+                        routerLink: '/app/storage-management/cash-collections'
+                    }  
                 ]
             }
         ]

@@ -32,6 +32,7 @@
                     <button class="btn btn-outline-primary btn-round-custom" (click)="setExisting()" (click)="getAllCheckedInAndPendingStorages()"><i class="fa fa-list"></i> Goods List</button>
                     <!-- <button class="btn btn-success btn-round-custom" (click)="setExisting()" (click)="getAllRecentCheckedOutStorages()">Checked Out</button> -->
                     <button class="btn btn-outline-primary btn-round-custom" (click)="setReleased()" (click)="getAllCheckedInStorages()"><i class="fa fa-sign-out"></i> Released List</button>
+                    <button class="btn btn-outline-danger btn-round-custom" (click)="setReleased()" (click)="getAllRecentCheckedOutStorages()"><i class="fa fa-sign-out"></i> Checked Out List</button>
                 </div>
                 <div class="col-lg-12" *ngIf="mode === 'new'">
                     <div class="col-sm-12">

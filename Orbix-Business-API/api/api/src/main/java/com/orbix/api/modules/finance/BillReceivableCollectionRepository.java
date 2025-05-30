@@ -38,9 +38,9 @@ public interface BillReceivableCollectionRepository extends JpaRepository<BillRe
 	        "JOIN " +
 	        "vehicle_equipment_types vt ON p.vehicle_and_equipment_type_id = vt.id " +
 	        "LEFT JOIN " +
-	        "parking_service_bill_receivables psbr ON psbr.bill_receivable_id = br.id " +
+	        "parking_service_bill_receivables psbr ON psbr.bill_receivable_id = br.id " + 
 	        "WHERE " +
-	        "u.nickname = :cashierNickname " +  // Filter by cashier's nickname
+	        "(:cashierNickname = '' OR u.nickname = :cashierNickname) " +  // Filter by cashier's nickname
 	        "AND c.collection_date_time BETWEEN :startDate AND :endDate",  // Filter by collection date
 	        nativeQuery = true)
 	List<ICashierCollection> getCashierCollectionsByDateAndCashier(

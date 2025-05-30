@@ -50,7 +50,7 @@
                                             <td style="text-align: right;">{{p.amount | currency:'':''}}</td>
                                             <td>{{p.payStatus}}</td>
                                             <td>
-                                                <button class="btn btn-success btn-round-custom" (click)="getStorageBill(p.id)" data-toggle="modal" data-target="#storage-bill-modal">Discount</button>
+                                                <button class="btn btn-success btn-round-custom" *ngIf="p.payStatus != 'PAID'" (click)="getStorageBill(p.id)" data-toggle="modal" data-target="#storage-bill-modal">Discount</button>
                                             </td>
                                         </tr>
                                     </tbody>

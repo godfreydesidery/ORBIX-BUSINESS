@@ -683,7 +683,7 @@ public class StorageServiceController implements StorageService {
 			}
 			lastBillDate = storageBillReceivable.getEndedAt();
 		}
-		if(lastBillDate.isBefore(lastDate) && (!storage_.get().getBillingType().equals("FLAT-RATE"))) {
+		if(storage_.get().getCurrentQty() > 0 && (!storage_.get().getBillingType().equals("FLAT-RATE"))) {
 			throw new InvalidOperationException("Could not checkout. Some storage days have not been billed. Please generate and clear bills");
 		}
 		
