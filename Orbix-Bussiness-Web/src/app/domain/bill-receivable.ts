@@ -23,6 +23,7 @@ export interface IParkingBillReceivable {
     price : number
 
     discount : number
+    discountStatus : string
 
     amount : number
 
@@ -67,6 +68,7 @@ export interface IStorageBillReceivable {
     price : number
 
     discount : number
+    discountStatus : string
 
     amount : number
 

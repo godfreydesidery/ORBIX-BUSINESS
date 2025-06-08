@@ -52,6 +52,11 @@ public class ParkingResource {
 		return ResponseEntity.ok().body(parkingService.getAllCheckedInParkings(request));
 	}
 	
+	@GetMapping("/parkings/get_all_with_discounts")
+	public ResponseEntity<List<ParkingResponseDTO>>getAllWithDiscounts(HttpServletRequest request){
+		return ResponseEntity.ok().body(parkingService.getAllWithDiscounts(request));
+	}
+	
 	@GetMapping("/parkings/get_all_cleared")
 	public ResponseEntity<List<ParkingResponseDTO>>getAllCleared(HttpServletRequest request){
 		return ResponseEntity.ok().body(parkingService.getAllCleared(request));

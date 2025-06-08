@@ -279,7 +279,16 @@ export class VehicleEquipmentBillingComponent {
         headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
       }
 
-      await this.http.post<IParkingBillReceivable>(API_URL + '/discount_requests/create?service_bill_id=' + this.parkingBillReceivableId + '&bill_amount=' + (this.parkingBillReceivablePrice * this.parkingBillReceivableQty) + '&discount_amount=' + this.parkingBillReceivableDiscount + '&service_bill_name=Parking', null, options)
+      var discountRequest = {
+        serviceBillId : this.parkingBillReceivableId,
+        billAmount : (this.parkingBillReceivablePrice * this.parkingBillReceivableQty),
+        discountAmount: this.parkingBillReceivableDiscount,
+        serviceBillName: 'Parking',
+        reason: this.discountReason
+
+      }
+
+      await this.http.post<IParkingBillReceivable>(API_URL + '/discount_requests/create?service_bill_id=' + this.parkingBillReceivableId + '&bill_amount=' + (this.parkingBillReceivablePrice * this.parkingBillReceivableQty) + '&discount_amount=' + this.parkingBillReceivableDiscount + '&service_bill_name=Parking', discountRequest, options)
         .toPromise()
         .then(
           data => {
@@ -299,6 +308,9 @@ export class VehicleEquipmentBillingComponent {
     }
   }
 
+  discountReason : string = ''
+  discountComments: string = ''
+
   async getDiscount() {
     
     if (this.parkingId != null) {
@@ -306,12 +318,15 @@ export class VehicleEquipmentBillingComponent {
         headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
       }
 
-      await this.http.get<number>(API_URL + '/discount_requests/get_discount?service_bill_id=' + this.parkingBillReceivableId + '&bill_amount=' + (this.parkingBillReceivablePrice * this.parkingBillReceivableQty) + '&discount_amount=' + this.parkingBillReceivableDiscount + '&service_bill_name=Parking', options)
+      await this.http.get<IDiscountRequest>(API_URL + '/discount_requests/get_discount?service_bill_id=' + this.parkingBillReceivableId + '&bill_amount=' + (this.parkingBillReceivablePrice * this.parkingBillReceivableQty) + '&discount_amount=' + this.parkingBillReceivableDiscount + '&service_bill_name=Parking', options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.parkingBillReceivableDiscount = data!
+            this.parkingBillReceivableDiscount = data!.discountAmount
+            this.discountReason = data!.reason
+            this.discountComments = data!.comments
+
           }
         )
         // .catch(
@@ -1189,3 +1204,11 @@ interface IModel {
   stringData: string
 }
 
+interface IDiscountRequest{
+  serviceBillId: any
+  billAmount: number
+  discountAmount: number
+  serviceBillName: string
+  reason: string
+  comments: string
+}

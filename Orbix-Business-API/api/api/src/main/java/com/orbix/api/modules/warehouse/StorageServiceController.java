@@ -15,6 +15,9 @@ import org.springframework.stereotype.Service;
 
 import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.api.commons.WorkFlowStatus;
+import com.orbix.api.api.vehicleandequipmentparking.Parking;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingBillReceivable;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
@@ -122,6 +125,28 @@ public class StorageServiceController implements StorageService {
 
 		for(Storage storage : storages) {
 			storageResponses.add(storageResponseDTOMapper(storage));					
+		}		
+		return storageResponses;
+	}
+	
+	@Override
+	public List<StorageResponseDTO> getAllWithDiscounts(HttpServletRequest request) {
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+		
+		List<Storage> storages = storageRepository.findAllByStatusIn(statuses);
+		List<StorageResponseDTO> storageResponses = new ArrayList<>();
+
+		for(Storage storage : storages) {
+			
+			List<StorageBillReceivable> sbrs = storageBillReceivableRepository.findByStorage(storage);
+			for(StorageBillReceivable sbr : sbrs) {
+				if(sbr.getDiscountStatus() != null && sbr.getDiscountStatus().equals("Requested")) {
+					storageResponses.add(storageResponseDTOMapper(storage));
+					break;
+				}
+			}							
 		}		
 		return storageResponses;
 	}

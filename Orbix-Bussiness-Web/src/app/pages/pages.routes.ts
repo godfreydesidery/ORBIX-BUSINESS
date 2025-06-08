@@ -355,9 +355,27 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
       {
+        path : 'accounts-and-finance/parking-discounts',
+        loadComponent: () => import('./accounts-and-finance/parking-discounts/parking-discounts.component').then(c => c.ParkingDiscountsComponent),
+        data : { breadcrumb : 'Accounts & Finance | Parking Discounts'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'accounts-and-finance/discounts',
+        loadComponent: () => import('./accounts-and-finance/discounts/discounts.component').then(c => c.DiscountsComponent),
+        data : { breadcrumb : 'Accounts & Finance | Discounts'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'accounts-and-finance/storage-billing',
         loadComponent: () => import('./accounts-and-finance/storage-billing/storage-billing.component').then(c => c.StorageBillingComponent),
         data : { breadcrumb : 'Accounts & Finance | Storage Billing'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'accounts-and-finance/storage-discounts',
+        loadComponent: () => import('./accounts-and-finance/storage-discounts/storage-discounts.component').then(c => c.StorageDiscountsComponent),
+        data : { breadcrumb : 'Accounts & Finance | Storage Discounts'},
         canActivate : [AuthGuard]
       },
       {

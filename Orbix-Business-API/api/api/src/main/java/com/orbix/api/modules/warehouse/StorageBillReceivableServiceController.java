@@ -390,6 +390,9 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		storageBillReceivableResponseDTO.setPayStatus(storageBillReceivable.getBillReceivable().getPayStatus().toString());
 		storageBillReceivableResponseDTO.setStorageId(String.valueOf(storageBillReceivable.getStorage().getId()));
 		storageBillReceivableResponseDTO.setDiscount(String.valueOf(storageBillReceivable.getDiscount()));
+		storageBillReceivableResponseDTO.setDiscountStatus(
+				storageBillReceivable.getDiscountStatus() != null ? storageBillReceivable.getDiscountStatus() : ""
+			);
 		storageBillReceivableResponseDTO.setAmount(String.valueOf(storageBillReceivable.getBillReceivable().getAmount()));
 		
 		return storageBillReceivableResponseDTO;

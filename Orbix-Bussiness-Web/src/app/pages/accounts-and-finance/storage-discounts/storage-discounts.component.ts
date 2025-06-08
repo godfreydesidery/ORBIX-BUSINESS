@@ -1,0 +1,729 @@
+import { CommonModule } from '@angular/common';
+import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { Component } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { AuthService } from 'src/app/auth.service';
+import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
+import { NgxPaginationModule } from 'ngx-pagination';
+import { IStorage } from 'src/app/domain/storage';
+import { Byte } from 'src/custom-packages/util';
+import { environment } from 'src/environments/environment';
+import { BrowserModule } from '@angular/platform-browser';
+import { Router, RouterModule } from '@angular/router';
+import { MsgBoxService } from '@services/custom/msg-box.service';
+import { IStorageBillReceivable } from 'src/app/domain/bill-receivable';
+import { IBillView } from 'src/app/domain/bill-view';
+import { DataService } from '@services/custom/data.service';
+import { IServiceBillItem } from 'src/app/domain/maintenance';
+import * as pdfMake from 'pdfmake/build/pdfmake';
+
+var pdfFonts = require('pdfmake/build/vfs_fonts.js');
+
+const API_URL = environment.apiUrl;
+
+
+@Component({
+  selector: 'az-storage-discounts',
+  standalone: true,
+  imports: [
+    FormsModule,
+    CommonModule,
+    SearchFilterPipe,
+    NgxPaginationModule,
+    RouterModule
+  ],
+  templateUrl: './storage-discounts.component.html',
+  styleUrl: './storage-discounts.component.scss'
+})
+export class StorageDiscountsComponent {
+page: number = 1; // Initialize the current page to 1
+
+  filterRecords: string = ''
+
+  startedAt: Date | null
+  endedAt: Date | null
+  billingType: string
+  qty: number
+  price: number
+  discount: number
+
+  storageId: any
+
+  autoBilling: any = 1
+
+  storageAmount: number
+
+  billingStartAt: string = ''
+  ////////////////////////////////////////////
+
+  vehicleEquipmentTypeName: string = ''
+
+
+  // Storage attributes
+  // storageId : any = null
+  storageNo: string = ''
+  storageBillReceivableId: any = null
+  storageBillReceivableDescription: string = ''
+  storageBillReceivableStartingDate: Date | null
+  storageBillReceivableEndingDate: Date | null
+  storageBillReceivablePrice: number = 0
+  storageBillReceivableQty: number = 0
+  storageBillReceivableDiscount: number = 0
+  storageBillReceivableAmount: number = 0
+  storageBillReceivableStatus: string = ''
+
+  // Service attributes
+  serviceBillReceivableId: any = null
+  serviceBillReceivableDate: Date | null
+  serviceBillReceivableDescription: string = ''
+  serviceBillReceivablePrice: number = 0
+  serviceBillReceivableQty: number = 0
+  serviceBillReceivableDiscount: number = 0
+  serviceBillReceivableStatus: string = ''
+  serviceBillReceivableAmount: number = 0
+
+  //Storage and bills Collections attributes
+  storageBillReceivables: IStorageBillReceivable[] = []
+  // serviceBillReceivables : IServiceBillReceivable[] = []
+  // billReceivables : IBillReceivable[] = []
+  documentHeader: any;
+  invoice: any;
+
+  cash: number = 0
+
+  mpesa: number = 0
+  mpesaRefNo: string = ''
+
+
+  /////////////////////////////////////////////
+
+
+  // Owner information
+  ownerFirstName: string = ''
+  ownerMiddleName: string = ''
+  ownerLastName: string = ''
+  ownerCompanyName: string = ''
+  ownerIdNo: string = ''
+  ownerIdType: string = ''
+  ownerPhoneNo: string = ''
+  ownerEmail: string = ''
+  ownerAddress: string = ''
+
+  color: string = ''
+
+  validUntilDate: Date | null = new Date()
+
+  comments: string = ''
+
+  cardNo: string = ''
+
+  goodCategory: string = ''
+
+  billingAmount: number = 0
+  //image: Byte[]
+
+  status: string = "PENDING"
+
+
+
+  startBillingAt: Date | null
+
+
+  goodName: string = ''
+  goodTypeId: any = ''
+  goodTypeName: string = ''
+  branchId: any = ''
+  companyId: any = ''
+
+  warehouseName: string = ''
+
+  initialQty: number = 0
+  currentQty: number = 0
+
+
+
+
+
+  ////////////////////////////////////////
+
+
+
+
+  /**Collections */
+  storages: IStorage[] = []
+  // storageBillReceivables : IStorageBillReceivable[] = []
+
+  constructor(
+    private http: HttpClient,
+    private auth: AuthService,
+    private router: Router,
+    private msg: MsgBoxService,
+    private data: DataService
+  ) { }
+
+
+  ngOnInit() {
+    this.getAllCheckedInStorages()
+  }
+
+  async getAllCheckedInStorages() {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    this.storages = []
+
+    await this.http.get<IStorage[]>(API_URL + '/storages/get_all_with_discounts', options)
+      .toPromise()
+      .then(
+        data => {
+          data?.reverse()
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.storages.push(element)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
+  }
+
+  async discounts(serviceId: any, serviceName : string) {
+
+    localStorage.setItem('service-id', '');
+    localStorage.setItem('service-id', serviceId);
+
+    localStorage.setItem('service-name', '');
+    localStorage.setItem('service-name', serviceName);
+
+    await this.router.navigate(['app/accounts-and-finance/discounts'], {
+      queryParams: { service_id: serviceId, service_name: serviceName }
+    });
+
+  }
+
+  async getStorageBillReceivables(storageId: any) {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    this.storageBillReceivables = []
+
+    await this.http.get<IStorageBillReceivable[]>(API_URL + '/storages/get_storage_bill_receivables?storage_id=' + storageId, options)
+      .toPromise()
+      .then(
+        data => {
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.storageBillReceivables.push(element)
+            sn = sn + 1
+          })
+          this.qty = 0
+          this.price = 0
+          this.discount = 0
+          this.storageAmount = 0
+          this.getStorage(storageId)
+          console.log(data)
+        }
+      )
+  }
+
+  async getStorage(storageId: any) {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.get<IStorage>(API_URL + '/storages/get?id=' + storageId, options)
+      .toPromise()
+      .then(
+        data => {
+          this.storageId = data!.id
+          this.billingType = data!.billingType
+          this.price = data!.billingAmount
+        }
+      )
+  }
+
+  async createStorageBillReceivable() {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+
+    var storageBillReceivable = {
+      startedAt: this.startedAt,
+      endedAt: this.endedAt,
+      billingType: this.billingType,
+      qty: this.qty,
+      price: this.price,
+      discount: this.discount,
+      autoBilling: this.autoBilling,
+      storageId: this.storageId
+    }
+
+    await this.http.post<IStorageBillReceivable>(API_URL + '/storages/create_storage_bill_receivable', storageBillReceivable, options)
+      .toPromise()
+      .then(
+        data => {
+          this.getStorageBillReceivables(this.storageId)
+          console.log(data)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+          console.log(error)
+        }
+      )
+
+
+  }
+
+  clearStorageBill() {
+    this.startedAt = null
+    this.endedAt = null
+    this.qty = 0
+    this.price = 0
+    this.discount = 0
+    this.storageId = null
+    this.autoBilling = 1
+    this.storageAmount = 0
+  }
+
+  doAutoBilling() {
+    this.clearStorageBill()
+  }
+
+  doCustomBilling() {
+    this.autoBilling = 0
+  }
+
+  refreshStorageAmounts() {
+    this.storageAmount = (this.price * this.qty) - this.discount
+  }
+
+
+  async storageBilling(storageId: any) {
+
+    localStorage.setItem('storage-id', '');
+    localStorage.setItem('storage-id', storageId);
+
+    await this.router.navigate(['app/accounts-and-finance/good-billing'], {
+      queryParams: { storage_id: storageId }
+    });
+
+  }
+
+  async get(id: any) {
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.get<IStorage>(API_URL + '/storages/get?id=' + id, options)
+      .toPromise()
+      .then(
+        data => {
+          this.startBillingAt = null
+          this.showStorageData(data!)
+          console.log(data)
+        }
+      )
+  }
+
+  showStorageData(data: IStorage) {
+
+    this.storageId = data?.id
+    this.storageNo = data?.no
+
+    this.ownerFirstName = data?.ownerFirstName
+    this.ownerMiddleName = data?.ownerMiddleName
+    this.ownerLastName = data?.ownerLastName
+    this.ownerCompanyName = data?.ownerCompanyName
+    this.ownerIdNo = data?.ownerIdNo
+    this.ownerIdType = data?.ownerIdType
+    this.ownerPhoneNo = data?.ownerPhoneNo
+    this.ownerEmail = data?.ownerEmail
+    this.ownerAddress = data?.ownerAddress
+
+    this.billingType = data?.billingType
+    this.billingAmount = data?.billingAmount
+    this.billingStartAt = data?.billingStartAt
+
+    this.initialQty = data?.initialQty
+    this.currentQty = data?.currentQty
+
+    this.goodName = data!.goodName
+
+    this.goodTypeName = data!.goodTypeName
+    this.warehouseName = data!.warehouseName
+    this.billingType = data!.billingType
+    this.status = data!.status
+    this.validUntilDate = null
+    this.comments = data!.comments// check this
+
+  }
+
+  clearStorageData() {
+    this.storageId = null
+    this.storageNo = ''
+    this.ownerFirstName = ''
+    this.ownerMiddleName = ''
+    this.ownerLastName = ''
+    this.ownerCompanyName = ''
+    this.ownerIdNo = ''
+    this.ownerIdType = ''
+    this.ownerPhoneNo = ''
+    this.ownerEmail = ''
+    this.ownerAddress = ''
+
+    this.billingType = ''
+    this.billingAmount = 0
+    this.billingStartAt = ''
+    this.goodTypeName = ''
+
+    this.initialQty = 0
+    this.currentQty = 0
+
+    this.goodName = ''
+
+    this.goodCategory = ''
+
+    this.warehouseName = ''
+    this.billingType = ''
+
+    this.color = ''
+    this.comments = ''
+  }
+
+
+
+
+  /////////////////////////
+
+
+
+  originalQty: number = 0
+  availableQty: number = 0
+  releasedQty: number = 0
+  availableForRelease: number = 0
+
+  qtyToRelease: number = 0
+
+  currentStorageId: any = null
+
+  async getStorageGoodReleaseDetail(storageId: any) {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+
+    this.originalQty = 0
+    this.availableQty = 0
+    this.releasedQty = 0
+    this.availableForRelease = 0
+
+    this.currentStorageId = null
+
+    this.qtyToRelease = 0
+
+    await this.http.get<IStorageGoodReleaseDetail>(API_URL + '/storage_good_releases/get_storage_good_release_detail?storage_id=' + storageId, options)
+      .toPromise()
+      .then(
+        data => {
+
+          this.currentStorageId = storageId
+
+          this.originalQty = data!.initialQty
+          this.availableQty = data!.currentQty
+          this.releasedQty = data!.releasedQty
+          this.availableForRelease = data!.availableForRelease
+
+          this.qtyToRelease = 0
+
+          console.log(data)
+        }
+      )
+  }
+
+
+  async createStorageGoodRelease() {
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+
+    var storageGoodRelease = {
+      storageId: this.currentStorageId,
+      qty: this.qtyToRelease,
+
+    }
+
+    await this.http.post<IStorageGoodReleaseDetail>(API_URL + '/storage_good_releases/create_storage_good_release', storageGoodRelease, options)
+      .toPromise()
+      .then(
+        data => {
+          //this.getStorageBillReceivables(this.storageId)
+          this.msg.showSuccessMessage('Success')
+          console.log(data)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+          console.log(error)
+        }
+      )
+
+
+  }
+
+
+  billPaid: number = 0
+  billGenerated: number = 0
+  billUngenerated: number = 0
+  billUnpaid: number = 0
+
+  async getBillView(id: any) {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+
+    this.billPaid = 0
+    this.billGenerated = 0
+    this.billUngenerated = 0
+    this.billUnpaid = 0
+
+    await this.http.get<IBillView>(API_URL + '/storage_bill_receivables/get_bill_view?storage_id=' + id, options)
+      .toPromise()
+      .then(
+        data => {
+          this.billPaid = data!.billPaid
+          this.billGenerated = data!.billGenerated
+          this.billUngenerated = data!.billUngenerated
+          this.billUnpaid = data!.billUnpaid
+          console.log(data)
+        }
+      )
+  }
+
+  async checkOut(id: any): Promise<void> {
+
+
+    if (await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to check out?', 'question', 'Yes', 'No') == false) {
+      return
+    }
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+
+    var storage = {
+      id: id
+    }
+
+    await this.http.post<IStorage>(API_URL + '/storages/check_out', storage, options)
+      .toPromise()
+      .then(
+        data => {
+
+          console.log(data)
+
+          this.msg.showSuccessMessage('Checked out Successifully')
+
+          this.printGatePassRcpt(data!.serviceBillItems, '', 0);
+        }
+      )
+      .catch(
+        error => {
+          console.log(error)
+          this.msg.showErrorMessage(error, 'Error')
+        }
+      )
+      this.getAllCheckedInStorages()
+  }
+
+  lastBillingDate: string = ''
+
+  async getLastBillingDate(storageId: any) {
+    // this.lastBillingDate = ''
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+
+    await this.http.get<IModel>(API_URL + '/storages/get_last_storage_bill_date?id=' + storageId, options)
+      .toPromise()
+      .then(
+        data => {
+          console.log(data)
+          // this.lastBillingDate = data!.stringData
+          this.lastBillingDate = data!.stringData
+        }
+      )
+      .catch(
+        error => {
+          console.log(error)
+          // this.lastBillingDate = ''
+          // this.msg.showErrorMessage(error, 'Error')
+          this.lastBillingDate = ''
+        }
+      )
+  }
+
+  printGatePassRcpt = async (billItems: IServiceBillItem[], receiptNo: string, cash: number) => {
+
+    await this.get(this.storageId)
+    await this.getLastBillingDate(this.storageId)
+
+    var companyName = localStorage.getItem('company-name')!
+
+    var header = ''
+    var footer = ''
+    var title = 'Gate Pass'
+    var total: number = 0
+    var discount: number = 0
+    var tax: number = 0
+
+    // var address : any = await this.data.getReceiptHeader(receiptNo)
+    var address: any = await this.data.getBranchReceiptHeaderWithNoTinAndVrn(receiptNo)
+
+    var receipt = [
+      [
+        { text: 'SN', fontSize: 8, bold: true },
+        { text: 'Item', fontSize: 8, bold: true },
+        { text: 'Qty', fontSize: 8, bold: true },
+        { text: 'Amount', fontSize: 8, bold: true },
+      ]
+    ]
+
+    var sn = 0
+
+    billItems.forEach((element) => {
+      total = total + (+element.amount)
+      sn = sn + 1
+      var item = [
+        { text: sn.toString(), fontSize: 8, bold: false },
+        { text: element.item, fontSize: 8, bold: false },
+        { text: element.qty.toString(), fontSize: 8, bold: false },
+        { text: (element.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 8, alignment: 'right', bold: false },
+      ]
+      receipt.push(item)
+    })
+    var detailSummary = [
+      { text: ' ', fontSize: 8, bold: false },
+      { text: 'Total', fontSize: 9, bold: true },
+      { text: ' ', fontSize: 8, bold: false },
+      { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+    ]
+    receipt.push(detailSummary)
+
+
+    const docDefinition = {
+      header: '',
+
+      //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
+      content: [
+        {
+          layout: 'noBorders',
+          table: address
+        },
+
+
+
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: [210],
+            body: [
+              [{ text: '==============================' }],
+            ]
+          }
+        },
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: [200],
+            body: [
+              [{ text: 'Gate Pass', alignment: 'center', fontSize: 9, bold: true }],
+              [{ text: 'Vehicle Name: ' + this.vehicleEquipmentTypeName, alignment: 'left', fontSize: 9, bold: false }],
+              [{ text: '________________________________' }],
+              [{ text: 'Payment Details', alignment: 'center', fontSize: 9, bold: true }],
+              [{ text: ' ', alignment: 'center', fontSize: 9, bold: true }],
+            ]
+          }
+        },
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 1,
+            widths: [15, 100, 15, 50],
+            body: receipt
+          }
+        },
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: [200],
+            body: [
+              [{ text: ' ' }],
+              [{ text: 'Cashier Comments', alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: this.comments, alignment: 'left', fontSize: 9, bold: false }],
+              [{ text: ' ' }],
+              [{ text: ' ' }],
+              [{ text: 'Issued At: ' + new Date().toString(), alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: 'Checkout At: ' + new Date().toString(), alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: 'Valid Until: ' + this.lastBillingDate, alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: ' ' }],
+              [{ text: 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: ' ' }],
+              [{ text: 'Signature: ......................' }],
+            ]
+          }
+        },
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: [210],
+            body: [
+              [{ text: '==============================' }],
+              [{ text: 'Developed By @Davaghana', fontSize: 10, bold: true, alignment: 'center' }],
+              [{ text: '***End of Document***', fontSize: 9, alignment: 'center' }]
+            ]
+          }
+        },
+      ],
+      pageMargins: 10,
+    }
+    const win = window.open('', "tempWinForPdf")
+    pdfMake.createPdf(docDefinition).print({}, win)
+    //win!.onfocus = function () { setTimeout(function () { win!.close(); }, 10000); } //set to 10 seconds
+  }
+
+}
+
+
+interface IStorageGoodReleaseDetail {
+  initialQty: number
+  currentQty: number
+  releasedQty: number
+  availableForRelease: number
+}
+
+interface IStorageGoodRelease {
+  id: any
+  no: string
+  qty: number
+  status: string
+  storageId: any
+  releaseDate: string
+  clientName: string
+  clientAddress: string
+  clientPhoneNo: string
+  goodName: string
+  unitPrice: string
+  total: string
+}
+
+interface IModel {
+  stringData: string
+}

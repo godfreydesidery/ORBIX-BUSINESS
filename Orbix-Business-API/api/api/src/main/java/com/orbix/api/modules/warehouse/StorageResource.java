@@ -19,6 +19,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
+
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -43,6 +45,11 @@ public class StorageResource {
 	@GetMapping("/storages/get_all_pending_or_checked_in")
 	public ResponseEntity<List<StorageResponseDTO>>getAllPendingAndCheckedIn(HttpServletRequest request){
 		return ResponseEntity.ok().body(storageService.getAllPendingOrCheckedInStorages(request));
+	}
+	
+	@GetMapping("/storages/get_all_with_discounts")
+	public ResponseEntity<List<StorageResponseDTO>>getAllWithDiscounts(HttpServletRequest request){
+		return ResponseEntity.ok().body(storageService.getAllWithDiscounts(request));
 	}
 	
 	@GetMapping("/storages/get_all_pending_or_checked_in_by_warehouse")

@@ -15,4 +15,6 @@ public class DiscountRequestResponseDTO {
     String branch;
     
     String description;
+    String reason;
+    String comments;
 }

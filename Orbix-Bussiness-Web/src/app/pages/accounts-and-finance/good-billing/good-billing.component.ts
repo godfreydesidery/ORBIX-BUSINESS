@@ -42,6 +42,7 @@ export class GoodBillingComponent {
   storageBillReceivableEndingDate : Date | null
   storageBillReceivablePrice : number = 0
   storageBillReceivableQty : number = 0
+  storageBillReceivableNoOfDays : number = 0
   storageBillReceivableDiscount : number = 0
   storageBillReceivableAmount : number = 0
   storageBillReceivableStatus : string = ''
@@ -148,11 +149,14 @@ export class GoodBillingComponent {
         this.storageBillReceivableEndingDate = data!.endedAt
         this.storageBillReceivablePrice = data!.price
         this.storageBillReceivableQty = data!.qty
+        this.storageBillReceivableNoOfDays = data!.noOfDays
         this.storageBillReceivableDiscount = data!.discount
         this.storageBillReceivableAmount = data!.amount
         this.storageBillReceivableStatus = data!.payStatus
         
         console.log(data)
+
+        this.getDiscount()
       }
     )
 
@@ -255,6 +259,78 @@ export class GoodBillingComponent {
       this.msg.showErrorMessage3('No storage available')
     }
   }
+
+  async requestDiscount() {
+      // if (await this.msg.showConfirmMessageDialog('Confirm', 'Confirm Requesting Discount?', 'question', 'Yes', 'No') == false) {
+      //   return
+      // }
+  
+      if (this.storageId != null) {
+        let options = {
+          headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+        }
+  
+        var discountRequest = {
+          serviceBillId : this.storageBillReceivableId,
+          billAmount : (this.storageBillReceivablePrice * this.storageBillReceivableQty * this.storageBillReceivableNoOfDays),
+          discountAmount: this.storageBillReceivableDiscount,
+          serviceBillName: 'Storage',
+          reason: this.discountReason
+  
+        }
+  
+        await this.http.post<IStorageBillReceivable>(API_URL + '/discount_requests/create?service_bill_id=' + this.storageBillReceivableId + '&bill_amount=' + (this.storageBillReceivablePrice * this.storageBillReceivableQty * this.storageBillReceivableNoOfDays) + '&discount_amount=' + this.storageBillReceivableDiscount + '&service_bill_name=Storage', discountRequest, options)
+          .toPromise()
+          .then(
+            data => {
+              this.msg.showSuccessMessage('Discount request sent successfully')
+              this.getStorageBillReceivables(this.storageId)
+              console.log(data)
+            }
+          )
+          .catch(
+            error => {
+              this.msg.showErrorMessage(error, 'Error')
+              this.getStorageBillReceivables(this.storageId)
+              console.log(error)
+            }
+          )
+  
+      }
+    }
+
+
+  discountReason : string = ''
+  discountComments: string = ''
+  
+    async getDiscount() {
+      
+      if (this.storageId != null) {
+        let options = {
+          headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+        }
+  
+        await this.http.get<IDiscountRequest>(API_URL + '/discount_requests/get_discount?service_bill_id=' + this.storageBillReceivableId + '&bill_amount=' + (this.storageBillReceivablePrice * this.storageBillReceivableQty) + '&discount_amount=' + this.storageBillReceivableDiscount + '&service_bill_name=Storage', options)
+          .toPromise()
+          .then(
+            data => {
+              console.log(data)
+              this.storageBillReceivableDiscount = data!.discountAmount
+              this.discountReason = data!.reason
+              this.discountComments = data!.comments
+  
+            }
+          )
+          // .catch(
+          //   error => {
+          //     this.msg.showErrorMessage(error, 'Error')
+          //     this.getParkingBillReceivables(this.parkingId)
+          //     console.log(error)
+          //   }
+          // )
+  
+      }
+    }
 
   async saveServiceBill() {
     // If service bill receivable id is null, create new service bill receivable
@@ -546,6 +622,7 @@ export class GoodBillingComponent {
     this.storageBillReceivableDescription = ''
     this.storageBillReceivableAmount = 0
     this.storageBillReceivableQty = 0
+    this.storageBillReceivableNoOfDays = 0
     this.storageBillReceivableDiscount = 0
     this.storageBillReceivableStartingDate = null
     this.storageBillReceivableEndingDate = null
@@ -1569,4 +1646,11 @@ interface IStorageGoodRelease{
   total : string
 }
 
-
+interface IDiscountRequest{
+  serviceBillId: any
+  billAmount: number
+  discountAmount: number
+  serviceBillName: string
+  reason: string
+  comments: string
+}

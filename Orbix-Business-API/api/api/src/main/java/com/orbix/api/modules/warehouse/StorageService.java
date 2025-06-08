@@ -5,12 +5,15 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
+
 
 
 public interface StorageService {
 	List<StorageResponseDTO> getAllStorages(HttpServletRequest request);	
 	List<StorageResponseDTO> getAllPendingOrCheckedInStorages(HttpServletRequest request);
 	List<StorageResponseDTO> getAllPendingOrCheckedInStoragesByWarehouse(Long warehouseId, HttpServletRequest request);
+	List<StorageResponseDTO> getAllWithDiscounts(HttpServletRequest request);
 	List<StorageResponseDTO> getAllCheckedInStoragesByWarehouse(Long warehouseId, HttpServletRequest request);
 	List<StorageResponseDTO> getAllRecentCheckedOutStoragesByWarehouse(Long warehouseId, HttpServletRequest request);
 	List<StorageResponseDTO> getAllCleared(HttpServletRequest request);

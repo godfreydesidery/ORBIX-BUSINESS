@@ -14,10 +14,14 @@ public class StorageBillReceivableResponseDTO {
 	String price;
 	
 	String discount;
+	String discountStatus;
 	
 	String amount;
 	
 	String storageId;
 	
 	String payStatus;
+	
+	String discountApprovedBy;
+	String discountApprovedDateTime;
 }

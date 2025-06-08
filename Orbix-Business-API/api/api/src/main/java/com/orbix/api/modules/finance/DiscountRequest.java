@@ -48,6 +48,8 @@ public class DiscountRequest {
 	double discountAmount;
 	
 	String description;
+	String reason;
+	String comments;
 	
 	@Enumerated(EnumType.STRING)
     @Column(nullable = false)
@@ -70,6 +72,15 @@ public class DiscountRequest {
     private User approvedByUser;
 		
 	private LocalDateTime approvedDateTime;
+	
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = true)
+    @JoinColumn(name = "rejected_by_user_id", nullable = true , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User rejectedByUser;
+		
+	private LocalDateTime rejectedDateTime;
 	
 	@ManyToOne(targetEntity = Branch.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "branch_id", nullable = false , updatable = false)

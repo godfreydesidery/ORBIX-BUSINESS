@@ -396,6 +396,11 @@ export const menuItems = [
                 routerLink: '/app/accounts-and-finance/parking-billing'
             },
             {
+                title: 'Parking Discounts',
+                show : grant(['FINCDISC-ACCESS']),
+                routerLink: '/app/accounts-and-finance/parking-discounts'
+            },
+            {
                 title: 'Release Vehicles',
                 show : grant(['FINCPKNG-ACCESS']),
                 routerLink: '/app/accounts-and-finance/release-vehicle-equipment'
@@ -404,6 +409,11 @@ export const menuItems = [
                 title: 'Storage Billing',
                 show : grant(['FINCSTRG-ACCESS']),
                 routerLink: '/app/accounts-and-finance/storage-billing'
+            },
+            {
+                title: 'Storage Discounts',
+                show : grant(['FINCDISC-ACCESS']),
+                routerLink: '/app/accounts-and-finance/storage-discounts'
             },
             {
                 title: 'Maintenance Billing',

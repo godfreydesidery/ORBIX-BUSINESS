@@ -238,6 +238,28 @@ public class ParkingServiceController implements ParkingService {
 		}		
 		return parkingResponses;
 	}
+	
+	@Override
+	public List<ParkingResponseDTO> getAllWithDiscounts(HttpServletRequest request) {
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+		
+		List<Parking> parkings = parkingRepository.findAllByStatusIn(statuses);
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+
+		for(Parking parking : parkings) {
+			
+			List<ParkingBillReceivable> pbrs = parkingBillReceivableRepository.findByParking(parking);
+			for(ParkingBillReceivable pbr : pbrs) {
+				if(pbr.getDiscountStatus() != null && pbr.getDiscountStatus().equals("Requested")) {
+					parkingResponses.add(parkingResponseDTOMapper(parking));
+					break;
+				}
+			}							
+		}		
+		return parkingResponses;
+	}
 
 	@Override
 	public ParkingResponseDTO get(Long id, HttpServletRequest request) {		

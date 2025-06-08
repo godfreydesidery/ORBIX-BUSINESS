@@ -328,6 +328,9 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		parkingBillReceivableResponseDTO.setParkingId(String.valueOf(parkingBillReceivable.getParking().getId()));
 		parkingBillReceivableResponseDTO.setDiscount(String.valueOf(parkingBillReceivable.getDiscount()));
 		parkingBillReceivableResponseDTO.setAmount(String.valueOf(parkingBillReceivable.getBillReceivable().getAmount()));
+		parkingBillReceivableResponseDTO.setDiscountStatus(
+			    parkingBillReceivable.getDiscountStatus() != null ? parkingBillReceivable.getDiscountStatus() : ""
+			);
 		
 		return parkingBillReceivableResponseDTO;
 		
@@ -350,7 +353,6 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		parkingServiceBillReceivableResponseDTO.setParkingId(String.valueOf(parkingServiceBillReceivable.getParking().getId()));
 		parkingServiceBillReceivableResponseDTO.setDiscount(String.valueOf(parkingServiceBillReceivable.getDiscount()));
 		parkingServiceBillReceivableResponseDTO.setAmount(String.valueOf(parkingServiceBillReceivable.getBillReceivable().getAmount()));
-		
 		
 		return parkingServiceBillReceivableResponseDTO;
 		
