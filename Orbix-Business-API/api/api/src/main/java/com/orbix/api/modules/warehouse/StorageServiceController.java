@@ -898,6 +898,7 @@ public class StorageServiceController implements StorageService {
 		
 		storageCustomBillDetail.setBillingRate(storage.getBillingAmount());
 		storageCustomBillDetail.setNoOfDays(noOfDays);
+		storageCustomBillDetail.setBillingType(storage.getBillingType());
 		
 		return storageCustomBillDetail;
 	}
@@ -919,4 +920,5 @@ class StorageCustomBillDetail{
 	double unbilledQty;
 	double billingRate;
 	double noOfDays;
+	String billingType;
 }

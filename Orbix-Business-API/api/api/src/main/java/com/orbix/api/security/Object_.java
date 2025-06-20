@@ -27,6 +27,8 @@ public class Object_ {
 	public static String FINC = "FINC-ACCESS";
 	public static String FINCPKNG = "FINCPKNG-ACCESS";
 	public static String FINCDISC = "FINCDISC-ACCESS";
+	public static String PKNGDISC = "PKNGDISC-ACCESS";
+	public static String STRGDISC = "STRGDISC-ACCESS";
 	public static String FINCSTRG = "FINCSTRG-ACCESS";
 	public static String FINCMTNC = "FINCMTNC-ACCESS";
 	public static String SHOP = "SHOP-ACCESS";

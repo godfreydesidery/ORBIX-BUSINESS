@@ -397,7 +397,7 @@ export const menuItems = [
             },
             {
                 title: 'Parking Discounts',
-                show : grant(['FINCDISC-ACCESS']),
+                show : grant(['FINCDISC-ACCESS', 'PKNGDISC-ACCESS']),
                 routerLink: '/app/accounts-and-finance/parking-discounts'
             },
             {
@@ -412,7 +412,7 @@ export const menuItems = [
             },
             {
                 title: 'Storage Discounts',
-                show : grant(['FINCDISC-ACCESS']),
+                show : grant(['FINCDISC-ACCESS', 'STRGDISC-ACCESS']),
                 routerLink: '/app/accounts-and-finance/storage-discounts'
             },
             {

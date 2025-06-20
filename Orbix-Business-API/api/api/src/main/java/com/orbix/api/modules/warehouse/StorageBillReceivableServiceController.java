@@ -366,7 +366,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 			
 			bill = qty * storage.getBillingAmount() * storage.getCurrentQty();
 			if(storage.getBillingType().equals("FLAT-RATE")) {
-				bill = qty * storage.getBillingAmount();
+				bill = storage.getCurrentQty() * storage.getBillingAmount();
 			}
 			
 		}catch(Exception e) {
@@ -389,6 +389,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		storageBillReceivableResponseDTO.setEndedAt(String.valueOf(storageBillReceivable.getEndedAt()));
 		storageBillReceivableResponseDTO.setPayStatus(storageBillReceivable.getBillReceivable().getPayStatus().toString());
 		storageBillReceivableResponseDTO.setStorageId(String.valueOf(storageBillReceivable.getStorage().getId()));
+		storageBillReceivableResponseDTO.setBillingType(storageBillReceivable.getStorage().getBillingType());
 		storageBillReceivableResponseDTO.setDiscount(String.valueOf(storageBillReceivable.getDiscount()));
 		storageBillReceivableResponseDTO.setDiscountStatus(
 				storageBillReceivable.getDiscountStatus() != null ? storageBillReceivable.getDiscountStatus() : ""

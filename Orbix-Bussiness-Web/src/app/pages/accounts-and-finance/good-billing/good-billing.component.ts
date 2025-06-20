@@ -153,6 +153,7 @@ export class GoodBillingComponent {
         this.storageBillReceivableDiscount = data!.discount
         this.storageBillReceivableAmount = data!.amount
         this.storageBillReceivableStatus = data!.payStatus
+        this.billingType = data!.billingType
         
         console.log(data)
 
@@ -997,6 +998,7 @@ export class GoodBillingComponent {
         this.billingRate = data!.billingRate
         this.noOfDays = data!.noOfDays
         this.qty = data!.unbilledQty // set defauult to unbilled qty
+        this.billingType = data!.billingType
 
         this.calcBillAmount()
         
@@ -1005,13 +1007,17 @@ export class GoodBillingComponent {
     )
   }
 
-  calcBillAmount(){
+  async calcBillAmount(){
     if(this.qty > this.unbilledQty){
       this.qty = 0
     }else if(this.qty < 0){
       this.qty = 0
     }
     this.totalBillingAmount = this.qty * this.billingRate * this.noOfDays
+    if(this.billingType == 'FLAT-RATE'){
+      this.totalBillingAmount = this.qty * this.billingRate 
+    }
+    
   }
 
 
@@ -1055,7 +1061,7 @@ export class GoodBillingComponent {
                 this.availableForRelease = data!.availableForRelease
       
                 this.qtyToRelease = this.availableForRelease
-                
+
                 console.log(data)
               }
             )
@@ -1619,6 +1625,7 @@ interface IStorageCustomBillDetail{
   unbilledQty : number
   billingRate : number
   noOfDays : number
+  billingType : string
 }
 
 
