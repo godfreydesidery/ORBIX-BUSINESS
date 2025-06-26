@@ -158,13 +158,19 @@
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Qty</label>
-                                    <input class="form-control" type="number" [(ngModel)]="initialQty" autocomplete="nope" min="0">
+                                    <input class="form-control" type="number" (input)="calculateBillingAmount()" [(ngModel)]="initialQty" autocomplete="nope" min="0">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Total Price</label>
+                                    <input class="form-control" type="number" (input)="calculateBillingAmount()" [(ngModel)]="totalPrice" autocomplete="nope" min="0" style="text-align: center; font-weight: bold;">
                                 </div>
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Billing Rate</label>
-                                    <input class="form-control" type="number" [(ngModel)]="billingAmount" autocomplete="nope" min="0" style="text-align: center; font-weight: bold;">
+                                    <input class="form-control" type="number" [(ngModel)]="billingAmount" autocomplete="nope" min="0" style="text-align: center; font-weight: bold;" readonly>
                                 </div>
                             </div>
                             <div class="col-lg-3">
@@ -205,7 +211,7 @@
                                     <th>Initial Qty</th>
                                     <th>Current Qty</th>
                                     <th>Billing Type</th>
-                                    <th>Price</th>
+                                    <th>Price &#64;</th>
                                     <th>Check Status</th>
                                     <th>Action</th>
                                 </tr>

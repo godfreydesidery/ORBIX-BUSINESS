@@ -72,6 +72,13 @@ public class ParkingResource {
 		return ResponseEntity.ok().body(parkingService.getRecentCheckedOut(request));
 	}
 	
+	@GetMapping("/parkings/get_parking_summary")
+	public ResponseEntity<List<MonthlyParkingStatusResponseDTO>>getParkingSummary(
+			@RequestParam(name = "year") int year,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(parkingService.getMonthlyStats(year, request));
+	}
+	
 	
 	@GetMapping("/parkings/get")
 	public ResponseEntity<ParkingResponseDTO>get(

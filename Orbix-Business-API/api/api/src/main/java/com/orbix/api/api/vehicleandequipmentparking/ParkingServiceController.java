@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -1021,6 +1022,14 @@ public class ParkingServiceController implements ParkingService {
 		}
 		
 		return null;
+	}
+
+	@Override
+	public List<MonthlyParkingStatusResponseDTO> getMonthlyStats(int year, HttpServletRequest request) {
+		List<Object[]> rawStats = parkingRepository.getMonthlyStats(year);
+		return rawStats.stream().map(row -> new MonthlyParkingStatusResponseDTO(((Number) row[0]).intValue(),
+				((Number) row[1]).longValue(), ((Number) row[2]).longValue())).collect(Collectors.toList());
+
 	}
 
 }

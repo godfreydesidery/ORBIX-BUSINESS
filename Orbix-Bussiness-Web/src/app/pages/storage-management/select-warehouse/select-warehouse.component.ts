@@ -88,12 +88,15 @@ export class SelectWarehouseComponent {
   status: string = ''
   billingType: string = 'DAILY'
   billingAmount: number | null = null
+  totalPrice : number | null = null
   initialQty: number = 0
   currentQty: number = 0
   warehouseId: any = null
   goodTypeId: any = null
   goodTypeName: string = ''
   warehouseName : string = ''
+
+
 
   storages: IStorage[] = []
   goodTypes: IGoodType[] = []
@@ -179,6 +182,13 @@ export class SelectWarehouseComponent {
     localStorage.setItem('selected-warehouse-id', '');
     this.selectedWarehouseId = ''
 
+  }
+
+  calculateBillingAmount(){
+    if(this.initialQty == null || this.initialQty <= 0){
+      this.billingAmount = 0
+    }
+    this.billingAmount = parseFloat((this.totalPrice! / this.initialQty).toFixed(2));
   }
 
   // Alerts array to manage the notifications
@@ -361,6 +371,7 @@ export class SelectWarehouseComponent {
     this.ownerAddress = ''
     this.billingType = 'DAILY'
     this.billingAmount = null
+    this.totalPrice = null
     this.goodTypeId = null
     this.goodTypeName = ''
     this.goodName = ''

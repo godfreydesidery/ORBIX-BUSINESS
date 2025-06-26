@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponseDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
 
 import lombok.Data;
@@ -198,6 +199,13 @@ public class StorageResource {
 		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/storages/create").toUriString());
 		
 		return ResponseEntity.created(uri).body(storageService.showStorageCustomBillDetail(storageId, request));
+	}
+	
+	@GetMapping("/storages/get_storage_summary")
+	public ResponseEntity<List<MonthlyStorageStatusResponseDTO>>getStorageSummary(
+			@RequestParam(name = "year") int year,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(storageService.getMonthlyStats(year, request));
 	}
 	
 	

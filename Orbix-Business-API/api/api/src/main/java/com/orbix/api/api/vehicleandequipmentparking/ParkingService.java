@@ -27,4 +27,6 @@ public interface ParkingService {
 //	ApiCustomResponse deactivateParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	
 	ParkingBillReceivableResponseDTO createParkingBillReceivable(Long parkingId, LocalDateTime startedAt, LocalDateTime endedAt, String billingType, double qty, double price, double discount, int autoBilling, HttpServletRequest request);
+	
+	List<MonthlyParkingStatusResponseDTO> getMonthlyStats(int year, HttpServletRequest request);
 }

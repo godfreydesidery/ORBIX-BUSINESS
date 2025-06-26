@@ -94,6 +94,7 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\salesandmarketing\SaleDetailBillReceivable.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\WebConfig.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\DiscountRequest.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\warehouse\MonthlyStorageStatusResponseDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\vehicleandequipmentmaintenance\ServiceSpecialist.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\DiscountRequestResource.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\LpoDetailResponseDTO.java
@@ -219,6 +220,7 @@ D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\vehicleandequipmentmaintenance\MaintenanceJobCardIssueResponseDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\finance\BillReceivableResponseDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\ShopProductLogRepository.java
+D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\MonthlyParkingStatusResponseDTO.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\DayServiceController.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\identityandaccess\PrivilegeService.java
 D:\My Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\TimeZone.java

@@ -7,6 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 
 import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.api.commons.WorkFlowStatus;
+import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponseDTO;
 import com.orbix.api.api.vehicleandequipmentparking.Parking;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingBillReceivable;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
@@ -901,6 +903,14 @@ public class StorageServiceController implements StorageService {
 		storageCustomBillDetail.setBillingType(storage.getBillingType());
 		
 		return storageCustomBillDetail;
+	}
+	
+	@Override
+	public List<MonthlyStorageStatusResponseDTO> getMonthlyStats(int year, HttpServletRequest request) {
+		List<Object[]> rawStats = storageRepository.getMonthlyStats(year);
+		return rawStats.stream().map(row -> new MonthlyStorageStatusResponseDTO(((Number) row[0]).intValue(),
+				((Number) row[1]).longValue(), ((Number) row[2]).longValue())).collect(Collectors.toList());
+
 	}
 }
 

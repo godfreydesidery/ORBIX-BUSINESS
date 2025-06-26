@@ -1183,7 +1183,7 @@ export class GoodBillingComponent {
               widths : [200],
               body : [
                 [{text : 'Gate Pass', alignment : 'center', fontSize : 9, bold : true}],
-                [{text : 'Vehicle Name: ' + this.vehicleEquipmentTypeName, alignment : 'left', fontSize : 9, bold : false}],
+                [{text : 'Client Name: ' + '', alignment : 'left', fontSize : 9, bold : false}],
                 [{text : '________________________________'}],
                 [{text : 'Payment Details', alignment : 'center', fontSize : 9, bold : true}],
                 [{text : ' ', alignment : 'center', fontSize : 9, bold : true}],

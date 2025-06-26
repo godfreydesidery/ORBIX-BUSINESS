@@ -508,7 +508,11 @@ export const menuItems = [
                     {
                         title: 'Collection Report',
                         routerLink: '/app/storage-management/cash-collections'
-                    } 
+                    },
+                    {
+                        title: 'Storage Report',
+                        routerLink: '/app/storage-management/storage-report'
+                    }  
                 ]
             },
         ]

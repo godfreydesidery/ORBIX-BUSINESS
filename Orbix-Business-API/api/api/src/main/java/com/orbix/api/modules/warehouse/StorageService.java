@@ -5,6 +5,7 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponseDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
 
 
@@ -32,4 +33,6 @@ public interface StorageService {
 	StorageBillReceivableResponseDTO createStorageBillReceivable(Long storageId, LocalDateTime startedAt, LocalDateTime endedAt, String billingType, double qty, double price, double discount, int autoBilling, HttpServletRequest request);
 
 	StorageCustomBillDetail showStorageCustomBillDetail(Long storageId, HttpServletRequest request);
+	
+	List<MonthlyStorageStatusResponseDTO> getMonthlyStats(int year, HttpServletRequest request);
 }
