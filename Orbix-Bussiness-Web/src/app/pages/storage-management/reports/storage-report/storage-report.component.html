@@ -31,7 +31,7 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label class="form-control">Status</label>
-                            <select class="form-control" [(ngModel)]="payStatus">
+                            <select class="form-control" [(ngModel)]="status">
                                 <option>--All--</option>
                                 <option>Checked In</option>
                                 <option>Checked Out</option>
@@ -44,65 +44,49 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <button class="btn btn-outline-success btn-round-custom" (click)="getRegistationByDate(from, to)"><i class="fa fa-refresh"></i> Run Report</button>
-                            <button class="btn btn-outline-success btn-round-custom" (click)="printParkingReport()" style="padding-left: 3px;"><i class="fa fa-file-pdf-o"></i> PDF</button>
+                            <button class="btn btn-outline-success btn-round-custom" (click)="printStorageReport()" style="padding-left: 3px;"><i class="fa fa-file-pdf-o"></i> Print Report</button>
                             <button class="btn btn-outline-success btn-round-custom" (click)="exportToExcel()" style="padding-left: 3px;"><i class="fa fa-file-excel-o"></i> Excel</button>
                         </div>
                     </div>
                 </div>
 
                 <div class="row">
-                    <div class="col-lg-12" *ngIf="parkingReports.length > 0">
+                    <div class="col-lg-12" *ngIf="storageReports.length > 0">
                         <div class="table-responsive table-striped table-sm table-bordered">
                             <table class="table">
                                 <thead>
                                     <td><b>SN</b></td>
-                                    <td><b>Category</b></td>
-                                    <td><b>Type</b></td>
-                                    <td><b>Name</b></td>
+                                    <td><b>Good No</b></td>
+                                    <td><b>Good Name</b></td>
+                                    <td><b>Owner Name</b></td>
                                     <td><b>Phone</b></td>
-                                    <td><b>Card No</b></td>
-                                    <td><b>Chassis No</b></td>
-                                    <td><b>Sub T1 Form</b></td>
-                                    <td><b>Device Status</b></td>
-                                    <td><b>Price</b></td>
-                                    <td><b>Pay Status</b></td>
-                                    <td><b>Paid Amount</b></td>
-                                    <td><b>Start Date</b></td>
-                                    <td><b>End Date</b></td>
-                                    <td><b>Remarks</b></td>
+                                    <td><b>Initial Qty</b></td>
+                                    <td><b>Billing Type</b></td>
+                                    <td><b>Status</b></td>
+                                    <td><b>Cheked In</b></td>
+                                    <td><b>Time</b></td>
+                                    <td><b>Checked Out</b></td>
+                                    <td><b>Time</b></td>
+                                    <td><b>Checked In By</b></td>
+                                    <td><b>Checked Out By</b></td>
 
-
-
-                                    <!-- <td><b>Chassis No</b></td>
-                                    <td><b>Vehicle Type</b></td>
-                                    <td><b>Key Status</b></td>
-                                    <td><b>Reg Date</b></td>
-                                    <td><b>Reg By</b></td> -->
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let r of parkingReports">
+                                    <tr *ngFor="let r of storageReports">
                                         <td>{{r.sn}}</td>
-                                        <td>{{r.vehicleEquipmentCategory}}</td>
-                                        <td>{{r.vehicleEquipmentTypeName}}</td>
+                                        <td>{{r.no}}</td>
+                                        <td>{{r.goodName}}</td>
                                         <td>{{r.ownerFirstName}} {{r.ownerLastName}}</td>
                                         <td>{{r.ownerPhoneNo}}</td>
-                                        <td>{{r.cardNo}}</td>
-                                        <td>{{r.chasisNo}}</td>
-                                        <td>{{r.tformNumber}}</td>
-                                        <td>{{r.deviceStatus}}</td>
-                                        <td style="text-align: right;">{{r.billingAmount | currency:'':''}}</td>
-                                        <td>{{r.payStatus}}</td>
-                                        <td style="text-align: right;">{{r.paidAmount | currency:'':''}}</td>
-                                        <td>{{r.checkedInAt}}</td>
-                                        <td>{{r.checkedOutAt}}</td>
+                                        <td>{{r.initialQty}}</td>
+                                        <td>{{r.billingType}}</td>
                                         <td>{{r.status}}</td>
-
-
-                                        <!-- <td>{{r.chassisNo}}</td>
-                                        <td>{{r.vehicleType}}</td>
-                                        <td>{{r.keyStatus}}</td>
-                                        <td>{{r.registeredDate}}</td>
-                                        <td>{{r.registeredBy}}</td> -->
+                                        <td>{{r.checkedInAt | date}}</td>
+                                        <td>{{r.checkedInAt | time}}</td>
+                                        <td>{{r.checkedOutAt | date}}</td>
+                                        <td>{{r.checkedOutAt | time}}</td>
+                                        <td>{{r.checkedInBy}}</td>
+                                        <td>{{r.checkedOutBy}}</td>
                                     </tr>
                                 </tbody>
                                 <!-- <tfoot>
@@ -116,8 +100,8 @@
                         </div>
 
                     </div>
-                    <div class="col-lg-12" *ngIf="parkingReports.length == 0"> 
-                        <div class="alert alert-info" *ngIf="parkingReports.length == 0" style="text-align: center;">
+                    <div class="col-lg-12" *ngIf="storageReports.length == 0"> 
+                        <div class="alert alert-info" *ngIf="storageReports.length == 0" style="text-align: center;">
                             No data
                         </div>
                     </div>

@@ -10,6 +10,7 @@ public class StorageGoodReleaseResponseDTO {
 	String status;
 	String storageId;
 	String releaseDate;
+	String checkedInDate;
 	//
 	String clientName;
 	String goodName;

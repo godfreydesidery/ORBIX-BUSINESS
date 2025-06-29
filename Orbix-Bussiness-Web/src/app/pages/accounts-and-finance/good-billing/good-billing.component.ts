@@ -703,7 +703,7 @@ export class GoodBillingComponent {
       items.push(item)
     })
 
-    this.printer.print(items, 'NA', 0)
+    this.printer.print(items, 'Client: ' + this.storageGoodReleaseClientName + 'Phone: ' + this.ownerPhoneNo + 'Address: ' + this.ownerAddress , 0)
     this.toPrintReceipt = false
   }
 
@@ -1183,7 +1183,9 @@ export class GoodBillingComponent {
               widths : [200],
               body : [
                 [{text : 'Gate Pass', alignment : 'center', fontSize : 9, bold : true}],
-                [{text : 'Client Name: ' + '', alignment : 'left', fontSize : 9, bold : false}],
+                [{text : 'Client Name: ' + this.storageGoodReleaseClientName, alignment : 'left', fontSize : 9, bold : false}],
+                [{text : 'Client Address: ' + this.ownerAddress, alignment : 'left', fontSize : 9, bold : false}],
+                [{text : 'Client Phone: ' + this.ownerPhoneNo, alignment : 'left', fontSize : 9, bold : false}],
                 [{text : '________________________________'}],
                 [{text : 'Payment Details', alignment : 'center', fontSize : 9, bold : true}],
                 [{text : ' ', alignment : 'center', fontSize : 9, bold : true}],
@@ -1212,6 +1214,7 @@ export class GoodBillingComponent {
                 [{text : 'Issued At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
                 [{text : 'Checkout At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
                 [{text : 'Valid Until: ' + this.lastBillingDate, alignment : 'left', fontSize : 9, bold : true}],
+                [{text : 'Number of Days: ' + this.noOfDays, alignment : 'left', fontSize : 9, bold : true}],
                 [{text : ' '}],
                 [{text : 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment : 'left', fontSize : 9, bold : true}],
                 [{text : ' '}],
@@ -1280,6 +1283,7 @@ export class GoodBillingComponent {
     storageGoodReleaseStatus : string = ''
     storageGoodReleaseStorageId : string = ''
     storageGoodReleaseReleaseDate : string = ''
+    storageGoodCheckedInDate : string = ''
     storageGoodReleaseClientName : string = ''
     storageGoodReleaseClientAddress : string = ''
     storageGoodReleaseClientPhoneNo : string = ''
@@ -1300,6 +1304,7 @@ export class GoodBillingComponent {
         this.storageGoodReleaseStatus = ''
         this.storageGoodReleaseStorageId = ''
         this.storageGoodReleaseReleaseDate = ''
+         this.storageGoodCheckedInDate = ''
         this.storageGoodReleaseClientName = ''
         this.storageGoodReleaseClientAddress = ''
         this.storageGoodReleaseClientPhoneNo = ''
@@ -1320,6 +1325,7 @@ export class GoodBillingComponent {
             this.storageGoodReleaseStatus = data!.status
             this.storageGoodReleaseStorageId = data!.storageId
             this.storageGoodReleaseReleaseDate = data!.releaseDate
+            this.storageGoodCheckedInDate = data!.checkedInDate
             this.storageGoodReleaseClientName = data!.clientName
             this.storageGoodReleaseClientAddress = data!.clientAddress
             this.storageGoodReleaseClientPhoneNo = data!.clientPhoneNo
@@ -1397,11 +1403,28 @@ export class GoodBillingComponent {
               },
         
               // Client Name
+              // {
+              //   text: 'Client Name: ' + this.storageGoodReleaseClientName,
+              //   fontSize: 12,
+              //   margin: [0, 0, 0, 15],
+              // },
+
               {
-                text: 'Client Name: ' + this.storageGoodReleaseClientName,
-                fontSize: 12,
-                margin: [0, 0, 0, 15],
-              },
+                      layout : 'noBorders',
+                      table : {
+                        headerRows : 0,
+                        widths : [200],
+                        body : [
+                          [{text : title, alignment : 'center', fontSize : 9, bold : true}],
+                         [{text : 'Client Name: ' + this.storageGoodReleaseClientName, alignment : 'left', fontSize : 9, bold : false}],
+                         [{text : 'Client Address: ' + this.storageGoodReleaseClientAddress, alignment : 'left', fontSize : 9, bold : false}],
+                         [{text : 'Phone No: ' + this.storageGoodReleaseClientPhoneNo, alignment : 'left', fontSize : 9, bold : false}],
+                          [{text : '________________________________'}],
+                          [{text : 'Goods Details', alignment : 'center', fontSize : 9, bold : true}],
+                          [{text : ' ', alignment : 'center', fontSize : 9, bold : true}],
+                        ]
+                      }
+                    }, 
         
               // Table Header
               {
@@ -1547,8 +1570,10 @@ export class GoodBillingComponent {
                           [{text : ' '}],
                           // [{text : 'Cashier Comments', alignment : 'left', fontSize : 9, bold : true}],
                           //[{text : this.comments, alignment : 'left', fontSize : 9, bold : false}],
+                          [{text : 'Check In Date: ' + this.storageGoodCheckedInDate.substring(0, 10), alignment : 'left', fontSize : 9, bold : true}],
                           [{text : 'Released Date: ' + this.storageGoodReleaseReleaseDate.substring(0, 10), alignment : 'left', fontSize : 9, bold : true}],
                           [{text : 'Released Time: ' + this.storageGoodReleaseReleaseDate.substring(11), alignment : 'left', fontSize : 9, bold : true}],
+                          [{text : 'Number of Days: ' + this.noOfDays, alignment : 'left', fontSize : 9, bold : true}],
                           //[{text : 'Checkout At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
                           //[{text : 'Day Out: ' + this.lastBillingDate, alignment : 'left', fontSize : 9, bold : true}],
                           [{text : ' '}],
@@ -1644,6 +1669,7 @@ interface IStorageGoodRelease{
   noOfDays : number
   status : string
   storageId : any
+  checkedInDate : string
   releaseDate : string
   clientName : string
   clientAddress : string

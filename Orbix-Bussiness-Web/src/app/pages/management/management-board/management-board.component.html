@@ -22,7 +22,7 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <br><br>
-                            <button class="btn btn-success btn-round-custom" (click)="getTotalsByDates(from, to)"><i
+                            <button class="btn btn-success btn-round-custom" (click)="getTotalsByDates(from, to)" (click)="getStorageTotalsByDates(from, to)"><i
                                     class="fa fa-refresh"></i> Update</button>
                             <!-- <button class="btn btn-success" (click)="exportToPdf()" style="margin: 3px;">Test</button> -->
                         </div>
@@ -47,7 +47,7 @@
                     <div class="col-lg-3" style="padding: 2px;">
                         <div class="card-deck-wrapper">
                             <div class="card-deck">
-                                <div class="card card-info">
+                                <div class="card card-success">
                                     <div class="card-body" style="text-align: center;">
                                         <h4 class="card-title"><i class="fa fa-group"></i></h4>
                                         <h4 class="card-title">Paid Vehicles</h4>
@@ -60,7 +60,7 @@
                     <div class="col-lg-3" style="padding: 2px;">
                         <div class="card-deck-wrapper">
                             <div class="card-deck">
-                                <div class="card card-info">
+                                <div class="card card-danger">
                                     <div class="card-body" style="text-align: center;">
                                         <h4 class="card-title"><i class="fa fa-group"></i></h4>
                                         <h4 class="card-title">Checked Out Vehicles</h4>
@@ -73,7 +73,7 @@
                     <div class="col-lg-3" style="padding: 2px;">
                         <div class="card-deck-wrapper">
                             <div class="card-deck">
-                                <div class="card card-info">
+                                <div class="card card-warning">
                                     <div class="card-body" style="text-align: center;">
                                         <h4 class="card-title"><i class="fa fa-group"></i></h4>
                                         <h4 class="card-title">Current Unpaid Vehicles</h4>
@@ -86,7 +86,7 @@
                     <div class="col-lg-3" style="padding: 2px;">
                         <div class="card-deck-wrapper">
                             <div class="card-deck">
-                                <div class="card card-info">
+                                <div class="card card-primary">
                                     <div class="card-body" style="text-align: center;">
                                         <h4 class="card-title"><i class="fa fa-group"></i></h4>
                                         <h4 class="card-title">Current Vehicles in Yards</h4>
@@ -114,11 +114,11 @@
                     <div class="col-lg-3" style="padding: 2px;">
                         <div class="card-deck-wrapper">
                             <div class="card-deck">
-                                <div class="card card-info">
+                                <div class="card card-primary">
                                     <div class="card-body" style="text-align: center;">
                                         <h4 class="card-title"><i class="fa fa-group"></i></h4>
                                         <h4 class="card-title">Total Goods</h4>
-                                        <h1 class="card-title">NA</h1>
+                                        <h1 class="card-title">{{storageCheckedIn}}</h1>
                                     </div>
                                 </div>
                             </div>

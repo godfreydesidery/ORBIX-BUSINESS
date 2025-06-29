@@ -12,9 +12,10 @@ import { HttpHeaders } from '@angular/common/http';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 
 import { environment } from 'src/environments/environment';
-import { ICashCollection, IParkingCashCollection, IParkingServiceCashCollection } from 'src/app/domain/cash-collection';
+import { ICashCollection, IStorageCashCollection } from 'src/app/domain/cash-collection';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
+import { TimePipe } from 'src/app/custom-pipes/time.pipe';
 
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
@@ -31,7 +32,8 @@ const API_URL = environment.apiUrl;
     CommonModule,
     SearchFilterPipe,
     NgxPaginationModule,
-    RouterModule
+    RouterModule,
+    TimePipe
   ],
   templateUrl: './storage-report.component.html',
   styleUrl: './storage-report.component.scss'
@@ -43,7 +45,7 @@ documentHeader! : any
   to : Date | string | null = null
 
   nickname = ''
-  payStatus = '--All--'
+  status = '--All--'
 
   constructor(
     private http :HttpClient,
@@ -65,7 +67,7 @@ documentHeader! : any
     }
 
     registrations : IRegistration[] = []
-    parkingReports : IParkingReport[] = []
+    storageReports : IStorageReport[] = []
 
   async getRegistationByDate(from : Date | string | null, to : Date | string | null) {
     if(from == null || to == null) {
@@ -82,15 +84,15 @@ documentHeader! : any
       to : to,
     }
 
-    this.parkingReports = []
+    this.storageReports = []
     
 
-    await this.http.post<IParkingReport[]>(API_URL+'/parking_reports/get_parking_report?nickname=' + this.nickname + '&payment_status=' + this.payStatus, args, options)
+    await this.http.post<IStorageReport[]>(API_URL+'/storage_reports/get_storage_report?status=' + this.status, args, options)
         .toPromise()
         .then(
           data => {
 
-            this.parkingReports = data!
+            this.storageReports = data!
 
             console.log(data)
           }
@@ -133,84 +135,84 @@ documentHeader! : any
 
   }
 
-  print = async () => {
-    if (this.parkingReports.length === 0) {
-      this.msg.showErrorMessage3('No data to export');
-      return;
-    }
-    this.documentHeader = await this.data.getDocumentHeader();
-    const title = 'Vehicle Registration Report';
-    const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
-    let total: number = 0;
-    let discount: number = 0;
+  // print = async () => {
+  //   if (this.storageReports.length === 0) {
+  //     this.msg.showErrorMessage3('No data to export');
+  //     return;
+  //   }
+  //   this.documentHeader = await this.data.getDocumentHeader();
+  //   const title = 'Vehicle Registration Report';
+  //   const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
+  //   let total: number = 0;
+  //   let discount: number = 0;
   
-    const report: any[] = [];
+  //   const report: any[] = [];
   
-    // Add header row
-    report.push([
-      { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Chassis No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Vehicle', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Key Status', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Date Registered', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Registered By', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-    ]);
+  //   // Add header row
+  //   report.push([
+  //     { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+  //     { text: 'Chassis No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+  //     { text: 'Vehicle', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+  //     { text: 'Key Status', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+  //     { text: 'Date Registered', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+  //     { text: 'Registered By', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+  //   ]);
   
-    // Add rows dynamically
-    this.parkingReports.forEach((element) => {
-      // total += parseFloat(element.amount) || 0;
-      // discount += parseFloat(element.discount) || 0;
+  //   // Add rows dynamically
+  //   this.storageReports.forEach((element) => {
+  //     // total += parseFloat(element.amount) || 0;
+  //     // discount += parseFloat(element.discount) || 0;
 
     
   
-      report.push([
-        { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.chasisNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.vehicleEquipmentTypeName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.keyStatus || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.checkedInAt.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.createdBy || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-      ]);
-    });
+  //     report.push([
+  //       { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+  //       { text: element.chasisNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+  //       { text: element.vehicleEquipmentTypeName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+  //       { text: element.keyStatus || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+  //       { text: element.checkedInAt.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+  //       { text: element.createdBy || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+  //     ]);
+  //   });
   
-    // Define document structure
-    const docDefinition: any = {
-      header: '',
-      pageOrientation: 'potrait', // landscape for Landscape
-      footer: (currentPage: any, pageCount: any) => ({
-        text: `${currentPage} of ${pageCount}`,
-        alignment: 'center',
-        fontSize: 8,
-      }),
-      content: [
-        {
-          columns: [
-            this.documentHeader,
-          ],
-        },
-        {text : ' '},
-        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-        {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-        {
-          table: {
-            widths: [25, 100, 100, 60, 80, 90],
-            body: report,
-          },
-        },
-      ],
-    };
+  //   // Define document structure
+  //   const docDefinition: any = {
+  //     header: '',
+  //     pageOrientation: 'potrait', // landscape for Landscape
+  //     footer: (currentPage: any, pageCount: any) => ({
+  //       text: `${currentPage} of ${pageCount}`,
+  //       alignment: 'center',
+  //       fontSize: 8,
+  //     }),
+  //     content: [
+  //       {
+  //         columns: [
+  //           this.documentHeader,
+  //         ],
+  //       },
+  //       {text : ' '},
+  //       {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+  //       {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+  //       {
+  //         table: {
+  //           widths: [25, 100, 100, 60, 80, 90],
+  //           body: report,
+  //         },
+  //       },
+  //     ],
+  //   };
   
-    pdfMake.createPdf(docDefinition).print();
-  };
+  //   pdfMake.createPdf(docDefinition).print();
+  // };
 
 
-  printParkingReport = async () => {
-    if (this.parkingReports.length === 0) {
+  printStorageReport = async () => {
+    if (this.storageReports.length === 0) {
       this.msg.showErrorMessage3('No data to export');
       return;
     }
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
-    const title = 'Vehicle Parking Report';
+    const title = 'Storage Report';
     const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;
     let discount: number = 0;
@@ -220,43 +222,37 @@ documentHeader! : any
     // Add header row
     report.push([
       { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Category', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Vehicle Type', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Good No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Good Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Owner Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Phone', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Card No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Chassis No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Sub T1 Form', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Device Status', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Price', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Start Date', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'End Date', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      // { text: 'Remarks', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Qty', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Billing Type', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Status', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Checked In', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'By', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Checked Out', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'By', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
     ]);
-
-    
-  
+ 
     // Add rows dynamically
-    this.parkingReports.forEach((element) => {
+    this.storageReports.forEach((element) => {
       // total += parseFloat(element.amount) || 0;
       // discount += parseFloat(element.discount) || 0;
 
-    
-  
       report.push([
         { text: element.sn || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.vehicleEquipmentCategory || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.vehicleEquipmentTypeName || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.no || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.goodName || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.ownerFirstName + ' ' + element.ownerLastName || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.ownerPhoneNo || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.cardNo || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.chasisNo || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.tformNumber || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.deviceStatus || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.billingAmount || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.checkedInAt.substring(0, 10) || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.checkedOutAt.substring(0, 10) || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
-        // { text: element.status || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.initialQty || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.billingType || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.status || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.checkedInAt || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+         { text: element.checkedInBy || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.checkedOutAt || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.checkedOutBy || '', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: false },
       ]);
     });
   
@@ -280,7 +276,7 @@ documentHeader! : any
         {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         {
           table: {
-            widths: [25, 50, 80, 90, 80, 60, 50, 50, 30, 50, 50, 50],
+            widths: [25, 50, 80, 90, 80, 30, 50, 50, 50, 50, 70, 50],
             body: report,
           },
         },
@@ -296,27 +292,24 @@ documentHeader! : any
   
 
   exportToExcel(): void {
-    if (this.parkingReports.length === 0) {
+    if (this.storageReports.length === 0) {
       this.msg.showErrorMessage3('No data to export');
       return;
     }
 
-    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.parkingReports.map((item)=>({
+    const worksheet: XLSX.WorkSheet = XLSX.utils.json_to_sheet(this.storageReports.map((item)=>({
     'S/N': item.sn,
-    'Category': item.vehicleEquipmentCategory,
-    'Type': item.vehicleEquipmentTypeName,
+    'Good No': item.no,
+    'Good Name': item.goodName,
     'Owner Name': `${item.ownerFirstName} ${item.ownerLastName}`,
     'Phone': item.ownerPhoneNo,
-    'Card Number': item.cardNo,
-    'Chasis Number': item.chasisNo,
-    'T-Form Number': item.tformNumber,
-    'Device Status': item.deviceStatus,
-    'Billing Amount': Number(item.billingAmount),
-    'Pay Status': item.payStatus,
-    'Paid Amount': Number(item.paidAmount),
+    'Initial Qty': item.initialQty,
+    'Billing Type': item.billingType,
+    'Status': item.status,
     'Checked In': item.checkedInAt,
+    'Checked In By': item.checkedInBy,
     'Checked Out': item.checkedOutAt,
-    'Status': item.status
+    'Checked Out By': item.checkedOutBy
     })));
     const workbook: XLSX.WorkBook = {
       Sheets: { 'Report': worksheet },
@@ -328,7 +321,7 @@ documentHeader! : any
       type: 'array'
     });
 
-    const fileName = 'Vehicle Parking Report ' + this.from + ' - ' + this.to + '.xlsx';
+    const fileName = 'Storage Report ' + this.from + ' - ' + this.to + '.xlsx';
     this.saveAsExcelFile(excelBuffer, fileName);
 
     // const blob = new Blob([excelBuffer], {
@@ -361,23 +354,21 @@ export interface IRegistration{
   registeredBy : string;
 }
 
-export interface IParkingReport{
+export interface IStorageReport{
   sn : string;
-  vehicleEquipmentCategory : string,
-  vehicleEquipmentTypeName : string,
+  no : string,
+  goodName : string,
   ownerFirstName : string,
   ownerLastName : string,
   ownerPhoneNo : string,
-  cardNo : string,
-  chasisNo : string,
-  tformNumber : string,
-  deviceStatus : string,
-  billingAmount : number
+  initialQty : number,
+  billingType : string,
   checkedInAt : string,
   checkedOutAt : string,
   status : string,
-  keyStatus : string,
   createdBy : string
+  checkedInBy: string
+  checkedOutBy: string
 
   payStatus : string
   paidAmount : number

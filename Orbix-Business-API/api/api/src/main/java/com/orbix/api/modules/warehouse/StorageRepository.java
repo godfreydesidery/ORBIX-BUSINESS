@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.orbix.api.modules.identityandaccess.User;
+
 public interface StorageRepository extends JpaRepository<Storage, Long> {
 
 	List<Storage> findAllByStatusIn(List<String> statuses);
@@ -15,6 +17,36 @@ public interface StorageRepository extends JpaRepository<Storage, Long> {
 			LocalDateTime endOfYesterday);
 
 	List<Storage> findAllByWarehouseAndStatusIn(Warehouse warehouse, List<String> statuses);
+	
+	/////////////////////////////////
+	
+
+//	List<Storage> findAllByVehicleEquipmentAndStatusIn(VehicleEquipment vehicleEquipment, List<String> statuses);
+	
+	
+	@Query("SELECT COUNT(p) FROM Storage p WHERE p.checkedInDateTime BETWEEN :startDate AND :endDate AND status IN :statuses")
+    long countByDateRangeAndRegistered(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, List<String> statuses);
+
+	@Query("SELECT COUNT(p) FROM Storage p WHERE p.checkedOutDateTime BETWEEN :startDate AND :endDate AND status IN :statuses")
+    long countByDateRangeAndCheckedOut(@Param("startDate") LocalDateTime startDate, @Param("endDate") LocalDateTime endDate, List<String> statuses);
+
+	
+	@Query("SELECT COUNT(p) FROM Storage p WHERE p.status = 'CHECKED-IN'")
+    long countRegistered();
+
+	List<Storage> findAllByCreatedByUserAndCreatedDateTimeBetweenAndStatusIn(User user, LocalDateTime atStartOfDay,
+			LocalDateTime plusDays, List<String> statuses);
+
+	List<Storage> findAllByCreatedDateTimeBetweenAndStatusIn(LocalDateTime atStartOfDay, LocalDateTime plusDays,
+			List<String> statuses);
+	
+	List<Storage> findAllByCheckedInByUserAndCheckedInDateTimeBetweenAndStatusIn(User user, LocalDateTime atStartOfDay,
+			LocalDateTime plusDays, List<String> statuses);
+	
+	List<Storage> findAllByCheckedInDateTimeBetweenAndStatusIn(LocalDateTime atStartOfDay, LocalDateTime plusDays,
+			List<String> statuses);
+
+	/////////////////////////////////
 	
 	List<Storage> findAllByWarehouseAndStatusInAndCheckedOutDateTimeAfter(Warehouse warehouse, List<String> statuses, LocalDateTime checkedOutAfter);
 
@@ -42,4 +74,6 @@ public interface StorageRepository extends JpaRepository<Storage, Long> {
 		    "ORDER BY months.month",
 		    nativeQuery = true)
 		List<Object[]> getMonthlyStats(@Param("year") int year);
+
+	int countByStatus(String string);
 }

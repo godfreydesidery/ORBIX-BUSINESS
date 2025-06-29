@@ -254,7 +254,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		billReceivable.setCreatedDateTime(dayService.getTimeStamp());
 		
 		billReceivable.setPayStatus(PayStatus.UNPAID);
-		billReceivable.setSummary("Storage bill for storage#: " + storage.getNo());
+		billReceivable.setSummary(storage.getNo() + " " + storage.getGoodName());
 		
 		billReceivable = billReceivableRepository.save(billReceivable);
 		billReceivable.setNo("BR" + billReceivable.getId().toString());
@@ -263,7 +263,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		StorageBillReceivable storageBillReceivable = new StorageBillReceivable();
 		
 		LocalDate today = LocalDate.now();
-		storageBillReceivable.setStartedAt(today.atStartOfDay());
+		storageBillReceivable.setStartedAt(storage.getStartBillingAt());
 		storageBillReceivable.setEndedAt(today.atTime(23, 59, 59));
 		
 		storageBillReceivable.setPrice(storage.getBillingAmount());
@@ -292,13 +292,6 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		billResponse.setBillGenerated("0");
 		billResponse.setBillUngenerated("0");
 		billResponse.setBillUnpaid("0");
-		
-		//////////////////////
-		
-//		billResponse.setBillPaid("10000");
-//		billResponse.setBillGenerated("10000");
-//		billResponse.setBillUngenerated("10000");
-//		billResponse.setBillUnpaid("10000");
 		
 		double totalPaid = 0;
 		double totalGenerated = 0;

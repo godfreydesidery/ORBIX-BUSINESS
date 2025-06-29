@@ -162,7 +162,11 @@ public class StorageGoodReleaseServiceController implements StorageGoodReleaseSe
 			        ? storageGoodRelease.getApprovedDateTime().toString()
 			        : ""
 			);
-		
+		storageGoodReleaseResponse.setCheckedInDate(
+			    storageGoodRelease.getStorage().getCheckedInDateTime() != null
+			        ? storageGoodRelease.getStorage().getCheckedInDateTime().toString()
+			        : ""
+			);
 		storageGoodReleaseResponse.setClientName(storageGoodRelease.getStorage().getOwnerFirstName() + " " + storageGoodRelease.getStorage().getOwnerLastName());;
 		storageGoodReleaseResponse.setGoodName(storageGoodRelease.getStorage().getGoodName());
 		if (storageGoodRelease.getStorage() != null) {

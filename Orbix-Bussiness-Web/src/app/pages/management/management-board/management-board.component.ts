@@ -121,6 +121,7 @@ export class ManagementBoardComponent {
     this.to = today.toISOString().split('T')[0];
 
     this.getTotalsByDates(this.from, this.to);
+    this.getStorageTotalsByDates(this.from, this.to);
 
     await this.getParkingSummary()
     await this.getStorageSummary()
@@ -407,6 +408,43 @@ export class ManagementBoardComponent {
   }
 
 
+  storageCheckedIn : any = 0
+  async getStorageTotalsByDates(from : Date | string | null, to : Date | string | null) {
+
+    this.storageCheckedIn = 0
+
+    if(from == null || to == null) {
+      from = new Date()
+      to = new Date()
+    }
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    var args = {
+      from : from,
+      to : to,
+    }
+
+    await this.http.post<IStorageTotalsByDates>(API_URL+'/storage_reports/get_totals_by_dates', args, options)
+        .toPromise()
+        .then(
+          data => {
+            this.storageCheckedIn = data!.checkedIn
+            console.log(data)
+          }
+        )
+        .catch(
+          error => {
+            this.msg.showErrorMessage(error, 'Error')
+            console.log(error)
+          }
+        )
+    return 0; 
+  }
+
+
   parkingSummary : IParkingSummary[] = []
 
   async getParkingSummary() {
@@ -569,6 +607,11 @@ interface IParkingTotalsByDates {
   currentTotalInYards : string
 }
 
+interface IStorageTotalsByDates {
+  from : string;
+  to : string;
+  checkedIn : string
+}
 
 interface IParkingSummary{
   month : number
