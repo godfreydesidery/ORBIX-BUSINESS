@@ -421,6 +421,11 @@ export const menuItems = [
                 routerLink: '/app/accounts-and-finance/maintenance-billing'
             },
             {
+                title: 'Weigh Billing',
+                show : grant(['FINCWEGH-ACCESS']),
+                routerLink: '/app/accounts-and-finance/weigh-billing'
+            },
+            {
                 title: 'Reports',
                 url: '#',
                 show : true,
@@ -538,6 +543,30 @@ export const menuItems = [
                 show : true,
                 routerLink: '/app/maintenance-management/maintenance-verify'
             }, 
+              
+        ]
+    },
+
+    {
+        title: 'Fleet Operations',
+        icon: 'fa-cogs',
+        selected: false,
+        expanded: false,
+        show : grant(['WEGH-ACCESS']),
+        order: 700,
+        subMenu: [     
+            { 
+                title: 'Weigh Bridge',
+                url: '#',
+                show : true,
+                routerLink: '/app/fleet-operations/weighbridge'
+            },
+            // { 
+            //     title: 'Verify',
+            //     url: '#',
+            //     show : true,
+            //     routerLink: '/app/maintenance-management/maintenance-verify'
+            // }, 
               
         ]
     },

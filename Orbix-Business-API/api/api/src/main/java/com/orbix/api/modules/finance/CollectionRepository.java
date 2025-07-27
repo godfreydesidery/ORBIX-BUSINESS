@@ -384,6 +384,33 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
 		    @Param("startDate") LocalDateTime startDate,
 		    @Param("endDate") LocalDateTime endDate
 		);
+	
+	@Query(
+		    value = "SELECT " +
+		            "brc.amount AS amount, " +  
+		            "c.pay_code AS payCode, " +
+		            "c.collection_date_time AS dateTime, " +
+		            "brc.reason AS reason, " +
+		            "p.reg_no AS regNo, " +
+		            "p.owner_first_name AS ownerFirstName, " +
+		            "p.owner_last_name AS ownerLastName, " +
+		            "p.owner_phone_no AS ownerPhoneNo, " +
+		            "p.created_date_time AS createdDateTime, " +
+		            "pbr.discount AS discount, " +
+		            "u.nickname AS cashierName " +
+		            "FROM bill_receivable_collections brc " +
+		            "JOIN collections c ON brc.collection_id = c.id " +
+		            "JOIN users u ON c.collected_by_user_id = u.id " +
+		            "JOIN bill_receivables br ON brc.bill_receivable_id = br.id " +
+		            "JOIN weigh_bill_receivables pbr ON pbr.bill_receivable_id = br.id " +
+		            "JOIN weighs p ON p.id = pbr.weigh_id " +
+		            "WHERE c.collection_date_time BETWEEN :startDate AND :endDate", 
+		    nativeQuery = true
+		)
+		List<IWeighCollection> findWeighCollectionsBetweenDates(
+		    @Param("startDate") LocalDateTime startDate,
+		    @Param("endDate") LocalDateTime endDate
+		);
 
 }
 
@@ -472,6 +499,20 @@ interface IMaintenanceCollection {
     String getChasisNo();
     String getCreatedDateTime();
     double getDays();
+    double getDiscount();
+    String getCashierName();
+}
+
+interface IWeighCollection {
+    String getAmount();
+    String getPayCode();
+    String getDateTime();
+    String getReason();
+    String getRegNo();
+    String getOwnerFirstName();
+    String getOwnerLastName();
+    String getOwnerPhoneNo();
+    String getCreatedDateTime();
     double getDiscount();
     String getCashierName();
 }

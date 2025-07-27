@@ -12,7 +12,7 @@ import { HttpHeaders } from '@angular/common/http';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 
 import { environment } from 'src/environments/environment';
-import { ICashCollection, IMaintenanceCashCollection, IParkingCashCollection, IParkingServiceCashCollection, ISalesCashCollection, IStorageCashCollection } from 'src/app/domain/cash-collection';
+import { ICashCollection, IMaintenanceCashCollection, IParkingCashCollection, IParkingServiceCashCollection, ISalesCashCollection, IStorageCashCollection, IWeighCashCollection } from 'src/app/domain/cash-collection';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
 
@@ -366,6 +366,60 @@ export class CashCollectionComponent {
             this.maintenanceCashCollections.forEach(element => {
               element.sn = sn
               this.totalMaintenanceCashCollections = this.totalMaintenanceCashCollections + (+element.amount)
+              sn = sn + 1
+            })
+
+
+            
+            console.log(data)
+          }
+        )
+        .catch(
+          error => {
+            this.msg.showErrorMessage(error, 'Error')
+            
+            console.log(error)
+          }
+        )
+
+
+    return 0; 
+  }
+
+  weighCashCollections : IWeighCashCollection[] = []
+  totalWeighCashCollections : number = 0
+
+  async getWeighDetailedTotalsByDates(from : Date | string | null, to : Date | string | null) {
+    if(from == null || to == null) {
+      from = new Date()
+      to = new Date()
+    }
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    var args = {
+      from : from,
+      to : to,
+    }
+
+    this.weighCashCollections = []
+    this.totalWeighCashCollections = 0
+    
+
+    await this.http.post<IWeighCashCollection[]>(API_URL+'/finance_reports/get_weigh_detailed_collections_by_dates', args, options)
+        .toPromise()
+        .then(
+          data => {
+
+            this.weighCashCollections = data!
+
+            var sn = 1
+            this.totalWeighCashCollections = 0
+            this.weighCashCollections.forEach(element => {
+              element.sn = sn
+              this.totalWeighCashCollections = this.totalWeighCashCollections + (+element.amount)
               sn = sn + 1
             })
 
@@ -947,6 +1001,86 @@ export class CashCollectionComponent {
         {
           table: {
             widths: [25, 75, 100, 100, 100, 60, 50, 80, 80],
+            body: report,
+          },
+        },
+      ],
+    };
+  
+    pdfMake.createPdf(docDefinition).print();
+  };
+
+  printWeighCollectionReport = async () => {
+    this.documentHeader = await this.data.getDocumentHeaderLandScape();
+    const title = 'Weigh Bridge Collection Report';
+    const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
+    let total: number = 0;
+    let discount: number = 0;
+  
+    const report: any[] = [];
+  
+    // Add header row
+    report.push([
+      { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Good', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Date Registered', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Days', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+    ]);
+  
+    // Add rows dynamically
+    this.weighCashCollections.forEach((element) => {
+       total = total + (+element.amount) || 0;
+       discount = discount + (+element.discount) || 0;
+
+      total += Number(element.amount) || 0;
+      discount += Number(element.discount) || 0;
+  
+      report.push([
+        { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: `${element.ownerFirstName || ''}`, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.goodName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.createdDateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.days || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
+        { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+        { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+      ]);
+    });
+  
+    // Add summary row
+    report.push([
+      { text: ''},
+      {},
+      {},
+      {},
+      { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
+      { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+      { text: '', fontSize: 9, alignment: 'left' },
+    ]);
+  
+    // Define document structure
+    const docDefinition: any = {
+      header: '',
+      pageOrientation: 'landscape',
+      footer: (currentPage: any, pageCount: any) => ({
+        text: `${currentPage} of ${pageCount}`,
+        alignment: 'center',
+        fontSize: 8,
+      }),
+      content: [
+        {
+          columns: [
+            this.documentHeader,
+          ],
+        },
+        {text : ' '},
+        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {
+          table: {
+            widths: [25, 100, 100, 60, 50, 80, 80],
             body: report,
           },
         },

@@ -32,6 +32,10 @@ import com.orbix.api.modules.warehouse.Storage;
 import com.orbix.api.modules.warehouse.StorageBillReceivable;
 import com.orbix.api.modules.warehouse.StorageBillReceivableRepository;
 import com.orbix.api.modules.warehouse.StorageRepository;
+import com.orbix.api.modules.weighbridge.Weigh;
+import com.orbix.api.modules.weighbridge.WeighBillReceivable;
+import com.orbix.api.modules.weighbridge.WeighBillReceivableRepository;
+import com.orbix.api.modules.weighbridge.WeighRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,10 +49,12 @@ public class BillReceivableServiceController implements BillReceivableService {
 	private final BillReceivableRepository billReceivableRepository;
 	private final ParkingRepository parkingRepository;
 	private final StorageRepository storageRepository;
+	private final WeighRepository weighRepository;
 	private final MaintenanceRepository maintenanceRepository;
 	private final ParkingBillReceivableRepository parkingBillReceivableRepository;
 	private final ParkingServiceBillReceivableRepository parkingServiceBillReceivableRepository;
 	private final StorageBillReceivableRepository storageBillReceivableRepository;
+	private final WeighBillReceivableRepository weighBillReceivableRepository;
 	private final MaintenanceJobCardIssueBillReceivableRepository maintenanceJobCardIssueBillReceivableRepository;
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
 	
@@ -125,6 +131,12 @@ public class BillReceivableServiceController implements BillReceivableService {
 				qty = 1; //maintenanceJobCardIssueBillReceivable.get().getQty();
 			}
 			
+			Optional<WeighBillReceivable> weighBillReceivable = weighBillReceivableRepository.findByBillReceivable(billReceivable);
+			if(weighBillReceivable.isPresent()) {
+				billReceivableCollection.setReason("Weigh Bridge");
+				qty = 1;
+			}
+			
 			billReceivableCollection = billReceivableCollectionRepository.save(billReceivableCollection);
 			billReceivable = billReceivableRepository.save(billReceivable);
 			billReceivable.setQty(qty); 
@@ -165,6 +177,19 @@ public class BillReceivableServiceController implements BillReceivableService {
 		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
 		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
 			billReceivableResponses.add(billReceivableResponseDTOMapper(storageBillReceivable.getBillReceivable()));
+		}		
+		return billReceivableResponses;
+	}
+	
+	@Override
+	public List<BillReceivableResponseDTO> getAllByWeigh(Long weighId, HttpServletRequest request) {
+		Weigh weigh = weighRepository.findById(weighId)
+			    .orElseThrow(() -> new NotFoundException("Weigh with ID " + weighId + " not found"));
+		
+		List<WeighBillReceivable> weighBillReceivables = weighBillReceivableRepository.findAllByWeigh(weigh);
+		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
+		for(WeighBillReceivable weighBillReceivable : weighBillReceivables) {
+			billReceivableResponses.add(billReceivableResponseDTOMapper(weighBillReceivable.getBillReceivable()));
 		}		
 		return billReceivableResponses;
 	}

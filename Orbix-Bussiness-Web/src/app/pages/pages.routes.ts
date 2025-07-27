@@ -414,6 +414,18 @@ export const routes: Routes = [
         data : { breadcrumb : 'Accounts & Finance | Maintenance Veh/Eq Billing'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'accounts-and-finance/weigh-billing',
+        loadComponent: () => import('./accounts-and-finance/weigh-billing/weigh-billing.component').then(c => c.WeighBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Weigh Billing'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'accounts-and-finance/weight-billing',
+        loadComponent: () => import('./accounts-and-finance/weight-billing/weight-billing.component').then(c => c.WeightBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Weight Billing'},
+        canActivate : [AuthGuard]
+      },
 
       // Management
 
@@ -499,6 +511,14 @@ export const routes: Routes = [
       
 
       // End of Procurement
+
+      // Fleet operations
+      {
+        path : 'fleet-operations/weighbridge',
+        loadComponent: () => import('./fleet-operations/weighbridge/weighbridge.component').then(c => c.WeighbridgeComponent),
+        data : { breadcrumb : 'Fleet Operations/Weigh Bridge'}, 
+        canActivate : [AuthGuard]
+      },
 
 
 

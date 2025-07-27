@@ -152,6 +152,22 @@ public class FinanceReportResource {
 
 	}
 	
+	@PostMapping("/finance_reports/get_weigh_detailed_collections_by_dates")
+	public ResponseEntity<List<IWeighCollection>>getWeighDetailedCollectionByDates(
+			@RequestBody DateRange dateRange,
+	        @RequestParam(name = "nickname", required = false) String nickname,
+			HttpServletRequest request){
+		
+		List<IWeighCollection> collections;
+		
+		collections = collectionRepository.findWeighCollectionsBetweenDates(
+				dateRange.getFrom().atStartOfDay(),
+                dateRange.getTo().atStartOfDay().plusDays(1)
+				);
+	    return ResponseEntity.ok().body(collections);
+
+	}
+	
 }
 
 @Data

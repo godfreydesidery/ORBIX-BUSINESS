@@ -30,9 +30,11 @@ public class Object_ {
 	public static String PKNGDISC = "PKNGDISC-ACCESS";
 	public static String STRGDISC = "STRGDISC-ACCESS";
 	public static String FINCSTRG = "FINCSTRG-ACCESS";
+	public static String FINCWEGH = "FINCWEGH-ACCESS";
 	public static String FINCMTNC = "FINCMTNC-ACCESS";
 	public static String SHOP = "SHOP-ACCESS";
 	public static String WRHOUSE = "WRHOUSE-ACCESS";
+	public static String WEGH = "WEGH-ACCESS";
 	public static String STRG = "STRG-UPDATE";
 	public static String PRCMT = "PRCMT-ACCESS";
 	public static String MNGNT = "MNGNT-ACCESS";
