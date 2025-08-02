@@ -45,11 +45,27 @@ const API_URL = environment.apiUrl;
 })
 export class WeighbridgeComponent {
 
+  pageStatus : string = ''
+
+  changeStatus(status : string){
+    if(status == 'single'){
+      this.pageStatus = 'single'
+      return;
+    }
+    if(status == 'list'){
+      this.pageStatus = 'list'
+      return;
+    }
+    this.pageStatus = ''
+    return
+  }
+
   id: any = null
   no: string = ''
   ownerName: string = ''
+  ownerPhoneNo: string = ''
   regNo: string = ''
-  weighStatus: string = ''
+  weighStatus: string = 'NORMAL'
   //details : IWeighbridgeDetail[] = []
 
   show: boolean = false
@@ -89,6 +105,19 @@ export class WeighbridgeComponent {
   weighs: IWeighbridge[] = []
   lpos: ILpo[] = []
 
+  weightOne : number | string = ''
+  weightTwo : number | string = ''
+  weightThree : number | string = ''
+  weightFour : number | string = ''
+
+  clearWeights(){
+    this.weightOne = ''
+    this.weightTwo = ''
+    this.weightThree = ''
+    this.weightFour = ''
+    this.weighStatus = 'NORMAL'
+  }
+
   // lpoId : any = null
 
 
@@ -103,13 +132,14 @@ export class WeighbridgeComponent {
   selectedTareLabel: string = '';
 
   tareOptions = [
-    { label: 'Single Excel', value: 10000 },
-    { label: 'Double Excel', value: 20000 }
+    { label: 'Excel One-Two', value: 10000 },
+    { label: 'Excel Three-Four', value: 20000 }
   ];
 
   onTareChange() {
     const selected = this.tareOptions.find(option => option.value === +this.selectedTareValue!);
     this.selectedTareLabel = selected?.label || '';
+    this.clearWeights()
   }
 
   constructor(
@@ -207,11 +237,13 @@ export class WeighbridgeComponent {
         data => {
           var sn = 1
           data?.forEach(element => {
-            element.sn = sn
             this.weighs.push(element)
-            sn = sn + 1
           })
           this.weighs.reverse()
+          this.weighs.forEach(ele => {
+            ele.sn = sn
+            sn = sn + 1
+          })
           console.log(data)
         }
       )
@@ -233,10 +265,12 @@ export class WeighbridgeComponent {
           this.id = data!.id
           this.no = data!.no
           this.ownerName = data!.ownerName
+          this.ownerPhoneNo = data!.ownerPhoneNo
           this.regNo = data!.regNo
-          this.weighStatus = data!.weighStatus
 
           this.getBills(data!.id)
+
+          this.changeStatus('single')
 
 
 
@@ -250,10 +284,27 @@ export class WeighbridgeComponent {
       )
   }
 
+  async recheck(id: any) {
+    if (await this.msg.showConfirmMessageDialog('Approve', 'Are you sure you want to recheck?', 'question', 'Yes', 'No') == false) {
+      return
+    }
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.post<null>(API_URL + '/weighs/recheck?id=' + id, null, options)
+      .toPromise()
+      .then(
+        data => {
+          this.getAllRecent()
+          this.msg.showSuccessMessage('Rechecked')
+        }
+      )
+  }
+
   async addBill() {
 
     if (this.selectedTareLabel == '') {
-      alert('Please select tare type')
+      this.msg.showErrorMessage3('Please select tare type')
       return
     }
 
@@ -264,14 +315,19 @@ export class WeighbridgeComponent {
     var bill = {
       weighId: this.id,
       amount: this.selectedTareValue,
-      description: this.selectedTareLabel
+      description: this.selectedTareLabel,
+      weightOne : this.weightOne,
+      weightTwo : this.weightTwo,
+      weightThree: this.weightThree,
+      weightFour : this.weightFour,
+      weighStatus : this.weighStatus
     }
 
     await this.http.post<IWeighbridge>(API_URL + '/weigh_bills/add_bill', bill, options)
       .toPromise()
       .then(
         () => {
-          alert('Bill added successfully')
+          this.msg.showSuccessMessage('Bill added successfully')
           this.getBills(this.id)
         }
       )
@@ -320,8 +376,8 @@ export class WeighbridgeComponent {
       id: this.id,
       no: this.no,
       ownerName: this.ownerName,
-      regNo: this.regNo,
-      weighStatus: this.weighStatus
+      ownerPhoneNo: this.ownerPhoneNo,
+      regNo: this.regNo
     }
 
     if(weigh.regNo == '') {
@@ -339,6 +395,7 @@ export class WeighbridgeComponent {
             this.id = data!.id
             this.no = data!.no
             this.ownerName = data!.ownerName
+            this.ownerPhoneNo = data!.ownerPhoneNo
             this.regNo = data!.regNo
 
             //this.get(data!.id)
@@ -365,6 +422,7 @@ export class WeighbridgeComponent {
             this.id = data!.id
             this.no = data!.no
             this.ownerName = data!.ownerName
+            this.ownerPhoneNo = data!.ownerPhoneNo
             this.regNo = data!.regNo
 
             this.get(data!.id)
@@ -432,8 +490,9 @@ export class WeighbridgeComponent {
   }
 
   public async removeBill(id: any) {
-
-    if(!confirm('Are you sure you want to remove this bill? Click OK to remove, Cancel to keep')) {return}
+    if (await this.msg.showConfirmMessageDialog('Approve', 'Are you sure you want to remove this bill? Click Yes to remove, No to keep', 'question', 'Yes', 'No') == false) {
+      return
+    }
 
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
@@ -467,7 +526,7 @@ export class WeighbridgeComponent {
     this.no = ''
     this.regNo = ''
     this.ownerName = ''
-    this.weighStatus = 'NORMAL'
+    this.ownerPhoneNo = ''
     this.bills = []
   }
 
@@ -793,8 +852,9 @@ export interface IWeighbridge {
   sn: number
   no: string
   ownerName: string
+  ownerPhoneNo: string
   regNo: string
-  weighStatus: string
+  recheck : number;
   details: IWeighbridgeDetail[]
 }
 
@@ -808,6 +868,15 @@ export interface IWeighbridgeDetail {
   description: string
   createdBy: string
   payStatus: string
+
+  weightOne : number | string
+  weightTwo : number | string
+  weightThree : number | string
+  weightFour : number | string
+
+  weighStatus : string
+
+  
 
 }
 

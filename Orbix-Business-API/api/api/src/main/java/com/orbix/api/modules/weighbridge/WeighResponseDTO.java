@@ -16,6 +16,8 @@ String id;
 	String regNo;
 	String refNo;
 	
+	String recheck;
+	
 
 	String ownerFirstName;
 	String ownerMiddleName;

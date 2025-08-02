@@ -66,7 +66,11 @@ public class WeighBillReceivableServiceController implements WeighBillReceivable
 				.setDescription(weighBillReceivable.getDescription());
 		weighBillReceivableResponseDTO.setPrice(String.valueOf(weighBillReceivable.getPrice()));
 		weighBillReceivableResponseDTO.setQty(String.valueOf(weighBillReceivable.getQty()));
-
+		weighBillReceivableResponseDTO.setWeightOne(String.valueOf(weighBillReceivable.getWeightOne()));
+		weighBillReceivableResponseDTO.setWeightTwo(String.valueOf(weighBillReceivable.getWeightTwo()));
+		weighBillReceivableResponseDTO.setWeightThree(String.valueOf(weighBillReceivable.getWeightThree()));
+		weighBillReceivableResponseDTO.setWeightFour(String.valueOf(weighBillReceivable.getWeightFour()));
+		weighBillReceivableResponseDTO.setWeighStatus(weighBillReceivable.getWeighStatus());
 		weighBillReceivableResponseDTO
 				.setPayStatus(weighBillReceivable.getBillReceivable().getPayStatus().toString());
 		weighBillReceivableResponseDTO.setWeighId(String.valueOf(weighBillReceivable.getWeigh().getId()));

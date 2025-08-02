@@ -23,6 +23,8 @@ public interface WeighService {
 	WeighResponseDTO checkIn(WeighRequestDTO weighRequest, HttpServletRequest request);
 	WeighResponseDTO checkOut(WeighRequestDTO weighRequest, HttpServletRequest request);
 	
+	boolean recheck(Long id);
+	
 	WeighBillReceivableResponseDTO createWeighBillReceivable(Long weighId, LocalDateTime startedAt, LocalDateTime endedAt, String billingType, double qty, double price, double discount, int autoBilling, HttpServletRequest request);
 
 //	WeighCustomBillDetail showWeighCustomBillDetail(Long weighId, HttpServletRequest request);

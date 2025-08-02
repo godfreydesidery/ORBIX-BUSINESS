@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
@@ -61,6 +62,14 @@ public class WeighResource {
 			HttpServletRequest request){		
 		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/weighs/update").toUriString());
 		return ResponseEntity.created(uri).body(weighService.updateWeigh(weighRequest, request));
+	}
+	
+	@PostMapping("/weighs/recheck")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public boolean recheck(
+			@RequestParam Long id,
+			HttpServletRequest request){		
+		return weighService.recheck(id);
 	}
 	
 	

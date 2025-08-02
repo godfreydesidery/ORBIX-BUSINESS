@@ -18,4 +18,12 @@ public class WeighBillReceivableResponseDTO {
 	String weighId;
 
 	String payStatus;
+	
+	String weightOne;
+	String weightTwo;
+	String weightThree;
+	String weightFour;
+	String weighStatus;
+	
+	String recheck;
 }

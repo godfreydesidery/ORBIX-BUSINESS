@@ -8,171 +8,229 @@
                 <div class="row">
                     <div class="col-lg-12">
                         <button type="button" class="btn btn-success btn-round-custom" (click)="clearWeigh()"
-                            data-toggle="modal" data-target="#weigh-modal"><i class="fa fa-refresh"></i>
-                            New</button>
+                            (click)="changeStatus('single')" data-toggle="modal" data-target="#weigh-modal"><i
+                                class="fa fa-refresh"></i>
+                            New Weight Vehicle</button>
                         <button type="button" class="btn btn-success btn-round-custom" (click)="getAllRecent()"
-                            data-toggle="modal" data-target="#weigh-list-modal"><i class="fa fa-refresh"></i>
-                            Recent List</button>
+                            (click)="changeStatus('list')"><i class="fa fa-refresh"></i>
+                            Vehicle Weight List</button>
                         <!-- <button class="btn btn-outline-success btn-round-custom" (click)="getAllPendingOrders()" data-toggle="modal" data-target="#sales-order-list-modal">Sales Order List</button> -->
                     </div>
                     <br>
                 </div>
                 <br>
+
                 <div class="row">
-
-                    <div class="col-lg-3 col-md-6 col-sm-12">
-                        <input type="hidden" [(ngModel)]="id">
-                        <label style="font-size: large; font-weight: bold;">Code No</label>
-                        <input class="form-control" [(ngModel)]="no" style="font-size: large; font-weight: bold;" readonly>
-                        <br>
-                        <label style="font-size: large; font-weight: bold;">Driver Name</label>
-                        <input class="form-control" [(ngModel)]="ownerName" style="font-size: large; font-weight: bold;">
-                        <br>
-                        <label style="font-size: large; font-weight: bold;">Reg No</label>
-                        <input class="form-control" [(ngModel)]="regNo" style="font-size: large; font-weight: bold;">
-                        <br>
-                        <label style="font-size: large; font-weight: bold;">Select Weigh Status</label>
-                        <select class="form-control" [(ngModel)]="weighStatus" style="font-size: large; font-weight: bold; color: red;">
-                            <option>NORMAL</option>
-                            <option>OVERWEIGHT</option>
-                        </select>
-                        <hr>
-                        <button type="button" class="btn btn-success btn-round-custom" (click)="save()"><i
-                                class="fa fa-save"></i> Save</button>
-                    </div>
-
-                    <div class="col-lg-9 col-md-6 col-sm-12">
-                        <table>
-                            <tr>
-                                <td>
-                                    <label style="font-size: large; font-weight: bold;">Tare : Select Tare Type</label>
-                                    <select id="tare" class="form-control" [(ngModel)]="selectedTareValue"
-                                        (change)="onTareChange()" style="font-size: large; font-weight: bold;">
-                                        <option value="">-- Select Tare --</option>
-                                        <option *ngFor="let option of tareOptions" [value]="option.value">
-                                            {{ option.label }} {{ option.value | number:'1.2-2' }}
-                                        </option>
-                                    </select>
-                                </td>
-                                <td>
-                                    <br>
-                                    <button type="button" class="btn btn-success btn-round-custom pull-right" *ngIf="id != null" (click)="addBill()"><i
-                                            class="fa fa-pencil"></i> Add</button>
-                                </td>
-                            </tr>
-                        </table>
-                        <br>
-                        <table class="table table-striped table-sm table-bordered">
-                            <thead>
-                                <tr>
-                                    <td>SN</td>
-                                    <td>Tare Type</td>
-                                    <td>Amount</td>
-                                    <td>Pay Status</td>
-                                    <td>Created By</td>
-                                    <td>Action</td>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                <tr style="font-size: large;" *ngFor="let bill of bills">
-                                    <td>1</td>
-                                    <td>{{bill.description}}</td>
-                                    <td style="text-align: right;">{{bill.amount | currency:'':''}}</td>
-                                    <td style="text-align: center;">{{bill.payStatus}}</td>
-                                    <td>{{bill.createdBy}}</td>
-                                    <td style="text-align: center;"><button type="button"
-                                            class="btn btn-danger btn-round-custom" *ngIf="bill.payStatus == 'UNPAID'" (click)="removeBill(bill.id)"><i class="fa fa-trash"></i>
-                                            Remove</button></td>
-                                </tr>
-                            </tbody>
-                            <tfoot>
-                                <tr style="font-size: large;">
-                                    <td colspan="2" style="text-align: right;">Total</td>
-                                    <td style="text-align: right;">{{totalAmount | currency:'':''}}</td>
-                                    <td></td>
-                                </tr>
-                            </tfoot>
-                            <!-- <tbody>
-                                        <tr
-                                            *ngFor="let discount of discounts | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }">
-                                            <td>{{discount.id}}</td>
-                                            <td>{{discount.serviceBillName}}</td>
-                                            <td>{{discount.description}}</td>
-                                            <td style="text-align: right;">{{discount.billAmount | currency:'':''}}</td>
-                                            <td style="text-align: right;">{{discount.discountAmount | currency:'':''}}
-                                            </td>
-                                            <td>{{discount.reason}}</td>
-                                            <td>
-                                                <span class="badge badge-warning" *ngIf="discount.status == 'PENDING'">{{discount.status}}</span>
-                                                <span class="badge badge-success" *ngIf="discount.status == 'APPROVED'">{{discount.status}}</span>
-                                                <span class="badge badge-danger" *ngIf="discount.status == 'REJECTED'">{{discount.status}}</span>
-                                            </td>
-                                            <td><button class="btn btn-success btn-round-custom" *ngIf="discount.status == 'PENDING'" (click)="getDiscount(discount.id)" data-toggle="modal"
-                                                    data-target="#approve-modal">Approve</button> <button
-                                                    class="btn btn-danger btn-round-custom" *ngIf="discount.status == 'PENDING'" (click)="getDiscount(discount.id)" data-toggle="modal"
-                                                    data-target="#reject-modal">Reject</button></td>
-                                        </tr>
-                                    </tbody> -->
-                        </table>
-
-
-                    </div>
-
-
-
-
-                    <div class="col-lg-12">
-
-
+                    <div class="col-sm-12" *ngIf="pageStatus === 'single'">
 
 
                         <div class="row">
+
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <input type="hidden" [(ngModel)]="id">
+                                <label style="font-size: large; font-weight: bold;">Code No</label>
+                                <input class="form-control" [(ngModel)]="no"
+                                    style="font-size: large; font-weight: bold;" readonly>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label style="font-size: large; font-weight: bold;">Driver Name</label>
+                                <input class="form-control" [(ngModel)]="ownerName"
+                                    style="font-size: large; font-weight: bold;">
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label style="font-size: large; font-weight: bold;">Phone Number</label>
+                                <input class="form-control" [(ngModel)]="ownerPhoneNo"
+                                    style="font-size: large; font-weight: bold;">
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label style="font-size: large; font-weight: bold;">Reg No</label>
+                                <input class="form-control" [(ngModel)]="regNo"
+                                    style="font-size: large; font-weight: bold;">
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
                             <div class="col-sm-12">
+                                <button class="btn btn-round-custom btn-outline-primary" (click)="save()"><i
+                                        class="fa fa-save"></i> Save</button>
+                            </div>
+
+                        </div>
+                        <hr>
+                        <div class="row" *ngIf="id != null">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label style="font-size: large; font-weight: bold;">Tare : Select Tare
+                                    Type</label>
+                                <select id="tare" class="form-control" [(ngModel)]="selectedTareValue"
+                                    (change)="onTareChange()" style="font-size: large; font-weight: bold;">
+                                    <option value="">-- Select Tare --</option>
+                                    <option *ngFor="let option of tareOptions" [value]="option.value">
+                                        {{ option.label }}
+                                    </option>
+                                </select>
+                            </div>
+                            <!-- Excel One -->
+                            <div class="col-lg-2 col-md-2 col-sm-6"
+                                *ngIf="selectedTareLabel === 'Excel One-Two' || selectedTareLabel === 'Excel Three-Four'">
+                                <label style="font-size: large; font-weight: bold;">Excel One</label>
+                                <input class="form-control" [(ngModel)]="weightOne"
+                                    style="font-size: large; font-weight: bold;">
+                            </div>
+
+                            <!-- Excel Two -->
+                            <div class="col-lg-2 col-md-2 col-sm-6"
+                                *ngIf="selectedTareLabel === 'Excel One-Two' || selectedTareLabel === 'Excel Three-Four'">
+                                <label style="font-size: large; font-weight: bold;">Excel Two</label>
+                                <input class="form-control" [(ngModel)]="weightTwo"
+                                    style="font-size: large; font-weight: bold;">
+                            </div>
+
+                            <!-- Excel Three -->
+                            <div class="col-lg-2 col-md-2 col-sm-6" *ngIf="selectedTareLabel === 'Excel Three-Four'">
+                                <label style="font-size: large; font-weight: bold;">Excel Three</label>
+                                <input class="form-control" [(ngModel)]="weightThree"
+                                    style="font-size: large; font-weight: bold;">
+                            </div>
+
+                            <!-- Excel Four -->
+                            <div class="col-lg-2 col-md-2 col-sm-6" *ngIf="selectedTareLabel === 'Excel Three-Four'">
+                                <label style="font-size: large; font-weight: bold;">Excel Four</label>
+                                <input class="form-control" [(ngModel)]="weightFour"
+                                    style="font-size: large; font-weight: bold;">
+                            </div>
+
+                        </div>
+
+                        <div class="row"
+                            *ngIf="selectedTareLabel === 'Excel One-Two' || selectedTareLabel === 'Excel Three-Four'">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label style="font-size: large; font-weight: bold;">Select Weigh Status</label>
+                                <select class="form-control" [(ngModel)]="weighStatus"
+                                    style="font-size: large; font-weight: bold; color: red;">
+                                    <option>NORMAL</option>
+                                    <option>OVERWEIGHT</option>
+                                    <option>UNDERWEIGHT</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-1 col-md-1 col-sm-6">
+                                <br>
+                                <button type="button" class="btn btn-outline-primary btn-round-custom pull-right"
+                                    (click)="addBill()"><i class="fa fa-pencil"></i>
+                                    Add</button>
+                            </div>
+                        </div>
+
+                        <div class="row" *ngIf="id != null">
+                            <div class="col-sm-12">
+                                <hr>
                                 <table class="table table-striped table-sm table-bordered">
-                                    <!-- <thead>
+                                    <thead style="font-weight: bold;">
                                         <tr>
-                                            <td>ID</td>
-                                            <td>Service</td>
-                                            <td>Description</td>
-                                            <td>Bill Amount</td>
-                                            <td>Discount Amount</td>
-                                            <td>Reason</td>
-                                            <td>Status</td>
-                                            <td>Action</td>
+                                            <td style="font-weight: bold;">SN</td>
+                                            <td style="font-weight: bold;">Tare Type</td>
+                                            <td style="font-weight: bold;">Excel One</td>
+                                            <td style="font-weight: bold;">Excel Two</td>
+                                            <td style="font-weight: bold;">Excel Three</td>
+                                            <td style="font-weight: bold;">Excel Four</td>
+                                            <td style="font-weight: bold;">Weight Status</td>
+                                            <td style="font-weight: bold;">Amount</td>
+                                            <td style="font-weight: bold;">Pay Status</td>
+                                            <td style="font-weight: bold;">Created By</td>
+                                            <td style="font-weight: bold;">Action</td>
                                         </tr>
-                                    </thead> -->
-                                    <!-- <tbody>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="font-size: large;" *ngFor="let bill of bills">
+                                            <td>1</td>
+                                            <td>{{bill.description}}</td>
+                                            <td>{{bill.weightOne}}</td>
+                                            <td>{{bill.weightTwo}}</td>
+                                            <td>{{bill.weightThree}}</td>
+                                            <td>{{bill.weightFour}}</td>
+                                            <td>{{bill.weighStatus}}</td>
+                                            <td style="text-align: right;">{{bill.amount | currency:'':''}}</td>
+                                            <td style="text-align: center;">{{bill.payStatus}}</td>
+                                            <td>{{bill.createdBy}}</td>
+                                            <td style="text-align: center;"><button type="button"
+                                                    class="btn btn-outline-danger btn-round-custom"
+                                                    *ngIf="bill.payStatus == 'UNPAID'" (click)="removeBill(bill.id)"><i
+                                                        class="fa fa-trash"></i>
+                                                    Remove</button></td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr style="font-size: large;">
+                                            <td style="text-align: right;"></td>
+                                            <td style="text-align: right;"></td>
+                                            <td style="text-align: right;"></td>
+                                            <td style="text-align: right;"></td>
+                                            <td style="text-align: right;"></td>
+                                            <td style="text-align: right;">Total</td>
+                                            <td style="text-align: right;">{{totalAmount | currency:'':''}}</td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-12" *ngIf="pageStatus === 'list'">
+                        <div class="row">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords"
+                                    placeholder="Search..." style="max-width: 8cm;">
+                            </div>
+                        </div>
+                        <br>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-sm table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">SN</th>
+                                            <th scope="col">No</th>
+                                            <th scope="col">Customer Name</th>
+                                            <th scope="col">Phone No</th>
+                                            <th scope="col">Reg No</th>
+                                            <th scope="col">Ref No</th>
+                                            <th scope="col">Recheck Count</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
                                         <tr
-                                            *ngFor="let discount of discounts | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }">
-                                            <td>{{discount.id}}</td>
-                                            <td>{{discount.serviceBillName}}</td>
-                                            <td>{{discount.description}}</td>
-                                            <td style="text-align: right;">{{discount.billAmount | currency:'':''}}</td>
-                                            <td style="text-align: right;">{{discount.discountAmount | currency:'':''}}
-                                            </td>
-                                            <td>{{discount.reason}}</td>
+                                            *ngFor="let weigh of weighs | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                            <td>{{weigh.sn}}</td>
+                                            <td>{{weigh.no}}</td>
+                                            <td>{{weigh.ownerName}}</td>
+                                            <td>{{weigh.ownerPhoneNo}}</td>
+                                            <td>{{weigh.regNo}}</td>
+                                            <td>{{weigh.regNo}}</td>
+                                            <td>{{weigh.recheck}}</td>
                                             <td>
-                                                <span class="badge badge-warning" *ngIf="discount.status == 'PENDING'">{{discount.status}}</span>
-                                                <span class="badge badge-success" *ngIf="discount.status == 'APPROVED'">{{discount.status}}</span>
-                                                <span class="badge badge-danger" *ngIf="discount.status == 'REJECTED'">{{discount.status}}</span>
+                                                <button class="btn btn-sm btn-outline-primary btn-round-custom" (click)="get(weigh.id)"
+                                                    data-dismiss="modal">Select</button>
+                                                <button class="btn btn-sm btn-outline-success btn-round-custom" *ngIf="weigh.recheck <= 0" (click)="recheck(weigh.id)"
+                                                    data-dismiss="modal"><i class="fa fa-check"></i> Recheck</button>
                                             </td>
-                                            <td><button class="btn btn-success btn-round-custom" *ngIf="discount.status == 'PENDING'" (click)="getDiscount(discount.id)" data-toggle="modal"
-                                                    data-target="#approve-modal">Approve</button> <button
-                                                    class="btn btn-danger btn-round-custom" *ngIf="discount.status == 'PENDING'" (click)="getDiscount(discount.id)" data-toggle="modal"
-                                                    data-target="#reject-modal">Reject</button></td>
                                         </tr>
-                                    </tbody> -->
+                                    </tbody>
                                 </table>
                                 <div class="row">
-                                    <!-- <div class="col-sm-12">
-                                        <pagination-controls class="pull-right"
-                                            (pageChange)="page = $event"></pagination-controls>
-                                    </div> -->
+                                    <div class="col-sm-12" style="text-align: right;">
+                                        <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                                    </div>
                                 </div>
                             </div>
                         </div>
                     </div>
                 </div>
+
+
             </div>
         </div>
     </div>
@@ -210,7 +268,7 @@
                                     <th scope="col">Customer Name</th>
                                     <th scope="col">Reg No</th>
                                     <th scope="col">Ref No</th>
-                                    <th scope="col">Weigh Status</th>
+                                    <!-- <th scope="col">Weigh Status</th> -->
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
@@ -221,7 +279,7 @@
                                     <td>{{weigh.ownerName}}</td>
                                     <td>{{weigh.regNo}}</td>
                                     <td>{{weigh.regNo}}</td>
-                                    <td>{{weigh.weighStatus}}</td>
+                                    <!-- <td>{{weigh.weighStatus}}</td> -->
                                     <td><button class="btn btn-success btn-round-custom" (click)="get(weigh.id)"
                                             data-dismiss="modal">Select</button></td>
                                 </tr>

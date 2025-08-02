@@ -46,6 +46,14 @@ public class WeighBillReceivable {
 	private double discount = 0;
 	private String discountStatus;
 	
+	private double weightOne;
+	private double weightTwo;
+	private double weightThree;
+	private double weightFour;
+		
+	private String weighStatus = "NORMAL";
+	
+	
 	@ManyToOne(targetEntity = Weigh.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "weigh_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)

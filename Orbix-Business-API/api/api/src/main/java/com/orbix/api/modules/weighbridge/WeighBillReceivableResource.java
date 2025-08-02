@@ -106,6 +106,11 @@ public class WeighBillReceivableResource {
 		weighBillReceivable.setDiscount(0);
 		weighBillReceivable.setBillReceivable(billReceivable);
 		weighBillReceivable.setWeigh(weigh_.get());
+		weighBillReceivable.setWeightOne(b.getWeightOne());
+		weighBillReceivable.setWeightTwo(b.getWeightTwo());
+		weighBillReceivable.setWeightThree(b.getWeightThree());
+		weighBillReceivable.setWeightFour(b.getWeightFour());
+		weighBillReceivable.setWeighStatus(b.getWeighStatus());
 		weighBillReceivable.setCreatedByUser(userService.getUser(request));
 		
 		weighBillReceivable = weighBillReceivableRepository.save(weighBillReceivable);
@@ -160,6 +165,16 @@ public class WeighBillReceivableResource {
 		response.setWeighId(bill.getWeigh().getId().toString());
 		response.setDescription(bill.getDescription());
 		response.setAmount(String.valueOf(bill.getPrice()));
+		response.setWeightOne(String.valueOf(bill.getWeightOne()));
+		response.setWeightTwo(String.valueOf(bill.getWeightTwo()));
+		response.setWeightThree(String.valueOf(bill.getWeightThree()));
+		response.setWeightFour(String.valueOf(bill.getWeightFour()));
+		response.setWeighStatus(String.valueOf(bill.getWeighStatus()));
+		if(bill.getWeighStatus() != null) {
+			response.setWeighStatus(bill.getWeighStatus());
+		}else {
+			response.setWeighStatus("");
+		}
 		response.setQty("1");
 		response.setPayStatus(bill.getBillReceivable().getPayStatus().toString());
 		
@@ -178,6 +193,12 @@ class Bill{
 	Long weighId;
 	String description;
 	double amount;
+	double weightOne;
+	double weightTwo;
+	double weightThree;
+	double weightFour;
+	String weighStatus;
+	int recheck;
 }
 
 @Data

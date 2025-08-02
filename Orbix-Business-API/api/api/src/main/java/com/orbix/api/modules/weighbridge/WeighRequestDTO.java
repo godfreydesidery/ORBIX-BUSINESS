@@ -25,6 +25,8 @@ public class WeighRequestDTO {
 	String ownerEmail;
 	String ownerAddress;
 	
+	String recheck;
+	
 	String weighStatus;
 
 	String comments;

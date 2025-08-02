@@ -53,6 +53,8 @@ public class Weigh {
 	private String ownerEmail;
 	private String ownerAddress;
 	
+	private int recheck = 0;
+	
 	private String comments;
 	
 	private String description;

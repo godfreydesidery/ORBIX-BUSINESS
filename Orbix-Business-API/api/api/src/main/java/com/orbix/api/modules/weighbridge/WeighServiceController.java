@@ -135,6 +135,7 @@ public class WeighServiceController implements WeighService {
 		weigh.setNo(String.valueOf(Math.random()));
 		weigh.setRefNo(weighRequest.getRegNo());
 		weigh.setRegNo(weighRequest.getRegNo());
+		weigh.setOwnerPhoneNo(weighRequest.getOwnerPhoneNo());
 		weigh.setOwnerFirstName(weighRequest.getOwnerName());
 		weigh.setOwnerLastName(weighRequest.getOwnerName());
 		weigh.setWeighStatus(weighRequest.getWeighStatus());
@@ -167,6 +168,7 @@ public class WeighServiceController implements WeighService {
 		Weigh weigh = weigh_.get();
 		weigh.setRefNo(weighRequest.getRegNo());
 		weigh.setRegNo(weighRequest.getRegNo());
+		weigh.setOwnerPhoneNo(weighRequest.getOwnerPhoneNo());
 		weigh.setOwnerFirstName(weighRequest.getOwnerName());
 		weigh.setOwnerLastName(weighRequest.getOwnerName());
 		weigh.setWeighStatus(weighRequest.getWeighStatus());
@@ -203,14 +205,24 @@ public class WeighServiceController implements WeighService {
 		weighResponse.setId(weigh.getId().toString());
 		weighResponse.setNo(weigh.getNo());
 		weighResponse.setOwnerName(weigh.getOwnerFirstName());
+		weighResponse.setOwnerPhoneNo(weigh.getOwnerPhoneNo());
 		weighResponse.setRegNo(weigh.getRegNo());
 		weighResponse.setRefNo(weigh.getRegNo());
 		weighResponse.setWeighStatus(weigh.getWeighStatus());
-		
+		weighResponse.setRecheck(String.valueOf(weigh.getRecheck()));
 		weighResponse.setOwnerFirstName(weigh.getOwnerFirstName());
 
 		
 		return weighResponse;
+	}
+
+	@Override
+	public boolean recheck(Long id) {
+		Optional<Weigh> weigh_ = weighRepository.findById(id);
+		Weigh weigh = weigh_.get();
+		weigh.setRecheck(weigh.getRecheck() + 1);
+		weighRepository.save(weigh);
+		return true;
 	}
 
 }
