@@ -270,8 +270,8 @@ export const menuItems = [
         icon: 'fa-home',
         selected: false,
         expanded: false,
-        show : true,
-        order: 0,        
+        show: true,
+        order: 0,
     },
     {
         title: 'Reception',
@@ -279,23 +279,23 @@ export const menuItems = [
         icon: 'fa-keyboard-o',
         selected: false,
         expanded: false,
-        show : grant(['RCPTN-ACCESS']),
+        show: grant(['RCPTN-ACCESS']),
         order: 100,
         subMenu: [
             {
                 title: 'Vehicle Register',
-                show : true,
+                show: true,
                 routerLink: '/app/parking-management/vehicle-register'
             },
             {
                 title: 'Parking',
-                show : true,
+                show: true,
                 routerLink: '/app/parking-management/parking'
             },
             {
                 title: 'Reports',
                 url: '#',
-                show : true,
+                show: true,
                 subMenu: [
                     {
                         title: 'Vehicle Registration',
@@ -369,7 +369,7 @@ export const menuItems = [
         icon: 'fa-money',
         selected: false,
         expanded: false,
-        show : grant(['FINC-ACCESS']),
+        show: grant(['FINC-ACCESS']),
         order: 100,
         subMenu: [
             // {
@@ -392,43 +392,43 @@ export const menuItems = [
             // },
             {
                 title: 'Parking Billing',
-                show : grant(['FINCPKNG-ACCESS']),
+                show: grant(['FINCPKNG-ACCESS']),
                 routerLink: '/app/accounts-and-finance/parking-billing'
             },
             {
                 title: 'Parking Discounts',
-                show : grant(['FINCDISC-ACCESS', 'PKNGDISC-ACCESS']),
+                show: grant(['FINCDISC-ACCESS', 'PKNGDISC-ACCESS']),
                 routerLink: '/app/accounts-and-finance/parking-discounts'
             },
             {
                 title: 'Release Vehicles',
-                show : grant(['FINCPKNG-ACCESS']),
+                show: grant(['FINCPKNG-ACCESS']),
                 routerLink: '/app/accounts-and-finance/release-vehicle-equipment'
             },
             {
                 title: 'Storage Billing',
-                show : grant(['FINCSTRG-ACCESS']),
+                show: grant(['FINCSTRG-ACCESS']),
                 routerLink: '/app/accounts-and-finance/storage-billing'
             },
             {
                 title: 'Storage Discounts',
-                show : grant(['FINCDISC-ACCESS', 'STRGDISC-ACCESS']),
+                show: grant(['FINCDISC-ACCESS', 'STRGDISC-ACCESS']),
                 routerLink: '/app/accounts-and-finance/storage-discounts'
             },
             {
                 title: 'Maintenance Billing',
-                show : grant(['FINCMTNC-ACCESS']),
+                show: grant(['FINCMTNC-ACCESS']),
                 routerLink: '/app/accounts-and-finance/maintenance-billing'
             },
             {
                 title: 'Weigh Billing',
-                show : grant(['FINCWEGH-ACCESS']),
+                show: grant(['FINCWEGH-ACCESS']),
                 routerLink: '/app/accounts-and-finance/weigh-billing'
             },
             {
                 title: 'Reports',
                 url: '#',
-                show : true,
+                show: true,
                 subMenu: [
                     {
                         title: 'Parking Collections',
@@ -437,7 +437,7 @@ export const menuItems = [
                     {
                         title: 'Warehouse Collection',
                         routerLink: '/app/storage-management/cash-collections'
-                    }  
+                    }
                 ]
             }
         ]
@@ -448,7 +448,7 @@ export const menuItems = [
         icon: 'fa-cogs',
         selected: false,
         expanded: false,
-        show : grant(['SHOP-ACCESS']),
+        show: grant(['SHOP-ACCESS']),
         order: 700,
         subMenu: [
             // {
@@ -471,13 +471,13 @@ export const menuItems = [
             // },
             {
                 title: 'Select Shop',
-                show : true,
+                show: true,
                 routerLink: '/app/mechandizing/select-shop'
             },
             {
                 title: 'Reports',
                 url: '#',
-                show : true,
+                show: true,
                 subMenu: [
                     {
                         title: 'Sales Listing Report',
@@ -489,7 +489,38 @@ export const menuItems = [
                     },
                 ]
             },
-            
+
+        ]
+    },
+    {
+        title: 'Restaurant',
+        icon: 'fa-cogs',
+        selected: false,
+        expanded: false,
+        show: grant(['RESTAURANT-ACCESS']),
+        order: 400,
+        subMenu: [
+            {
+                title: 'Select Restaurant',
+                show: true,
+                routerLink: '/app/mechandizing/select-restaurant'
+            },
+            {
+                title: 'Reports',
+                url: '#',
+                show: true,
+                subMenu: [
+                    {
+                        title: 'Sales Listing Report',
+                        routerLink: '/app/mechandizing/sales-listing-report'
+                    },
+                    {
+                        title: 'Fast Moving Products',
+                        routerLink: '/app/mechandizing/fast-moving-products-report'
+                    },
+                ]
+            },
+
         ]
     },
     {
@@ -497,18 +528,18 @@ export const menuItems = [
         icon: 'fa-cogs',
         selected: false,
         expanded: false,
-        show : grant(['WRHOUSE-ACCESS']),
+        show: grant(['WRHOUSE-ACCESS']),
         order: 700,
-        subMenu: [ 
+        subMenu: [
             {
                 title: 'Select Warehouse',
-                show : true,
+                show: true,
                 routerLink: '/app/storage-management/select-warehouse'
             },
             {
                 title: 'Reports',
                 url: '#',
-                show : true,
+                show: true,
                 subMenu: [
                     {
                         title: 'Collection Report',
@@ -517,7 +548,7 @@ export const menuItems = [
                     {
                         title: 'Storage Report',
                         routerLink: '/app/storage-management/storage-report'
-                    }  
+                    }
                 ]
             },
         ]
@@ -527,23 +558,23 @@ export const menuItems = [
         icon: 'fa-cogs',
         selected: false,
         expanded: false,
-        show : grant(['MTNC-ACCESS']),
+        show: grant(['MTNC-ACCESS']),
         //show : true,
         order: 700,
-        subMenu: [     
-            { 
+        subMenu: [
+            {
                 title: 'Maintenance',
                 url: '#',
-                show : true,
+                show: true,
                 routerLink: '/app/maintenance-management/maintenance'
             },
-            { 
+            {
                 title: 'Verify',
                 url: '#',
-                show : true,
+                show: true,
                 routerLink: '/app/maintenance-management/maintenance-verify'
-            }, 
-              
+            },
+
         ]
     },
 
@@ -552,13 +583,13 @@ export const menuItems = [
         icon: 'fa-cogs',
         selected: false,
         expanded: false,
-        show : grant(['WEGH-ACCESS']),
+        show: grant(['WEGH-ACCESS']),
         order: 700,
-        subMenu: [     
-            { 
+        subMenu: [
+            {
                 title: 'Weigh Bridge',
                 url: '#',
-                show : true,
+                show: true,
                 routerLink: '/app/fleet-operations/weighbridge'
             },
             // { 
@@ -567,7 +598,7 @@ export const menuItems = [
             //     show : true,
             //     routerLink: '/app/maintenance-management/maintenance-verify'
             // }, 
-              
+
         ]
     },
 
@@ -576,37 +607,37 @@ export const menuItems = [
         icon: 'fa-cogs',
         selected: false,
         expanded: false,
-        show : grant(['TCHN-ACCESS']),
+        show: grant(['TCHN-ACCESS']),
         order: 700,
-        subMenu: [     
-            { 
+        subMenu: [
+            {
                 title: 'My Jobs',
                 url: '#',
-                show : true,
+                show: true,
                 routerLink: '/app/workshop/my-jobs'
-            }, 
-            { 
+            },
+            {
                 title: 'Verified Jobs',
                 url: '#',
-                show : true,
+                show: true,
                 routerLink: '/app/workshop/my-closed-jobs'
-            }, 
+            },
         ]
     },
 
-    
+
     {
         title: 'Procurement',
         routerLink: ' ',
         icon: 'fa-money',
         selected: false,
         expanded: false,
-        show : grant(['PRCMT-ACCESS']),
+        show: grant(['PRCMT-ACCESS']),
         order: 100,
         subMenu: [
             {
                 title: 'Suppliers',
-                show : true,
+                show: true,
                 routerLink: '/app/procurement/suppliers'
             },
             // {
@@ -615,23 +646,23 @@ export const menuItems = [
             // },
             {
                 title: 'Supplier Product List',
-                show : true,
+                show: true,
                 routerLink: '/app/procurement/supplier-price-list'
             },
             {
                 title: 'Local Purchase Order',
-                show : true,
+                show: true,
                 routerLink: '/app/procurement/lpo'
             },
             {
                 title: 'Goods Received Note',
-                show : true,
+                show: true,
                 routerLink: '/app/procurement/grn'
             },
             {
                 title: 'Reports',
                 url: '#',
-                show : true,
+                show: true,
                 subMenu: [
                     {
                         title: 'Local Purchase Order',
@@ -640,7 +671,7 @@ export const menuItems = [
                     {
                         title: 'Goods Received Note',
                         routerLink: '/app/procurement/reports/grn-report'
-                    },               
+                    },
                 ]
             },
             // {
@@ -659,28 +690,28 @@ export const menuItems = [
         icon: 'fa-money',
         selected: false,
         expanded: false,
-        show : grant(['MNGNT-ACCESS']),
+        show: grant(['MNGNT-ACCESS']),
         order: 700,
         subMenu: [
             {
                 title: 'Management Board',
-                show : true,
+                show: true,
                 routerLink: '/app/management/management-board'
             },
             {
                 title: 'Cash Collections',
-                show : true,
+                show: true,
                 routerLink: '/app/management/cash-collections'
-            },            
+            },
             {
                 title: 'Reports',
                 url: '#',
-                show : true,
+                show: true,
                 subMenu: [
                     {
                         title: 'Vehicle Registration',
                         routerLink: '/app/management/vehicle-registration-report'
-                    },                    
+                    },
                     {
                         title: 'Vehicle Parking',
                         routerLink: '/app/parking-management/reports/parking-report'
@@ -692,7 +723,7 @@ export const menuItems = [
                     {
                         title: 'Fast Moving Products',
                         routerLink: '/app/mechandizing/fast-moving-products-report'
-                    },                    
+                    },
                     {
                         title: 'Revenue Report',
                         routerLink: '/app/blank'
@@ -726,7 +757,7 @@ export const menuItems = [
     //             title: 'UOM',
     //             routerLink: '/app/inventory/uom'
     //         },
-                      
+
     //         // {
     //         //     title: 'Reports',
     //         //     url: '#',
@@ -760,13 +791,13 @@ export const menuItems = [
         icon: 'fa-cogs',
         selected: false,
         expanded: false,
-        show : grant(['ADMIN-ACCESS']),
+        show: grant(['ADMIN-ACCESS']),
         order: 700,
         subMenu: [
             {
                 title: 'Identity and Access',
                 url: '#',
-                show : true,
+                show: true,
                 subMenu: [
                     {
                         title: 'User',
@@ -785,7 +816,7 @@ export const menuItems = [
             {
                 title: 'Admin Units',
                 url: '#',
-                show : true,
+                show: true,
                 subMenu: [
                     {
                         title: 'Company',
@@ -799,29 +830,29 @@ export const menuItems = [
                         title: 'Shop',
                         routerLink: '/app/admin-unit/shop'
                     },
-                   /*  
-                   {
-                        title: 'Department',
-                        routerLink: '/app/admin-unit/department'
-                    },
-                   {
-                        title: 'Warehouse',
-                        routerLink: '/app/admin-unit/warehouse'
-                    },
+                    /*  
                     {
-                        title: 'Shop',
-                        routerLink: '/app/admin-unit/shop'
-                    },
+                         title: 'Department',
+                         routerLink: '/app/admin-unit/department'
+                     },
                     {
-                        title: 'Shop-Till',
-                        routerLink: '/app/admin-unit/shop-till'
-                    },*/
+                         title: 'Warehouse',
+                         routerLink: '/app/admin-unit/warehouse'
+                     },
+                     {
+                         title: 'Shop',
+                         routerLink: '/app/admin-unit/shop'
+                     },
+                     {
+                         title: 'Shop-Till',
+                         routerLink: '/app/admin-unit/shop-till'
+                     },*/
                 ]
             },
             {
                 title: 'Parking Management',
                 url: '#',
-                show : true,
+                show: true,
                 subMenu: [
                     {
                         title: 'Parking Zone',
@@ -840,7 +871,7 @@ export const menuItems = [
             {
                 title: 'Storage Management',
                 url: '#',
-                show : true,
+                show: true,
                 subMenu: [
                     {
                         title: 'Warehouse',
@@ -859,45 +890,45 @@ export const menuItems = [
             {
                 title: 'Maintenance Management',
                 url: '#',
-                show : true,
+                show: true,
                 subMenu: [
-                    { 
+                    {
                         title: 'Issue Type',
                         url: '#',
-                        show : true,
+                        show: true,
                         routerLink: '/app/maintenance-management/maintenance-issue-type'
-                    }, 
-                    { 
+                    },
+                    {
                         title: 'Service Specialist',
                         url: '#',
-                        show : true,
+                        show: true,
                         routerLink: '/app/maintenance-management/service-specialist'
-                    },             
+                    },
                 ]
             },
 
-              
-            
+
+
             {
                 title: 'Inventory',
                 routerLink: ' ',
                 icon: 'fa-money',
                 selected: false,
                 expanded: false,
-                show : true,//grant(['MNGNT-ACCESS']),
+                show: true,//grant(['MNGNT-ACCESS']),
                 order: 700,
                 subMenu: [
                     {
                         title: 'Product',
-                        show : true,
+                        show: true,
                         routerLink: '/app/inventory/product'
                     },
                     {
                         title: 'UOM',
-                        show : true,
+                        show: true,
                         routerLink: '/app/inventory/uom'
                     },
-                              
+
                     // {
                     //     title: 'Reports',
                     //     url: '#',
@@ -929,7 +960,7 @@ export const menuItems = [
             {
                 title: 'Reports',
                 url: '#',
-                show : true,
+                show: true,
                 subMenu: [
                     {
                         title: 'Vehicle Parking Report',
@@ -961,7 +992,7 @@ export const menuItems = [
 //     let granted: boolean = false;
 //     privilege.forEach(element => {
 //         console.log(element)
-        
+
 
 //         var granted : boolean = false
 //         let currentUser : {
@@ -989,7 +1020,7 @@ export const menuItems = [
 
 export function grant(privileges: string[]): boolean {
     /** Allow user to perform an action if the user has that privilege */
-    
+
     const currentUser = JSON.parse(localStorage.getItem('current-user')!);
     if (!currentUser || !currentUser.access_token) {
         console.error('No valid user or access token found.');

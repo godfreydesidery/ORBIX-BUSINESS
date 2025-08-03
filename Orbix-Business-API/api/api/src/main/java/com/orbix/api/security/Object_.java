@@ -33,6 +33,7 @@ public class Object_ {
 	public static String FINCWEGH = "FINCWEGH-ACCESS";
 	public static String FINCMTNC = "FINCMTNC-ACCESS";
 	public static String SHOP = "SHOP-ACCESS";
+	public static String RESTAURANT = "RESTAURANT-ACCESS";
 	public static String WRHOUSE = "WRHOUSE-ACCESS";
 	public static String WEGH = "WEGH-ACCESS";
 	public static String STRG = "STRG-UPDATE";

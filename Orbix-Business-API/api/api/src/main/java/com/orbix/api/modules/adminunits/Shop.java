@@ -43,6 +43,8 @@ public class Shop {
 	private String locationName;
 	private boolean active = false;
 	
+	private String shopCategory = "NORMAL";
+	
 	@ManyToOne(targetEntity = Branch.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "branch_id", nullable = false , updatable = true)
     @OnDelete(action = OnDeleteAction.NO_ACTION)

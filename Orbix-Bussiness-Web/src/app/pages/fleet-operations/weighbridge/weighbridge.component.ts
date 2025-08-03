@@ -132,8 +132,8 @@ export class WeighbridgeComponent {
   selectedTareLabel: string = '';
 
   tareOptions = [
-    { label: 'Excel One-Two', value: 10000 },
-    { label: 'Excel Three-Four', value: 20000 }
+    { label: 'Axle One-Two', value: 10000 },
+    { label: 'Axle Three-Four', value: 20000 }
   ];
 
   onTareChange() {

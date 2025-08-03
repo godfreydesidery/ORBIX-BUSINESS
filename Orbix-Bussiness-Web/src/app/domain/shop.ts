@@ -6,6 +6,8 @@ export interface IShop {
     name : string
     locationName : string
 
+    shopCategory : string
+
     active : string
 
     branchId : string

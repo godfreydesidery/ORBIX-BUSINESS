@@ -12,4 +12,6 @@ public class ShopRequestDTO {
 	private String locationName;
 	private boolean active;
 	private Long branchId;
+	
+	private String shopCategory;
 }
