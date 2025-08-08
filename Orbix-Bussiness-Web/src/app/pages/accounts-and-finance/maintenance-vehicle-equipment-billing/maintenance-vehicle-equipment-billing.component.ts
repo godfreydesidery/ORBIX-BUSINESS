@@ -16,6 +16,7 @@ import { DataService } from '@services/custom/data.service';
 import { IMaintenanceJobCardIssueBillReceivable } from 'src/app/domain/maintenance-job-card-issue-bill-receivable';
 import { IBillReceivable } from 'src/app/domain/bill-receivable';
 import { IMaintenance, IServiceBillItem } from 'src/app/domain/maintenance';
+import { ICustomer } from 'src/app/domain/customer';
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
@@ -589,7 +590,13 @@ export class MaintenanceVehicleEquipmentBillingComponent {
       items.push(item)
     })
 
-    this.printer.print(items, 'NA', 0)
+    var customer: ICustomer = {
+          name: this.ownerFirstName + ' ' + this.ownerLastName,
+          address: this.ownerAddress,
+          phone: this.ownerPhoneNo
+        }
+
+    this.printer.print(items, 'NA', 0, customer)
     this.toPrintReceipt = false
   }
 

@@ -15,6 +15,7 @@ import { PosReceiptPrinterService } from '@services/custom/pos-receipt-printer.s
 import { ReceiptItem } from 'src/app/domain/receipt-item';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
+import { ICustomer } from 'src/app/domain/customer';
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
@@ -790,7 +791,13 @@ export class DiscountsComponent {
       items.push(item)
     })
 
-    this.printer.print(items, 'NA', 0)
+    var customer : ICustomer = {
+      name: this.ownerFirstName + ' ' + this.ownerLastName,
+      address: this.ownerAddress,
+      phone: this.ownerPhoneNo
+    }
+
+    this.printer.print(items, 'NA', 0, customer)
     this.toPrintReceipt = false
   }
 

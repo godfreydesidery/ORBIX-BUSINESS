@@ -83,12 +83,14 @@ public class WeighBillReceivableResource {
 			throw new NotFoundException("Weigh not found");
 		}
 		
+		Weigh weigh = weigh_.get();
+		
 		BillReceivable billReceivable = new BillReceivable();
 		billReceivable.setNo(String.valueOf(Math.random()));
 		billReceivable.setAmount(b.getAmount());
 		billReceivable.setPaid(0);
 		billReceivable.setDue(b.getAmount());
-		billReceivable.setBranch(weigh_.get().getBranch());
+		billReceivable.setBranch(weigh.getBranch());
 		billReceivable.setCreatedDateTime(dayService.getTimeStamp());
 		
 		billReceivable.setPayStatus(PayStatus.UNPAID);
@@ -105,7 +107,7 @@ public class WeighBillReceivableResource {
 		weighBillReceivable.setDescription(b.getDescription());
 		weighBillReceivable.setDiscount(0);
 		weighBillReceivable.setBillReceivable(billReceivable);
-		weighBillReceivable.setWeigh(weigh_.get());
+		weighBillReceivable.setWeigh(weigh);
 		weighBillReceivable.setWeightOne(b.getWeightOne());
 		weighBillReceivable.setWeightTwo(b.getWeightTwo());
 		weighBillReceivable.setWeightThree(b.getWeightThree());
@@ -114,6 +116,10 @@ public class WeighBillReceivableResource {
 		weighBillReceivable.setCreatedByUser(userService.getUser(request));
 		
 		weighBillReceivable = weighBillReceivableRepository.save(weighBillReceivable);
+		
+		weigh.setWeighStatus(weighBillReceivable.getWeighStatus());
+		
+		weighRepository.saveAndFlush(weigh);
 	
 	}
 	

@@ -24,6 +24,7 @@ import { id } from '@swimlane/ngx-datatable';
 import { IGrn } from 'src/app/domain/grn';
 
 import * as pdfMake from 'pdfmake/build/pdfmake';
+import { ICustomer } from 'src/app/domain/customer';
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
@@ -697,8 +698,14 @@ status : string = ''
           item.qty = element.qty
           items.push(item)
         })
+
+        var customer: ICustomer = {
+              name: '',
+              address: '',
+              phone: ''
+            }
     
-        this.printer.print(items, 'NA', 0)
+        this.printer.print(items, 'NA', 0, customer)
         //this.toPrintReceipt = false
       }
 

@@ -23,6 +23,7 @@ import { ISupplierProduct } from 'src/app/domain/supplier-product';
 import { NgSelectModule } from '@ng-select/ng-select';
 
 import * as pdfMake from 'pdfmake/build/pdfmake';
+import { ICustomer } from 'src/app/domain/customer';
 
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js');
@@ -791,7 +792,13 @@ export class LpoComponent {
       items.push(item)
     })
 
-    this.printer.print(items, 'NA', 0)
+    var customer: ICustomer = {
+          name: '',
+          address: '',
+          phone: ''
+        }
+
+    this.printer.print(items, 'NA', 0, customer)
     //this.toPrintReceipt = false
   }
 

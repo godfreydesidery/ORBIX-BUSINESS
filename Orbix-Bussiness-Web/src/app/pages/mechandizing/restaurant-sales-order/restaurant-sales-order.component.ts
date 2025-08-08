@@ -17,6 +17,7 @@ import { IProduct } from 'src/app/domain/product';
 import { IShopSalesOrder, IShopSalesOrderDetail } from 'src/app/domain/shop-sales-order';
 
 import { ReceiptItem } from 'src/app/domain/receipt-item';
+import { ICustomer } from 'src/app/domain/customer';
 
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
@@ -585,8 +586,14 @@ shopId: number;
           item.qty = element.qty
           items.push(item)
         })
+
+        var customer: ICustomer = {
+              name: this.customerName,
+              address: '',
+              phone: ''
+            }
     
-        this.printer.print(items, 'NA', 0)
+        this.printer.print(items, 'NA', 0, customer)
         //this.toPrintReceipt = false
       }
 

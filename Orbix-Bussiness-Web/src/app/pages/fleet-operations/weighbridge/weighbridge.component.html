@@ -197,6 +197,7 @@
                                             <th scope="col">Phone No</th>
                                             <th scope="col">Reg No</th>
                                             <th scope="col">Ref No</th>
+                                            <th scope="col">Weigh Status</th>
                                             <th scope="col">Recheck Count</th>
                                             <th scope="col">Action</th>
                                         </tr>
@@ -210,11 +211,12 @@
                                             <td>{{weigh.ownerPhoneNo}}</td>
                                             <td>{{weigh.regNo}}</td>
                                             <td>{{weigh.regNo}}</td>
+                                            <td>{{weigh.weighStatus}}</td>
                                             <td>{{weigh.recheck}}</td>
                                             <td>
                                                 <button class="btn btn-sm btn-outline-primary btn-round-custom" (click)="get(weigh.id)"
                                                     data-dismiss="modal">Select</button>
-                                                <button class="btn btn-sm btn-outline-success btn-round-custom" *ngIf="weigh.recheck <= 0" (click)="recheck(weigh.id)"
+                                                <button class="btn btn-sm btn-outline-success btn-round-custom" *ngIf="weigh.weighStatus === 'OVERWEIGHT' && weigh.recheck < 1" (click)="recheck(weigh.id)"
                                                     data-dismiss="modal"><i class="fa fa-check"></i> Recheck</button>
                                             </td>
                                         </tr>

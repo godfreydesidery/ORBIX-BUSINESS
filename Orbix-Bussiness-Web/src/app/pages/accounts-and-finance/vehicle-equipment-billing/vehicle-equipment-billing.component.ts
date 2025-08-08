@@ -15,6 +15,7 @@ import { PosReceiptPrinterService } from '@services/custom/pos-receipt-printer.s
 import { ReceiptItem } from 'src/app/domain/receipt-item';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
+import { ICustomer } from 'src/app/domain/customer';
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
@@ -280,8 +281,8 @@ export class VehicleEquipmentBillingComponent {
       }
 
       var discountRequest = {
-        serviceBillId : this.parkingBillReceivableId,
-        billAmount : (this.parkingBillReceivablePrice * this.parkingBillReceivableQty),
+        serviceBillId: this.parkingBillReceivableId,
+        billAmount: (this.parkingBillReceivablePrice * this.parkingBillReceivableQty),
         discountAmount: this.parkingBillReceivableDiscount,
         serviceBillName: 'Parking',
         reason: this.discountReason
@@ -308,11 +309,11 @@ export class VehicleEquipmentBillingComponent {
     }
   }
 
-  discountReason : string = ''
+  discountReason: string = ''
   discountComments: string = ''
 
   async getDiscount() {
-    
+
     if (this.parkingId != null) {
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
@@ -329,13 +330,13 @@ export class VehicleEquipmentBillingComponent {
 
           }
         )
-        // .catch(
-        //   error => {
-        //     this.msg.showErrorMessage(error, 'Error')
-        //     this.getParkingBillReceivables(this.parkingId)
-        //     console.log(error)
-        //   }
-        // )
+      // .catch(
+      //   error => {
+      //     this.msg.showErrorMessage(error, 'Error')
+      //     this.getParkingBillReceivables(this.parkingId)
+      //     console.log(error)
+      //   }
+      // )
 
     }
   }
@@ -713,7 +714,13 @@ export class VehicleEquipmentBillingComponent {
       items.push(item)
     })
 
-    this.printer.print(items, 'NA', 0)
+    var customer: ICustomer = {
+      name: this.ownerFirstName + ' ' + this.ownerLastName,
+      address: this.ownerAddress,
+      phone: this.ownerPhoneNo
+    }
+
+    this.printer.print(items, 'NA', 0, customer)
     this.toPrintReceipt = false
   }
 
@@ -1204,7 +1211,7 @@ interface IModel {
   stringData: string
 }
 
-interface IDiscountRequest{
+interface IDiscountRequest {
   serviceBillId: any
   billAmount: number
   discountAmount: number

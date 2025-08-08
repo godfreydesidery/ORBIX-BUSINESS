@@ -322,7 +322,6 @@ export class WeighbridgeComponent {
       weightFour : this.weightFour,
       weighStatus : this.weighStatus
     }
-
     await this.http.post<IWeighbridge>(API_URL + '/weigh_bills/add_bill', bill, options)
       .toPromise()
       .then(
