@@ -1,0 +1,309 @@
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>Restaurant Name: {{selectedRestaurant.name}}</span>
+            </div>
+            <div class="card-body widget-body"> 
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <!-- <button class="btn btn-success btn-round-custom" (click)="toggleShowImportList()">Import Product</button> -->
+                        <button class="btn btn-success btn-round-custom" (click)="clearImportList()" (click)="loadRestaurantProductStockStatus()">Refresh Stock</button>    
+                        <button class="btn btn-primary btn-round-custom" (click)="clearImportList()" (click)="filterUnderStock()">Understock</button>
+                        <button class="btn btn-primary btn-round-custom" (click)="clearImportList()" (click)="filterOutofStock()">Out of stock</button>
+                        <!-- <button class="btn btn-success btn-round-custom" (click)="clearImportList()">Print Stock Report</button> -->
+                    </div>
+                </div>
+                <br>
+                <div class="row">
+                    <div class="col-md-12">                       
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <p>Products available in restaurant</p>
+                            </div>
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                            </div>
+                        </div>
+                        <br>
+                        <div class=" table-responsive table-sm">
+                            <table class="table table-striped">
+                                <thead>
+                                    <tr>
+                                        <th scope="col">Code</th>
+                                        <th scope="col">Name</th>
+                                        <th scope="col">Description</th>                   
+                                        <th scope="col">Stock</th>
+                                        <th scope="col">Min Stock</th>
+                                        <th scope="col">Base UOM</th>
+                                        <th scope="col">Cost Price Incl</th>
+                                        <!-- <th scope="col">Cost Price Excl</th> -->
+                                        <th scope="col">Selling Price Incl</th>
+                                        <!-- <th scope="col">Selling Price Excl</th> -->
+                                        <!-- <th scope="col">Def Reorder Qty</th> -->
+                                        <!-- <th scope="col">Def Reorder Level</th> -->
+                                        <th scope="col">VAT%</th>
+                                        <th scope="col">Action</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let restaurantProduct of showRestaurantProducts | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                        <td>{{restaurantProduct.productCode}}</td>
+                                        <td>{{restaurantProduct.productName}}</td>
+                                        <td>{{restaurantProduct.productDescription}}</td>
+                                        <td><b style="color: red;">{{restaurantProduct.currentStock}}</b></td>
+                                        <td><b style="color: red;">{{restaurantProduct.minStock}}</b></td>
+                                        <td>{{restaurantProduct.baseUom}}</td>
+                                        <td class="text-success" style="text-align: right;"><b>{{restaurantProduct.costPriceVatIncl | currency:'':''}}</b></td>
+                                        <!-- <td style="text-align: right;">{{restaurantProduct.costPriceVatExcl | currency:'':''}}</td> -->
+                                        <td class="text-primary" style="text-align: right;"><b>{{restaurantProduct.sellingPriceVatIncl | currency:'':''}}</b></td>
+                                        <!-- <td style="text-align: right;">{{restaurantProduct.sellingPriceVatExcl | currency:'':''}}</td> -->
+                                        <!-- <td>{{restaurantProduct.defaultReorderQty}}</td> -->
+                                        <!-- <td>{{restaurantProduct.defaultReorderLevel}}</td> -->
+                                        <td>{{restaurantProduct.vatRate * 100}} %</td>
+                                        <td>
+                                            <button class="btn btn-warning btn-round-custom" (click)="searchRestaurantProduct(restaurantProduct.id)" *ngIf="grant(['SHPPRDCT-ALL'])," data-toggle="modal" data-target="#update-modal">Edit</button>
+                                            <button class="btn btn-success btn-round-custom" (click)="searchRestaurantProduct(restaurantProduct.id)" *ngIf="grant(['SHPSTK-ALL','SHPSTK-UPDATE'])," data-toggle="modal" data-target="#adjust-stock-modal">Adjust Stock</button>
+                                        </td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                            <br>
+                            <div class="row">
+                                <div class="col-sm-12" style="text-align: right;">
+                                    <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+                        
+                    </div>
+                </div>
+
+
+
+
+                
+
+                
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="modal fade" id="import-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Import New Product</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <input type="hidden" [(ngModel)]="productId">
+                       <!-- <div class="form-group">
+                            
+                            <label>(Type to Search by Name or Code)</label>
+                            <input 
+                              class="form-control" 
+                              type="text" 
+                              [(ngModel)]="searchKey" 
+                              (ngModelChange)="onInputChange($event)" 
+                              (change)="onProductSelected()" 
+                              list="productList" 
+                              autocomplete="off">
+                            <datalist id="productList" *ngIf="searchedProducts.length > 0">
+                              <option *ngFor="let product of searchedProducts" [value]="product.name"></option>
+                            </datalist>
+
+
+                        </div> -->
+                        <div class="form-group">
+                            <label>Product Code</label>
+                            <input class="form-control" type="text" [(ngModel)]="productCode" autocomplete="nope" readonly>
+                        </div> 
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="productName" autocomplete="nope" readonly>
+                        </div> 
+                        <div class="form-group">
+                            <label>Product Description</label>
+                            <input class="form-control" type="text" [(ngModel)]="productDescription" autocomplete="nope" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>VAT(0-100)%</label>
+                            <input class="form-control" type="number" [(ngModel)]="vat" autocomplete="nope">
+                        </div>  
+                        <div class="form-group">
+                            <label>Cost Price Vat Inclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="costPriceVatIncl" autocomplete="nope">
+                        </div>
+                        <!-- <div class="form-group">
+                            <label>Cost Price Vat Exclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="costPriceVatExcl" autocomplete="nope">
+                        </div> -->
+                        <div class="form-group">
+                            <label>Selling Price Vat Inclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="sellingPriceVatIncl" autocomplete="nope">
+                        </div> 
+                        <!-- <div class="form-group">
+                            <label>Selling Price Vat Exclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="sellingPriceVatExcl" autocomplete="nope">
+                        </div>                      -->
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                             <label>Minimum Stock Level</label>
+                            <input class="form-control" type="text" [(ngModel)]="minStock" autocomplete="nope">
+                        </div>
+                        <!-- <div class="form-group">
+                            <label>Maximum Stock Level</label>
+                            <input class="form-control" type="number" [(ngModel)]="maxStock" autocomplete="nope">
+                        </div>-->
+                        <!-- <div class="form-group">
+                            <label>Default Reorder Qty</label>
+                            <input class="form-control" type="number" [(ngModel)]="defaultReorderQty" autocomplete="nope">
+                        </div>  -->
+                        <!-- <div class="form-group">
+                            <label>Default Reorder Level</label>
+                            <input class="form-control" type="number" [(ngModel)]="defaultReorderLevel" autocomplete="nope">
+                        </div>-->
+                     </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="importRestaurantProduct()">Save Product</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="update-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Update Product</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-6">
+                        <input type="hidden" [(ngModel)]="productId">                       
+                        <div class="form-group">
+                            <label>Product Code</label>
+                            <input class="form-control" type="text" [(ngModel)]="productCode" autocomplete="nope" readonly>
+                        </div> 
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="productName" autocomplete="nope" readonly>
+                        </div> 
+                        <div class="form-group">
+                            <label>Product Description</label>
+                            <input class="form-control" type="text" [(ngModel)]="productDescription" autocomplete="nope" readonly>
+                        </div>
+                        
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>VAT(0-100)%</label>
+                            <input class="form-control" type="number" [(ngModel)]="vat" autocomplete="nope">
+                        </div>  
+                        <div class="form-group">
+                            <label>Cost Price Vat Inclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="costPriceVatIncl" autocomplete="nope">
+                        </div>
+                        <!-- <div class="form-group">
+                            <label>Cost Price Vat Exclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="costPriceVatExcl" autocomplete="nope">
+                        </div> -->
+                        <div class="form-group">
+                            <label>Selling Price Vat Inclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="sellingPriceVatIncl" autocomplete="nope">
+                        </div> 
+                        <!-- <div class="form-group">
+                            <label>Selling Price Vat Exclusive</label>
+                            <input class="form-control" type="number" [(ngModel)]="sellingPriceVatExcl" autocomplete="nope">
+                        </div>-->
+                        <div class="form-group">
+                             <label>Minimum Stock Level</label>
+                            <input class="form-control" type="text" [(ngModel)]="minStock" autocomplete="nope">
+                        </div>
+                        <!-- <div class="form-group">
+                            <label>Maximum Stock Level</label>
+                            <input class="form-control" type="number" [(ngModel)]="maxStock" autocomplete="nope">
+                        </div>  -->
+                        <!-- <div class="form-group">
+                            <label>Default Reorder Qty</label>
+                            <input class="form-control" type="number" [(ngModel)]="defaultReorderQty" autocomplete="nope">
+                        </div>-->
+                        <!-- <div class="form-group">
+                            <label>Default Reorder Level</label>
+                            <input class="form-control" type="number" [(ngModel)]="defaultReorderLevel" autocomplete="nope">
+                        </div>-->
+                     </div>
+                </div>
+                
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-success btn-round-custom" data-dismiss="modal" (click)="updateRestaurantProduct()">Save Product</button>
+                <button type="button" class="btn btn-danger btn-round-custom" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="adjust-stock-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">                                    
+                <h4 class="modal-title" id="modal-large-label">Adjust Stock</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <input type="hidden" [(ngModel)]="productId">                       
+                        <div class="form-group">
+                            <label>Product Code</label>
+                            <input class="form-control" type="text" [(ngModel)]="productCode" autocomplete="nope" readonly>
+                        </div> 
+                        <div class="form-group">
+                            <label>Product Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="productName" autocomplete="nope" readonly>
+                        </div> 
+                        <div class="form-group">
+                            <label>Product Description</label>
+                            <input class="form-control" type="text" [(ngModel)]="productDescription" autocomplete="nope" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label>Stock</label>
+                           <input class="form-control" type="text" [(ngModel)]="currentStock" autocomplete="nope" style="text-align: center;">
+                       </div>  
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="adjustRestaurantStock()">Update Stock</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

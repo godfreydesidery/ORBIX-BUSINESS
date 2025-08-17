@@ -140,6 +140,7 @@ export class ImportDineableComponent {
           
           console.log(data)
           this.msg.showSuccessMessage('Dineable imported successfully')
+          this.getDineablesToImportByRestaurant()
           this.loadRestaurantDineableStockStatus()
         }
       )

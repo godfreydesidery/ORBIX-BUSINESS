@@ -1,48 +1,66 @@
-
-
 <div class="row bottom-30">
     <div class="col">
         <div widget class="card">
             <div class="card-header">
                 <span>Restaurant Name: {{selectedRestaurant.name}}</span>
             </div>
-            <div class="card-body widget-body"> 
-
+            <div class="card-body widget-body">
                 <div class="row">
                     <div class="col-md-12">
-                        <button class="btn btn-success btn-round-custom" (click)="getDineablesToImportByRestaurant()">Refresh</button>
+                        <button class="btn btn-success btn-round-custom" (click)="clearAgent()" data-toggle="modal"
+                            data-target="#agent-modal">New Agent</button>
                     </div>
                 </div>
-
-
                 <div class="row">
                     <div class="col-md-12">
                         <br><br>
-                        
-
                         <div class="row">
-                            <div class="col-sm-4">
-                                <p>Select Dineables to Import</p>
-                            </div>
                             <div class="col-sm-4"></div>
-                            <div class="col-sm-4">
-                                <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                            <div class="col-sm-8">
+                                <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords"
+                                    placeholder="Search..." style="max-width: 8cm;">
                             </div>
                         </div>
                         <br>
 
-                        <table class="table table-striped">
+                        <table class="table table-striped table-bordered table-sm">
                             <thead>
                                 <tr>
-                                    <th scope="col">Code</th>
+                                    <th scope="col">SN</th>
                                     <th scope="col">Name</th>
-                                    <th scope="col">Description</th>
+                                    <th scope="col">Phone No</th>
+                                    <th scope="col">Assigned Badge</th>
                                     <th scope="col">Is Active?</th>
-                                    <th scope="col">Base UOM</th>
                                     <th scope="col">Action</th>
                                 </tr>
-                            </thead> 
+                            </thead>
                             <tbody>
+                                <tr
+                                    *ngFor="let agent of restaurantAgents | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                    <td>{{agent.sn}}</td>
+                                    <td style="font-weight: bold; font-size: large;">{{agent.name}}</td>
+                                    <td style="font-weight: bold; font-size: large;">{{agent.phoneNo}}</td>
+                                    <td style="font-weight: bold; font-size: large; color: red;">
+                                        {{agent.restaurantBadgeCode}}</td>
+                                    <td>{{agent.activeStatus}}</td>
+                                    <td>
+                                        <span *ngIf="agent.activeStatus ==='Active'">Lock__</span><span
+                                            *ngIf="agent.activeStatus ==='Inactive'">Unlock</span> |
+                                        <button *ngIf="agent.activeStatus ==='Active'" (click)="deactivate(agent.id)"><i
+                                                class="fa fa-unlock text-success"></i></button>
+                                        <button *ngIf="agent.activeStatus ==='Inactive'" (click)="activate(agent.id)"><i
+                                                class="fa fa-lock text-danger"></i></button>
+
+                                        <button class="btn btn-outline-primary btn-sm btn-round-custom" *ngIf="agent.restaurantBadgeCode === ''" data-toggle="modal"
+                                            data-target="#agent-badge-modal"
+                                            (click)="loadAvailableBadgesByRestaurant(agent.id)">Assign Badge</button>
+                                        <button class="btn btn-outline-primary btn-sm btn-round-custom" *ngIf="agent.restaurantBadgeCode != ''"
+                                            (click)="unassignRestaurantBadge(agent.id)">Unassign Badge</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+
+                            <!-- <tbody>
                                 <tr *ngFor="let dineable of importDineables | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
                                     <td>{{dineable.code}}</td>
                                     <td>{{dineable.name}}</td>
@@ -51,10 +69,10 @@
                                     <td>{{dineable.baseUom}}</td>
                                     <td>
                                         <button class="btn btn-primary btn-round-custom" *ngIf="dineable.imported == '0'" (click)="searchDineable(dineable.id)" data-toggle="modal" data-target="#import-modal">Import</button>
-                                        <span class="badge" *ngIf="dineable.imported == '1'">Imported</span>
+                                        <span class="agent" *ngIf="dineable.imported == '1'">Imported</span>
                                     </td>
                                 </tr>
-                            </tbody>           
+                            </tbody> -->
                         </table>
                         <br>
                         <div class="row">
@@ -62,17 +80,84 @@
                                 <pagination-controls (pageChange)="page = $event"></pagination-controls>
                             </div>
                         </div>
-                    </div>    
+                    </div>
                 </div>
 
-                
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="agent-modal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-md" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">
+                <h4 class="modal-title" id="modal-large-label">Create New Agent</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <input type="hidden" [(ngModel)]="restaurantAgentId">
+                        <div class="form-group">
+                            <label>Agent Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="restaurantAgentName"
+                                autocomplete="nope">
+                        </div>
+                        <div class="form-group">
+                            <label>Agent Phone No</label>
+                            <input class="form-control" type="text" [(ngModel)]="restaurantAgentPhone"
+                                autocomplete="nope">
+                        </div>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-round-custom btn-sm pull-right"
+                                (click)="saveRestaurantAgent()" data-dismiss="modal">Save</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="agent-badge-modal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-md" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">
+                <h4 class="modal-title" id="modal-large-label">Assign Badge to Agent</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <input type="hidden" [(ngModel)]="restaurantAgentId">
+                        <div class="form-group">
+                            <label>Select Badge</label>
+                            <select class="form-control" [(ngModel)]="selectedBadgeId">
+                                <option *ngFor="let availableBadge of availableBadges" [value]="availableBadge.id">
+                                    {{availableBadge.code}}
+                                </option>
+                            </select>
+                        </div>
+                        <hr>
+                        <div class="form-group">
+                            <button class="btn btn-success btn-round-custom btn-sm pull-right" data-dismiss="modal"
+                                (click)="assignBadge()">Assign</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
 </div>
 
 
-<div class="modal fade" id="import-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+<!-- <div class="modal fade" id="import-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
     <div class="modal-dialog modal-xl" role="document" style="top: 0;">
         <div class="modal-content">
             <div class="modal-header state modal-default">                                    
@@ -83,23 +168,6 @@
                 <div class="row">
                     <div class="col-lg-6">
                         <input type="hidden" [(ngModel)]="dineableId">
-                       <!-- <div class="form-group">
-                            
-                            <label>(Type to Search by Name or Code)</label>
-                            <input 
-                              class="form-control" 
-                              type="text" 
-                              [(ngModel)]="searchKey" 
-                              (ngModelChange)="onInputChange($event)" 
-                              (change)="onDineableSelected()" 
-                              list="dineableList" 
-                              autocomplete="off">
-                            <datalist id="dineableList" *ngIf="searchedDineables.length > 0">
-                              <option *ngFor="let dineable of searchedDineables" [value]="dineable.name"></option>
-                            </datalist>
-
-
-                        </div> -->
                         <div class="form-group">
                             <label>Dineable Code</label>
                             <input class="form-control" type="text" [(ngModel)]="dineableCode" autocomplete="nope" readonly>
@@ -112,18 +180,6 @@
                         
                     </div>
                     <div class="col-lg-6">
-                        <!-- <div class="form-group">
-                            <label>VAT(0-100)%</label>
-                            <input class="form-control" type="number" [(ngModel)]="vat" autocomplete="nope">
-                        </div>   -->
-                        <!-- <div class="form-group">
-                            <label>Cost Price Vat Inclusive</label>
-                            <input class="form-control" type="number" [(ngModel)]="costPriceVatIncl" autocomplete="nope">
-                        </div> -->
-                        <!-- <div class="form-group">
-                            <label>Cost Price Vat Exclusive</label>
-                            <input class="form-control" type="number" [(ngModel)]="costPriceVatExcl" autocomplete="nope">
-                        </div> -->
                         <div class="form-group">
                             <label>Dineable Description</label>
                             <input class="form-control" type="text" [(ngModel)]="dineableDescription" autocomplete="nope" readonly>
@@ -132,26 +188,6 @@
                             <label>Selling Price Vat Inclusive</label>
                             <input class="form-control" type="number" [(ngModel)]="sellingPriceVatIncl" autocomplete="nope">
                         </div> 
-                        <!-- <div class="form-group">
-                            <label>Selling Price Vat Exclusive</label>
-                            <input class="form-control" type="number" [(ngModel)]="sellingPriceVatExcl" autocomplete="nope">
-                        </div>-->
-                        <!-- <div class="form-group">
-                             <label>Minimum Stock Level</label>
-                            <input class="form-control" type="text" [(ngModel)]="minStock" autocomplete="nope">
-                        </div> -->
-                        <!-- <div class="form-group">
-                            <label>Maximum Stock Level</label>
-                            <input class="form-control" type="number" [(ngModel)]="maxStock" autocomplete="nope">
-                        </div>-->
-                        <!-- <div class="form-group">
-                            <label>Default Reorder Qty</label>
-                            <input class="form-control" type="number" [(ngModel)]="defaultReorderQty" autocomplete="nope">
-                        </div>  -->
-                        <!-- <div class="form-group">
-                            <label>Default Reorder Level</label>
-                            <input class="form-control" type="number" [(ngModel)]="defaultReorderLevel" autocomplete="nope">
-                        </div>-->
                      </div>
                 </div>
                 
@@ -162,10 +198,10 @@
             </div>
         </div>
     </div>
-</div>
+</div> -->
 
 
-<div class="modal fade" id="update-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
+<!-- <div class="modal fade" id="update-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
     <div class="modal-dialog modal-xl" role="document" style="top: 0;">
         <div class="modal-content">
             <div class="modal-header state modal-default">                                    
@@ -199,37 +235,16 @@
                             <label>Cost Price Vat Inclusive</label>
                             <input class="form-control" type="number" [(ngModel)]="costPriceVatIncl" autocomplete="nope">
                         </div>
-                        <!-- <div class="form-group">
-                            <label>Cost Price Vat Exclusive</label>
-                            <input class="form-control" type="number" [(ngModel)]="costPriceVatExcl" autocomplete="nope">
-                        </div> -->
                         <div class="form-group">
                             <label>Selling Price Vat Inclusive</label>
                             <input class="form-control" type="number" [(ngModel)]="sellingPriceVatIncl" autocomplete="nope">
                         </div> 
-                        <!-- <div class="form-group">
-                            <label>Selling Price Vat Exclusive</label>
-                            <input class="form-control" type="number" [(ngModel)]="sellingPriceVatExcl" autocomplete="nope">
-                        </div>-->
                         <div class="form-group">
                              <label>Minimum Stock Level</label>
                             <input class="form-control" type="text" [(ngModel)]="minStock" autocomplete="nope">
                         </div>
-                        <!-- <div class="form-group">
-                            <label>Maximum Stock Level</label>
-                            <input class="form-control" type="number" [(ngModel)]="maxStock" autocomplete="nope">
-                        </div>  -->
-                        <!-- <div class="form-group">
-                            <label>Default Reorder Qty</label>
-                            <input class="form-control" type="number" [(ngModel)]="defaultReorderQty" autocomplete="nope">
-                        </div>-->
-                        <!-- <div class="form-group">
-                            <label>Default Reorder Level</label>
-                            <input class="form-control" type="number" [(ngModel)]="defaultReorderLevel" autocomplete="nope">
-                        </div>-->
                      </div>
                 </div>
-                
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" data-dismiss="modal" (click)="updateRestaurantDineable()">Save Dineable</button>
@@ -237,13 +252,4 @@
             </div>
         </div>
     </div>
-</div>
-
-
-
-
-
-
-
-
-
+</div> -->

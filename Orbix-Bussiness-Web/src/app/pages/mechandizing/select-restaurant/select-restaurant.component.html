@@ -35,6 +35,9 @@
                         <button class="btn btn-success btn-round-custom"
                             [routerLink]="'/app/mechandizing/restaurant-sales-order'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Sales Order</button>
+                        <button class="btn btn-success btn-round-custom"
+                            [routerLink]="'/app/mechandizing/restaurant-product-stock-status'"
+                            [queryParams]="{ restaurant_id: selectedRestaurantId }">Stock Status</button>
                         <!-- <button class="btn btn-success btn-round-custom"
                             [routerLink]="'/app/mechandizing/restaurant-product-stock-status'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Stock Status</button> -->
@@ -45,7 +48,13 @@
                             data-toggle="modal" data-target="#grn-list-modal">Goods Received Notes</button> -->
                         <button class="btn btn-success btn-round-custom"
                             [routerLink]="'/app/mechandizing/import-dineable'"
-                            [queryParams]="{ restaurant_id: selectedRestaurantId }">Import Product</button>
+                            [queryParams]="{ restaurant_id: selectedRestaurantId }">Import Meal</button>
+                        <button class="btn btn-success btn-round-custom"
+                            [routerLink]="'/app/mechandizing/restaurant-badge'"
+                            [queryParams]="{ restaurant_id: selectedRestaurantId }">Badges</button>
+                        <button class="btn btn-success btn-round-custom"
+                            [routerLink]="'/app/mechandizing/restaurant-agent'"
+                            [queryParams]="{ restaurant_id: selectedRestaurantId }">Agents</button>
                         <!-- <button class="btn btn-success btn-round-custom"
                             [routerLink]="'/app/mechandizing/restaurant-product-stock-log'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Stock Card</button> -->

@@ -147,6 +147,12 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
       {
+        path : 'mechandizing/restaurant-product-stock-status',
+        loadComponent: () => import('./mechandizing/restaurant-product-stock-status/restaurant-product-stock-status.component').then(c => c.RestaurantProductStockStatusComponent),
+        data : { breadcrumb : 'Mechandizing/Restaurant Stock Status'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'mechandizing/shop-product-stock-status-out',
         loadComponent: () => import('./mechandizing/shop-product-stock-status-out/shop-product-stock-status-out.component').then(c => c.ShopProductStockStatusOutComponent),
         data : { breadcrumb : 'Mechandizing/Shop Stock Status(Out of stock)'},
@@ -179,6 +185,18 @@ export const routes: Routes = [
         path : 'mechandizing/import-dineable',
         loadComponent: () => import('./mechandizing/import-dineable/import-dineable.component').then(c => c.ImportDineableComponent),
         data : { breadcrumb : 'Mechandizing/Import Dineable'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/restaurant-badge',
+        loadComponent: () => import('./mechandizing/restaurant-badge/restaurant-badge.component').then(c => c.RestaurantBadgeComponent),
+        data : { breadcrumb : 'Mechandizing/Restaurant Badge'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/restaurant-agent',
+        loadComponent: () => import('./mechandizing/restaurant-agent/restaurant-agent.component').then(c => c.RestaurantAgentComponent),
+        data : { breadcrumb : 'Mechandizing/Restaurant Agent'},
         canActivate : [AuthGuard]
       },
       {
