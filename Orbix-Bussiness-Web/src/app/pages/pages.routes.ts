@@ -12,6 +12,7 @@ import { SystemProfileComponent } from './system/system-profile/system-profile.c
 import { RoleAccessComponent } from './identity-and-access/role-access/role-access.component';
 import { AuthGuard } from '../auth-guard';
 import { ProductComponent } from './inventory/product/product.component';
+import { RestaurantComponent } from './administration-units/restaurant/restaurant.component';
 
 export const routes: Routes = [
   {
@@ -95,6 +96,12 @@ export const routes: Routes = [
         data : { breadcrumb : 'Admin Unit/Shop Till'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'admin-unit/restaurant',
+        loadComponent : () => import('./administration-units/administration-units.routes').then(c => RestaurantComponent),
+        data : { breadcrumb : 'Admin Unit/Restaurant'},
+        canActivate : [AuthGuard]
+      },
 
       // Inventory
 
@@ -102,6 +109,12 @@ export const routes: Routes = [
         path : 'inventory/product',
         loadComponent: () => import('./inventory/product/product.component').then(c => c.ProductComponent),
         data : { breadcrumb : 'Product/Product'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'inventory/dineable',
+        loadComponent: () => import('./inventory/dineable/dineable.component').then(c => c.DineableComponent),
+        data : { breadcrumb : 'Dineable/Dineable'},
         canActivate : [AuthGuard]
       },
       {
@@ -160,6 +173,12 @@ export const routes: Routes = [
         path : 'mechandizing/import-product',
         loadComponent: () => import('./mechandizing/import-product/import-product.component').then(c => c.ImportProductComponent),
         data : { breadcrumb : 'Mechandizing/Import Product'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/import-dineable',
+        loadComponent: () => import('./mechandizing/import-dineable/import-dineable.component').then(c => c.ImportDineableComponent),
+        data : { breadcrumb : 'Mechandizing/Import Dineable'},
         canActivate : [AuthGuard]
       },
       {

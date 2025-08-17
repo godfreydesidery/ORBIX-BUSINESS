@@ -1,0 +1,11 @@
+package com.orbix.api.modules.salesandmarketing;
+
+import java.util.List;
+
+import lombok.Data;
+
+@Data
+public class RestaurantSaleRequestDTO {
+	Long id;
+	List<RestaurantSaleDetailRequestDTO> restaurantSaleDetails;
+}

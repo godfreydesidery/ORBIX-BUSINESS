@@ -308,10 +308,6 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 		shopSalesOrder.setConfirmedDateTime(dayService.getTimeStamp());
 		
 		shopSalesOrderRepository.save(shopSalesOrder);
-		for(int i = 1; i < 100; i++) {
-			System.out.println(sale.getId());
-		}
-		
 		
 		for(SaleDetail saleDetail : sale.getSaleDetails()) {
 			
@@ -338,7 +334,7 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 			saleDetailBillReceivable.setSaleDetail(saleDetail);
 			saleDetailBillReceivable.setDiscount(0);
 			saleDetailBillReceivable.setQty(saleDetail.getQty());
-			saleDetailBillReceivable.setPrice(saleDetail.getCostPriceVatIncl());
+			saleDetailBillReceivable.setPrice(saleDetail.getSellingPriceVatIncl());
 			saleDetailBillReceivableRepository.save(saleDetailBillReceivable);
 			
 			Collection collection = new Collection();

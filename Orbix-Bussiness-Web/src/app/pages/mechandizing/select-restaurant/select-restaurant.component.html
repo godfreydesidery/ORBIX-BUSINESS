@@ -2,85 +2,87 @@
     <div class="col">
         <div widget class="card">
             <div class="card-header">
-                <span>Restaurant: {{ selectedShop?.name || '' }}</span>
+                <span>Restaurant: {{ selectedRestaurant?.name || '' }}</span>
             </div>
             <div class="card-body widget-body text-white">
-                <div class="row" *ngIf="shopLoaded == false">
+                <div class="row" *ngIf="restaurantLoaded == false">
                     <div class="col-md-3"></div>
                     <div class="col-md-6">
 
                         <br><br>
 
                         <div class="form-group">
-                            <select class="form-control" [(ngModel)]="selectedShopId" (change)="onShopChange($event)">
+                            <select class="form-control" [(ngModel)]="selectedRestaurantId"
+                                (change)="onRestaurantChange($event)">
                                 <option value=''></option>
-                                <option *ngFor="let shop of availableShops" [value]="shop.id"
-                                    style="font-size: larger;">Shop name: <b>{{shop.name}}</b> Location:
-                                    {{shop.locationName}}</option>
+                                <option *ngFor="let restaurant of availableRestaurants" [value]="restaurant.id"
+                                    style="font-size: larger;">Restaurant name: <b>{{restaurant.name}}</b> Location:
+                                    {{restaurant.locationName}}</option>
                             </select>
                         </div>
                         <div class="form-group">
-                            <button type="button" class="btn btn-success btn-round-custom" (click)="selectShop()"
+                            <button type="button" class="btn btn-success btn-round-custom" (click)="selectRestaurant()"
                                 style="width: 25%;">Select</button>
                             <button type="button" class="btn btn-danger btn-round-custom pull-right"
-                                (click)="clearSelectedShop()">Cancel</button>
+                                (click)="clearSelectedRestaurant()">Cancel</button>
                         </div>
                     </div>
                     <div class="col-md-3"></div>
                 </div>
-                <div class="row" *ngIf="shopLoaded == true">
+                <div class="row" *ngIf="restaurantLoaded == true">
                     <div class="col-md-12">
                         <!-- <button class="btn btn-success btn-round-custom">Sales Order</button> -->
                         <button class="btn btn-success btn-round-custom"
                             [routerLink]="'/app/mechandizing/restaurant-sales-order'"
-                            [queryParams]="{ shop_id: selectedShopId }">Sales Order</button>
+                            [queryParams]="{ restaurant_id: selectedRestaurantId }">Sales Order</button>
                         <!-- <button class="btn btn-success btn-round-custom"
-                            [routerLink]="'/app/mechandizing/shop-product-stock-status'"
-                            [queryParams]="{ shop_id: selectedShopId }">Stock Status</button> -->
-                        <!-- <button class="btn btn-success btn-round-custom" [routerLink]="'/app/mechandizing/shop-lpo'" [queryParams]="{ shop_id: selectedShopId }">LPO</button> -->
+                            [routerLink]="'/app/mechandizing/restaurant-product-stock-status'"
+                            [queryParams]="{ restaurant_id: selectedRestaurantId }">Stock Status</button> -->
+                        <!-- <button class="btn btn-success btn-round-custom" [routerLink]="'/app/mechandizing/restaurant-lpo'" [queryParams]="{ restaurant_id: selectedRestaurantId }">LPO</button> -->
                         <!-- <button class="btn btn-success btn-round-custom" (click)="getAllPendingOrders()"
                             data-toggle="modal" data-target="#sales-order-list-modal">Local Purchase Orders</button> -->
                         <!-- <button class="btn btn-success btn-round-custom" (click)="getAllPendingGrns()"
                             data-toggle="modal" data-target="#grn-list-modal">Goods Received Notes</button> -->
                         <button class="btn btn-success btn-round-custom"
-                            [routerLink]="'/app/mechandizing/import-product'"
-                            [queryParams]="{ shop_id: selectedShopId }">Import Product</button>
-                            <!-- <button class="btn btn-success btn-round-custom"
-                            [routerLink]="'/app/mechandizing/shop-product-stock-log'"
-                            [queryParams]="{ shop_id: selectedShopId }">Stock Card</button> -->
+                            [routerLink]="'/app/mechandizing/import-dineable'"
+                            [queryParams]="{ restaurant_id: selectedRestaurantId }">Import Product</button>
+                        <!-- <button class="btn btn-success btn-round-custom"
+                            [routerLink]="'/app/mechandizing/restaurant-product-stock-log'"
+                            [queryParams]="{ restaurant_id: selectedRestaurantId }">Stock Card</button> -->
                     </div>
 
                     <div class="col-md-12">
                         <div class="row justify-content-center">
-                            <!-- <div class="col-md-3" style="margin-left: 20px;">
+                            <div class="col-md-3" style="margin-left: 20px;">
                                 <div class="alert alert-info alert-dismissible fade show" *ngIf="underStock > 0"
                                     role="alert" style="background-color: white; border-width: 0px;">
                                     <button type="button" class="close btn-round-custom" data-dismiss="alert"
                                         aria-label="Close">
                                         <span aria-hidden="true" style="color: black;">&times;</span>
                                     </button>
-                                    <strong style="color: black; font-size: larger;">{{underStock}} Items are under stocked! </strong> <br>
-                                    <span [routerLink]="'/app/mechandizing/shop-product-stock-status-under'"
-                                        [queryParams]="{ shop_id: selectedShopId }"
+                                    <strong style="color: black; font-size: larger;">{{underStock}} Items are under
+                                        stocked! </strong> <br>
+                                    <span [routerLink]="'/app/mechandizing/restaurant-product-stock-status-under'"
+                                        [queryParams]="{ restaurant_id: selectedRestaurantId }"
                                         style="color: red; cursor: pointer; font-size: large;">
                                         Click Here to View</span>
                                 </div>
-                            </div> -->
-                            <!-- <div class="col-md-3" style="margin-left: 20px;">
+                            </div>
+                            <div class="col-md-3" style="margin-left: 20px;">
                                 <div class="alert alert-info alert-dismissible fade show" *ngIf="outofStock > 0"
                                     role="alert" style="background-color: white; border-width: 0px;">
                                     <button type="button" class="close btn-round-custom" data-dismiss="alert"
                                         aria-label="Close">
                                         <span aria-hidden="true" style="color: black;">&times;</span>
                                     </button>
-                                    <strong style="color: black; font-size: larger;">{{outofStock}} Items are out of stock! </strong> <br>
-                                    <span
-                                        [routerLink]="'/app/mechandizing/shop-product-stock-status-out'"
-                                        [queryParams]="{ shop_id: selectedShopId }"
+                                    <strong style="color: black; font-size: larger;">{{outofStock}} Items are out of
+                                        stock! </strong> <br>
+                                    <span [routerLink]="'/app/mechandizing/restaurant-product-stock-status-out'"
+                                        [queryParams]="{ restaurant_id: selectedRestaurantId }"
                                         style="color: red; cursor: pointer; font-size: large;">
                                         Click Here to View</span>
                                 </div>
-                            </div> -->
+                            </div>
                         </div>
                     </div>
 

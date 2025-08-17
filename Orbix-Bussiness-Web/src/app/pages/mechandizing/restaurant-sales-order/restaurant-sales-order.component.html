@@ -2,33 +2,25 @@
     <div class="col">
         <div widget class="card">
             <div class="card-header">
-                <span>Restaurant Name: <span>{{selectedShop.name}}</span></span>
+                <span>Restaurant Name: <span>{{selectedRestaurant.name}}</span></span>                       
             </div>
 
             <div class="container-fluid mt-4">
-
+                
                 <!-- Action Buttons -->
                 <div class="row mb-4">
                     <div class="col-md-12">
-                        <button class="btn btn-outline-success btn-round-custom" (click)="getAllPendingOrders()"
-                            data-toggle="modal" data-target="#sales-order-list-modal">Sales Order List</button>
-                        <button class="btn btn-outline-success btn-round-custom" (click)="clearOrder()"
-                            data-toggle="modal" data-target="#sales-order-modal">New Sales Order</button>
-                        <button class="btn btn-outline-danger btn-round-custom" (click)="cancelOrder()"
-                            *ngIf="shopSalesOrderId != null">Cancel Order</button>
+                        <button class="btn btn-outline-success btn-round-custom" (click)="getAllPendingOrders()" data-toggle="modal" data-target="#sales-order-list-modal">Sales Order List</button>
+                        <button class="btn btn-outline-success btn-round-custom" (click)="clearOrder()" data-toggle="modal" data-target="#sales-order-modal">New Sales Order</button>
+                        <button class="btn btn-outline-danger btn-round-custom" (click)="cancelOrder()" *ngIf="restaurantSalesOrderId != null">Cancel Order</button>
                     </div>
                 </div>
-
-                <div class="row" *ngIf="shopSalesOrderId != null">
+            
+                <div class="row" *ngIf="restaurantSalesOrderId != null">
                     <div class="col-md-12">
-
-
+            
+            
                         <div class="row">
-                            <div class="col-sm-12">
-                                <div class="alert alert-info"><span style="font-weight: bold; font-size: large;">This is
-                                        Restaurant</span></div>
-                            </div>
-
                             <!-- General Information -->
                             <div class="col-md-4 mb-4">
                                 <div class="card shadow-sm">
@@ -37,9 +29,9 @@
                                     </div>
                                     <div class="card-body">
                                         <ul class="list-unstyled mb-0">
-                                            <li><strong>Sales Order ID:</strong> {{shopSalesOrder!.id}}</li>
-                                            <li><strong>Sales Order #:</strong> {{shopSalesOrder!.no}}</li>
-                                            <li><strong>Order Status:</strong> {{shopSalesOrder!.status}}</li>
+                                            <li><strong>Sales Order ID:</strong> {{restaurantSalesOrder!.id}}</li>
+                                            <li><strong>Sales Order #:</strong> {{restaurantSalesOrder!.no}}</li>
+                                            <li><strong>Order Status:</strong> {{restaurantSalesOrder!.status}}</li>
                                             <!-- <li><strong>Order Date:</strong> 2024-06-15</li>
                                             
                                             <li><strong>Sales Order Type:</strong> Standard Order</li> -->
@@ -47,7 +39,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                    
                             <!-- Customer Details -->
                             <div class="col-md-4 mb-4">
                                 <div class="card shadow-sm">
@@ -65,7 +57,7 @@
                                     </div>
                                 </div>
                             </div>
-
+                    
                             <!-- Order Summary -->
                             <div class="col-md-4 mb-4">
                                 <div class="card shadow-sm">
@@ -81,7 +73,7 @@
                                             </tr>
                                             <tr>
                                                 <td>
-                                                    <select class="form-control" [(ngModel)]="payCode">
+                                                    <select class="form-control" [(ngModel)] = "payCode">
                                                         <option>CASH</option>
                                                         <option>MPESA</option>
                                                         <option>TIGOPESA</option>
@@ -91,9 +83,8 @@
                                                         <option>OTHER</option>
                                                     </select>
                                                 </td>
-                                                <td style="padding-left: 10px;"><input type="text" class="form-control"
-                                                        *ngIf="payCode != 'CASH'" [(ngModel)]="payRefNo"></td>
-                                            </tr>
+                                                <td style="padding-left: 10px;"><input type="text" class="form-control" *ngIf="payCode != 'CASH'" [(ngModel)]="payRefNo"></td>
+                                            </tr> 
                                             <br>
                                         </table>
 
@@ -109,123 +100,58 @@
                                                 <span>Tax (10%):</span> <span>$45.00</span>
                                             </li> -->
                                             <li class="d-flex justify-content-between font-weight-bold border-top pt-2">
-                                                <span style="font-weight: bold;">Total Amount:</span> <span
-                                                    style="font-weight: bold; font-size: larger;">{{totalAmount |
-                                                    currency:'':''}}</span>
+                                                <span style="font-weight: bold;">Total Amount:</span> <span style="font-weight: bold; font-size: larger;">{{totalAmount | currency:'':''}}</span>
                                             </li>
                                         </ul>
                                     </div>
                                     <div class="card-footer text-right" *ngIf="payCode != ''">
-                                        <button class="btn btn-success btn-sm" (click)="confirmOrder()">Confirm
-                                            Order</button>
+                                        <button class="btn btn-success btn-sm" (click)="confirmOrder()">Confirm Order</button>
                                     </div>
                                 </div>
                             </div>
                         </div>
-
+                    
                         <!-- Order Details Table -->
                         <div class="row">
-                            <div class="col-sm-12">
-                                <table class="table table-bordered" style="width: 100%;">
-                                    <thead class="thead-light">
-                                        <tr>
-                                            <td scope="col" style="font-weight: bold;">Item</td>
-                                            <td scope="col" style="font-weight: bold;">Billing Type</td>
-                                            <td scope="col" style="font-weight: bold;">Qty</td>
-                                            <td scope="col" style="font-weight: bold;">Price</td>
-                                            <td scope="col" style="font-weight: bold;">Total Price</td>
-                                            <td scope="col" style="font-weight: bold;">Save</td>
-                                        </tr>
-                                    </thead>
-                                    <tbody>
-                                        <tr>
-                                            <td>
-                                                <div class="dropdown">
-                                                    <input type="text" id="productSearch" class="form-control"
-                                                        [(ngModel)]="searchTerm" (input)="searchProducts()"
-                                                        (focus)="isDropdownOpen = true"
-                                                        placeholder="Type to search products..." autocomplete="off" />
-                                                    <div class="dropdown-menu show mt-1"
-                                                        *ngIf="isDropdownOpen && filteredProducts.length > 0"
-                                                        style="max-height: 200px; overflow-y: auto; width: 100%;">
-                                                        <button class="dropdown-item form-control"
-                                                            *ngFor="let product of filteredProducts"
-                                                            (click)="selectProduct(product)">
-                                                            {{ product.name }}
-                                                        </button>
-                                                    </div>
-
-                                                    <!-- <div class="dropdown-menu show mt-1 text-muted" *ngIf="isDropdownOpen && filteredProducts.length === 0">
-                        No products found.
-                      </div> -->
-                                                </div>
-                                            </td>
-                                            <td>
-                                                <select class="form-control">
-                                                    <option>NM</option>
-                                                </select>
-                                            </td>
-                                            <td><input class="form-control" type="number" [(ngModel)]="qty" style="text-align: center;" min="0"></td>
-                                            <td>
-                                                <input class="form-control" type="text" [(ngModel)]="sellingPriceVatIncl"
-                            style="text-align: right;" readonly>
-                                            </td>
-                                            <td>
-                                                <span class="form-control" style="text-align: right;">{{(sellingPriceVatIncl * qty) - discount |
-                            currency:'':''}}</span>
-                                            </td>
-                                            <td>
-                                                <button type="submit" class="btn btn-success btn-round-custom pull-right"
-                        *ngIf="(sellingPriceVatIncl * qty) - discount >= 0" (click)="saveDetail()"
-                        id="saveSalesOrderBtn" data-dismiss="modal" style="margin: 10px;">Save</button>
-                                            </td>
-                                        </tr>
-                                    </tbody>
-                                </table>
-                            </div>
                             <div class="col-md-12">
                                 <!-- <div class="d-flex align-items-center mb-3">
                                     <h5 class="font-weight-bold mb-0">Order Details  .</h5>
-                                    <button class="btn btn-success rounded-circle mr-2" (click)="clearShopProduct()" style="width: 40px; height: 40px; padding: 0; display: flex; justify-content: center; align-items: center;" data-toggle="modal" data-target="#sales-order-detail-modal">+</button>
+                                    <button class="btn btn-success rounded-circle mr-2" (click)="clearRestaurantDineable()" style="width: 40px; height: 40px; padding: 0; display: flex; justify-content: center; align-items: center;" data-toggle="modal" data-target="#sales-order-detail-modal">+</button>
                                 </div> -->
                                 <div class="d-flex align-items-center mb-3">
-                                    <!-- <button class="btn btn-success btn-round-custom" (click)="clearShopProduct()"
-                                        data-toggle="modal" data-target="#sales-order-detail-modal">Add Items</button> -->
+                                    <button class="btn btn-success btn-round-custom" (click)="clearRestaurantDineable()" data-toggle="modal" data-target="#sales-order-detail-modal">Add Items</button>
                                 </div>
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-hover">
                                         <thead class="thead-light">
-                                            <tr>
-                                                <th scope="col">SN</th>
+                                            <tr><th scope="col">SN</th>
                                                 <th scope="col">Code</th>
                                                 <th scope="col">Name</th>
-                                                <!-- <th scope="col">UOM</th> -->
+                                                <th scope="col">UOM</th>
                                                 <th scope="col">Qty</th>
                                                 <th scope="col">Unit Price</th>
-                                                <!-- <th scope="col">Discount</th> -->
+                                                <th scope="col">Discount</th>
                                                 <th scope="col">Amount</th>
                                                 <th scope="col">Action</th>
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr *ngFor="let item of shopSalesOrder.shopSalesOrderDetails">
+                                            <tr *ngFor="let item of restaurantSalesOrder.restaurantSalesOrderDetails">
                                                 <td>{{item.sn}}</td>
-                                                <td>{{item.productCode}}</td>
-                                                <td>{{item.productName}}</td>
-                                                <!-- <td>{{item.baseUom}}</td> -->
+                                                <td>{{item.dineableCode}}</td>
+                                                <td>{{item.dineableName}}</td>
+                                                <td>{{item.baseUom}}</td>
                                                 <td>{{item.qty}}</td>
-                                                <td style="text-align: right;">{{item.sellingPriceVatIncl |
-                                                    currency:'':''}}</td>
-                                                <!-- <td style="text-align: right;">{{item.discount | currency:'':''}}</td> -->
+                                                <td style="text-align: right;">{{item.sellingPriceVatIncl | currency:'':''}}</td>
+                                                <td style="text-align: right;">{{item.discount | currency:'':''}}</td>
                                                 <td style="text-align: right;">{{item.amount | currency:'':''}}</td>
                                                 <td>
                                                     <!-- <button class="btn btn-sm btn-success btn-round-custom">Edit</button> -->
-                                                    <button class="btn btn-sm btn-danger btn-round-custom"
-                                                        (click)="removeDetail(item.id)">Remove</button>
+                                                    <button class="btn btn-sm btn-danger btn-round-custom" (click)="removeDetail(item.id)">Remove</button>
                                                 </td>
                                             </tr>
-
-                                            <tr *ngIf="shopSalesOrder.shopSalesOrderDetails.length > 0">
+            
+                                            <tr *ngIf="restaurantSalesOrder.restaurantSalesOrderDetails.length > 0">
                                                 <td></td>
                                                 <td></td>
                                                 <td></td>
@@ -233,15 +159,14 @@
                                                 <td></td>
                                                 <td></td>
                                                 <td style="font-weight: bold;">Total</td>
-                                                <td style="text-align: right; font-weight: bold;">{{totalAmount |
-                                                    currency:'':''}}</td>
+                                                <td style="text-align: right; font-weight: bold;">{{totalAmount | currency:'':''}}</td>
                                                 <td></td>
                                             </tr>
-
-
+                    
+                    
                                             <!-- <tr>
                                                 <td>ITEM001</td>
-                                                <td>Product A</td>
+                                                <td>Dineable A</td>
                                                 <td>PCS</td>
                                                 <td>10</td>
                                                 <td>$15.00</td>
@@ -253,7 +178,7 @@
                                             </tr>
                                             <tr>
                                                 <td>ITEM002</td>
-                                                <td>Product B</td>
+                                                <td>Dineable B</td>
                                                 <td>BOX</td>
                                                 <td>5</td>
                                                 <td>$30.00</td>
@@ -265,7 +190,7 @@
                                             </tr>
                                             <tr>
                                                 <td>ITEM003</td>
-                                                <td>Product C</td>
+                                                <td>Dineable C</td>
                                                 <td>LTR</td>
                                                 <td>20</td>
                                                 <td>$10.00</td>
@@ -281,9 +206,9 @@
                             </div>
                         </div>
                     </div>
-
-
-                </div>
+            
+            
+                    </div>
             </div>
 
 
@@ -297,7 +222,7 @@
 
 
 
-
+            
         </div>
     </div>
 </div>
@@ -310,13 +235,12 @@
 
 
 
-
+    
 
 
 
 <!-- Modal -->
-<div class="modal fade" id="sales-order-detail-modal" tabindex="-1" role="dialog"
-    aria-labelledby="salesOrderModalDetailLabel" aria-hidden="true">
+<div class="modal fade" id="sales-order-detail-modal" tabindex="-1" role="dialog" aria-labelledby="salesOrderModalDetailLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -337,28 +261,41 @@
 
 
                 <div class="container mt-4" style="width: 50%;">
-                    <!-- <label for="productSearch" class="form-label">Search Product:</label> -->
+                    <!-- <label for="dineableSearch" class="form-label">Search Dineable:</label> -->
                     <div class="dropdown">
-                        <input type="text" id="productSearch" class="form-control" [(ngModel)]="searchTerm"
-                            (input)="searchProducts()" (focus)="isDropdownOpen = true"
-                            placeholder="Type to search products..." autocomplete="off" />
-                        <div class="dropdown-menu show mt-1" *ngIf="isDropdownOpen && filteredProducts.length > 0"
-                            style="max-height: 200px; overflow-y: auto; width: 100%;">
-                            <button class="dropdown-item form-control" *ngFor="let product of filteredProducts"
-                                (click)="selectProduct(product)">
-                                {{ product.name }}
-                            </button>
-                        </div>
-
-                        <!-- <div class="dropdown-menu show mt-1 text-muted" *ngIf="isDropdownOpen && filteredProducts.length === 0">
-                        No products found.
+                      <input
+                        type="text"
+                        id="dineableSearch"
+                        class="form-control"
+                        [(ngModel)]="searchTerm"
+                        (input)="searchDineables()"
+                        (focus)="isDropdownOpen = true"
+                        placeholder="Type to search dineables..."
+                        autocomplete="off"
+                      />
+                      <div
+                        class="dropdown-menu show mt-1"
+                        *ngIf="isDropdownOpen && filteredDineables.length > 0"
+                        style="max-height: 200px; overflow-y: auto; width: 100%;"
+                      >
+                        <button
+                          class="dropdown-item form-control"
+                          *ngFor="let dineable of filteredDineables"
+                          (click)="selectDineable(dineable)"
+                        >
+                          {{ dineable.name }}
+                        </button>
+                      </div>
+                  
+                      <!-- <div class="dropdown-menu show mt-1 text-muted" *ngIf="isDropdownOpen && filteredDineables.length === 0">
+                        No dineables found.
                       </div> -->
                     </div>
-
+                    
                 </div>
 
 
-
+                
 
 
 
@@ -376,11 +313,11 @@
                         type="text" 
                         [(ngModel)]="searchKey" 
                         (ngModelChange)="onInputChange($event)" 
-                        (change)="onProductSelected()" 
-                        list="productList" 
+                        (change)="onDineableSelected()" 
+                        list="dineableList" 
                         autocomplete="off">
-                    <datalist id="productList" *ngIf="searchedProducts.length > 0">
-                        <option *ngFor="let product of searchedProducts" [value]="product.name"></option>
+                    <datalist id="dineableList" *ngIf="searchedDineables.length > 0">
+                        <option *ngFor="let dineable of searchedDineables" [value]="dineable.name"></option>
                     </datalist>
                 </div> -->
 
@@ -389,40 +326,34 @@
 
                 <div class="row">
                     <div class="col-md-6">
-                        <input class="form-control" type="hidden" [(ngModel)]="productId">
-                        <p>Product Code</p>
-                        <span class="form-control">{{productCode}}</span>
-                        <p>Product Name</p>
-                        <span class="form-control">{{productName}}</span>
-                        <p>Product Description</p>
-                        <span class="form-control">{{productDescription}}</span>
-                        <p>Product Base UOM</p>
+                        <input class="form-control" type="hidden" [(ngModel)]="dineableId">
+                        <p>Dineable Code</p>
+                        <span class="form-control">{{dineableCode}}</span>
+                        <p>Dineable Name</p>
+                        <span class="form-control">{{dineableName}}</span>
+                        <p>Dineable Description</p>
+                        <span class="form-control">{{dineableDescription}}</span>
+                        <p>Dineable Base UOM</p>
                         <span class="form-control">{{baseUom}}</span>
                     </div>
                     <div class="col-md-6">
                         <p>Price</p>
-                        <input class="form-control" type="text" [(ngModel)]="sellingPriceVatIncl"
-                            style="text-align: right;" readonly>
+                        <input class="form-control" type="text" [(ngModel)]="sellingPriceVatIncl" style="text-align: right;" readonly>
                         <p>Qty</p>
                         <hr>
                         <input class="form-control" type="number" [(ngModel)]="qty" style="text-align: center;" min="0">
                         <p>Discount</p>
-                        <input class="form-control" type="text" [(ngModel)]="discount" style="text-align: right;"
-                            min="0">
+                        <input class="form-control" type="text" [(ngModel)]="discount" style="text-align: right;" min="0">
                         <p>Amount</p>
-                        <span class="form-control" style="text-align: right;">{{(sellingPriceVatIncl * qty) - discount |
-                            currency:'':''}}</span>
+                        <span class="form-control" style="text-align: right;">{{(sellingPriceVatIncl * qty) - discount | currency:'':''}}</span>
                     </div>
                 </div>
             </div>
             <div class="row">
                 <div class="col-md-12">
                     <hr>
-                    <button type="button" class="btn btn-danger btn-round-custom" data-dismiss="modal"
-                        style="margin: 10px;">Close</button>
-                    <button type="submit" class="btn btn-success btn-round-custom pull-right"
-                        *ngIf="(sellingPriceVatIncl * qty) - discount >= 0" (click)="saveDetail()"
-                        id="saveSalesOrderBtn" data-dismiss="modal" style="margin: 10px;">Save</button>
+                    <button type="button" class="btn btn-danger btn-round-custom" data-dismiss="modal" style="margin: 10px;">Close</button>
+                    <button type="submit" class="btn btn-success btn-round-custom pull-right" *ngIf="(sellingPriceVatIncl * qty) - discount >= 0" (click)="saveDetail()" id="saveSalesOrderBtn" data-dismiss="modal" style="margin: 10px;">Save</button>
                 </div>
             </div>
         </div>
@@ -431,8 +362,7 @@
 
 
 <!-- Modal -->
-<div class="modal fade" id="sales-order-modal" tabindex="-1" role="dialog" aria-labelledby="salesOrderModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="sales-order-modal" tabindex="-1" role="dialog" aria-labelledby="salesOrderModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -444,26 +374,23 @@
             <div class="modal-body">
                 <form id="salesOrderForm">
                     <div class="row">
-                        <!-- Product Code -->
-                        <div class="col-md-3"></div>
+                        <!-- Dineable Code -->
+                        <div class="col-md-3"></div> 
                         <div class="col-md-6 mb-3">
-                            <label for="productCode">Customer Name</label>
-                            <input type="text" class="form-control" [(ngModel)]="customerName" id="productCode"
-                                name="customerName" placeholder="Enter Customer Name">
+                            <label for="dineableCode">Customer Name</label>
+                            <input type="text" class="form-control" [(ngModel)]="customerName" id="dineableCode" name="customerName" placeholder="Enter Customer Name">
                         </div>
-
+                        
                     </div>
-
-
+                    
+                    
                 </form>
             </div>
             <div class="row">
                 <div class="col-md-12">
                     <hr>
-                    <button type="button" class="btn btn-danger btn-round-custom" data-dismiss="modal"
-                        style="margin: 10px;">Close</button>
-                    <button type="submit" class="btn btn-success btn-round-custom pull-right" (click)="save()"
-                        id="saveSalesOrderBtn" data-dismiss="modal" style="margin: 10px;">Save Order</button>
+                    <button type="button" class="btn btn-danger btn-round-custom" data-dismiss="modal" style="margin: 10px;">Close</button>
+                    <button type="submit" class="btn btn-success btn-round-custom pull-right" (click)="save()" id="saveSalesOrderBtn" data-dismiss="modal" style="margin: 10px;">Save Order</button>
                 </div>
             </div>
         </div>
@@ -471,8 +398,7 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="sales-order-list-modal" tabindex="-1" role="dialog" aria-labelledby="salesOrderModalLabel"
-    aria-hidden="true">
+<div class="modal fade" id="sales-order-list-modal" tabindex="-1" role="dialog" aria-labelledby="salesOrderModalLabel" aria-hidden="true">
     <div class="modal-dialog modal-lg" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -487,8 +413,7 @@
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords"
-                            placeholder="Search..." style="max-width: 8cm;">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
                     </div>
                 </div>
                 <br>
@@ -500,20 +425,18 @@
                                 <tr>
                                     <th scope="col">No</th>
                                     <th scope="col">Customer</th>
-                                    <th scope="col">Status</th>
+                                    <th scope="col">Status</th>                                   
                                     <th scope="col">Summary</th>
                                     <th scope="col">Action</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr
-                                    *ngFor="let shopSalesOrder of shopSalesOrders | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
-                                    <td>{{shopSalesOrder.no}}</td>
-                                    <td>{{shopSalesOrder.customerName}}</td>
-                                    <td>{{shopSalesOrder.status}}</td>
-                                    <td>{{shopSalesOrder.summary}}</td>
-                                    <td><button class="btn btn-success btn-round-custom"
-                                            (click)="get(shopSalesOrder.id)" data-dismiss="modal">Select</button></td>
+                                <tr *ngFor="let restaurantSalesOrder of restaurantSalesOrders | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                    <td>{{restaurantSalesOrder.no}}</td>
+                                    <td>{{restaurantSalesOrder.customerName}}</td>
+                                    <td>{{restaurantSalesOrder.status}}</td>
+                                    <td>{{restaurantSalesOrder.summary}}</td>
+                                    <td><button class="btn btn-success btn-round-custom" (click)="get(restaurantSalesOrder.id)" data-dismiss="modal">Select</button></td>
                                 </tr>
                             </tbody>
                         </table>
@@ -524,8 +447,11 @@
                         </div>
                     </div>
                 </div>
-
+                
             </div>
         </div>
     </div>
 </div>
+
+
+

@@ -830,6 +830,10 @@ export const menuItems = [
                         title: 'Shop',
                         routerLink: '/app/admin-unit/shop'
                     },
+                    {
+                        title: 'Restaurant',
+                        routerLink: '/app/admin-unit/restaurant'
+                    },
                     /*  
                     {
                          title: 'Department',
@@ -922,6 +926,11 @@ export const menuItems = [
                         title: 'Product',
                         show: true,
                         routerLink: '/app/inventory/product'
+                    },
+                    {
+                        title: 'Dineable',
+                        show: true,
+                        routerLink: '/app/inventory/dineable'
                     },
                     {
                         title: 'UOM',

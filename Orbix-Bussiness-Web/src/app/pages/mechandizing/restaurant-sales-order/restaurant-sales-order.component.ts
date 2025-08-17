@@ -9,15 +9,15 @@ import { PosReceiptPrinterService } from '@services/custom/pos-receipt-printer.s
 import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from 'src/app/auth.service';
 import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
-import { IShop } from 'src/app/domain/shop';
+import { IRestaurant } from 'src/app/domain/restaurant';
 import { environment } from 'src/environments/environment';
 import { HttpHeaders } from '@angular/common/http';
-import { IShopProduct } from 'src/app/domain/shop-product';
-import { IProduct } from 'src/app/domain/product';
-import { IShopSalesOrder, IShopSalesOrderDetail } from 'src/app/domain/shop-sales-order';
 
 import { ReceiptItem } from 'src/app/domain/receipt-item';
 import { ICustomer } from 'src/app/domain/customer';
+import { IRestaurantDineable } from 'src/app/domain/restaurant-dineable';
+import { IDineable } from 'src/app/domain/dineable';
+import { IRestaurantSalesOrder, IRestaurantSalesOrderDetail } from 'src/app/domain/restaurant-sales-order';
 
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
@@ -37,33 +37,33 @@ const API_URL = environment.apiUrl;
   styleUrl: './restaurant-sales-order.component.scss'
 })
 export class RestaurantSalesOrderComponent {
-shopId: number;
+restaurantId: number;
 
-  shopProducts : IShopProduct[] = []
+  restaurantDineables : IRestaurantDineable[] = []
 
   searchKey : string = ''
 
-  productId : any
-  productName : string = ''
-  productDescription : string = ''
-  productCode : string = ''
+  dineableId : any
+  dineableName : string = ''
+  dineableDescription : string = ''
+  dineableCode : string = ''
   discount : number = 0
 
-  selectedShop : IShop
+  selectedRestaurant : IRestaurant
 
-  shopName : string = ''
+  restaurantName : string = ''
 
-  searchedProducts : IProduct[] = []
+  searchedDineables : IDineable[] = []
 
   isUserTyping: boolean = true; // Flag to detect user typing
 
   showImportList : boolean = false
 
-  importProducts : IProduct[] = []
+  importDineables : IDineable[] = []
 
-  shopSalesOrders : IShopSalesOrder[] = []
+  restaurantSalesOrders : IRestaurantSalesOrder[] = []
 
-  shopSalesOrderId : any = null
+  restaurantSalesOrderId : any = null
 
   customerName : string = ''
 
@@ -85,12 +85,12 @@ shopId: number;
   ) {}
 
   async ngOnInit(): Promise<void> {
-    // Retrieve the shop_id query parameter from the URL
+    // Retrieve the restaurant_id query parameter from the URL
     this.route.queryParams.subscribe(params => {
-      this.shopId = params['shop_id'];
-      console.log('Shop ID:', this.shopId);
+      this.restaurantId = params['restaurant_id'];
+      console.log('Restaurant ID:', this.restaurantId);
     });
-    await this.loadSelectedShop()
+    await this.loadSelectedRestaurant()
     //await this.getAllPendingOrders()
   }
 
@@ -99,35 +99,35 @@ shopId: number;
 
 
   searchTerm: string = '';
-  filteredProducts: any[] = [];
-  selectedProduct: any | null = null;
+  filteredDineables: any[] = [];
+  selectedDineable: any | null = null;
   isDropdownOpen: boolean = false;
-  searchProducts(): void {
+  searchDineables(): void {
     const options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     
     }
-    this.filteredProducts = [];
+    this.filteredDineables = [];
     if (this.searchTerm.trim().length >= 2) {
       this.http
-      //await this.http.get<IProduct[]>(API_URL+'/shop_products/get_products_by_shop_containing?product_name_like=' + searchKey + '&shop_id=' + this.shopId , options)
-        .get<IProduct[]>(API_URL+'/shop_products/get_products_by_shop_containing?product_name_like=' + this.searchTerm + '&shop_id=' + this.shopId , options)
+      //await this.http.get<IDineable[]>(API_URL+'/restaurant_dineables/get_dineables_by_restaurant_containing?dineable_name_like=' + searchKey + '&restaurant_id=' + this.restaurantId , options)
+        .get<IDineable[]>(API_URL+'/restaurant_dineables/get_dineables_by_restaurant_containing?dineable_name_like=' + this.searchTerm + '&restaurant_id=' + this.restaurantId , options)
         .subscribe(
-          (data) => (this.filteredProducts = data),
-          (error) => console.error('Error fetching products:', error)
+          (data) => (this.filteredDineables = data),
+          (error) => console.error('Error fetching dineables:', error)
         );
     } else {
-      this.filteredProducts = [];
+      this.filteredDineables = [];
     }
   }
 
-  selectProduct(product: any): void {
-    this.selectedProduct = product;
-    this.searchTerm = product.name;
+  selectDineable(dineable: any): void {
+    this.selectedDineable = dineable;
+    this.searchTerm = dineable.name;
     this.isDropdownOpen = false;
     
-    this.searchProductInShop(product.id)
-    this.filteredProducts = [];
+    this.searchDineableInRestaurant(dineable.id)
+    this.filteredDineables = [];
   }
 
 
@@ -143,18 +143,18 @@ shopId: number;
 
 
 
-  loadSelectedShop = async () => {
+  loadSelectedRestaurant = async () => {
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
   
-      await this.http.get<IShop>(API_URL+'/shops/get_selected_shop?shop_id=' + this.shopId , options)
+      await this.http.get<IRestaurant>(API_URL+'/restaurants/get_selected_restaurant?restaurant_id=' + this.restaurantId , options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.shopName = data!.name
-            this.selectedShop = data!
+            this.restaurantName = data!.name
+            this.selectedRestaurant = data!
             
           }
         )
@@ -171,16 +171,16 @@ shopId: number;
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      this.shopSalesOrders = []
+      this.restaurantSalesOrders = []
     
-      await this.http.get<IShopSalesOrder[]>(API_URL+'/shop_sales_orders/get_all_pending_by_shop?shop_id=' + this.shopId, options)
+      await this.http.get<IRestaurantSalesOrder[]>(API_URL+'/restaurant_sales_orders/get_all_pending_by_restaurant?restaurant_id=' + this.restaurantId, options)
       .toPromise()
       .then(
         data => {
           var sn = 1
           data?.forEach(element => {
             element.sn = sn
-            this.shopSalesOrders.push(element)
+            this.restaurantSalesOrders.push(element)
             sn = sn + 1
           })
           console.log(data)
@@ -188,7 +188,7 @@ shopId: number;
       )
     }
 
-    shopSalesOrder! : IShopSalesOrder
+    restaurantSalesOrder! : IRestaurantSalesOrder
 
     totalAmount : number = 0
 
@@ -196,30 +196,30 @@ shopId: number;
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      await this.http.get<IShopSalesOrder>(API_URL+'/shop_sales_orders/get?id=' + id, options)
+      await this.http.get<IRestaurantSalesOrder>(API_URL+'/restaurant_sales_orders/get?id=' + id, options)
       .toPromise()
       .then(
         data => {
           //this.showUomData(data!)
           console.log(data)
 
-          this.shopSalesOrder = data!
+          this.restaurantSalesOrder = data!
 
-          this.shopSalesOrderId = this.shopSalesOrder.id
+          this.restaurantSalesOrderId = this.restaurantSalesOrder.id
 
           this.customerName = data!.customerName
 
           this.totalAmount = 0
 
           var sn = 1
-          this.shopSalesOrder.shopSalesOrderDetails.forEach(element => {
+          this.restaurantSalesOrder.restaurantSalesOrderDetails.forEach(element => {
             element.sn = sn
             this.totalAmount = this.totalAmount + ((+element.sellingPriceVatIncl) * element.qty - (+element.discount))
             sn = sn + 1
             
           })
 
-          this.receiptData = this.shopSalesOrder.shopSalesOrderDetails
+          this.receiptData = this.restaurantSalesOrder.restaurantSalesOrderDetails
 
         }
       )
@@ -231,17 +231,17 @@ shopId: number;
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
     
-      var shopSalesOrder = {
+      var restaurantSalesOrder = {
         id : null,
         no : null,
         summary : null,
-        shopId : this.shopId,
+        restaurantId : this.restaurantId,
         customerName : this.customerName
       }
     
-      if(shopSalesOrder.id === null){
+      if(restaurantSalesOrder.id === null){
         /**Create new uom */
-        await this.http.post<IShopSalesOrder>(API_URL+'/shop_sales_orders/create', shopSalesOrder, options)
+        await this.http.post<IRestaurantSalesOrder>(API_URL+'/restaurant_sales_orders/create', restaurantSalesOrder, options)
         .toPromise()
         .then(
           data => {
@@ -264,7 +264,7 @@ shopId: number;
         )
       }else{
         /**Update an existing uom */
-        await this.http.post<IShopSalesOrder>(API_URL+'/shop_sales_orders/update', shopSalesOrder, options)
+        await this.http.post<IRestaurantSalesOrder>(API_URL+'/restaurant_sales_orders/update', restaurantSalesOrder, options)
         .toPromise()
         .then(
           data => {
@@ -289,28 +289,28 @@ shopId: number;
     }
 
     clearOrder(){
-      this.shopSalesOrder!
-      this.shopSalesOrderId = null
+      this.restaurantSalesOrder!
+      this.restaurantSalesOrderId = null
       this.customerName = ''
     }
 
     // Triggered on every keystroke
   onInputChange(searchText: string): void {
     if (this.isUserTyping) {
-      this.getShopProductLike(searchText);
+      this.getRestaurantDineableLike(searchText);
     }
   }
 
-  onProductSelected(): void {
-    const selectedProduct = this.searchedProducts.find(
-      (product) => product.name === this.searchKey
+  onDineableSelected(): void {
+    const selectedDineable = this.searchedDineables.find(
+      (dineable) => dineable.name === this.searchKey
     );
 
-    if (selectedProduct) {
-      this.searchProductInShop(selectedProduct.id)
-      this.searchedProducts = []; // Clear suggestions after selection
+    if (selectedDineable) {
+      this.searchDineableInRestaurant(selectedDineable.id)
+      this.searchedDineables = []; // Clear suggestions after selection
     } else {
-      console.warn('Selected product is not in the suggestions list');
+      console.warn('Selected dineable is not in the suggestions list');
     }
 
     // Allow typing detection after a short delay
@@ -318,21 +318,21 @@ shopId: number;
     
   }
 
-  searchProduct = async (id : any) => {
+  searchDineable = async (id : any) => {
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      this.clearShopProduct()
+      this.clearRestaurantDineable()
   
-      await this.http.get<IProduct>(API_URL+'/products/get?id=' + id , options)
+      await this.http.get<IDineable>(API_URL+'/dineables/get?id=' + id , options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.productId = data!.id
-            this.productCode = data!.code
-            this.productName = data!.name
-            this.productDescription =data!.description
+            this.dineableId = data!.id
+            this.dineableCode = data!.code
+            this.dineableName = data!.name
+            this.dineableDescription =data!.description
 
            
             
@@ -347,7 +347,7 @@ shopId: number;
     }
 
     salesOrderDetailId : any = null
-    shopProductId : any = null
+    restaurantDineableId : any = null
     vat : number = 0
     costPriceVatIncl : number = 0
     sellingPriceVatIncl : number = 0
@@ -361,16 +361,16 @@ shopId: number;
 
     qty : number = 0
 
-    clearShopProduct(){
-      this.productId = null
+    clearRestaurantDineable(){
+      this.dineableId = null
 
       this.searchTerm = ''
     
       this.salesOrderDetailId = null
       this.searchKey = ''
-      this.productName = ''
-      this.productCode = ''
-      this.productDescription = ''
+      this.dineableName = ''
+      this.dineableCode = ''
+      this.dineableDescription = ''
       this.vat = 0
       this.costPriceVatIncl = 0
       this.sellingPriceVatIncl = 0
@@ -386,21 +386,21 @@ shopId: number;
       }
 
 
-  searchProductInShop = async (product_id : any) => {
+  searchDineableInRestaurant = async (dineable_id : any) => {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    this.clearShopProduct()
+    this.clearRestaurantDineable()
 
-    await this.http.get<IShopProduct>(API_URL+'/shop_products/get_product_in_shop?product_id=' + product_id + '&shop_id=' + this.shopId , options)
+    await this.http.get<IRestaurantDineable>(API_URL+'/restaurant_dineables/get_dineable_in_restaurant?dineable_id=' + dineable_id + '&restaurant_id=' + this.restaurantId , options)
       .toPromise()
       .then(
         data => {
           console.log(data)
-          this.productId = data!.productId
-          this.productCode = data!.productCode
-          this.productName = data!.productName
-          this.productDescription = data!.productDescription
+          this.dineableId = data!.dineableId
+          this.dineableCode = data!.dineableCode
+          this.dineableName = data!.dineableName
+          this.dineableDescription = data!.dineableDescription
           this.vat = data!.vatRate * 100
           this.costPriceVatIncl = data!.costPriceVatIncl
           this.sellingPriceVatIncl = data!.sellingPriceVatIncl
@@ -411,8 +411,6 @@ shopId: number;
           this.defaultReorderQty = data!.defaultReorderQty
           this.defaultReorderLevel = data!.defaultReorderLevel
           this.baseUom = data!.baseUom
-
-          this.searchTerm = this.productName
           
         }
       )
@@ -424,17 +422,17 @@ shopId: number;
     
   }
 
-  getShopProductLike = async (searchKey : string) => {
+  getRestaurantDineableLike = async (searchKey : string) => {
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
   
-      await this.http.get<IProduct[]>(API_URL+'/shop_products/get_products_by_shop_containing?product_name_like=' + searchKey + '&shop_id=' + this.shopId , options)
+      await this.http.get<IDineable[]>(API_URL+'/restaurant_dineables/get_dineables_by_restaurant_containing?dineable_name_like=' + searchKey + '&restaurant_id=' + this.restaurantId , options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.searchedProducts = data!
+            this.searchedDineables = data!
             
           }
         )
@@ -452,20 +450,20 @@ shopId: number;
 
       var detail = {
         id : this.salesOrderDetailId,
-        shopSalesOrderId : this.shopSalesOrderId,
-        productId : this.productId,
+        restaurantSalesOrderId : this.restaurantSalesOrderId,
+        dineableId : this.dineableId,
         discount : this.discount,
         qty : this.qty
       }
 
       if(detail.id === null){
         /**Create new detail */
-        this.http.post<IShopSalesOrderDetail>(API_URL+'/shop_sales_orders/create_detail', detail, options)
+        this.http.post<IRestaurantSalesOrderDetail>(API_URL+'/restaurant_sales_orders/create_detail', detail, options)
           .toPromise()
           .then(
             data => {
               console.log(data)
-              this.get(this.shopSalesOrderId)
+              this.get(this.restaurantSalesOrderId)
             }
           )
           .catch(error => {
@@ -475,12 +473,12 @@ shopId: number;
         ) 
       }else if(detail.id !== null){
         /**Update detail */
-        this.http.post<IShopSalesOrderDetail>(API_URL+'/shop_sales_orders/update_detail', detail, options)
+        this.http.post<IRestaurantSalesOrderDetail>(API_URL+'/restaurant_sales_orders/update_detail', detail, options)
           .toPromise()
           .then(
             data => {
               console.log(data)
-              this.get(this.shopSalesOrderId)
+              this.get(this.restaurantSalesOrderId)
             }
           )
           .catch(error => {
@@ -496,12 +494,12 @@ shopId: number;
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      this.http.get<IShopSalesOrderDetail>(API_URL+'/shop_sales_orders/remove_detail?shop_sales_order_detail_id=' + id + '&shop_sales_order_id=' + this.shopSalesOrderId, options)
+      this.http.get<IRestaurantSalesOrderDetail>(API_URL+'/restaurant_sales_orders/remove_detail?restaurant_sales_order_detail_id=' + id + '&restaurant_sales_order_id=' + this.restaurantSalesOrderId, options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.get(this.shopSalesOrderId)
+            this.get(this.restaurantSalesOrderId)
           }
         )
         .catch(error => {
@@ -518,12 +516,12 @@ shopId: number;
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      await this.http.post<IShopSalesOrder>(API_URL+'/shop_sales_orders/confirm?shop_sales_order_id=' + this.shopSalesOrderId + '&pay_code=' + this.payCode + '&pay_ref_no=' + this.payRefNo, null, options)
+      await this.http.post<IRestaurantSalesOrder>(API_URL+'/restaurant_sales_orders/confirm?restaurant_sales_order_id=' + this.restaurantSalesOrderId + '&pay_code=' + this.payCode + '&pay_ref_no=' + this.payRefNo, null, options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.get(this.shopSalesOrderId)
+            this.get(this.restaurantSalesOrderId)
             this.msg.showSuccessMessage('Order confirmed successifully')
             this.printReceipt()
           }
@@ -544,12 +542,12 @@ shopId: number;
       let options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       }
-      this.http.post<IShopSalesOrder>(API_URL+'/shop_sales_orders/cancel?shop_sales_order_id=' + this.shopSalesOrderId, null, options)
+      this.http.post<IRestaurantSalesOrder>(API_URL+'/restaurant_sales_orders/cancel?restaurant_sales_order_id=' + this.restaurantSalesOrderId, null, options)
         .toPromise()
         .then(
           data => {
             console.log(data)
-            this.get(this.shopSalesOrderId)
+            this.get(this.restaurantSalesOrderId)
             this.msg.showSuccessMessage('Order canceled successifully')
           }
         )
@@ -562,7 +560,7 @@ shopId: number;
 
 
 
-    receiptData : IShopSalesOrderDetail [] = []
+    receiptData : IRestaurantSalesOrderDetail [] = []
 
     printReceipt(){
     
@@ -581,14 +579,14 @@ shopId: number;
         this.receiptData.forEach(element => {
           item = new ReceiptItem()
           item.code = element.id
-          item.name = element.productName
+          item.name = element.dineableName
           item.amount = element.sellingPriceVatIncl * (+element.qty) - (+element.discount)
           item.qty = element.qty
           items.push(item)
         })
 
         var customer: ICustomer = {
-              name: this.customerName,
+              name: '',
               address: '',
               phone: ''
             }

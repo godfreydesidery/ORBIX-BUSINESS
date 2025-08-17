@@ -1,9 +1,6 @@
 package com.orbix.api.modules.adminunits;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
-
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
