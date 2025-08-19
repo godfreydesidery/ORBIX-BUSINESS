@@ -17,6 +17,8 @@ import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.Company;
 import com.orbix.api.modules.adminunits.CompanyRepository;
 import com.orbix.api.modules.adminunits.DayService;
+import com.orbix.api.modules.adminunits.Restaurant;
+import com.orbix.api.modules.adminunits.RestaurantRepository;
 import com.orbix.api.modules.adminunits.Shop;
 import com.orbix.api.modules.adminunits.ShopRepository;
 import com.orbix.api.modules.adminunits.ShopService;
@@ -36,8 +38,10 @@ public class ProductServiceController implements ProductService {
 	private final DayService dayService;
 	
 	private final ShopRepository shopRepository;
+	private final RestaurantRepository restaurantRepository;
 	
 	private final ShopProductRepository shopProductRepository;
+	private final RestaurantProductRepository restaurantProductRepository;
 	
 	/**
 	 * 
@@ -299,6 +303,36 @@ public class ProductServiceController implements ProductService {
 	    	boolean imported = false;
 	    	Optional<ShopProduct> shopProduct_ = shopProductRepository.findByProductAndShop(product, shop);
 	    	if(shopProduct_.isPresent()) {
+	    		imported = true;
+	    	}	    	
+	    	productResponses.add(productResponseDTOMapperWithImportedStatus(product, imported));
+	    	
+	    }
+
+	    // Map to DTOs
+	    return productResponses;
+	}
+	
+	@Override
+	public List<ProductResponseDTO> getCompanySellableProductsByRestaurant(Long restaurantId, HttpServletRequest request) {
+	    
+
+	    // Fetch company
+	    Company company = userService.getUserCompany(request);
+	    if (company == null) {
+	        throw new NotFoundException("Company not found for the user");
+	    }
+	    Restaurant restaurant = restaurantRepository.findById(restaurantId)
+	    	    .orElseThrow(() -> new NotFoundException("Restaurant not found"));
+
+	    // Fetch products
+	    List<Product> products = productRepository.findAllByCompanyAndSellable(company, true);
+	    List<ProductResponseDTO> productResponses = new ArrayList<>();
+	    
+	    for(Product product : products) {
+	    	boolean imported = false;
+	    	Optional<RestaurantProduct> restaurantProduct_ = restaurantProductRepository.findByProductAndRestaurant(product, restaurant);
+	    	if(restaurantProduct_.isPresent()) {
 	    		imported = true;
 	    	}	    	
 	    	productResponses.add(productResponseDTOMapperWithImportedStatus(product, imported));

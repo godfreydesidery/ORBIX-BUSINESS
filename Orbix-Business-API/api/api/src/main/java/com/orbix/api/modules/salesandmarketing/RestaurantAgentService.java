@@ -9,6 +9,7 @@ import com.orbix.api.modules.inventoryandprocurement.ProductRequestDTO;
 
 public interface RestaurantAgentService {
 	List<RestaurantAgentResponseDTO> getAllRestaurantAgentsByRestaurantId(Long restaurantId, HttpServletRequest request);
+	List<RestaurantAgentResponseDTO> getAvailableRestaurantAgentsByRestaurantId(Long restaurantId, HttpServletRequest request);
 	RestaurantAgentResponseDTO createAgent(RestaurantAgentRequestDTO agentRequest, HttpServletRequest request);
 	List<RestaurantBadgeResponseDTO> getAvailableBadgeByRestaurantId(Long restaurantId, HttpServletRequest request);
 	

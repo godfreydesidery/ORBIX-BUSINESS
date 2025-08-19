@@ -7,6 +7,11 @@ export interface IRestaurantSalesOrder {
     status : string
     restaurantId : number
 
+    createdAt : string
+
+    restaurantBadgeCode : string
+    restaurantAgentName : string
+
     restaurantSalesOrderDetails : IRestaurantSalesOrderDetail[]
 
     sn : number

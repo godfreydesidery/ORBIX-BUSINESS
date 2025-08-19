@@ -1023,17 +1023,15 @@ export class CashCollectionComponent {
     report.push([
       { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Good', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Plate No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Date Registered', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Days', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      // { text: 'Axle', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
     ]);
   
     // Add rows dynamically
     this.weighCashCollections.forEach((element) => {
-       total = total + (+element.amount) || 0;
-       discount = discount + (+element.discount) || 0;
 
       total += Number(element.amount) || 0;
       discount += Number(element.discount) || 0;
@@ -1041,9 +1039,9 @@ export class CashCollectionComponent {
       report.push([
         { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: `${element.ownerFirstName || ''}`, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.goodName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.regNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.createdDateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.days || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
+        // { text: element. || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
         { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
         { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       ]);
@@ -1052,7 +1050,6 @@ export class CashCollectionComponent {
     // Add summary row
     report.push([
       { text: ''},
-      {},
       {},
       {},
       { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
@@ -1080,7 +1077,7 @@ export class CashCollectionComponent {
         {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         {
           table: {
-            widths: [25, 100, 100, 60, 50, 80, 80],
+            widths: [25, 100, 100, 60, 80, 80],
             body: report,
           },
         },

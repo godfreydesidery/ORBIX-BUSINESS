@@ -9,6 +9,7 @@ public class RestaurantSalesOrderRequestDTO {
 	String summary;
 	String status;	
     Long restaurantId;
+    Long restaurantAgentId;
     
     String customerName;
 }

@@ -38,6 +38,9 @@
                         <button class="btn btn-success btn-round-custom"
                             [routerLink]="'/app/mechandizing/restaurant-product-stock-status'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Stock Status</button>
+                        <button class="btn btn-success btn-round-custom"
+                            [routerLink]="'/app/mechandizing/import-restaurant-product'"
+                            [queryParams]="{ restaurant_id: selectedRestaurantId }">Import Product</button>
                         <!-- <button class="btn btn-success btn-round-custom"
                             [routerLink]="'/app/mechandizing/restaurant-product-stock-status'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Stock Status</button> -->
@@ -55,12 +58,15 @@
                         <button class="btn btn-success btn-round-custom"
                             [routerLink]="'/app/mechandizing/restaurant-agent'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Agents</button>
+                        <button class="btn btn-success btn-round-custom"
+                            [routerLink]="'/app/mechandizing/restaurant-dineable-stock-status'"
+                            [queryParams]="{ restaurant_id: selectedRestaurantId }">Menu Price List</button>
                         <!-- <button class="btn btn-success btn-round-custom"
                             [routerLink]="'/app/mechandizing/restaurant-product-stock-log'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Stock Card</button> -->
                     </div>
 
-                    <div class="col-md-12">
+                    <!-- <div class="col-md-12">
                         <div class="row justify-content-center">
                             <div class="col-md-3" style="margin-left: 20px;">
                                 <div class="alert alert-info alert-dismissible fade show" *ngIf="underStock > 0"
@@ -93,7 +99,7 @@
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> -->
 
                 </div>
             </div>

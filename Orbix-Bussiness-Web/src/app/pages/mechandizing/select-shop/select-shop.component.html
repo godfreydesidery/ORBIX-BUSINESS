@@ -45,7 +45,7 @@
                         <button class="btn btn-success btn-round-custom"
                             [routerLink]="'/app/mechandizing/import-product'"
                             [queryParams]="{ shop_id: selectedShopId }">Import Product</button>
-                            <button class="btn btn-success btn-round-custom"
+                        <button class="btn btn-success btn-round-custom"
                             [routerLink]="'/app/mechandizing/shop-product-stock-log'"
                             [queryParams]="{ shop_id: selectedShopId }">Stock Card</button>
                     </div>
@@ -59,7 +59,8 @@
                                         aria-label="Close">
                                         <span aria-hidden="true" style="color: black;">&times;</span>
                                     </button>
-                                    <strong style="color: black; font-size: larger;">{{underStock}} Items are under stocked! </strong> <br>
+                                    <strong style="color: black; font-size: larger;">{{underStock}} Items are under
+                                        stocked! </strong> <br>
                                     <span [routerLink]="'/app/mechandizing/shop-product-stock-status-under'"
                                         [queryParams]="{ shop_id: selectedShopId }"
                                         style="color: red; cursor: pointer; font-size: large;">
@@ -73,9 +74,9 @@
                                         aria-label="Close">
                                         <span aria-hidden="true" style="color: black;">&times;</span>
                                     </button>
-                                    <strong style="color: black; font-size: larger;">{{outofStock}} Items are out of stock! </strong> <br>
-                                    <span
-                                        [routerLink]="'/app/mechandizing/shop-product-stock-status-out'"
+                                    <strong style="color: black; font-size: larger;">{{outofStock}} Items are out of
+                                        stock! </strong> <br>
+                                    <span [routerLink]="'/app/mechandizing/shop-product-stock-status-out'"
                                         [queryParams]="{ shop_id: selectedShopId }"
                                         style="color: red; cursor: pointer; font-size: large;">
                                         Click Here to View</span>

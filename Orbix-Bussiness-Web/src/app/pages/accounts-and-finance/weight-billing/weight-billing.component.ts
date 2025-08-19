@@ -682,9 +682,9 @@ export class WeightBillingComponent {
 
   printReceipt() {
 
-    if (this.toPrintReceipt == false) {
-      return
-    }
+    // if (this.toPrintReceipt == false) {
+    //   return
+    // }
 
     if (this.receiptData.length == 0) {
       this.msg.showErrorMessage3('No data to print')

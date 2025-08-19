@@ -16,6 +16,7 @@ import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.Restaurant;
 import com.orbix.api.modules.adminunits.RestaurantRepository;
+import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.inventoryandprocurement.Product;
 import com.orbix.api.modules.inventoryandprocurement.ProductRequestDTO;
 
@@ -32,6 +33,7 @@ public class RestaurantAgentServiceController implements RestaurantAgentService 
 	private final RestaurantAgentRepository restaurantAgentRepository;
 	
 	private final RestaurantBadgeRepository restaurantBadgeRepository;
+	private final UserService userService;
 
 	@Override
 	public List<RestaurantAgentResponseDTO> getAllRestaurantAgentsByRestaurantId(Long restaurantId, HttpServletRequest request) {
@@ -39,9 +41,25 @@ public class RestaurantAgentServiceController implements RestaurantAgentService 
 		Restaurant restaurant = restaurantRepository.findById(restaurantId)
 			    .orElseThrow(() -> new NotFoundException("Restaurant not found, with id " + restaurantId));
 
-		return restaurantAgentRepository.findAllByRestaurant(restaurant).stream()
-		        .map(this::agentToDto)
-		        .toList();
+		return restaurantAgentRepository.findAllByRestaurant(restaurant)
+	            .stream()
+	            .map(this::agentToDto)
+	            .toList();
+	}
+	
+	@Override
+	public List<RestaurantAgentResponseDTO> getAvailableRestaurantAgentsByRestaurantId(Long restaurantId, HttpServletRequest request) {
+		
+		Restaurant restaurant = restaurantRepository.findById(restaurantId)
+			    .orElseThrow(() -> new NotFoundException("Restaurant not found, with id " + restaurantId));
+
+		return Optional.ofNullable(
+		           restaurantAgentRepository.findAllByRestaurantAndRestaurantBadgeNotNull(restaurant)
+		       )
+		       .orElseGet(List::of)  // if null, use empty list
+		       .stream()
+		       .map(this::agentToDto)
+		       .toList();
 	}
 
 	@Override
@@ -53,6 +71,7 @@ public class RestaurantAgentServiceController implements RestaurantAgentService 
 		agent.setName(agentRequest.getName());
 		agent.setPhoneNo(agentRequest.getPhoneNo());
 		agent.setRestaurant(restaurant);
+		agent.setCreatedByUser(userService.getUser(request));
 		agent = restaurantAgentRepository.save(agent);
 		
 		return agentToDto(agent);

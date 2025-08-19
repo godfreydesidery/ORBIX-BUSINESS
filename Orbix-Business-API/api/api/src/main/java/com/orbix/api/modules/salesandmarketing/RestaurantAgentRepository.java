@@ -1,5 +1,6 @@
 package com.orbix.api.modules.salesandmarketing;
 
+import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -13,5 +14,7 @@ public interface RestaurantAgentRepository extends JpaRepository<RestaurantAgent
 	List<RestaurantAgent> findAllByRestaurantAndRestaurantBadgeIsNotNull(Restaurant restaurant);
 	
 	boolean existsByRestaurantBadgeId(Long restaurantBadgeId);
+
+	List<RestaurantAgent> findAllByRestaurantAndRestaurantBadgeNotNull(Restaurant restaurant);
 
 }

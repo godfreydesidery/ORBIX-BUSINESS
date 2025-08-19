@@ -139,6 +139,12 @@ export const routes: Routes = [
         data : { breadcrumb : 'Mechandizing/Select Restaurant'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'mechandizing/restaurant-dineable-stock-status',
+        loadComponent: () => import('./mechandizing/restaurant-dineable-stock-status/restaurant-dineable-stock-status.component').then(c => c.RestaurantDineableStockStatusComponent),
+        data : { breadcrumb : 'Mechandizing/Restaurant Dineable Stock Status'},
+        canActivate : [AuthGuard]
+      },
 
       {
         path : 'mechandizing/shop-product-stock-status',
@@ -179,6 +185,12 @@ export const routes: Routes = [
         path : 'mechandizing/import-product',
         loadComponent: () => import('./mechandizing/import-product/import-product.component').then(c => c.ImportProductComponent),
         data : { breadcrumb : 'Mechandizing/Import Product'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/import-restaurant-product',
+        loadComponent: () => import('./mechandizing/import-restaurant-product/import-restaurant-product.component').then(c => c.ImportRestaurantProductComponent),
+        data : { breadcrumb : 'Mechandizing/Import Restaurant Product'},
         canActivate : [AuthGuard]
       },
       {

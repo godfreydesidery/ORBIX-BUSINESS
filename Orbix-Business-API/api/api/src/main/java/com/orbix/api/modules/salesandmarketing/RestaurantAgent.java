@@ -17,10 +17,13 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.orbix.api.modules.adminunits.Restaurant;
+import com.orbix.api.modules.identityandaccess.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data 
@@ -39,6 +42,13 @@ public class RestaurantAgent {
 	private String phoneNo;
 	
 	private boolean active = false;
+	
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "created_by_user_id", nullable = false, updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User createdByUser;
 	
 	@OneToOne(targetEntity = RestaurantBadge.class, fetch = FetchType.EAGER,  optional = true)
     @JoinColumn(name = "restaurant_badge_id", nullable = true , updatable = true)

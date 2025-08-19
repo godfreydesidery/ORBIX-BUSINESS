@@ -56,6 +56,18 @@ public class RestaurantSalesOrder {
     @Column(nullable = false)
 	WorkFlowStatus status = WorkFlowStatus.PENDING;
 	
+	@ManyToOne(targetEntity = RestaurantAgent.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "restaurant_agent_id", nullable = false , updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@JsonIgnoreProperties("restaurantSalesOrders")
+    private RestaurantAgent restaurantAgent;
+	
+	@ManyToOne(targetEntity = RestaurantBadge.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "restaurant_badge_id", nullable = false , updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@JsonIgnoreProperties("restaurantSalesOrders")
+    private RestaurantBadge restaurantBadge;
+	
 	@ManyToOne(targetEntity = Restaurant.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "restaurant_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)

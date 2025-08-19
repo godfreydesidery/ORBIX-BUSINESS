@@ -38,6 +38,13 @@ public class RestaurantAgentResource {
 				.body(restaurantAgentService.getAllRestaurantAgentsByRestaurantId(restaurantId, request));
 	}
 	
+	@GetMapping("/restaurants/get_available_agents")
+	public ResponseEntity<List<RestaurantAgentResponseDTO>> getAvailableAgents(
+			@RequestParam(name = "restaurant_id") Long restaurantId, HttpServletRequest request) {
+		return ResponseEntity.ok()
+				.body(restaurantAgentService.getAvailableRestaurantAgentsByRestaurantId(restaurantId, request));
+	}
+	
 	
 	@PostMapping("/restaurants/create_agent")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")

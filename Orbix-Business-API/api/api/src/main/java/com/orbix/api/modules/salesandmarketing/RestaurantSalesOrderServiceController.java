@@ -42,6 +42,7 @@ public class RestaurantSalesOrderServiceController implements RestaurantSalesOrd
 	private final RestaurantSalesOrderRepository restaurantSalesOrderRepository;
 	private final RestaurantSalesOrderDetailRepository restaurantSalesOrderDetailRepository;
 	private final RestaurantRepository restaurantRepository;
+	private final RestaurantAgentRepository restaurantAgentRepository;
 	private final UserService userService;
 	private final DayService dayService;
 	
@@ -95,10 +96,17 @@ public class RestaurantSalesOrderServiceController implements RestaurantSalesOrd
 		Restaurant restaurant = restaurantRepository.findById(restaurantSalesOrderRequest.getRestaurantId())
 			    .orElseThrow(() -> new NotFoundException("Restaurant not found, with id " + restaurantSalesOrderRequest.getRestaurantId()));
 		
+		RestaurantAgent restaurantAgent = restaurantAgentRepository.findById(restaurantSalesOrderRequest.getRestaurantAgentId())
+			    .orElseThrow(() -> new NotFoundException("Restaurant agent not found, with id " + restaurantSalesOrderRequest.getRestaurantAgentId()));
+		
+		if(restaurantAgent.getRestaurantBadge() == null) throw new InvalidOperationException("Agent does not have a badge");
+		
 		RestaurantSalesOrder restaurantSalesOrder = new RestaurantSalesOrder();
 		
 		restaurantSalesOrder.setNo(String.valueOf(Math.random()));
 		restaurantSalesOrder.setRestaurant(restaurant);
+		restaurantSalesOrder.setRestaurantAgent(restaurantAgent);
+		restaurantSalesOrder.setRestaurantBadge(restaurantAgent.getRestaurantBadge());
 		restaurantSalesOrder.setStatus(WorkFlowStatus.PENDING);
 		restaurantSalesOrder.setSummary(restaurantSalesOrderRequest.getSummary());
 		restaurantSalesOrder.setCustomerName(restaurantSalesOrderRequest.getCustomerName());
@@ -128,6 +136,9 @@ public class RestaurantSalesOrderServiceController implements RestaurantSalesOrd
 		restaurantSalesOrderResponse.setStatus(restaurantSalesOrder.getStatus().toString());
 		restaurantSalesOrderResponse.setSummary(restaurantSalesOrder.getSummary());
 		restaurantSalesOrderResponse.setCustomerName(restaurantSalesOrder.getCustomerName());
+		restaurantSalesOrderResponse.setRestaurantBadgeCode(restaurantSalesOrder.getRestaurantBadge().getCode());
+		restaurantSalesOrderResponse.setRestaurantAgentName(restaurantSalesOrder.getRestaurantAgent().getName());
+		restaurantSalesOrderResponse.setCreatedAt(restaurantSalesOrder.getCreatedDateTime().toString());
 		
 		return restaurantSalesOrderResponse;
 	}
@@ -142,6 +153,9 @@ public class RestaurantSalesOrderServiceController implements RestaurantSalesOrd
 		restaurantSalesOrderResponse.setStatus(restaurantSalesOrder.getStatus().toString());
 		restaurantSalesOrderResponse.setSummary(restaurantSalesOrder.getSummary());
 		restaurantSalesOrderResponse.setCustomerName(restaurantSalesOrder.getCustomerName());
+		restaurantSalesOrderResponse.setRestaurantBadgeCode(restaurantSalesOrder.getRestaurantBadge().getCode());
+		restaurantSalesOrderResponse.setRestaurantAgentName(restaurantSalesOrder.getRestaurantAgent().getName());
+		restaurantSalesOrderResponse.setCreatedAt(restaurantSalesOrder.getCreatedDateTime().toString());
 		
 		for(RestaurantSalesOrderDetail restaurantSalesOrderDetail : restaurantSalesOrder.getRestaurantSalesOrderDetails()) {
 			restaurantSalesOrderDetailResponses.add(restaurantSalesOrderDetailResponseDTOMapper(restaurantSalesOrderDetail));
@@ -212,9 +226,9 @@ public class RestaurantSalesOrderServiceController implements RestaurantSalesOrd
 			throw new InvalidOperationException("Invalid quantiy selected");
 		}
 		
-		if(restaurantSalesOrderDetailRepository.existsByRestaurantSalesOrderAndDineable(restaurantSalesOrder, dineable)) {
-			throw new InvalidOperationException("Dineable already present in order");
-		}
+//		if(restaurantSalesOrderDetailRepository.existsByRestaurantSalesOrderAndDineable(restaurantSalesOrder, dineable)) {
+//			throw new InvalidOperationException("Dineable already present in order");
+//		}
 		restaurantSalesOrderDetail.setQty(restaurantSalesOrderDetailRequest.getQty());
 		restaurantSalesOrderDetail.setRestaurantSalesOrder(restaurantSalesOrder);
 		

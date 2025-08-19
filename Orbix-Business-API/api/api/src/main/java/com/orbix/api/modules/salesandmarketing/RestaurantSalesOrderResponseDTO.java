@@ -15,5 +15,8 @@ public class RestaurantSalesOrderResponseDTO {
     String createdBy;
     String  createdAt;
     
+    String restaurantBadgeCode;
+    String restaurantAgentName;
+    
     List<RestaurantSalesOrderDetailResponseDTO> restaurantSalesOrderDetails;
 }
