@@ -38,4 +38,6 @@ export interface IRestaurantSalesOrderDetail {
     discount : number
     amount : number
     sn : number
+
+    status : string
 }

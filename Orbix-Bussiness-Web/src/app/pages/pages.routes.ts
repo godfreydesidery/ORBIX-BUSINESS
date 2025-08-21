@@ -145,6 +145,12 @@ export const routes: Routes = [
         data : { breadcrumb : 'Mechandizing/Restaurant Dineable Stock Status'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'mechandizing/restaurant-dineable-product',
+        loadComponent: () => import('./mechandizing/restaurant-dineable-product/restaurant-dineable-product.component').then(c => c.RestaurantDineableProductComponent),
+        data : { breadcrumb : 'Mechandizing/Restaurant Dineable Product'},
+        canActivate : [AuthGuard]
+      },
 
       {
         path : 'mechandizing/shop-product-stock-status',

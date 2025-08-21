@@ -110,9 +110,9 @@
                                             </li>
                                         </ul>
                                     </div>
-                                    <div class="card-footer text-right" *ngIf="payCode != ''">
-                                        <button class="btn btn-success btn-sm" (click)="confirmOrder()">Confirm
-                                            Order</button>
+                                    <div class="text-center" *ngIf="payCode != ''">
+                                        <button class="btn btn-outline-primary" (click)="confirmOrder()"><i class="fa fa-bank"></i>Confirm
+                                            Payment</button>
                                     </div>
                                 </div>
                             </div>
@@ -129,6 +129,11 @@
                                     <button class="btn btn-success btn-round-custom" (click)="clearRestaurantDineable()"
                                         data-toggle="modal" data-target="#sales-order-detail-modal">Add Items</button>
                                 </div> -->
+                                <div class="row">
+                                    <div class="col-sm-12">
+                                        <span class="form-control text-primary" style="text-align: center; font-size: x-large; font-weight: bolder;">CART-SIGHMAN-NO:: {{restaurantSalesOrder!.no}}</span>
+                                    </div>
+                                </div>
                                 <div class="table-responsive">
                                     <table class="table table-bordered table-hover">
                                         <thead class="thead-light">
@@ -190,6 +195,7 @@
                                             </tr>
                                         </tbody>
                                     </table>
+
                                     <table class="table table-bordered table-hover table-striped table-sm">
                                         <thead class="thead-light">
                                             <tr>
@@ -201,6 +207,7 @@
                                                 <th scope="col">Unit Price</th>
                                                 <th scope="col">Discount</th>
                                                 <th scope="col">Amount</th>
+                                                <th scope="col">Status</th>
                                                 <th scope="col">Action</th>
                                             </tr>
                                         </thead>
@@ -215,6 +222,8 @@
                                                     currency:'':''}}</td>
                                                 <td style="text-align: right;">{{item.discount | currency:'':''}}</td>
                                                 <td style="text-align: right;">{{item.amount | currency:'':''}}</td>
+                                                <td style="text-align: center;"><span
+                                                        class="badge badge-primary">{{item.status}}</span></td>
                                                 <td>
                                                     <!-- <button class="btn btn-sm btn-success btn-round-custom">Edit</button> -->
                                                     <button class="btn btn-sm btn-outline-danger btn-round-custom"

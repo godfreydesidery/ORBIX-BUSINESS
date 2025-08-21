@@ -16,8 +16,6 @@ public class RestaurantSalesOrderDetailResponseDTO {
 	String discount;
 	String baseUom;
 	String amount;
-	//
-	String billId;
-	String billStatus;
-	String billDescription;
+	
+	String status;
 }

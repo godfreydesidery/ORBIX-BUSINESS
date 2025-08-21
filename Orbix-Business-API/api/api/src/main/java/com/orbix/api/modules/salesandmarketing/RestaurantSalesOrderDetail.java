@@ -16,6 +16,7 @@ import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.orbix.api.api.commons.WorkFlowStatus;
 import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.inventoryandprocurement.Dineable;
 import com.orbix.api.modules.inventoryandprocurement.Product;
@@ -46,6 +47,8 @@ public class RestaurantSalesOrderDetail {
 	private double qty;
 	@NotNull
 	private double discount = 0;
+	
+	private WorkFlowStatus status = WorkFlowStatus.PENDING;
 	
 	@ManyToOne(targetEntity = RestaurantSalesOrder.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "restaurant_sales_order_id", nullable = false , updatable = false)

@@ -3,6 +3,7 @@ package com.orbix.api.modules.salesandmarketing;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -180,6 +181,7 @@ public class RestaurantSalesOrderServiceController implements RestaurantSalesOrd
 		restaurantSalesOrderDetailResponse.setBaseUom(restaurantSalesOrderDetail.getDineable().getBaseUom());
 		restaurantSalesOrderDetailResponse.setAmount(String.valueOf(restaurantSalesOrderDetail.getSellingPriceVatIncl() * restaurantSalesOrderDetail.getQty() - restaurantSalesOrderDetail.getDiscount()));
 		
+		restaurantSalesOrderDetailResponse.setStatus(restaurantSalesOrderDetail.getStatus() != null ? restaurantSalesOrderDetail.getStatus().toString() : "");
 		
 		return restaurantSalesOrderDetailResponse;
 	}
