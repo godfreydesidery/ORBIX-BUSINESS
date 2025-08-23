@@ -24,4 +24,7 @@ public class RestaurantProductRequestDTO {
 
     @NotNull
     private Long restaurantId;
+    
+    private String reason;
+    private double qty;
 }

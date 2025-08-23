@@ -29,8 +29,15 @@ import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.inventoryandprocurement.Dineable;
 import com.orbix.api.modules.inventoryandprocurement.DineableRepository;
+import com.orbix.api.modules.inventoryandprocurement.Product;
 import com.orbix.api.modules.inventoryandprocurement.RestaurantDineable;
+import com.orbix.api.modules.inventoryandprocurement.RestaurantDineableProduct;
+import com.orbix.api.modules.inventoryandprocurement.RestaurantDineableProductRepository;
 import com.orbix.api.modules.inventoryandprocurement.RestaurantDineableRepository;
+import com.orbix.api.modules.inventoryandprocurement.RestaurantProduct;
+import com.orbix.api.modules.inventoryandprocurement.RestaurantProductLog;
+import com.orbix.api.modules.inventoryandprocurement.RestaurantProductLogRepository;
+import com.orbix.api.modules.inventoryandprocurement.RestaurantProductRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -44,11 +51,16 @@ public class RestaurantSalesOrderServiceController implements RestaurantSalesOrd
 	private final RestaurantSalesOrderDetailRepository restaurantSalesOrderDetailRepository;
 	private final RestaurantRepository restaurantRepository;
 	private final RestaurantAgentRepository restaurantAgentRepository;
+	
+	private final RestaurantProductLogRepository restaurantProductLogRepository;
+	
 	private final UserService userService;
 	private final DayService dayService;
 	
 	private final RestaurantDineableRepository restaurantDineableRepository;
+	private final RestaurantDineableProductRepository restaurantDineableProductRepository;
 	private final DineableRepository dineableRepository;
+	private final RestaurantProductRepository restaurantProductRepository;
 	
 	private final RestaurantSaleService restaurantSaleService;
 //	private final RestaurantDineableLogRepository restaurantDineableLogRepository;
@@ -296,18 +308,29 @@ public class RestaurantSalesOrderServiceController implements RestaurantSalesOrd
 			
 			RestaurantDineable restaurantDineable = restaurantDineableRepository.findByDineableAndRestaurant(restaurantSalesOrderDetail.getDineable(), restaurantSalesOrder.getRestaurant()).orElseThrow();
 			
+			Restaurant restaurant = restaurantDineable.getRestaurant();
+			Dineable dineable = restaurantDineable.getDineable();
+			
+			List<RestaurantDineableProduct> restaurantDineableProducts =  restaurantDineableProductRepository.findAllByRestaurantAndDineable(restaurant, dineable);
+			for(RestaurantDineableProduct restaurantDineableProduct : restaurantDineableProducts) {
+				
+				RestaurantProduct restaurantProduct =  restaurantProductRepository.findByRestaurantAndProduct(restaurant, restaurantDineableProduct.getProduct()).orElseThrow();
+				
+				double newStock = restaurantProduct.getCurrentStock() - (restaurantDineableProduct.getQty() * restaurantSalesOrderDetail.getQty());
+				
+				restaurantProduct.setCurrentStock(newStock);
+				
+				restaurantProduct = restaurantProductRepository.save(restaurantProduct);
+				
+				this.createRestaurantProductLog(restaurantSalesOrder.getRestaurant(), restaurantProduct.getProduct(), 0, restaurantDineableProduct.getQty() * restaurantSalesOrderDetail.getQty(), newStock, userService.getUser(request), dayService.getTimeStamp(), "Restaurant sale");
+
+			}
+			
 //			if(restaurantDineable.getCurrentStock() < restaurantSalesOrderDetail.getQty()) {
 //				//throw new InvalidOperationException("Exceeds available stock in dineable " + restaurantDineable.getDineable().getName());
 //			}
 			
-//			double newStock = restaurantDineable.getCurrentStock() - restaurantSalesOrderDetail.getQty();
 			
-//			restaurantDineable.setCurrentStock(newStock);
-			
-			restaurantDineable = restaurantDineableRepository.save(restaurantDineable);
-			
-//			this.createRestaurantDineableLog(restaurantSalesOrder.getRestaurant(), restaurantSalesOrderDetail.getDineable(), 0, restaurantSalesOrderDetail.getQty(), newStock, userService.getUser(request), dayService.getTimeStamp(), "Restaurant sale");
-
 		}
 		restaurantSaleRequest.setRestaurantSaleDetails(restaurantSaleDetails);
 		
@@ -389,18 +412,18 @@ public class RestaurantSalesOrderServiceController implements RestaurantSalesOrd
 		return true;
 	}
 	
-//	private boolean createRestaurantDineableLog(Restaurant restaurant, Dineable dineable, double qtyIn, double qtyOut, double balance, User createdByUser, LocalDateTime createdDateTime, String reference) {
-//		// Create a restaurant dineable log
-//		RestaurantDineableLog restaurantDineableLog = new RestaurantDineableLog();
-//		restaurantDineableLog.setRestaurant(restaurant);
-//		restaurantDineableLog.setDineable(dineable);
-//		restaurantDineableLog.setQtyIn(qtyIn);
-//		restaurantDineableLog.setQtyOut(qtyOut);
-//		restaurantDineableLog.setBalance(balance);
-//		restaurantDineableLog.setReference(reference);
-//		restaurantDineableLog.setCreatedByUser(createdByUser);
-//		restaurantDineableLog.setCreatedDateTime(createdDateTime);
-//		restaurantDineableLogRepository.save(restaurantDineableLog);
-//		return true;
-//	}
+	private boolean createRestaurantProductLog(Restaurant restaurant, Product product, double qtyIn, double qtyOut, double balance, User createdByUser, LocalDateTime createdDateTime, String reference) {
+		// Create a restaurant dineable log
+		RestaurantProductLog restaurantProductLog = new RestaurantProductLog();
+		restaurantProductLog.setRestaurant(restaurant);
+		restaurantProductLog.setProduct(product);
+		restaurantProductLog.setQtyIn(qtyIn);
+		restaurantProductLog.setQtyOut(qtyOut);
+		restaurantProductLog.setBalance(balance);
+		restaurantProductLog.setReference(reference);
+		restaurantProductLog.setCreatedByUser(createdByUser);
+		restaurantProductLog.setCreatedDateTime(createdDateTime);
+		restaurantProductLogRepository.save(restaurantProductLog);
+		return true;
+	}
 }

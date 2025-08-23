@@ -23,4 +23,6 @@ export interface IRestaurantProduct {
     created : string
     createdDateTime : string
 
+    qty : number
+
 }

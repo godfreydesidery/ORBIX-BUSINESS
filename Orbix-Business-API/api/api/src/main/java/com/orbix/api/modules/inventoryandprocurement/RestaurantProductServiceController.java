@@ -270,7 +270,103 @@ public class RestaurantProductServiceController implements RestaurantProductServ
 	    
 	    //Update RestaurantProduct log for stock card
 	    
-	    if(stockChanged == true)this.createRestaurantProductLog(restaurant, product, currentStock, 0, currentStock, userService.getUser(request), dayService.getTimeStamp(), "Stock Adjustment");
+	    if(stockChanged == true)this.createRestaurantProductLog(restaurant, product, currentStock, 0, currentStock, userService.getUser(request), dayService.getTimeStamp(), restaurantProductRequest.getReason());
+
+	    
+	    return this.restaurantProductResponseDTOMapper(restaurantProduct);
+	}
+	
+	@Override
+	public RestaurantProductResponseDTO addRestaurantStock(RestaurantProductRequestDTO restaurantProductRequest,
+			HttpServletRequest request) {
+		
+		
+		
+		Long restaurantId = restaurantProductRequest.getRestaurantId();
+		Long productId = restaurantProductRequest.getProductId();
+		
+		/////////////////
+		
+		
+		double qty = restaurantProductRequest.getQty();
+		
+		// Validate and fetch the restaurant
+	    Restaurant restaurant = restaurantRepository.findById(restaurantId)
+	                              .orElseThrow(() -> new NotFoundException("Restaurant not found"));
+	    // Validate and fetch the product
+	    Product product = productRepository.findById(productId)
+	                              .orElseThrow(() -> new NotFoundException("Restaurant Product not found"));
+	    
+	    Optional<RestaurantProduct> restaurantProduct_ = restaurantProductRepository.findByRestaurantAndProduct(restaurant, product);
+	    if(restaurantProduct_.isEmpty()) {
+	    	throw new InvalidOperationException(
+		            String.format("Product '%s' does not exist in restaurant '%s'", product.getName(), restaurant.getName())
+		        );
+	    }
+	   
+		RestaurantProduct restaurantProduct = restaurantProduct_.get();
+		boolean stockChanged = false;
+		double currentStock = restaurantProduct.getCurrentStock() + qty;
+		if(restaurantProduct.getCurrentStock() != currentStock) {
+			stockChanged = true;
+		}
+	    restaurantProduct.setCurrentStock(currentStock);
+	    
+	    restaurantProduct.setActive(true);
+	    
+	    restaurantProduct = restaurantProductRepository.save(restaurantProduct);
+	    
+	    //Update RestaurantProduct log for stock card
+	    
+	    if(stockChanged == true)this.createRestaurantProductLog(restaurant, product, qty, 0, currentStock, userService.getUser(request), dayService.getTimeStamp(), restaurantProductRequest.getReason());
+
+	    
+	    return this.restaurantProductResponseDTOMapper(restaurantProduct);
+	}
+	
+	@Override
+	public RestaurantProductResponseDTO deductRestaurantStock(RestaurantProductRequestDTO restaurantProductRequest,
+			HttpServletRequest request) {
+		
+		
+		
+		Long restaurantId = restaurantProductRequest.getRestaurantId();
+		Long productId = restaurantProductRequest.getProductId();
+		
+		/////////////////
+		
+		
+		double qty = restaurantProductRequest.getQty();
+		
+		// Validate and fetch the restaurant
+	    Restaurant restaurant = restaurantRepository.findById(restaurantId)
+	                              .orElseThrow(() -> new NotFoundException("Restaurant not found"));
+	    // Validate and fetch the product
+	    Product product = productRepository.findById(productId)
+	                              .orElseThrow(() -> new NotFoundException("Restaurant Product not found"));
+	    
+	    Optional<RestaurantProduct> restaurantProduct_ = restaurantProductRepository.findByRestaurantAndProduct(restaurant, product);
+	    if(restaurantProduct_.isEmpty()) {
+	    	throw new InvalidOperationException(
+		            String.format("Product '%s' does not exist in restaurant '%s'", product.getName(), restaurant.getName())
+		        );
+	    }
+	   
+		RestaurantProduct restaurantProduct = restaurantProduct_.get();
+		boolean stockChanged = false;
+		double currentStock = restaurantProduct.getCurrentStock() - qty;
+		if(restaurantProduct.getCurrentStock() != currentStock) {
+			stockChanged = true;
+		}
+	    restaurantProduct.setCurrentStock(currentStock);
+	    
+	    restaurantProduct.setActive(true);
+	    
+	    restaurantProduct = restaurantProductRepository.save(restaurantProduct);
+	    
+	    //Update RestaurantProduct log for stock card
+	    
+	    if(stockChanged == true)this.createRestaurantProductLog(restaurant, product, 0, qty, currentStock, userService.getUser(request), dayService.getTimeStamp(), restaurantProductRequest.getReason());
 
 	    
 	    return this.restaurantProductResponseDTOMapper(restaurantProduct);

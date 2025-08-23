@@ -229,17 +229,25 @@ restaurantId: number;
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
 
-    var stk = (+this.currentStock)
+    var stk = 0
 
     if((+this.amountToChange) <= 0){
       this.msg.showErrorMessage3('Invalid')
       return
     }
 
+    if(this.reason === '' || this.reason === null){
+      this.msg.showErrorMessage3('Please enter reason')
+      return
+    }
+      
+    var command = ''
+    stk = (+this.amountToChange)
+
     if(this.action === 'Add'){
-      stk = stk + (+this.amountToChange)
+      command = 'add_stock'
     }else if(this.action === 'Deduct'){
-      stk = stk - (+this.amountToChange)
+      command = 'deduct_stock'
     }else{
       this.msg.showErrorMessage3('Invalid')
       return;
@@ -249,11 +257,11 @@ restaurantId: number;
     var restaurantProduct = {
       productId : this.productId,
       restaurantId : this.restaurantId,
-      currentStock : stk,
+      qty : stk,
       reason : this.reason
     }
 
-    await this.http.post<IRestaurantProduct>(API_URL+'/restaurant_products/adjust_stock', restaurantProduct, options)
+    await this.http.post<IRestaurantProduct>(API_URL+'/restaurant_products/' + command, restaurantProduct, options)
     .toPromise()
     .then(
       data => {

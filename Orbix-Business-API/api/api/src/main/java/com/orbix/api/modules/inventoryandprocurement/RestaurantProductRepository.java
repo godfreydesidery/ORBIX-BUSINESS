@@ -41,4 +41,6 @@ public interface RestaurantProductRepository extends JpaRepository<RestaurantPro
     
  // Find all RestaurantProducts for a specific restaurant where currentStock <= 0
     List<RestaurantProduct> findByRestaurantAndCurrentStockLessThanEqual(Restaurant restaurant, double currentStock);
+
+
 }

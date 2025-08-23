@@ -74,6 +74,24 @@ public class RestaurantProductResource {
 				.path("/orbix-business-api/restaurant_products/adjust_stock").toUriString());
 		return ResponseEntity.created(uri).body(restaurantProductService.adjustRestaurantStock(restaurantProductRequest, request));
 	}
+	
+	@PostMapping("/restaurant_products/add_stock")
+	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<RestaurantProductResponseDTO> addStock(@RequestBody RestaurantProductRequestDTO restaurantProductRequest,
+			HttpServletRequest request) {
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath()
+				.path("/orbix-business-api/restaurant_products/adjust_stock").toUriString());
+		return ResponseEntity.created(uri).body(restaurantProductService.addRestaurantStock(restaurantProductRequest, request));
+	}
+	
+	@PostMapping("/restaurant_products/deduct_stock")
+	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<RestaurantProductResponseDTO> deductStock(@RequestBody RestaurantProductRequestDTO restaurantProductRequest,
+			HttpServletRequest request) {
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath()
+				.path("/orbix-business-api/restaurant_products/deduct_stock").toUriString());
+		return ResponseEntity.created(uri).body(restaurantProductService.deductRestaurantStock(restaurantProductRequest, request));
+	}
 
 	@PostMapping("/restaurant_products/activate")
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")

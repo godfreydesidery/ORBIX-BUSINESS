@@ -64,8 +64,8 @@
                                         <!-- <td>{{restaurantProduct.defaultReorderLevel}}</td> -->
                                         <!-- <td>{{restaurantProduct.vatRate * 100}} %</td> -->
                                         <td>
-                                            <button class="btn btn-warning btn-round-custom" (click)="searchRestaurantProduct(restaurantProduct.id)" *ngIf="grant(['SHPPRDCT-ALL'])," data-toggle="modal" data-target="#update-modal">Edit</button>
-                                            <button class="btn btn-success btn-round-custom" (click)="searchRestaurantProduct(restaurantProduct.id)" *ngIf="grant(['SHPSTK-ALL','SHPSTK-UPDATE'])," data-toggle="modal" data-target="#adjust-stock-modal">Adjust Stock</button>
+                                            <button class="btn btn-outline-success btn-round-custom" (click)="searchRestaurantProduct(restaurantProduct.id)" *ngIf="grant(['SHPPRDCT-ALL'])," data-toggle="modal" data-target="#update-modal">Edit</button>
+                                            <button class="btn btn-outline-primary btn-round-custom" (click)="searchRestaurantProduct(restaurantProduct.id)" *ngIf="grant(['SHPSTK-ALL','SHPSTK-UPDATE'])," data-toggle="modal" data-target="#adjust-stock-modal">Adjust Stock</button>
                                         </td>
                                     </tr>
                                 </tbody>
@@ -324,7 +324,7 @@
                             </div>
                             <div class="col-sm-6">
                                 <div class="form-group">
-                                    <input class="form-control" type="text" autocomplete="nope" placeholder="Enter Reason">
+                                    <textarea class="form-control" [(ngModel)]="reason" placeholder="Enter Reason"></textarea>
                                 </div>
                             </div>
                         </div>
