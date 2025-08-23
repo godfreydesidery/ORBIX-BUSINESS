@@ -38,13 +38,13 @@
                                         <th scope="col">Stock</th>
                                         <th scope="col">Min Stock</th>
                                         <th scope="col">Base UOM</th>
-                                        <th scope="col">Cost Price Incl</th>
+                                        <!-- <th scope="col">Cost Price Incl</th> -->
                                         <!-- <th scope="col">Cost Price Excl</th> -->
-                                        <th scope="col">Selling Price Incl</th>
+                                        <!-- <th scope="col">Selling Price Incl</th> -->
                                         <!-- <th scope="col">Selling Price Excl</th> -->
                                         <!-- <th scope="col">Def Reorder Qty</th> -->
                                         <!-- <th scope="col">Def Reorder Level</th> -->
-                                        <th scope="col">VAT%</th>
+                                        <!-- <th scope="col">VAT%</th> -->
                                         <th scope="col">Action</th>
                                     </tr>
                                 </thead>
@@ -56,13 +56,13 @@
                                         <td><b style="color: red;">{{restaurantProduct.currentStock}}</b></td>
                                         <td><b style="color: red;">{{restaurantProduct.minStock}}</b></td>
                                         <td>{{restaurantProduct.baseUom}}</td>
-                                        <td class="text-success" style="text-align: right;"><b>{{restaurantProduct.costPriceVatIncl | currency:'':''}}</b></td>
+                                        <!-- <td class="text-success" style="text-align: right;"><b>{{restaurantProduct.costPriceVatIncl | currency:'':''}}</b></td> -->
                                         <!-- <td style="text-align: right;">{{restaurantProduct.costPriceVatExcl | currency:'':''}}</td> -->
-                                        <td class="text-primary" style="text-align: right;"><b>{{restaurantProduct.sellingPriceVatIncl | currency:'':''}}</b></td>
+                                        <!-- <td class="text-primary" style="text-align: right;"><b>{{restaurantProduct.sellingPriceVatIncl | currency:'':''}}</b></td> -->
                                         <!-- <td style="text-align: right;">{{restaurantProduct.sellingPriceVatExcl | currency:'':''}}</td> -->
                                         <!-- <td>{{restaurantProduct.defaultReorderQty}}</td> -->
                                         <!-- <td>{{restaurantProduct.defaultReorderLevel}}</td> -->
-                                        <td>{{restaurantProduct.vatRate * 100}} %</td>
+                                        <!-- <td>{{restaurantProduct.vatRate * 100}} %</td> -->
                                         <td>
                                             <button class="btn btn-warning btn-round-custom" (click)="searchRestaurantProduct(restaurantProduct.id)" *ngIf="grant(['SHPPRDCT-ALL'])," data-toggle="modal" data-target="#update-modal">Edit</button>
                                             <button class="btn btn-success btn-round-custom" (click)="searchRestaurantProduct(restaurantProduct.id)" *ngIf="grant(['SHPSTK-ALL','SHPSTK-UPDATE'])," data-toggle="modal" data-target="#adjust-stock-modal">Adjust Stock</button>
@@ -271,7 +271,7 @@
 </div>
 
 <div class="modal fade" id="adjust-stock-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
-    <div class="modal-dialog" role="document" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
         <div class="modal-content">
             <div class="modal-header state modal-default">                                    
                 <h4 class="modal-title" id="modal-large-label">Adjust Stock</h4>
@@ -280,23 +280,58 @@
             <div class="modal-body">
                 <div class="row">
                     <div class="col-lg-12">
-                        <input type="hidden" [(ngModel)]="productId">                       
-                        <div class="form-group">
-                            <label>Product Code</label>
-                            <input class="form-control" type="text" [(ngModel)]="productCode" autocomplete="nope" readonly>
-                        </div> 
-                        <div class="form-group">
-                            <label>Product Name</label>
-                            <input class="form-control" type="text" [(ngModel)]="productName" autocomplete="nope" readonly>
-                        </div> 
-                        <div class="form-group">
-                            <label>Product Description</label>
-                            <input class="form-control" type="text" [(ngModel)]="productDescription" autocomplete="nope" readonly>
+                        <input type="hidden" [(ngModel)]="productId">
+
+                        <div class="row">
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Product Code</label>
+                                    <input class="form-control" type="text" [(ngModel)]="productCode" autocomplete="nope" readonly>
+                                </div> 
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Product Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="productName" autocomplete="nope" readonly>
+                                </div> 
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Product Description</label>
+                                    <input class="form-control" type="text" [(ngModel)]="productDescription" autocomplete="nope" readonly>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <label>Available Stock</label>
+                                    <input class="form-control" type="text" [(ngModel)]="currentStock" autocomplete="nope" style="text-align: center; color: red;" readonly>
+                                </div>
+                            </div>
+                            <br>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <select class="form-control" [(ngModel)]="action">
+                                        <option>--Select Action--</option>
+                                        <option>Add</option>
+                                        <option>Deduct</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-sm-3">
+                                <div class="form-group">
+                                    <input class="form-control" type="text" [(ngModel)]="amountToChange" autocomplete="nope" placeholder="Enter Amount">
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="form-group">
+                                    <input class="form-control" type="text" autocomplete="nope" placeholder="Enter Reason">
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
-                            <label>Stock</label>
-                           <input class="form-control" type="text" [(ngModel)]="currentStock" autocomplete="nope" style="text-align: center;">
-                       </div>  
+
+                        
+                        
+                       
                     </div>
                 </div>
             </div>

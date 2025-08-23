@@ -65,6 +65,12 @@ restaurantId: number;
   selectedOption: string = '';
   options: string[] = ['Option 1', 'Option 2', 'Option 3'];
 
+  action : string = ''
+
+  reason : string = '--Select Action--'
+
+  amountToChange : number = 0
+
   constructor(
     private http :HttpClient,
     private auth : AuthService,
@@ -223,10 +229,28 @@ restaurantId: number;
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
 
+    var stk = (+this.currentStock)
+
+    if((+this.amountToChange) <= 0){
+      this.msg.showErrorMessage3('Invalid')
+      return
+    }
+
+    if(this.action === 'Add'){
+      stk = stk + (+this.amountToChange)
+    }else if(this.action === 'Deduct'){
+      stk = stk - (+this.amountToChange)
+    }else{
+      this.msg.showErrorMessage3('Invalid')
+      return;
+    }
+
+
     var restaurantProduct = {
       productId : this.productId,
       restaurantId : this.restaurantId,
-      currentStock : this.currentStock
+      currentStock : stk,
+      reason : this.reason
     }
 
     await this.http.post<IRestaurantProduct>(API_URL+'/restaurant_products/adjust_stock', restaurantProduct, options)
@@ -263,6 +287,10 @@ restaurantId: number;
   this.maxStock = 0
   this.defaultReorderQty = 0
   this.defaultReorderLevel = 0
+
+  this.reason = ''
+  this.amountToChange = 0
+  this.action = '--Select Action--'
   }
 
   loadSelectedRestaurant = async () => {

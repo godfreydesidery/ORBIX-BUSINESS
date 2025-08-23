@@ -1,7 +1,7 @@
 
 export interface IRestaurantDineable {
     id : number
-    dineableId : number
+    dineableId : any
     dineableCode : string
     dineableName : string
     dineableDescription : string
@@ -22,5 +22,7 @@ export interface IRestaurantDineable {
     active : string
     created : string
     createdDateTime : string
+
+    sn : number
 
 }
