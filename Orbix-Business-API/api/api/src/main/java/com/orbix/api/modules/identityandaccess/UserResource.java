@@ -56,6 +56,8 @@ import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.modules.adminunits.Branch;
 import com.orbix.api.modules.adminunits.CompanyRequestDTO;
 import com.orbix.api.modules.adminunits.DayService;
+import com.orbix.api.modules.salesandmarketing.RestaurantAgent;
+import com.orbix.api.modules.salesandmarketing.RestaurantAgentRepository;
 import com.orbix.api.modules.utilities.Shortcut;
 import com.orbix.api.security.Object_;
 import com.orbix.api.security.Operation;
@@ -86,6 +88,8 @@ public class UserResource {
 	
 	private final RoleRepository roleRepository;
 	private final PrivilegeRepository privilegeRepository;
+	
+	private final RestaurantAgentRepository restaurantAgentRepository;
 	
 	
 	@GetMapping("/users/load_user")
@@ -607,6 +611,25 @@ public class UserResource {
 			List<User> users = userRepository.findAllByBranch(branch);
 			for(User user : users) {
 				nicknames.add(user.getNickname());
+			}	
+		}catch(Exception e) {
+			return nicknames;
+		}
+		return nicknames;		
+	}	
+	
+	@GetMapping("/users/get_branch_agent_names")
+	public List<String> getBranchAgentnames(
+			HttpServletRequest request
+			){
+		List<String> nicknames = new ArrayList<>();
+		try {
+			Branch branch = null;
+			branch = userService.getUser(request).getBranch();
+			
+			List<RestaurantAgent> users = restaurantAgentRepository.findAll();
+			for(RestaurantAgent user : users) {
+				nicknames.add(user.getName());
 			}	
 		}catch(Exception e) {
 			return nicknames;

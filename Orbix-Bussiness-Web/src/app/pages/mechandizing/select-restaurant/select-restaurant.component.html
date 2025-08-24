@@ -32,13 +32,13 @@
                 <div class="row" *ngIf="restaurantLoaded == true">
                     <div class="col-md-12">
                         <!-- <button class="btn btn-success btn-round-custom">Sales Order</button> -->
-                        <button class="btn btn-success btn-round-custom"
+                        <button class="btn btn-success btn-round-custom" *ngIf="grant(['RESTAURANT-SALE'])"
                             [routerLink]="'/app/mechandizing/restaurant-sales-order'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Sales Order</button>
                         <button class="btn btn-success btn-round-custom"
-                            [routerLink]="'/app/mechandizing/restaurant-product-stock-status'"
+                            [routerLink]="'/app/mechandizing/restaurant-product-stock-status'" *ngIf="grant(['RESTAURANT-ADMIN'])"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Stock Status</button>
-                        <button class="btn btn-success btn-round-custom"
+                        <button class="btn btn-success btn-round-custom" *ngIf="grant(['RESTAURANT-ADMIN'])"
                             [routerLink]="'/app/mechandizing/import-restaurant-product'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Import Product</button>
                         <!-- <button class="btn btn-success btn-round-custom"
@@ -49,22 +49,22 @@
                             data-toggle="modal" data-target="#sales-order-list-modal">Local Purchase Orders</button> -->
                         <!-- <button class="btn btn-success btn-round-custom" (click)="getAllPendingGrns()"
                             data-toggle="modal" data-target="#grn-list-modal">Goods Received Notes</button> -->
-                        <button class="btn btn-success btn-round-custom"
+                        <button class="btn btn-success btn-round-custom" *ngIf="grant(['RESTAURANT-ADMIN'])"
                             [routerLink]="'/app/mechandizing/import-dineable'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Import Meal</button>
-                        <button class="btn btn-success btn-round-custom"
+                        <button class="btn btn-success btn-round-custom" *ngIf="grant(['RESTAURANT-ADMIN'])"
                             [routerLink]="'/app/mechandizing/restaurant-badge'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Badges</button>
-                        <button class="btn btn-success btn-round-custom"
+                        <button class="btn btn-success btn-round-custom" *ngIf="grant(['RESTAURANT-ADMIN'])"
                             [routerLink]="'/app/mechandizing/restaurant-agent'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Agents</button>
-                        <button class="btn btn-success btn-round-custom"
+                        <button class="btn btn-success btn-round-custom" *ngIf="grant(['RESTAURANT-ADMIN'])"
                             [routerLink]="'/app/mechandizing/restaurant-dineable-stock-status'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Menu Price List</button>
-                        <button class="btn btn-success btn-round-custom"
+                        <button class="btn btn-success btn-round-custom" *ngIf="grant(['RESTAURANT-ADMIN'])"
                             [routerLink]="'/app/mechandizing/restaurant-dineable-product'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Configure Dineables</button>
-                        <button class="btn btn-success btn-round-custom"
+                        <button class="btn btn-success btn-round-custom" *ngIf="grant(['RESTAURANT-ADMIN'])"
                             [routerLink]="'/app/mechandizing/restaurant-product-stock-log'"
                             [queryParams]="{ restaurant_id: selectedRestaurantId }">Stock Card</button>
                         <!-- <button class="btn btn-success btn-round-custom"

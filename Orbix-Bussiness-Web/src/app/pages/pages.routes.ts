@@ -254,6 +254,13 @@ export const routes: Routes = [
         data : { breadcrumb : 'Mechandizing/Reports/Sales Listing Report'},
         canActivate : [AuthGuard]
       },
+
+      {
+        path : 'mechandizing/restaurant-sales-listing-report',
+        loadComponent: () => import('./mechandizing/reports/restaurant-sales-listing-report/restaurant-sales-listing-report.component').then(c => c.RestaurantSalesListingReportComponent),
+        data : { breadcrumb : 'Mechandizing/Reports/Sales Listing Report'},
+        canActivate : [AuthGuard]
+      },
       {
         path : 'mechandizing/fast-moving-products-report',
         loadComponent: () => import('./mechandizing/reports/fast-moving-products-report/fast-moving-products-report.component').then(c => c.FastMovingProductsReportComponent),

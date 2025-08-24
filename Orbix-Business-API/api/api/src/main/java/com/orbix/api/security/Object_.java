@@ -33,12 +33,12 @@ public class Object_ {
 	public static String FINCWEGH = "FINCWEGH-ACCESS";
 	public static String FINCMTNC = "FINCMTNC-ACCESS";
 	public static String SHOP = "SHOP-ACCESS";
-	public static String RESTAURANT = "RESTAURANT-ACCESS";
+	public static String RESTAURANT = "RESTAURANT-ACCESS SALE ADMIN"; 
 	public static String WRHOUSE = "WRHOUSE-ACCESS";
 	public static String WEGH = "WEGH-ACCESS";
 	public static String STRG = "STRG-UPDATE";
 	public static String PRCMT = "PRCMT-ACCESS";
-	public static String MNGNT = "MNGNT-ACCESS";
+	public static String MNGNT = "MNGNT-ACCESS"; 
 	
 	public static String SHPSTK = "SHPSTK-ALL UPDATE";
 	public static String SHPPRDCT = "SHPPRDCT-ALL CREATE UPDATE DELETE";

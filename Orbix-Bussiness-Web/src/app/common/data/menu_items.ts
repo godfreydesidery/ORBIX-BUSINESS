@@ -483,6 +483,7 @@ export const menuItems = [
                         title: 'Sales Listing Report',
                         routerLink: '/app/mechandizing/sales-listing-report'
                     },
+                    
                     {
                         title: 'Fast Moving Products',
                         routerLink: '/app/mechandizing/fast-moving-products-report'
@@ -510,13 +511,17 @@ export const menuItems = [
                 url: '#',
                 show: true,
                 subMenu: [
-                    {
-                        title: 'Sales Listing Report',
-                        routerLink: '/app/mechandizing/sales-listing-report'
-                    },
+                    // {
+                    //     title: 'Sales Listing Report',
+                    //     routerLink: '/app/mechandizing/sales-listing-report'
+                    // },
                     {
                         title: 'Fast Moving Products',
                         routerLink: '/app/mechandizing/fast-moving-products-report'
+                    },
+                    {
+                        title: 'Restaurant Sales Report',
+                        routerLink: '/app/mechandizing/restaurant-sales-listing-report'
                     },
                 ]
             },
@@ -735,7 +740,11 @@ export const menuItems = [
                     {
                         title: 'Invoice Report',
                         routerLink: '/app/blank'
-                    }
+                    },
+                    {
+                        title: 'Restaurant Report',
+                        routerLink: '/app/mechandizing/restaurant-sales-listing-report'
+                    },
                 ]
             }
         ]
