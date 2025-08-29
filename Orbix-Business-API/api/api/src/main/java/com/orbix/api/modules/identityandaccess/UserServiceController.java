@@ -7,6 +7,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -170,6 +171,109 @@ public class UserServiceController implements UserService, UserDetailsService {
 		return user;
 	}
 	
+	@Override
+	public User saveUserWithDto(UserRequestDTO userRequest, HttpServletRequest request) {
+		validateUserRequest(userRequest);
+		log.info("Saving user to the database");
+
+		User user;
+
+		if (userRequest.getId() == null) {
+
+			User newUser = new User();
+
+			if (userRequest.getUsername().equalsIgnoreCase("root")) {
+				Optional<User> u = userRepository.findByUsername("root");
+				if (u.isPresent()) {
+					throw new InvalidOperationException("root already exist");
+				}
+			}
+
+			if (userRequest.getType().equals("COMPANY-ROOT-USER") || userRequest.getType().equals("COMPANY-USER")) {
+//				if(user.getCompany().getId() == null) {
+//					throw new InvalidOperationException("Company User must have a company");
+//				}
+				if (userRequest.getCompanyName().equals("")) {
+					throw new InvalidOperationException("Company User must have a company");
+				}
+//				Optional<Company> company_ = companyRepository.findById(user.getCompany().getId());
+				Optional<Company> company_ = companyRepository.findByName(userRequest.getCompanyName());
+				if (company_.isEmpty()) {
+					throw new NotFoundException("Company not found");
+				}
+				newUser.setCompany(company_.get());
+//				if(user.getBranch().getId() == null) {
+//					throw new InvalidOperationException("Company User must have a branch");
+//				}
+				if (userRequest.getBranchName().equals("")) {
+					throw new InvalidOperationException("Company User must have a branch");
+				}
+//				Optional<Branch> branch_ = branchRepository.findById(user.getBranch().getId());
+				Optional<Branch> branch_ = branchRepository.findByName(userRequest.getBranchName());
+				if (branch_.isEmpty()) {
+					throw new NotFoundException("Branch not found");
+				}
+				if (branch_.get().getCompany().getId() != company_.get().getId()) {
+					throw new InvalidOperationException("Branch does not belong to the specified company");
+				}
+				newUser.setBranch(branch_.get());
+
+				if (userRequest.getUsername().contains("@")) {
+					throw new InvalidEntryException("Invalid Entry in username");
+				}
+
+				newUser.setUsername(userRequest.getUsername() + "@" + company_.get().getDomain().replace(" ", ""));
+
+			} else if (userRequest.getType().equals("SYSTEM-ROOT-USER")
+					|| userRequest.getType().equals("SYSTEM-USER")) {
+				newUser.setCompany(null);
+				newUser.setBranch(null);
+			} else {
+				throw new InvalidOperationException("User type is invalid.");
+			}
+
+			newUser.setCode(this.requestUserCode().getCode());
+			newUser.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+
+			newUser.setFirstName(userRequest.getFirstName());
+			newUser.setMiddleName(userRequest.getMiddleName());
+			newUser.setLastName(userRequest.getLastName());
+			newUser.setType(userRequest.getType());
+			newUser.setNickname(userRequest.getNickname());
+
+			user = newUser;
+
+		} else {
+			User userToUpdate = userRepository.findById(userRequest.getId()).get();
+			if (!userToUpdate.getCode().equals(userRequest.getCode())) {
+				throw new InvalidOperationException("Changing user code is not allowed");
+			}
+			if (userRequest.getPassword() == null || userRequest.getPassword().isBlank()) {
+				userToUpdate.setPassword(userToUpdate.getPassword());
+			} else {
+				userToUpdate.setPassword(passwordEncoder.encode(userRequest.getPassword()));
+			}
+			// user.setActive(true);// use this in the mean time before implementing
+			// actiavate and deactivate user
+
+			userToUpdate.setCompany(userToUpdate.getCompany());
+			userToUpdate.setBranch(userToUpdate.getBranch());
+
+			user = userToUpdate;
+		}
+
+		user = userRepository.saveAndFlush(user);
+
+		List<Role> managedRoles = userRequest.getRoles().stream()
+				.map(roleDto -> roleRepository.findById(roleDto.getId())
+						.orElseThrow(() -> new NotFoundException("Role not found: " + roleDto.getId())))
+				.collect(Collectors.toList());
+
+		user.setRoles(List.copyOf(managedRoles));
+
+		return user;
+	}
+	
 	private boolean validateUser(User user) {
 		/**
 		 * Validate Username, username should be >=6 and <=16 in length
@@ -202,6 +306,43 @@ public class UserServiceController implements UserService, UserDetailsService {
 		 * Alias is a unique flag name that visually identifies a user in the system, also identified as Nickname
 		 */
 		if(user.getNickname().equals("")) {
+			throw new MissingInformationException("The nickname field is missing");
+		}		
+		return true;
+	}
+	
+	private boolean validateUserRequest(UserRequestDTO userRequest) {
+		/**
+		 * Validate Username, username should be >=6 and <=16 in length
+		 */
+		if((userRequest.getUsername().length() < 3 || userRequest.getUsername().length() > 50) && !userRequest.getUsername().equalsIgnoreCase("root")) {
+			throw new InvalidEntryException("Invalid length in username, length should be between 3 and 50");
+		}
+		/**
+		 * Validate password, password should have a valid length
+		 */
+		if(userRequest.getId() == null) {
+			if(userRequest.getPassword().equals("")) {
+				throw new MissingInformationException("The password field is required");
+			}else if(userRequest.getPassword().length() < 4 || userRequest.getPassword().length() >50) {
+				throw new InvalidEntryException("Password length should be more than 5 and less than 51");
+			}
+		}else {
+			if(userRequest.getPassword().length() > 0 && (userRequest.getPassword().length() < 6 || userRequest.getPassword().length() > 50)){
+				throw new InvalidEntryException("Password length should be more than 3 and less than 51");
+			}
+		}
+		/**
+		 * Validate names, first name and last name should be present
+		 */
+		if(userRequest.getFirstName().equals("") || userRequest.getLastName().equals("")) {
+			throw new MissingInformationException("First name or Last name fields are missing");
+		}
+		/**
+		 * Validate alias, alias field should be present
+		 * Alias is a unique flag name that visually identifies a user in the system, also identified as Nickname
+		 */
+		if(userRequest.getNickname().equals("")) {
 			throw new MissingInformationException("The nickname field is missing");
 		}		
 		return true;

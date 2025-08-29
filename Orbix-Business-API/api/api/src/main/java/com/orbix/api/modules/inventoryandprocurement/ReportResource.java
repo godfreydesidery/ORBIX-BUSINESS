@@ -89,10 +89,11 @@ public class ReportResource {
 	@PostMapping("/restaurant_stock_logs/get_stock_logs_report_by_dates")
 	public ResponseEntity<List<RestaurantStockLogReportProjection>> getRestaurantSalesListingReportByDates(
 			@RequestParam(name = "restaurant_id") Long restaurantId,
+			@RequestParam(name = "product_id") Long productId,
 	        @RequestBody DateRange dateRange,
 	        HttpServletRequest request) {
 
-	    List<RestaurantStockLogReportProjection> report = restaurantProductLogRepository.getStockLogReportByRestaurant(restaurantId, dateRange.getFrom().atStartOfDay(), dateRange.getTo().atStartOfDay().plusDays(1));
+	    List<RestaurantStockLogReportProjection> report = restaurantProductLogRepository.getStockLogReportByRestaurant(restaurantId, productId, dateRange.getFrom().atStartOfDay(), dateRange.getTo().atStartOfDay().plusDays(1));
 	    
 	    return ResponseEntity.ok(report);
 	}

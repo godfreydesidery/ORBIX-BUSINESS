@@ -12,6 +12,7 @@ import com.orbix.api.modules.utilities.Shortcut;
 
 public interface UserService {
 	User saveUser(User user, HttpServletRequest request);
+	User saveUserWithDto(UserRequestDTO userRequest, HttpServletRequest request);
 	Role saveRole(Role role, HttpServletRequest request);
 	Privilege savePrivilege(Privilege privilege, HttpServletRequest request);
 	void addRoleToUser(String username, String roleName, HttpServletRequest request);

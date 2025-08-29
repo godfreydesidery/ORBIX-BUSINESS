@@ -95,7 +95,7 @@ export class RestaurantSalesOrderComponent {
       console.log('Restaurant ID:', this.restaurantId);
     });
     await this.loadSelectedRestaurant()
-    await this.getAvailableAgentsByRestaurant()
+
   }
 
 
@@ -321,10 +321,13 @@ export class RestaurantSalesOrderComponent {
     }
   }
 
-  clearOrder() {
+  async clearOrder() {
     this.restaurantSalesOrder!
     this.restaurantSalesOrderId = null
     this.customerName = ''
+    this.payCode = 'CASH'
+    this.payRefNo = ''
+    this.selectedAgentId = null
   }
 
   // Triggered on every keystroke
@@ -392,7 +395,7 @@ export class RestaurantSalesOrderComponent {
   defaultReorderLevel: number = 0
   baseUom: string = ''
 
-  qty: number | string = ''
+  qty: number | string = 0
 
   clearRestaurantDineable() {
     this.dineableId = null
@@ -443,6 +446,8 @@ export class RestaurantSalesOrderComponent {
           this.defaultReorderQty = data!.defaultReorderQty
           this.defaultReorderLevel = data!.defaultReorderLevel
           this.baseUom = data!.baseUom
+
+          this.qty = 1
 
           this.searchTerm = data!.dineableName
 
@@ -525,7 +530,7 @@ export class RestaurantSalesOrderComponent {
 
   }
 
-  verifyDetail(id: any){
+  verifyDetail(id: any) {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
@@ -552,7 +557,7 @@ export class RestaurantSalesOrderComponent {
       )
   }
 
-  async confirmOrder() {
+  async confirmOrder11() {
     if (await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to confirm this order?', 'question', 'Yes', 'No') == false) {
       return
     }
@@ -567,16 +572,63 @@ export class RestaurantSalesOrderComponent {
           this.get(this.restaurantSalesOrderId)
           this.msg.showSuccessMessage('Order confirmed successifully')
           this.printReceipt()
+          //this.clearOrder()
         }
       )
       .catch(error => {
         console.log(error)
         this.msg.showErrorMessage(error, 'Error')
+        return
       }
       )
-    this.payCode = ''
-    this.payRefNo = ''
+    await this.clearOrder()
+    alert(this.restaurantDineableId)
   }
+
+  async confirmOrder() {
+    if (!(await this.msg.showConfirmMessageDialog(
+      'Confirm',
+      'Are you sure you want to confirm this order?',
+      'question',
+      'Yes',
+      'No'
+    ))) {
+      return;
+    }
+
+    let options = {
+      headers: new HttpHeaders().set(
+        'Authorization',
+        'Bearer ' + this.auth.user.access_token
+      )
+    };
+
+    try {
+      const data = await this.http.post<IRestaurantSalesOrder>(
+        API_URL + '/restaurant_sales_orders/confirm?restaurant_sales_order_id=' +
+        this.restaurantSalesOrderId +
+        '&pay_code=' + this.payCode +
+        '&pay_ref_no=' + this.payRefNo,
+        null,
+        options
+      ).toPromise();
+
+      console.log(data);
+
+      // ensure get() completes before clearOrder()
+      await this.get(this.restaurantSalesOrderId);
+
+      this.msg.showSuccessMessage('Order confirmed successfully');
+      this.printReceipt();
+
+      await this.clearOrder();  // runs after get() finishes
+
+    } catch (error) {
+      console.log(error);
+      this.msg.showErrorMessage(error, 'Error');
+    }
+  }
+
 
   async cancelOrder() {
     if (await this.msg.showConfirmMessageDialog('Cancel', 'Are you sure you want to cancel this order?', 'question', 'Yes', 'No') == false) {

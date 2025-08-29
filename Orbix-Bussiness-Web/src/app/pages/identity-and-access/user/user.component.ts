@@ -116,14 +116,19 @@ export class UserComponent {
       lastName: this.lastName,
       nickname: this.nickname,
       active: this.active,
-      company: {
-        id: this.companyId,
-        name: this.companyName
-      },
-      branch: {
-        id: this.branchId,
-        name: this.branchName
-      },
+      // company: {
+      //   id: this.companyId,
+      //   name: this.companyName
+      // },
+      companyId: this.companyId,
+      companyName: this.companyName,
+
+      // branch: {
+      //   id: this.branchId,
+      //   name: this.branchName
+      // },
+      branchId : this.branchId,
+      branchName : this.branchName,
       roles: userRoles,
       type: this.type,
 

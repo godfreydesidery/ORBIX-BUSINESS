@@ -16,6 +16,9 @@ import { ICashCollection, IParkingCashCollection, IParkingServiceCashCollection 
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { IRestaurantProduct } from 'src/app/domain/restaurant-product';
+import { IRestaurant } from 'src/app/domain/restaurant';
+import { IProduct } from 'src/app/domain/product';
 
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js');
@@ -76,6 +79,8 @@ export class RestaurantProductStockLogComponent {
       to = new Date()
     }
 
+    var productId = this.selectedProduct?.id ?? ''
+
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
@@ -89,7 +94,7 @@ export class RestaurantProductStockLogComponent {
     this.total = 0
 
 
-    await this.http.post<IFastMovingProducts[]>(API_URL + '/restaurant_stock_logs/get_stock_logs_report_by_dates?restaurant_id=' + this.restaurantId, args, options)
+    await this.http.post<IFastMovingProducts[]>(API_URL + '/restaurant_stock_logs/get_stock_logs_report_by_dates?restaurant_id=' + this.restaurantId + '&product_id=' + productId, args, options)
       .toPromise()
       .then(
         data => {
@@ -155,6 +160,63 @@ export class RestaurantProductStockLogComponent {
       )
 
   }
+
+
+    selectedRestaurant: IRestaurant;
+    restaurantName: string = '';
+    restaurantProducts: IRestaurantProduct[] = [];
+    searchedProducts: IProduct[] = [];
+    filteredProducts: any[] = [];
+    selectedProduct: any | null = null;
+    isDropdownOpen: boolean = false;
+
+
+  searchTerm: string = '';
+  searchKey: string = '';
+  isUserTyping: boolean = true; // Flag to detect user typing
+  page: number = 1; // Pagination
+  filterRecords: string = '';
+  selectedOption: string = '';
+
+
+  selectedDineableId: any = null
+  selectedDineableCode: string = ''
+  selectedDineableName: string = ''
+
+  id: any = null
+  dinableName: string = ''
+
+
+  searchProducts(): void {
+      const options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+  
+      }
+      this.filteredProducts = [];
+      this.selectedProduct = null
+      if (this.searchTerm.trim().length >= 2) {
+        this.http
+          .get<IProduct[]>(API_URL + '/restaurant_products/get_products_by_restaurant_containing?product_name_like=' + this.searchTerm + '&restaurant_id=' + this.restaurantId, options)
+          .subscribe(
+            (data) => (this.filteredProducts = data),
+            (error) => console.error('Error fetching dineables:', error)
+          );
+      } else {
+        this.filteredProducts = [];
+      }
+    }
+
+    productId : any = null
+  
+    selectProduct(product: any): void {
+      this.selectedProduct = product
+      this.productId = product.id
+      this.searchTerm = product.name
+      this.isDropdownOpen = false
+  
+      //this.searchProductInRestaurant(product.id)
+      this.filteredProducts = []
+    }
 
 
 

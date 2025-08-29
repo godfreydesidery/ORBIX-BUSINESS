@@ -23,10 +23,12 @@ public interface RestaurantProductLogRepository extends JpaRepository<Restaurant
 	        "LEFT JOIN products p ON spl.product_id = p.id " +
 	        "WHERE spl.restaurant_id = :restaurantId " +
 	        "AND spl.created_date_time BETWEEN :startDateTime AND :endDateTime " +
+	        "AND (:productId IS NULL OR spl.product_id = :productId) " +
 	        "ORDER BY spl.created_date_time DESC",
 	        nativeQuery = true)
 	    List<RestaurantStockLogReportProjection> getStockLogReportByRestaurant(
 	        @Param("restaurantId") Long restaurantId,
+	        @Param("productId") Long productId,
 	        @Param("startDateTime") LocalDateTime startDateTime,
 	        @Param("endDateTime") LocalDateTime endDateTime
 	    );

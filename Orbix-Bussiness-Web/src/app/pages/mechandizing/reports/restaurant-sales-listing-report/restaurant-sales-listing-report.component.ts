@@ -83,74 +83,6 @@ export class RestaurantSalesListingReportComponent {
   totalAmount: number = 0
   totalProfit: number = 0
 
-
-
-  async getSalesListingByDate11(from: Date | string | null, to: Date | string | null) {
-    if (from == null || to == null) {
-      from = new Date()
-      to = new Date()
-    }
-
-    let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
-    }
-
-    var args = {
-      from: from,
-      to: to,
-    }
-
-    this.salesListings = []
-    this.totalCost = 0
-    this.totalDiscount = 0
-    this.totalAmount = 0
-    this.totalProfit = 0
-
-    var restId = ''
-
-    if (this.restaurantId != null) restId = this.restaurantId
-
-
-    await this.http.get<IRestaurantSalesListingReport[]>(API_URL +
-      '/get_restaurant_sales_listing_report?start_date=' + from + 'T00:00:00' + '&end_date=' + to + 'T23:59:59' + '&restaurant_id=' + restId + '&agent_name=' + this.nickname + '&nickname=' + this.nickname,
-      options)
-      .toPromise()
-      .then(
-        data => {
-
-          this.salesListings = data!
-
-          var sn = 1
-          this.totalCost = 0
-          this.totalDiscount = 0
-          this.totalAmount = 0
-          this.totalProfit = 0
-          // this.salesListings.forEach(element => {
-          //   element.sn = sn
-          //   this.totalCost = this.totalCost + (+element.cost)
-          //   this.totalDiscount = this.totalDiscount + (+element.discount)
-          //   this.totalAmount = this.totalAmount + (+element.amount)
-          //   this.totalProfit = this.totalProfit + (+element.profit)
-          //   sn = sn + 1
-          // })
-
-
-
-          console.log(data)
-        }
-      )
-      .catch(
-        error => {
-          this.msg.showErrorMessage(error, 'Error')
-
-          console.log(error)
-        }
-      )
-
-
-    return 0;
-  }
-
   async getSalesListingByDate(from: Date | string | null, to: Date | string | null) {
     if (!from) from = new Date();
     if (!to) to = new Date();
@@ -191,15 +123,13 @@ export class RestaurantSalesListingReportComponent {
 
       var sn = 1
 
+      this.totalAmount = 0
       this.salesListings.forEach(element => {
+        this.totalAmount = this.totalAmount + (+element.amount)
         element.sn = sn
         sn++
       })
-      this.totalCost = 0;
-      this.totalDiscount = 0;
-      this.totalAmount = 0;
-      this.totalProfit = 0;
-
+      
       console.log(data);
     } catch (error) {
       this.msg.showErrorMessage(error, 'Error');

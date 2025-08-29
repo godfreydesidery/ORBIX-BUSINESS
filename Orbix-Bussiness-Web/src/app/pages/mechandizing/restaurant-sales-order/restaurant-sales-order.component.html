@@ -12,7 +12,7 @@
                     <div class="col-md-12">
                         <button class="btn btn-outline-success btn-round-custom" (click)="getAllPendingOrders()"
                             data-toggle="modal" data-target="#sales-order-list-modal">Sales Order List</button>
-                        <button class="btn btn-outline-success btn-round-custom" (click)="clearOrder()"
+                        <button class="btn btn-outline-success btn-round-custom" (click)="clearOrder()" (click)="getAvailableAgentsByRestaurant()" 
                             data-toggle="modal" data-target="#sales-order-modal">New Sales Order</button>
                         <button class="btn btn-outline-danger btn-round-custom" (click)="cancelOrder()"
                             *ngIf="restaurantSalesOrderId != null">Cancel Order</button>
@@ -229,9 +229,9 @@
                                                     <button class="btn btn-sm btn-outline-danger btn-round-custom"
                                                         (click)="removeDetail(item.id)"><i class="fa fa-trash"></i>
                                                         Remove</button>
-                                                    <button class="btn btn-sm btn-outline-success btn-round-custom"
+                                                    <!-- <button class="btn btn-sm btn-outline-success btn-round-custom"
                                                         (click)="verifyDetail(item.id)"><i class="fa fa-check"></i>
-                                                        Verify</button>
+                                                        Verify</button> -->
                                                 </td>
                                             </tr>
 
@@ -460,7 +460,7 @@
                         <div class="col-md-10 mb-1">
                             <label for="dineableCode">Select Agent</label>
                             <select class="form-control" [(ngModel)]="selectedAgentId" (change)="onAgentChange($event)">
-                                <option [value]="null"></option>
+                                <option [ngValue]="null"></option>
                                 <option *ngFor="let availableAgent of restaurantAgents" [value]="availableAgent.id">
                                     {{availableAgent.name}} | {{availableAgent.restaurantBadgeCode}}
                                 </option>

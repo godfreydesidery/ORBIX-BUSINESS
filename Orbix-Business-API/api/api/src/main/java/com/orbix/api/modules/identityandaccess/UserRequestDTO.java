@@ -1,5 +1,8 @@
 package com.orbix.api.modules.identityandaccess;
 
+import java.util.ArrayList;
+import java.util.Collection;
+
 import lombok.Data;
 
 @Data
@@ -21,5 +24,7 @@ public class UserRequestDTO {
 	private Long branchId;
 	private String branchCode;
 	private String branchName;
+	
+	private Collection<Role> roles = new ArrayList<>();
 	
 }

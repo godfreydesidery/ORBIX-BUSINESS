@@ -42,6 +42,8 @@
                             <!-- <br><br> -->
                             <button class="btn btn-outline-success btn-round-custom" (click)="getSalesListingByDate(from, to)">Run Report</button>
                             <button class="btn btn-outline-primary btn-round-custom" (click)="printReport()" style="padding-left: 3px;">Print Report</button>
+                            <br>
+                            <span class="form-control text-primary" *ngIf="salesListings.length > 0" style="font-weight: bolder; text-align: right;">Total Sales: {{totalAmount| currency:'':'':''}}</span>
                         
                         </div>
                     </div>
@@ -65,10 +67,19 @@
                                         <td>{{s.sn}}</td>
                                         <td>{{s.dineableName}}</td>
                                         <td class="text-danger" style="font-weight: bold;">{{s.qty}}</td>
-                                        <td style="text-align: right;" style="font-weight: bold;">{{s.amount | currency:'':'':'' }}</td>
+                                        <td style="text-align: right; font-weight: bold;">{{s.amount | currency:'':'':'' }}</td>
                                         <td class="text-primary" style="font-weight: bold;">{{s.dateTime}}</td>
                                         <td>{{s.confirmedBy}}</td>
                                         <td>{{s.agentName}}</td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td></td>
+                                        <td class="text-primary" style="font-weight: bolder">Total</td>
+                                        <td class="text-primary" style="text-align: right; font-weight: bolder;">{{totalAmount | currency:'':'':'' }}</td>
+                                        <td></td>
+                                        <td></td>
+                                        <td></td>
                                     </tr>
                                 </tbody>
                                 <!-- <tbody>
