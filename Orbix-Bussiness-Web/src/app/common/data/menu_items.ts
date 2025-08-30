@@ -516,8 +516,8 @@ export const menuItems = [
                     //     routerLink: '/app/mechandizing/sales-listing-report'
                     // },
                     {
-                        title: 'Fast Moving Products',
-                        routerLink: '/app/mechandizing/fast-moving-products-report'
+                        title: 'Fast Moving Meals',
+                        routerLink: '/app/mechandizing/fast-moving-dineables-report'
                     },
                     {
                         title: 'Restaurant Sales Report',
@@ -556,6 +556,36 @@ export const menuItems = [
                     }
                 ]
             },
+        ]
+    },
+    {
+        title: 'Workshop',
+        icon: 'fa-cogs',
+        selected: false,
+        expanded: false,
+        show: grant(['WRHOUSE-ACCESS']),
+        order: 700,
+        subMenu: [
+            {
+                title: 'Select Workshop',
+                show: true,
+                routerLink: '/app/service-bay/select-workshop'
+            },
+            // {
+            //     title: 'Reports',
+            //     url: '#',
+            //     show: true,
+            //     subMenu: [
+            //         {
+            //             title: 'Collection Report',
+            //             routerLink: '/app/storage-management/cash-collections'
+            //         },
+            //         {
+            //             title: 'Storage Report',
+            //             routerLink: '/app/storage-management/storage-report'
+            //         }
+            //     ]
+            // },
         ]
     },
     {
@@ -840,6 +870,10 @@ export const menuItems = [
                         routerLink: '/app/admin-unit/shop'
                     },
                     {
+                        title: 'Workshop',
+                        routerLink: '/app/admin-unit/workshop'
+                    },
+                    {
                         title: 'Restaurant',
                         routerLink: '/app/admin-unit/restaurant'
                     },
@@ -935,6 +969,11 @@ export const menuItems = [
                         title: 'Product',
                         show: true,
                         routerLink: '/app/inventory/product'
+                    },
+                    {
+                        title: 'Service',
+                        show: true,
+                        routerLink: '/app/inventory/service'
                     },
                     {
                         title: 'Dineable',

@@ -77,6 +77,8 @@ export class RestaurantSalesOrderComponent {
   payRefNo: string = ''
 
   selectedAgentId: any = null
+  selectedAgentname: string = ''
+  phoneNo: string = ''
 
   constructor(
     private http: HttpClient,
@@ -328,6 +330,7 @@ export class RestaurantSalesOrderComponent {
     this.payCode = 'CASH'
     this.payRefNo = ''
     this.selectedAgentId = null
+    this.selectedAgentname = ''
   }
 
   // Triggered on every keystroke
@@ -557,33 +560,7 @@ export class RestaurantSalesOrderComponent {
       )
   }
 
-  async confirmOrder11() {
-    if (await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to confirm this order?', 'question', 'Yes', 'No') == false) {
-      return
-    }
-    let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
-    }
-    await this.http.post<IRestaurantSalesOrder>(API_URL + '/restaurant_sales_orders/confirm?restaurant_sales_order_id=' + this.restaurantSalesOrderId + '&pay_code=' + this.payCode + '&pay_ref_no=' + this.payRefNo, null, options)
-      .toPromise()
-      .then(
-        data => {
-          console.log(data)
-          this.get(this.restaurantSalesOrderId)
-          this.msg.showSuccessMessage('Order confirmed successifully')
-          this.printReceipt()
-          //this.clearOrder()
-        }
-      )
-      .catch(error => {
-        console.log(error)
-        this.msg.showErrorMessage(error, 'Error')
-        return
-      }
-      )
-    await this.clearOrder()
-    alert(this.restaurantDineableId)
-  }
+  
 
   async confirmOrder() {
     if (!(await this.msg.showConfirmMessageDialog(
@@ -616,42 +593,61 @@ export class RestaurantSalesOrderComponent {
       console.log(data);
 
       // ensure get() completes before clearOrder()
-      await this.get(this.restaurantSalesOrderId);
+      await this.get(this.restaurantSalesOrderId)
 
-      this.msg.showSuccessMessage('Order confirmed successfully');
+      this.msg.showSuccessMessage('Order confirmed successfully')
       this.printReceipt();
 
       await this.clearOrder();  // runs after get() finishes
 
     } catch (error) {
-      console.log(error);
-      this.msg.showErrorMessage(error, 'Error');
+      console.log(error)
+      this.msg.showErrorMessage(error, 'Error')
     }
   }
-
 
   async cancelOrder() {
-    if (await this.msg.showConfirmMessageDialog('Cancel', 'Are you sure you want to cancel this order?', 'question', 'Yes', 'No') == false) {
-      return
-    }
-    let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
-    }
-    this.http.post<IRestaurantSalesOrder>(API_URL + '/restaurant_sales_orders/cancel?restaurant_sales_order_id=' + this.restaurantSalesOrderId, null, options)
-      .toPromise()
-      .then(
-        data => {
-          console.log(data)
-          this.get(this.restaurantSalesOrderId)
-          this.msg.showSuccessMessage('Order canceled successifully')
-        }
-      )
-      .catch(error => {
-        console.log(error)
-        this.msg.showErrorMessage(error, 'Error')
-      }
-      )
+  if (!(await this.msg.showConfirmMessageDialog(
+    'Cancel',
+    'Are you sure you want to cancel this order?',
+    'question',
+    'Yes',
+    'No'
+  ))) {
+    return;
   }
+
+  let options = {
+    headers: new HttpHeaders().set(
+      'Authorization',
+      'Bearer ' + this.auth.user.access_token
+    )
+  };
+
+  try {
+    const data = await this.http.post<IRestaurantSalesOrder>(
+      API_URL + '/restaurant_sales_orders/cancel?restaurant_sales_order_id=' +
+      this.restaurantSalesOrderId,
+      null,
+      options
+    ).toPromise();
+
+    console.log(data);
+
+    // ensure get() finishes before showing success
+    await this.get(this.restaurantSalesOrderId);
+
+    this.msg.showSuccessMessage('Order canceled successfully');
+
+    // optionally clear after cancel if that's the intended flow
+    await this.clearOrder();
+
+  } catch (error) {
+    console.log(error);
+    this.msg.showErrorMessage(error, 'Error');
+  }
+}
+
 
 
 
@@ -681,9 +677,9 @@ export class RestaurantSalesOrderComponent {
     })
 
     var customer: ICustomer = {
-      name: '',
+      name: this.restaurantSalesOrder.restaurantAgentName ?? '',
       address: '',
-      phone: ''
+      phone: this.restaurantSalesOrder.restaurantAgentPhone ?? ''
     }
 
     this.printer.print(items, 'NA', 0, customer)

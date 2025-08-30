@@ -151,6 +151,9 @@ public class RestaurantSalesOrderServiceController implements RestaurantSalesOrd
 		restaurantSalesOrderResponse.setCustomerName(restaurantSalesOrder.getCustomerName());
 		restaurantSalesOrderResponse.setRestaurantBadgeCode(restaurantSalesOrder.getRestaurantBadge().getCode());
 		restaurantSalesOrderResponse.setRestaurantAgentName(restaurantSalesOrder.getRestaurantAgent().getName());
+		restaurantSalesOrderResponse.setRestaurantAgentPhone(Optional.ofNullable(restaurantSalesOrder.getRestaurantAgent())
+		        .map(RestaurantAgent::getPhoneNo)
+		        .orElse(null));
 		restaurantSalesOrderResponse.setCreatedAt(restaurantSalesOrder.getCreatedDateTime().toString());
 		
 		return restaurantSalesOrderResponse;
@@ -168,6 +171,9 @@ public class RestaurantSalesOrderServiceController implements RestaurantSalesOrd
 		restaurantSalesOrderResponse.setCustomerName(restaurantSalesOrder.getCustomerName());
 		restaurantSalesOrderResponse.setRestaurantBadgeCode(restaurantSalesOrder.getRestaurantBadge().getCode());
 		restaurantSalesOrderResponse.setRestaurantAgentName(restaurantSalesOrder.getRestaurantAgent().getName());
+		restaurantSalesOrderResponse.setRestaurantAgentPhone(Optional.ofNullable(restaurantSalesOrder.getRestaurantAgent())
+		        .map(RestaurantAgent::getPhoneNo)
+		        .orElse(null));
 		restaurantSalesOrderResponse.setCreatedAt(restaurantSalesOrder.getCreatedDateTime().toString());
 		
 		for(RestaurantSalesOrderDetail restaurantSalesOrderDetail : restaurantSalesOrder.getRestaurantSalesOrderDetails()) {

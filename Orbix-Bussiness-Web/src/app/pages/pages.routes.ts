@@ -13,6 +13,7 @@ import { RoleAccessComponent } from './identity-and-access/role-access/role-acce
 import { AuthGuard } from '../auth-guard';
 import { ProductComponent } from './inventory/product/product.component';
 import { RestaurantComponent } from './administration-units/restaurant/restaurant.component';
+import { WorkshopComponent } from './administration-units/workshop/workshop.component';
 
 export const routes: Routes = [
   {
@@ -91,6 +92,12 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
       {
+        path : 'admin-unit/workshop',
+        loadComponent : () => import('./administration-units/administration-units.routes').then(c => WorkshopComponent),
+        data : { breadcrumb : 'Admin Unit/Workshop'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'admin-unit/shop-till',
         loadComponent : () => import('./administration-units/administration-units.routes').then(c => ShopTillComponent),
         data : { breadcrumb : 'Admin Unit/Shop Till'},
@@ -109,6 +116,13 @@ export const routes: Routes = [
         path : 'inventory/product',
         loadComponent: () => import('./inventory/product/product.component').then(c => c.ProductComponent),
         data : { breadcrumb : 'Product/Product'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'inventory/service',
+        loadComponent: () => import('./inventory/service/service.component').then(c => c.ServiceComponent),
+        data : { breadcrumb : 'Service/Service'},
         canActivate : [AuthGuard]
       },
       {
@@ -268,6 +282,13 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
 
+      {
+        path : 'mechandizing/fast-moving-dineables-report',
+        loadComponent: () => import('./mechandizing/reports/fast-moving-dineables-report/fast-moving-dineables-report.component').then(c => c.FastMovingDineablesReportComponent),
+        data : { breadcrumb : 'Mechandizing/Reports/Fast Moving Meals Report'},
+        canActivate : [AuthGuard]
+      },
+
 
       //System Profile
       /**Start of System Profile */
@@ -414,6 +435,17 @@ export const routes: Routes = [
 
 
       /**End Storage Management */
+
+      /**Service Bay */
+
+      {
+        path : 'service-bay/select-workshop',
+        loadComponent: () => import('./service-bay/select-workshop/select-workshop.component').then(c => c.SelectWorkshopComponent),
+        data : { breadcrumb : 'Workshop/Select Workshop'},
+        canActivate : [AuthGuard]
+      },
+
+      /** End of Service Bay */
 
 
       {

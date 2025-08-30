@@ -11,6 +11,7 @@ export interface IRestaurantSalesOrder {
 
     restaurantBadgeCode : string
     restaurantAgentName : string
+    restaurantAgentPhone : string
 
     restaurantSalesOrderDetails : IRestaurantSalesOrderDetail[]
 

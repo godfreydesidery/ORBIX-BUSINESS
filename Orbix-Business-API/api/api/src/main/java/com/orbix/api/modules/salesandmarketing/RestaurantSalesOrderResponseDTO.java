@@ -17,6 +17,7 @@ public class RestaurantSalesOrderResponseDTO {
     
     String restaurantBadgeCode;
     String restaurantAgentName;
+    String restaurantAgentPhone;
     
     List<RestaurantSalesOrderDetailResponseDTO> restaurantSalesOrderDetails;
 }

@@ -50,8 +50,8 @@
                                 <tbody>
                                     <tr *ngFor="let cashCollection of cashCollections">
                                         <td>{{cashCollection.sn}}</td>
-                                        <td>{{cashCollection.reason}}</td>                                        
-                                        <td style="text-align: right;">{{cashCollection.amount | currency:'':''}}</td>
+                                        <td class="text-primary" style="font-weight: bolder;">{{cashCollection.reason}}</td>                                        
+                                        <td class="text-danger" style="text-align: right; font-weight: bolder;">{{cashCollection.amount | currency:'':''}}</td>
                                         <td>{{cashCollection.payCode}}</td>  
                                         <td>{{cashCollection.cashierName}}</td>                                      
                                     </tr>
@@ -59,7 +59,7 @@
                                 <tfoot>
                                     <tr>
                                         <td colspan="2"><b>Total</b></td>
-                                        <td style="text-align: right;"><b>{{totalCollections | currency:'':''}}</b></td>
+                                        <td class="text-primary" style="text-align: right; font-weight: bolder;"><b>{{totalCollections | currency:'':''}}</b></td>
                                         <td colspan="2"></td>
                                     </tr>
                                 </tfoot>
