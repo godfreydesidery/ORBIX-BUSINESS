@@ -104,3 +104,27 @@ export interface IWeighBillReceivable {
     sn : number
 
 }
+
+export interface IMachineServiceBillReceivable {
+    id : any
+    startedAt : Date
+    endedAt : Date
+    description : string
+    billingType : string
+    qty : number
+    noOfDays : number
+    price : number
+
+    discount : number
+    discountStatus : string
+
+    amount : number
+
+    storageId : string
+    billReceivableId : string
+
+    payStatus : string
+
+    sn : number
+
+}

@@ -19,7 +19,8 @@ import { ICustomer } from 'src/app/domain/customer';
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
-const API_URL = environment.apiUrl; @Component({
+const API_URL = environment.apiUrl; 
+@Component({
   selector: 'az-weight-billing',
   standalone: true,
   imports: [

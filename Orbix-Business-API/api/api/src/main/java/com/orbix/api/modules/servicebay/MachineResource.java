@@ -35,6 +35,12 @@ public class MachineResource {
             @RequestParam(name = "workshop_id") Long workshopId) {
         return ResponseEntity.ok().body(machineService.getMachinesByWorkshop(workshopId));
     }
+    
+    @GetMapping("/machines/by_branch")
+    public ResponseEntity<List<MachineResponseDTO>> getByBranch(
+    		HttpServletRequest request) {
+        return ResponseEntity.ok().body(machineService.getMachinesByBranch(request));
+    }
 
     @PostMapping("/machines/create")
     public ResponseEntity<MachineResponseDTO> create(

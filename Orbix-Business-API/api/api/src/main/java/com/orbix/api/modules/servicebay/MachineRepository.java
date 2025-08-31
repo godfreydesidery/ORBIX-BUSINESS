@@ -8,6 +8,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
+import com.orbix.api.modules.adminunits.Branch;
+
 public interface MachineRepository extends JpaRepository<Machine, Long> {
 
 	//List<Machine> findByWorkshopId(Long workshopId);
@@ -31,5 +33,16 @@ public interface MachineRepository extends JpaRepository<Machine, Long> {
         "WHERE m.id = :machineId"
     )
     Optional<Machine> findWithServicesById(@Param("machineId") Long machineId);
+
+    @Query(
+    	    "SELECT m FROM Machine m " +
+    	    "WHERE m.branch = :branch " +
+    	    "AND m.createdDateTime >= :fromTime " +
+    	    "AND m.status = 'CHECKED-IN'"
+    	)
+        List<Machine> findRecentByBranch(
+                @Param("branch") Branch branch,
+                @Param("fromTime") LocalDateTime fromTime
+        );
 
 }

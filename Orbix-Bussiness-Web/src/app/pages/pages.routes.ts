@@ -541,6 +541,20 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
 
+      {
+        path : 'accounts-and-finance/service-bay-billing',
+        loadComponent: () => import('./accounts-and-finance/service-bay-billing/service-bay-billing.component').then(c => c.ServiceBayBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Service Bay Billing'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'accounts-and-finance/machine-service-billing',
+        loadComponent: () => import('./accounts-and-finance/machine-service-billing/machine-service-billing.component').then(c => c.MachineServiceBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Machine Service Billing'},
+        canActivate : [AuthGuard]
+      },
+
       // Management
 
       {

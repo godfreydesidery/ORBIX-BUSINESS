@@ -67,6 +67,13 @@ public class BillReceivableResource {
 		return ResponseEntity.ok().body(billReceivableService.getAllByWeigh(weighId, request));
 	}
 	
+	@GetMapping("/bill_receivables/get_all_by_machine")
+	public ResponseEntity<List<BillReceivableResponseDTO>>getAllByMachine(
+			@RequestParam(name = "machine_id") Long machineId,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(billReceivableService.getAllByMachine(machineId, request));
+	}
+	
 	
 	
 	

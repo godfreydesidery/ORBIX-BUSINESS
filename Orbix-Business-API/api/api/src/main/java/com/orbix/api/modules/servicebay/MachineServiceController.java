@@ -13,6 +13,7 @@ import org.springframework.stereotype.Service;
 
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
+import com.orbix.api.modules.adminunits.Branch;
 import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.adminunits.Workshop;
 import com.orbix.api.modules.adminunits.WorkshopRepository;
@@ -130,6 +131,7 @@ public class MachineServiceController implements MachineServiceInterface {
 		dto.setOwnerPhoneNo(machine.getOwnerPhoneNo());
 		dto.setMachineRegNo(machine.getRegNo());
 		dto.setName(machine.getName());
+		dto.setMachineName(machine.getName());
 		dto.setStatus(machine.getStatus());
 
 		// Workshop
@@ -164,6 +166,7 @@ public class MachineServiceController implements MachineServiceInterface {
 		dto.setOwnerPhoneNo(machine.getOwnerPhoneNo());
 		dto.setMachineRegNo(machine.getRegNo());
 		dto.setName(machine.getName());
+		dto.setMachineName(machine.getName());
 		dto.setStatus(machine.getStatus());
 
 		// Workshop
@@ -205,6 +208,18 @@ public class MachineServiceController implements MachineServiceInterface {
 		dto.setMachineServices(services);
 		
 		return dto;
+	}
+
+	@Override
+	public List<MachineResponseDTO> getMachinesByBranch(HttpServletRequest request) {
+		LocalDateTime twentyFourHoursAgo = LocalDateTime.now().minusHours(24);
+		
+		Branch branch = userService.getUserBranch(request);
+
+	    return machineRepository.findRecentByBranch(branch, twentyFourHoursAgo)
+	            .stream()
+	            .map(this::toDto)
+	            .toList();
 	}
 
 	

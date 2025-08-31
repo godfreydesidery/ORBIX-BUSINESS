@@ -91,6 +91,12 @@ public class MachineServiceServiceController implements MachineServiceService {
 		List<MachineService> machineServices = machineServiceRepository.findAllByMachineAndStatus(machine, "PENDING");
 
 		for (MachineService machineService : machineServices) {
+			
+			if(machine.getStatus().equals("PENDING")) {
+				machine.setStatus("CHECKED-IN");
+				machine = machineRepository.save(machine);
+			}
+			
 			if (machineService.getStatus().equals("PENDING")) {
 				
 				machineService.setStatus("APPROVED");

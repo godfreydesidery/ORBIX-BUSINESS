@@ -24,6 +24,12 @@ import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.modules.servicebay.Machine;
+import com.orbix.api.modules.servicebay.MachineRepository;
+import com.orbix.api.modules.servicebay.MachineService;
+import com.orbix.api.modules.servicebay.MachineServiceBillReceivable;
+import com.orbix.api.modules.servicebay.MachineServiceBillReceivableRepository;
+import com.orbix.api.modules.servicebay.MachineServiceRepository;
 import com.orbix.api.modules.vehicleandequipmentmaintenance.Maintenance;
 import com.orbix.api.modules.vehicleandequipmentmaintenance.MaintenanceJobCardIssueBillReceivable;
 import com.orbix.api.modules.vehicleandequipmentmaintenance.MaintenanceJobCardIssueBillReceivableRepository;
@@ -50,6 +56,7 @@ public class BillReceivableServiceController implements BillReceivableService {
 	private final ParkingRepository parkingRepository;
 	private final StorageRepository storageRepository;
 	private final WeighRepository weighRepository;
+	private final MachineRepository machineRepository;
 	private final MaintenanceRepository maintenanceRepository;
 	private final ParkingBillReceivableRepository parkingBillReceivableRepository;
 	private final ParkingServiceBillReceivableRepository parkingServiceBillReceivableRepository;
@@ -57,6 +64,8 @@ public class BillReceivableServiceController implements BillReceivableService {
 	private final WeighBillReceivableRepository weighBillReceivableRepository;
 	private final MaintenanceJobCardIssueBillReceivableRepository maintenanceJobCardIssueBillReceivableRepository;
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
+	private final MachineServiceRepository machineServiceRepository;
+	private final MachineServiceBillReceivableRepository machineServiceBillReceivableRepository;
 	
 	private final BillReceivableCollectionRepository billReceivableCollectionRepository;
 	
@@ -137,6 +146,12 @@ public class BillReceivableServiceController implements BillReceivableService {
 				qty = 1;
 			}
 			
+			Optional<MachineServiceBillReceivable> machineServiceBillReceivable = machineServiceBillReceivableRepository.findByBillReceivable(billReceivable);
+			if(machineServiceBillReceivable.isPresent()) {
+				billReceivableCollection.setReason("Machine/Vehicle Service");
+				qty = machineServiceBillReceivable.get().getQty();
+			}
+			
 			billReceivableCollection = billReceivableCollectionRepository.save(billReceivableCollection);
 			billReceivable = billReceivableRepository.save(billReceivable);
 			billReceivable.setQty(qty); 
@@ -203,6 +218,21 @@ public class BillReceivableServiceController implements BillReceivableService {
 		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
 		for(MaintenanceJobCardIssueBillReceivable maintenanceJobCardIssueBillReceivable : maintenanceJobCardIssueBillReceivables) {
 			billReceivableResponses.add(billReceivableResponseDTOMapper(maintenanceJobCardIssueBillReceivable.getBillReceivable()));
+		}		
+		return billReceivableResponses;
+	}
+	
+	@Override
+	public List<BillReceivableResponseDTO> getAllByMachine(Long machineId, HttpServletRequest request) {
+		Machine machine = machineRepository.findById(machineId)
+			    .orElseThrow(() -> new NotFoundException("Machine with ID " + machineId + " not found"));
+		
+		List<MachineService> machineServices = machineServiceRepository.findAllByMachine(machine);
+		
+		List<MachineServiceBillReceivable> machineServiceBillReceivables = machineServiceBillReceivableRepository.findAllByMachineServiceIn(machineServices);
+		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
+		for(MachineServiceBillReceivable machineServiceBillReceivable : machineServiceBillReceivables) {
+			billReceivableResponses.add(billReceivableResponseDTOMapper(machineServiceBillReceivable.getBillReceivable()));
 		}		
 		return billReceivableResponses;
 	}

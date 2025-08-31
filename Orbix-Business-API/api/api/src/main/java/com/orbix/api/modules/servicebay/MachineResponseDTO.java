@@ -13,6 +13,7 @@ public class MachineResponseDTO {
 	private String ownerPhoneNo;
 	private String machineRegNo;
 	private String name;
+	private String machineName;
 	private String status;
 	private String workshopId;
 	private String workshopName;

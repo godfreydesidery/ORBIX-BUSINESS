@@ -13,4 +13,6 @@ public interface MachineServiceInterface {
 	public MachineResponseDTO updateMachine(MachineRequestDTO machineRequest, HttpServletRequest request);
 	
 	public List<MachineResponseDTO> getMachinesByWorkshop(Long workshopId);
+	
+	public List<MachineResponseDTO> getMachinesByBranch(HttpServletRequest request);
 }

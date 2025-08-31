@@ -426,6 +426,12 @@ export const menuItems = [
                 routerLink: '/app/accounts-and-finance/weigh-billing'
             },
             {
+                title: 'Service Bay Billing',
+                show: grant(['FINCSERVBAY-ACCESS']),
+                //show: true,
+                routerLink: '/app/accounts-and-finance/service-bay-billing'
+            },
+            {
                 title: 'Reports',
                 url: '#',
                 show: true,
@@ -563,7 +569,7 @@ export const menuItems = [
         icon: 'fa-cogs',
         selected: false,
         expanded: false,
-        show: grant(['WRHOUSE-ACCESS']),
+        show: grant(['SERVBAY-ACCESS']),
         order: 700,
         subMenu: [
             {

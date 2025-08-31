@@ -13,7 +13,7 @@ public class Object_ {
 	 * List of authorities not allowed
 	 * ACCESS ALL CREATE READ UPDATE DELETE ACTIVATE APPROVE VERIFY CANCEL
 	 * C R U D T V Y X
-	 * Format: OBJECT-LIST OF NOT ALLOWED AUTHORITIES
+	 * Format: OBJECT-LIST OF NOT ALLOWED AUTHORITIES 
 	 */
 	
 	public static String USER = "USER-ALL CREATE READ UPDATE";
@@ -25,6 +25,7 @@ public class Object_ {
 	public static String MTNC = "MTNC-ACCESS";
 	public static String TCHN = "TCHN-ACCESS";
 	public static String FINC = "FINC-ACCESS";
+	public static String SERVBAY = "SERVBAY-ACCESS";
 	public static String FINCPKNG = "FINCPKNG-ACCESS";
 	public static String FINCDISC = "FINCDISC-ACCESS";
 	public static String PKNGDISC = "PKNGDISC-ACCESS";
@@ -32,6 +33,7 @@ public class Object_ {
 	public static String FINCSTRG = "FINCSTRG-ACCESS";
 	public static String FINCWEGH = "FINCWEGH-ACCESS";
 	public static String FINCMTNC = "FINCMTNC-ACCESS";
+	public static String FINCSERVBAY = "FINCSERVBAY-ACCESS";
 	public static String SHOP = "SHOP-ACCESS";
 	public static String RESTAURANT = "RESTAURANT-ACCESS SALE ADMIN"; 
 	public static String WRHOUSE = "WRHOUSE-ACCESS";
