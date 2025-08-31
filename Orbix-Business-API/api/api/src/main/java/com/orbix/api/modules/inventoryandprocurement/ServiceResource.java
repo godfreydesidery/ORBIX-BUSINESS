@@ -123,4 +123,13 @@ public class ServiceResource {
 		return ResponseEntity.ok().body(serviceService.getServicesByCompanyAndName(serviceNameLike, request));
 
 	}
+	
+//	@GetMapping("/services/get_services_containing")
+//	public ResponseEntity<List<ServiceResponseDTO>>getAllRestaurantDineablesByRestaurantContaining(
+//			@RequestParam(name = "dineable_name_like")String dineableNameLike,
+//			HttpServletRequest request){
+//
+//		return ResponseEntity.ok().body(serviceService.getServicesByCompanyAndName(dineableNameLike));
+//
+//	}
 }
