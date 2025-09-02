@@ -24,6 +24,8 @@ import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.modules.salesandmarketing.RestaurantSaleDetailBillReceivable;
+import com.orbix.api.modules.salesandmarketing.RestaurantSaleDetailBillReceivableRepository;
 import com.orbix.api.modules.servicebay.Machine;
 import com.orbix.api.modules.servicebay.MachineRepository;
 import com.orbix.api.modules.servicebay.MachineService;
@@ -66,6 +68,7 @@ public class BillReceivableServiceController implements BillReceivableService {
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
 	private final MachineServiceRepository machineServiceRepository;
 	private final MachineServiceBillReceivableRepository machineServiceBillReceivableRepository;
+	private final RestaurantSaleDetailBillReceivableRepository restaurantSaleDetailBillReceivableRepository;
 	
 	private final BillReceivableCollectionRepository billReceivableCollectionRepository;
 	
@@ -144,6 +147,12 @@ public class BillReceivableServiceController implements BillReceivableService {
 			if(weighBillReceivable.isPresent()) {
 				billReceivableCollection.setReason("Weigh Bridge");
 				qty = 1;
+			}
+			
+			Optional<RestaurantSaleDetailBillReceivable> restaurantSaleDetailBillReceivable = restaurantSaleDetailBillReceivableRepository.findByBillReceivable(billReceivable);
+			if(restaurantSaleDetailBillReceivable.isPresent()) {
+				billReceivableCollection.setReason("Restaurant Sales");
+				qty = restaurantSaleDetailBillReceivable.get().getQty();
 			}
 			
 			Optional<MachineServiceBillReceivable> machineServiceBillReceivable = machineServiceBillReceivableRepository.findByBillReceivable(billReceivable);

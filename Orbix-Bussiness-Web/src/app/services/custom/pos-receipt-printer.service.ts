@@ -20,7 +20,7 @@ export class PosReceiptPrinterService {
     private data: DataService) { }
 
   //print = async (items : ReceiptItem[], receiptNo :string, cash : number, patient : IPatient) => {
-  print = async (items: ReceiptItem[], receiptNo: string, cash: number, customer? : ICustomer) => {
+  print = async (items: ReceiptItem[], receiptNo: string, cash: number, customer?: ICustomer) => {
 
     var companyName = localStorage.getItem('company-name')!
 
@@ -32,11 +32,26 @@ export class PosReceiptPrinterService {
     var tax: number = 0
 
     const datePipe = new DatePipe('en-US');
-const now = new Date();
-const formattedDate = datePipe.transform(now, 'dd/MM/yyyy : HH:mm:ss');
+    const now = new Date();
+    const formattedDate = datePipe.transform(now, 'dd/MM/yyyy : HH:mm:ss');
 
     //var address : any = await this.data.getReceiptHeader(receiptNo)
     var address: any = await this.data.getBranchReceiptHeader(receiptNo)
+
+    // Set up VFS for pdfMake - try different approaches
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
 
     var receipt = [
       [
@@ -99,8 +114,8 @@ const formattedDate = datePipe.transform(now, 'dd/MM/yyyy : HH:mm:ss');
             body: [
               [{ text: 'Client Details', alignment: 'center', }],
               [{ text: customer?.name, fontSize: 9, alignment: 'center', }],
-              [{ text: customer?.address, fontSize: 8, alignment: 'center',  }],
-              [{ text: customer?.phone, fontSize: 8, alignment: 'center',  }],
+              [{ text: customer?.address, fontSize: 8, alignment: 'center', }],
+              [{ text: customer?.phone, fontSize: 8, alignment: 'center', }],
               [{ text: '________________________________', alignment: 'center', }],
             ]
           }

@@ -73,9 +73,11 @@
               "node_modules/fullcalendar/dist/fullcalendar.min.js",
               "node_modules/dropzone/dist/dropzone.js",
               "node_modules/jquery/dist/jquery.min.js",
-              "node_modules/select2/dist/js/select2.min.js"
+              "node_modules/select2/dist/js/select2.min.js",
+              "node_modules/pdfmake/build/pdfmake.min.js",
+              "node_modules/pdfmake/build/vfs_fonts.js"
             ],
-            "allowedCommonJsDependencies": [ 
+            "allowedCommonJsDependencies": [
               "leaflet-map",
               "chart.js",
               "pace",
@@ -93,13 +95,13 @@
               "budgets": [
                 {
                   "type": "initial",
-                  "maximumWarning": "3mb",
-                  "maximumError": "4mb"
+                  "maximumWarning": "7mb",
+                  "maximumError": "10mb"
                 },
                 {
                   "type": "anyComponentStyle",
-                  "maximumWarning": "6kb",
-                  "maximumError": "10kb"
+                  "maximumWarning": "50kb",
+                  "maximumError": "100kb"
                 }
               ],
               "fileReplacements": [
@@ -109,11 +111,11 @@
                 }
               ],
               "outputHashing": "all",
-              "optimization": { 
-                  "styles": {
-                      "minify": true,
-                      "inlineCritical": false
-                  }
+              "optimization": {
+                "styles": {
+                  "minify": true,
+                  "inlineCritical": false
+                }
               }
             },
             "development": {
@@ -152,7 +154,12 @@
               {
                 "glob": "**/*",
                 "input": "public"
-
+              },
+              "src/assets",
+              {
+                "glob": "**/*.ttf",
+                "input": "node_modules/pdfmake/examples/fonts",
+                "output": "fonts/"
               },
               "src/env.js"
             ],

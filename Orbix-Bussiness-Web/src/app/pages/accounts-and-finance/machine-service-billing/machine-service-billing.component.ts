@@ -350,8 +350,34 @@ export class MachineServiceBillingComponent {
     this.serviceBillReceivableDiscount = 0
   }
 
+  ownerName : string = ''
+
+  async getMachine(id: any) {
+  
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      }
+      await this.http.get<IMachine>(API_URL + '/machines/get?id=' + id, options)
+        .toPromise()
+        .then(
+          data => {
+            
+            this.machineId = data!.id
+            this.machineNo = data!.no
+            this.ownerName = data!.ownerName
+            this.ownerPhoneNo = data!.ownerPhoneNo
+
+
+  
+            console.log(data)
+          }
+        )
+    }
+
 
   async printReceipt() {
+
+    await this.getMachine(this.machineId)
 
     // if (this.toPrintReceipt == false) {
     //   return
@@ -375,9 +401,9 @@ export class MachineServiceBillingComponent {
     })
 
     var customer: ICustomer = {
-      name: '',
+      name: this.ownerName ?? '',
       address: '',
-      phone: ''
+      phone: this.ownerPhoneNo ?? ''
     }
 
     this.printer.print(items, '', 0, customer)
@@ -393,150 +419,12 @@ export class MachineServiceBillingComponent {
 
 
 
-  generatePDF() {
-    const documentDefinition = {
-      content: [
-        { text: 'Hello, World!', fontSize: 18, bold: true },
-        { text: 'This is a sample PDF generated using pdfMake in Angular.' }
-      ]
-    };
-    pdfMake.createPdf(documentDefinition).open();
-  }
+  
 
 
 
 
 
-
-
-
-
-  // print = async (items : ReceiptItem[], receiptNo :string, cash : number, patient : IPatient) => {
-  print = async (receiptNo: string, cash: number) => {
-
-    var companyName = localStorage.getItem('company-name')!
-
-    var header = ''
-    var footer = ''
-    var title = 'Receipt'
-    var total: number = 0
-    var discount: number = 0
-    var tax: number = 0
-
-    //var address : any = await this.data.getReceiptHeader(receiptNo)
-    var address: any = await this.data.getBranchReceiptHeader(receiptNo)
-
-    var receipt = [
-      [
-        { text: 'SN', fontSize: 8, bold: true },
-        { text: 'Item', fontSize: 8, bold: true },
-        { text: 'Qty', fontSize: 8, bold: true },
-        { text: 'Amount', fontSize: 8, bold: true },
-      ]
-    ]
-
-    var sn = 0
-
-    this.billReceivables.forEach((element) => {
-      total = total + (+element.amount)
-      sn = sn + 1
-      var item = [
-        { text: sn.toString(), fontSize: 8, bold: false },
-        { text: element.summary, fontSize: 8, bold: false },
-        { text: element.qty.toString(), fontSize: 8, bold: false },
-        { text: (element.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 8, alignment: 'right', bold: false },
-      ]
-      receipt.push(item)
-    })
-    var detailSummary = [
-      { text: ' ', fontSize: 8, bold: false },
-      { text: 'Total', fontSize: 9, bold: true },
-      { text: ' ', fontSize: 8, bold: false },
-      { text: (+total).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
-    ]
-    receipt.push(detailSummary)
-
-
-    const docDefinition = {
-      header: '',
-
-      //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
-      content: [
-        {
-          layout: 'noBorders',
-          table: address
-
-        },
-
-
-
-        {
-          layout: 'noBorders',
-          table: {
-            headerRows: 0,
-            widths: [210],
-            body: [
-              [{ text: '==============================' }],
-            ]
-          }
-        },
-        {
-          layout: 'noBorders',
-          table: {
-            headerRows: 0,
-            widths: [200],
-            body: [
-              // [{text : patient?.firstName + ' '+ patient?.middleName + ' '+ patient?.lastName , fontSize : 8}],
-              // [{text : patient?.no, fontSize : 8}],
-              // [{text : patient?.address, fontSize : 8}],
-              // [{text : patient?.phoneNo, fontSize : 8}],
-              // [{text : '________________________________',alignment : 'center',}],
-              [{ text: '', fontSize: 8 }],
-              [{ text: '', fontSize: 8 }],
-              [{ text: '', fontSize: 8 }],
-              [{ text: '', fontSize: 8 }],
-              [{ text: '________________________________', alignment: 'center', }],
-            ]
-          }
-        },
-        {
-          layout: 'noBorders',
-          table: {
-            headerRows: 0,
-            widths: [200],
-            body: [
-              [{ text: 'Receipt', alignment: 'center', fontSize: 9, bold: true }],
-            ]
-          }
-        },
-        {
-          layout: 'noBorders',
-          table: {
-            headerRows: 1,
-            widths: [15, 100, 15, 50],
-            body: receipt
-          }
-        },
-        {
-          layout: 'noBorders',
-          table: {
-            headerRows: 0,
-            widths: [210],
-            body: [
-              [{ text: '==============================' }],
-              [{ text: 'Served By : ' + localStorage.getItem('user-name'), fontSize: 9, alignment: 'left' }],
-              [{ text: 'Developed By @Orbix Systems', fontSize: 10, bold: true, alignment: 'center' }],
-              [{ text: '***End of Receipt***', fontSize: 9, alignment: 'center' }]
-            ]
-          }
-        },
-      ],
-      pageMargins: 10,
-    }
-    const win = window.open('', "tempWinForPdf")
-    pdfMake.createPdf(docDefinition).print({}, win)
-    //win!.onfocus = function () { setTimeout(function () { win!.close(); }, 10000); } //set to 10 seconds
-  }
 
 
 
@@ -685,179 +573,14 @@ export class MachineServiceBillingComponent {
   }
 
 
-  async createWeighGoodRelease() {
-
-    let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
-    }
-
-    var weighGoodRelease = {
-      weighId: this.currentWeighId,
-      qty: this.qtyToRelease,
-
-    }
-
-    await this.http.post<IWeighGoodReleaseDetail>(API_URL + '/weigh_good_releases/create_weigh_good_release', weighGoodRelease, options)
-      .toPromise()
-      .then(
-        data => {
-          //this.getMachineServiceBillReceivables(this.weighId)
-          this.msg.showSuccessMessage('Success')
-          console.log(data)
-          this.printReleaseNote(data!.id)
-        }
-      )
-      .catch(
-        error => {
-          this.msg.showErrorMessage(error, 'Error')
-          console.log(error)
-        }
-      )
-
-
-  }
-
+  
 
 
 
   ///////////////////////////////////
 
 
-  printGatePassRcpt = async (billItems: IServiceBillItem[], receiptNo: string, cash: number) => {
-
-    await this.get(this.machineId)
-    await this.getLastBillingDate(this.machineId)
-
-    var companyName = localStorage.getItem('company-name')!
-
-    var header = ''
-    var footer = ''
-    var title = 'Gate Pass'
-    var total: number = 0
-    var discount: number = 0
-    var tax: number = 0
-
-    // var address : any = await this.data.getReceiptHeader(receiptNo)
-    var address: any = await this.data.getBranchReceiptHeaderWithNoTinAndVrn(receiptNo)
-
-    var receipt = [
-      [
-        { text: 'SN', fontSize: 8, bold: true },
-        { text: 'Item', fontSize: 8, bold: true },
-        { text: 'Qty', fontSize: 8, bold: true },
-        { text: 'Amount', fontSize: 8, bold: true },
-      ]
-    ]
-
-    var sn = 0
-
-    billItems.forEach((element) => {
-      total = total + (+element.amount)
-      sn = sn + 1
-      var item = [
-        { text: sn.toString(), fontSize: 8, bold: false },
-        { text: element.item, fontSize: 8, bold: false },
-        { text: element.qty.toString(), fontSize: 8, bold: false },
-        { text: (element.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 8, alignment: 'right', bold: false },
-      ]
-      receipt.push(item)
-    })
-    var detailSummary = [
-      { text: ' ', fontSize: 8, bold: false },
-      { text: 'Total', fontSize: 9, bold: true },
-      { text: ' ', fontSize: 8, bold: false },
-      { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
-    ]
-    receipt.push(detailSummary)
-
-
-    const docDefinition = {
-      header: '',
-
-      //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
-      content: [
-        {
-          layout: 'noBorders',
-          table: address
-        },
-
-
-
-        {
-          layout: 'noBorders',
-          table: {
-            headerRows: 0,
-            widths: [210],
-            body: [
-              [{ text: '==============================' }],
-            ]
-          }
-        },
-        {
-          layout: 'noBorders',
-          table: {
-            headerRows: 0,
-            widths: [200],
-            body: [
-              [{ text: 'Gate Pass', alignment: 'center', fontSize: 9, bold: true }],
-              [{ text: 'Client Name: ' + this.weighGoodReleaseClientName, alignment: 'left', fontSize: 9, bold: false }],
-              [{ text: 'Client Address: ' + this.ownerAddress, alignment: 'left', fontSize: 9, bold: false }],
-              [{ text: 'Client Phone: ' + this.ownerPhoneNo, alignment: 'left', fontSize: 9, bold: false }],
-              [{ text: '________________________________' }],
-              [{ text: 'Payment Details', alignment: 'center', fontSize: 9, bold: true }],
-              [{ text: ' ', alignment: 'center', fontSize: 9, bold: true }],
-            ]
-          }
-        },
-        {
-          layout: 'noBorders',
-          table: {
-            headerRows: 1,
-            widths: [15, 100, 15, 50],
-            body: receipt
-          }
-        },
-        {
-          layout: 'noBorders',
-          table: {
-            headerRows: 0,
-            widths: [200],
-            body: [
-              [{ text: ' ' }],
-              [{ text: 'Cashier Comments', alignment: 'left', fontSize: 9, bold: true }],
-              [{ text: this.comments, alignment: 'left', fontSize: 9, bold: false }],
-              [{ text: ' ' }],
-              [{ text: ' ' }],
-              [{ text: 'Issued At: ' + new Date().toString(), alignment: 'left', fontSize: 9, bold: true }],
-              [{ text: 'Checkout At: ' + new Date().toString(), alignment: 'left', fontSize: 9, bold: true }],
-              [{ text: 'Valid Until: ' + this.lastBillingDate, alignment: 'left', fontSize: 9, bold: true }],
-              [{ text: 'Number of Days: ' + this.noOfDays, alignment: 'left', fontSize: 9, bold: true }],
-              [{ text: ' ' }],
-              [{ text: 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment: 'left', fontSize: 9, bold: true }],
-              [{ text: ' ' }],
-              [{ text: 'Signature: ......................' }],
-            ]
-          }
-        },
-        {
-          layout: 'noBorders',
-          table: {
-            headerRows: 0,
-            widths: [210],
-            body: [
-              [{ text: '==============================' }],
-              [{ text: 'Developed By @Davaghana', fontSize: 10, bold: true, alignment: 'center' }],
-              [{ text: '***End of Document***', fontSize: 9, alignment: 'center' }]
-            ]
-          }
-        },
-      ],
-      pageMargins: 10,
-    }
-    const win = window.open('', "tempWinForPdf")
-    pdfMake.createPdf(docDefinition).print({}, win)
-    //win!.onfocus = function () { setTimeout(function () { win!.close(); }, 10000); } //set to 10 seconds
-  }
+  
 
 
 
@@ -970,130 +693,9 @@ export class MachineServiceBillingComponent {
       })
   }
 
-  async printWeighGoodReleaseNote(id: any) {
-    await this.getWeighGoodRelease(id)
+  
 
-    this.documentHeader = await this.data.getDocumentHeader()
-    const title = 'Gate Pass - Weigh Release'
-
-    // Define document structure
-    const docDefinition: any = {
-      header: '',
-      pageOrientation: 'potrait',
-      footer: (currentPage: any, pageCount: any) => ({
-        text: `${currentPage} of ${pageCount}`,
-        alignment: 'center',
-        fontSize: 8,
-      }),
-      content: [
-        // Document Header
-        {
-          columns: [this.documentHeader],
-          margin: [0, 0, 0, 10]
-        },
-
-        // Title
-        {
-          text: title,
-          fontSize: 16,
-          bold: true,
-          alignment: 'left',
-          margin: [0, 10, 0, 20],
-        },
-
-        // No and Date
-        {
-          columns: [
-            {
-              text: 'No: ' + this.weighGoodReleaseNo,
-              fontSize: 12,
-              width: '50%',
-            },
-            {
-              text: 'Date: ____________',
-              alignment: 'right',
-              fontSize: 12,
-              width: '50%',
-            },
-          ],
-          margin: [0, 0, 0, 10],
-        },
-
-        // Client Name
-        // {
-        //   text: 'Client Name: ' + this.weighGoodReleaseClientName,
-        //   fontSize: 12,
-        //   margin: [0, 0, 0, 15],
-        // },
-
-        {
-          layout: 'noBorders',
-          table: {
-            headerRows: 0,
-            widths: [200],
-            body: [
-              [{ text: title, alignment: 'center', fontSize: 9, bold: true }],
-              [{ text: 'Client Name: ' + this.weighGoodReleaseClientName, alignment: 'left', fontSize: 9, bold: false }],
-              [{ text: 'Client Address: ' + this.weighGoodReleaseClientAddress, alignment: 'left', fontSize: 9, bold: false }],
-              [{ text: 'Phone No: ' + this.weighGoodReleaseClientPhoneNo, alignment: 'left', fontSize: 9, bold: false }],
-              [{ text: '________________________________' }],
-              [{ text: 'Goods Details', alignment: 'center', fontSize: 9, bold: true }],
-              [{ text: ' ', alignment: 'center', fontSize: 9, bold: true }],
-            ]
-          }
-        },
-
-        // Table Header
-        {
-          columns: [
-            { text: 'Description', bold: true, fontSize: 12, width: '30%' },
-            { text: 'Qty', bold: true, fontSize: 12, width: '20%' },
-            { text: 'Unit Price', bold: true, fontSize: 12, width: '25%', alignment: 'right' },
-            { text: 'Total', bold: true, fontSize: 12, width: '25%', alignment: 'right' },
-          ],
-          margin: [0, 0, 0, 5],
-        },
-
-        // Table Row
-        {
-          columns: [
-            { text: this.weighGoodReleaseGoodName, fontSize: 11, width: '25%' },
-            { text: this.weighGoodReleaseQty, fontSize: 11, width: '25%' },
-            { text: this.getTzFormatCurrency(this.weighGoodReleaseUnitPrice), fontSize: 11, alignment: 'right', width: '25%' },
-            { text: this.getTzFormatCurrency(this.weighGoodReleaseTotal), fontSize: 11, alignment: 'right', width: '25%' },
-          ],
-          margin: [0, 0, 0, 10],
-        },
-
-        // Total Section
-        {
-          columns: [
-            { text: '', width: '50%' },
-            {
-              text: 'Total (TZS): ' + this.getTzFormatCurrency(this.weighGoodReleaseTotal),
-              fontSize: 12,
-              bold: true,
-              alignment: 'right',
-              width: '50%',
-            },
-          ],
-          margin: [0, 10, 0, 20],
-        },
-        { text: '' },
-        { text: '' },
-        {
-          text: 'Served By: _________________________',
-          fontSize: 12,
-          margin: [0, 0, 0, 15],
-        },
-      ],
-    };
-
-    pdfMake.createPdf(docDefinition).print();
-
-  }
-
-  printGatePassNote = async (billItems: IServiceBillItem[], receiptNo: string, cash: number, id: any) => {
+  printGatePassNotea = async (billItems: IServiceBillItem[], receiptNo: string, cash: number, id: any) => {
 
     //await this.get(this.parkingId)
     //await this.getWeighGoodRelease(id)
@@ -1220,10 +822,7 @@ export class MachineServiceBillingComponent {
     //win!.onfocus = function () { setTimeout(function () { win!.close(); }, 10000); } //set to 10 seconds
   }
 
-  async printReleaseNote(id: any) {
-    await this.getWeighGoodRelease(id)
-    await this.printGatePassNote(this.billItems, this.weighGoodReleaseNo, 0, id)
-  }
+  
 
   getTzFormatCurrency(value: any) {
     return new Intl.NumberFormat('en-TZ', {

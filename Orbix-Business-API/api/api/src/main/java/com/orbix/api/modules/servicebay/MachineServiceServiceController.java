@@ -113,7 +113,7 @@ public class MachineServiceServiceController implements MachineServiceService {
 				billReceivable.setCreatedDateTime(dayService.getTimeStamp());
 
 				billReceivable.setPayStatus(PayStatus.UNPAID);
-				billReceivable.setSummary("Machine/Vehicle Service");
+				billReceivable.setSummary(machineService.getService().getName());
 
 				billReceivable = billReceivableRepository.save(billReceivable);
 				billReceivable.setNo("BR" + billReceivable.getId().toString());
