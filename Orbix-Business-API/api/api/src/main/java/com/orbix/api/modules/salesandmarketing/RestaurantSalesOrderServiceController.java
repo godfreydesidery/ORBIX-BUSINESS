@@ -351,7 +351,7 @@ public class RestaurantSalesOrderServiceController implements RestaurantSalesOrd
 		
 		for(RestaurantSaleDetail restaurantSaleDetail : restaurantSale.getRestaurantSaleDetails()) {
 			
-			double amount = (restaurantSaleDetail.getCostPriceVatIncl() * restaurantSaleDetail.getQty()) - restaurantSaleDetail.getDiscount();
+			double amount = (restaurantSaleDetail.getSellingPriceVatIncl() * restaurantSaleDetail.getQty()) - restaurantSaleDetail.getDiscount();
 			
 			// Create a bill receivable
 			
