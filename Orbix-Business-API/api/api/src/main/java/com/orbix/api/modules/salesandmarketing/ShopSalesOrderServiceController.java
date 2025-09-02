@@ -311,7 +311,7 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 		
 		for(SaleDetail saleDetail : sale.getSaleDetails()) {
 			
-			double amount = (saleDetail.getCostPriceVatIncl() * saleDetail.getQty()) - saleDetail.getDiscount();
+			double amount = (saleDetail.getSellingPriceVatIncl() * saleDetail.getQty()) - saleDetail.getDiscount();
 			
 			// Create a bill receivable
 			
