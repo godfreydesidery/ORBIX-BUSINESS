@@ -372,24 +372,6 @@ export const menuItems = [
         show: grant(['FINC-ACCESS']),
         order: 100,
         subMenu: [
-            // {
-            //     title: 'Invoices',
-            //     url: '#',
-            //     subMenu: [
-            //         // {
-            //         //     title: 'Receivable',
-            //         //     routerLink: '/app/accounts-and-finance/invoices/receivable-invoice-list'
-            //         // },
-            //         // {
-            //         //     title: 'Receivable-Parking',
-            //         //     routerLink: '/app/accounts-and-finance/invoices/parking-receivable-invoice-list'
-            //         // },
-            //         // {
-            //         //     title: 'Payable',
-            //         //     routerLink: '/app/blank'
-            //         // },
-            //     ]
-            // },
             {
                 title: 'Parking Billing',
                 show: grant(['FINCPKNG-ACCESS']),
@@ -443,6 +425,14 @@ export const menuItems = [
                     {
                         title: 'Warehouse Collection',
                         routerLink: '/app/storage-management/cash-collections'
+                    },
+                    {
+                        title: 'Weight Collection',
+                        routerLink: '/app/fleet-management/cash-collections'
+                    },
+                    {
+                        title: 'Workshop Collection',
+                        routerLink: '/app/workshop-management/cash-collections'
                     }
                 ]
             }
@@ -577,21 +567,17 @@ export const menuItems = [
                 show: true,
                 routerLink: '/app/service-bay/select-workshop'
             },
-            // {
-            //     title: 'Reports',
-            //     url: '#',
-            //     show: true,
-            //     subMenu: [
-            //         {
-            //             title: 'Collection Report',
-            //             routerLink: '/app/storage-management/cash-collections'
-            //         },
-            //         {
-            //             title: 'Storage Report',
-            //             routerLink: '/app/storage-management/storage-report'
-            //         }
-            //     ]
-            // },
+            {
+                title: 'Reports',
+                url: '#',
+                show: true,
+                subMenu: [
+                    {
+                        title: 'Workshop Collection',
+                        routerLink: '/app/workshop-management/cash-collections'
+                    }
+                ]
+            }
         ]
     },
     {

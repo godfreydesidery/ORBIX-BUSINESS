@@ -1,0 +1,91 @@
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>Cash Collections</span>
+            </div>
+            <div class="card-body widget-body text-white">
+                <div class="row">
+                    <div class="col-lg-2">
+                        <div class="form-group">
+                            <label class="form-control">From</label>
+                            <input type="date" class="form-control" [(ngModel)]="from">
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="form-group">
+                            <label class="form-control">To</label>
+                            <input type="date" class="form-control" [(ngModel)]="to">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="form-control">Cashier Name</label>
+                            <select class="form-control" [(ngModel)]="nickname">
+                                <option></option>
+                                <option *ngFor="let cashier of userNames">{{cashier}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <br><br>
+                            <button class="btn btn-outline-success btn-round-custom"
+                                (click)="getWeighDetailedTotalsByDates(from, to)"><i class="fa fa-refresh"></i> Run
+                                Report</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-2" *ngIf="workshopCashCollections.length > 0">
+                        <div class="form-group">
+                            <label class="form-control text-primary" style="font-weight: bolder;"><b>Total</b></label>
+                            <span class="form-control text-primary"
+                                style="text-align: right; font-weight: bolder;"><b>{{totalWorkshopCashCollections |
+                                    currency :'':''}}</b></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm table-striped">
+                                <thead>
+                                    <td><b>SN</b></td>
+                                    <td><b>Owner Name</b></td>
+                                    <td><b>Phone No</b></td>
+                                    <td><b>Machine/Vehicle Name</b></td>
+                                    <td><b>Reg No</b></td>
+                                    <td><b>Service Name</b></td>
+                                    <td><b>Amount</b></td>
+                                    <td><b>Date Time</b></td>
+                                    <td><b>Cashier Name</b></td>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let p of workshopCashCollections">
+                                        <td>{{p.sn}}</td>
+                                        <td>{{p.ownerName}}</td>
+                                        <td>{{p.ownerPhoneNo}}</td>
+                                        <td>{{p.machineName}}</td>
+                                        <td>{{p.regNo}}</td>
+                                        <td>{{p.serviceName}}</td>
+                                        <td class="text-danger" style="text-align: right;"><b>{{p.amount |
+                                                currency:'':''}}</b></td>
+                                        <td>{{p.createdDateTime}}</td>
+                                        <td>{{p.cashierName}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12" style="text-align: center;"
+                                *ngIf="workshopCashCollections.length > 0">
+                                <button class="btn btn-outline-primary btn-round-custom"
+                                    (click)="printWorkshopCollectionReport()"><i class="fa fa-print"></i> Print
+                                    Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

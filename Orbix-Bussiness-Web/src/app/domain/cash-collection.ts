@@ -64,6 +64,20 @@ export interface ISalesCashCollection {
   sn: number
 }
 
+export interface IRestaurantSalesCashCollection {
+
+  amount: number
+  paymentType: string
+  cashierName: string
+  reason: string
+  productName: string
+  dateTime: string
+  qty: number
+  discount: number
+
+  sn: number
+}
+
 
 export interface IStorageCashCollection {
 
@@ -118,5 +132,28 @@ export interface IWeighCashCollection {
   days: number
   discount: number
 
+  weightOne: string
+  weightTwo: string
+  weightThree: string
+  weightFour: string
+
+  sn: number
+}
+
+export interface IWorkshopCashCollection {
+
+  amount: number
+  paymentType: string
+  cashierName: string
+  reason: string
+  goodName: string
+  regNo: string
+  ownerName: string
+  machineName: string
+  ownerPhoneNo: string
+  serviceName: string
+  createdDateTime: string
+  days: number
+  discount: number
   sn: number
 }

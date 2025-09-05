@@ -88,8 +88,17 @@ public class RestaurantSalesOrderServiceController implements RestaurantSalesOrd
 		Restaurant restaurant = restaurantRepository.findById(restaurantId)
 			    .orElseThrow(() -> new NotFoundException("Restaurant not found, with id " + restaurantId));
 
-			List<RestaurantSalesOrder> restaurantSalesOrders = restaurantSalesOrderRepository.findAllByRestaurantAndStatus(restaurant, WorkFlowStatus.PENDING);
+			//List<RestaurantSalesOrder> restaurantSalesOrders = restaurantSalesOrderRepository.findAllByRestaurantAndStatus(restaurant, WorkFlowStatus.PENDING);
 
+			LocalDateTime since = LocalDateTime.now().minusHours(12);
+
+			List<RestaurantSalesOrder> restaurantSalesOrders =
+			        restaurantSalesOrderRepository.findAllByRestaurantAndStatusAndCreatedDateTimeAfter(
+			                restaurant,
+			                WorkFlowStatus.PENDING,
+			                since
+			        );
+			
 			return restaurantSalesOrders.stream()
 			    .map(this::restaurantSalesOrderResponseDTOMapper)
 			    .collect(Collectors.toList());

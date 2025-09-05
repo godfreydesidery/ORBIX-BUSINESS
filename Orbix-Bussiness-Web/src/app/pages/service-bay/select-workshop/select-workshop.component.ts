@@ -72,10 +72,10 @@ export class SelectWorkshopComponent {
     var machine = {
       id: this.machineId,
       no: this.machineNo,
-      regNo: this.machineRegNo,
-      name: this.machineName,
-      ownerName: this.ownerName,
-      ownerPhoneNo: this.ownerPhoneNo,
+      regNo: (this.machineRegNo && this.machineRegNo.trim() !== '') ? this.machineRegNo : 'NA',
+      name: (this.machineName && this.machineName.trim() !== '') ? this.machineName : 'NA',
+      ownerName: (this.ownerName && this.ownerName.trim() !== '') ? this.ownerName : 'NA',
+      ownerPhoneNo: (this.ownerPhoneNo && this.ownerPhoneNo.trim() !== '') ? this.ownerPhoneNo : 'NA',
       workshopId: this.workshopId
     }
 

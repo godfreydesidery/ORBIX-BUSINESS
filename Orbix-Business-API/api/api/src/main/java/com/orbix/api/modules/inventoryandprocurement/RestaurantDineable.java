@@ -11,6 +11,7 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
 import javax.validation.constraints.DecimalMax;
 import javax.validation.constraints.DecimalMin;
 import javax.validation.constraints.NotNull;
@@ -32,7 +33,7 @@ import lombok.ToString;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "restaurant_dineables")
+@Table(name = "restaurant_dineables",uniqueConstraints = {@UniqueConstraint(name = "uk_dineable_restaurant",columnNames = {"dineable_id", "restaurant_id"})})
 public class RestaurantDineable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

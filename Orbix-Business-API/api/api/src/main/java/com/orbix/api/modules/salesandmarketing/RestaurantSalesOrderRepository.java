@@ -1,5 +1,6 @@
 package com.orbix.api.modules.salesandmarketing;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -10,4 +11,10 @@ import com.orbix.api.modules.adminunits.Shop;
 
 public interface RestaurantSalesOrderRepository extends JpaRepository<RestaurantSalesOrder, Long> {
 	List<RestaurantSalesOrder> findAllByRestaurantAndStatus(Restaurant restaurant, WorkFlowStatus pending);
+	
+	List<RestaurantSalesOrder> findAllByRestaurantAndStatusAndCreatedDateTimeAfter(
+            Restaurant restaurant,
+            WorkFlowStatus status,
+            LocalDateTime createdDateTime
+    );
 }

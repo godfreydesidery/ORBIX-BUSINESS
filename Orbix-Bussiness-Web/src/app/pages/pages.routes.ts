@@ -445,6 +445,13 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
 
+      {
+        path : 'workshop-management/cash-collections',
+        loadComponent: () => import('./service-bay/service-cash-collection/service-cash-collection.component').then(c => c.ServiceCashCollectionComponent),
+        data : { breadcrumb : 'Workshop Cash Collections'},
+        canActivate : [AuthGuard]
+      },
+
       /** End of Service Bay */
 
 
@@ -647,9 +654,12 @@ export const routes: Routes = [
         data : { breadcrumb : 'Fleet Operations/Weigh Bridge'}, 
         canActivate : [AuthGuard]
       },
-
-
-
+      {
+        path : 'fleet-management/cash-collections',
+        loadComponent: () => import('./fleet-operations/weigh-cash-collection/weigh-cash-collection.component').then(c => c.WeighCashCollectionComponent),
+        data : { breadcrumb : 'Weight/Cash Collections'},
+        canActivate : [AuthGuard]
+      },
       { 
         path: 'blank', 
         loadComponent: () => import('./blank/blank.component').then(c => c.BlankComponent),
