@@ -408,9 +408,8 @@ export const menuItems = [
                 routerLink: '/app/accounts-and-finance/weigh-billing'
             },
             {
-                title: 'Service Bay Billing',
+                title: 'Workshop Billing',
                 show: grant(['FINCSERVBAY-ACCESS']),
-                //show: true,
                 routerLink: '/app/accounts-and-finance/service-bay-billing'
             },
             {
