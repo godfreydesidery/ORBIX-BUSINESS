@@ -38,7 +38,7 @@ public class Object_ {
 	public static String RESTAURANT = "RESTAURANT-ACCESS SALE ADMIN"; 
 	public static String WRHOUSE = "WRHOUSE-ACCESS";
 	public static String WEGH = "WEGH-ACCESS";
-	public static String STRG = "STRG-UPDATE";
+	public static String STRG = "STRG-UPDATE ARCHIVE";
 	public static String PRCMT = "PRCMT-ACCESS";
 	public static String MNGNT = "MNGNT-ACCESS"; 
 	

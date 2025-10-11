@@ -122,6 +122,17 @@ public class StorageResource {
 		return ResponseEntity.created(uri).body(storageService.updateStorage(storageRequest, request));
 	}
 	
+	@PostMapping("/storages/remove")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public void remove(
+			@RequestParam(name = "storage_id") Long storageId,
+			@RequestParam(name = "qty") double qty,
+			@RequestParam(name = "reason") String reason,
+			HttpServletRequest request){		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/storages/remove").toUriString());
+		storageService.removeGoods(storageId, qty, reason, request);
+	}
+	
 	@PostMapping("/storages/check_in")
 	public ResponseEntity<StorageResponseDTO>checkIn(
 			@RequestBody StorageRequestDTO storageRequest,

@@ -37,6 +37,8 @@ public class StorageReportResource {
 	private final UserService userService;
 	private final UserRepository userRepository;
 	
+	private final RemovedGoodRepository removedGoodRepository;
+	
 	
 	@PostMapping("/storage_reports/get_totals_by_dates")
 	public ResponseEntity<StorageTotalsResponseDTO>getTotalsByDates(
@@ -167,7 +169,46 @@ public class StorageReportResource {
 		}
 		return ResponseEntity.ok().body(storageResponses);
 		
-	}	
+	}
+	
+	@PostMapping("/storage_reports/get_goods_removed_report")
+	public ResponseEntity<List<GoodsRemovedResponseDTO>>getGoodsRemovedReport(
+			@RequestBody DateRange dateRange,
+			HttpServletRequest request){
+		
+		List<RemovedGood> removedGoods = removedGoodRepository.findAllByCreatedDateTimeBetween(dateRange.getFrom().atStartOfDay(),
+		        dateRange.getTo().atTime(LocalTime.MAX));
+		
+		List<GoodsRemovedResponseDTO> goodRemovedResponses = new ArrayList<>();
+		
+		int sn = 1;
+		for(RemovedGood removedGood : removedGoods) {
+			GoodsRemovedResponseDTO goodsRemovedResponse = new GoodsRemovedResponseDTO();
+			goodsRemovedResponse.setSn(String.valueOf(sn));
+			goodsRemovedResponse.setCustomerName(removedGood.getStorage().getOwnerFirstName() + " " + removedGood.getStorage().getOwnerLastName());
+			if(removedGood.getStorage().getOwnerPhoneNo() != null) {
+				goodsRemovedResponse.setPhoneNo(removedGood.getStorage().getOwnerPhoneNo());
+			}else {
+				goodsRemovedResponse.setPhoneNo("");
+			}
+			
+			if(removedGood.getStorage().getGoodName() != null) {
+				goodsRemovedResponse.setGoodName(removedGood.getStorage().getGoodName());
+			}else {
+				goodsRemovedResponse.setGoodName("");
+			}
+			
+			goodsRemovedResponse.setQty(String.valueOf(removedGood.getQty()));
+			goodsRemovedResponse.setReason(removedGood.getReason());
+			goodsRemovedResponse.setDateTime(removedGood.getCreatedDateTime().toString());
+			goodsRemovedResponse.setRegisteredBy(removedGood.getStorage().getCheckedInByUser().getNickname());
+			goodsRemovedResponse.setRemovedBy(removedGood.getCreatedByUser().getNickname());
+			goodRemovedResponses.add(goodsRemovedResponse);
+			sn++;
+		}
+		return ResponseEntity.ok().body(goodRemovedResponses);
+		
+	}
 }
 
 @Data
@@ -189,4 +230,17 @@ class RegistrationResponseDTO{
 	String keyStatus;
 	String registeredDate;
 	String registeredBy;	
+}
+
+@Data
+class GoodsRemovedResponseDTO{
+	String sn;
+	String customerName;
+	String phoneNo;
+	String goodName;
+	String qty;
+	String reason;
+	String dateTime;
+	String registeredBy;
+	String removedBy;
 }

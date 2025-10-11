@@ -265,6 +265,21 @@ export class CashierCollectionComponent {
 
   printCashierCollectionReport = async () => {
     this.documentHeader = await this.data.getDocumentHeaderLandScape()
+
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
+
     var header = ''
     var footer = ''
     var title  = 'Cashier Collection Report'
@@ -395,12 +410,30 @@ export class CashierCollectionComponent {
 
   printParkingCollectionReport = async () => {
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
+
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
+
+    
+
     const title = 'Parking Collection Report';
     const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;
     let discount: number = 0;
   
     const report: any[] = [];
+    
   
     // Add header row
     report.push([
@@ -483,6 +516,21 @@ export class CashierCollectionComponent {
 
   printParkingServiceCollectionReport = async () => {
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
+
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
+
     const title = 'Vehicle Services Collection Report';
     const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;

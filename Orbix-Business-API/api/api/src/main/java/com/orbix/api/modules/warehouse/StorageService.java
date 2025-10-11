@@ -35,4 +35,6 @@ public interface StorageService {
 	StorageCustomBillDetail showStorageCustomBillDetail(Long storageId, HttpServletRequest request);
 	
 	List<MonthlyStorageStatusResponseDTO> getMonthlyStats(int year, HttpServletRequest request);
+	
+	void removeGoods(Long storageId, double qty, String reason, HttpServletRequest request);
 }

@@ -446,24 +446,6 @@ export const menuItems = [
         show: grant(['SHOP-ACCESS']),
         order: 700,
         subMenu: [
-            // {
-            //     title: 'Sales',
-            //     url: '#',
-            //     subMenu: [
-            //         {
-            //             title: 'Sales List',
-            //             routerLink: '/app/blank'
-            //         },
-            //         {
-            //             title: 'Sales Order',
-            //             routerLink: '/app/blank'
-            //         },
-            //     ]
-            // },
-            // {
-            //     title: 'Inventory',
-            //     routerLink: '/app/blank'
-            // },
             {
                 title: 'Select Shop',
                 show: true,
@@ -766,6 +748,10 @@ export const menuItems = [
                         title: 'Restaurant Report',
                         routerLink: '/app/mechandizing/restaurant-sales-listing-report'
                     },
+                    {
+                        title: 'Goods Archive Report',
+                        routerLink: '/app/storage-management/goods-removed-report'
+                    }
                 ]
             }
         ]

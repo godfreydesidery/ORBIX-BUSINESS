@@ -431,6 +431,12 @@ export const routes: Routes = [
         data : { breadcrumb : 'Warehouse/Reports/Storage Report'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'storage-management/goods-removed-report',
+        loadComponent: () => import('./storage-management/reports/goods-removed-report/goods-removed-report.component').then(c => c.GoodsRemovedReportComponent),
+        data : { breadcrumb : 'Warehouse/Reports/Goods Removed Report'},
+        canActivate : [AuthGuard]
+      },
 
 
 

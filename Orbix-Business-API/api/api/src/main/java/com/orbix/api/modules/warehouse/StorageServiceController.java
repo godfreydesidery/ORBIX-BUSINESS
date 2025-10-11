@@ -64,6 +64,8 @@ public class StorageServiceController implements StorageService {
 	private final InvoiceReceivableRepository invoiceReceivableRepository;
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
 	
+	private final RemovedGoodRepository removedGoodRepository;
+	
 		
 	
 
@@ -911,6 +913,58 @@ public class StorageServiceController implements StorageService {
 		return rawStats.stream().map(row -> new MonthlyStorageStatusResponseDTO(((Number) row[0]).intValue(),
 				((Number) row[1]).longValue(), ((Number) row[2]).longValue())).collect(Collectors.toList());
 
+	}
+
+	@Override
+	public void removeGoods(Long storageId, double qty, String reason, HttpServletRequest request) {
+		Optional<Storage> storage_ = storageRepository.findById(storageId);
+		if(storage_.isEmpty()) throw new NotFoundException("Storage not found in database");
+		
+		if(!storage_.get().getStatus().equals("CHECKED-IN")) throw new NotFoundException("Can only archive goods from checked in storage");
+		
+			
+		Optional<Company> company_ = companyRepository.findById(userService.getUserCompany(request).getId());
+		if(company_.isEmpty()) throw new NotFoundException("Company not found");
+			
+		Optional<Branch> branch_ = branchRepository.findById(userService.getUserBranch(request).getId());
+		if(branch_.isEmpty()) throw new NotFoundException("Branch not found");
+			
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage_.get());
+		double billedQty = 0;
+		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
+			billedQty = billedQty + storageBillReceivable.getQty();
+			if(storageBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.UNPAID)) {
+				throw new InvalidOperationException("Can not archive, some generated bills  not cleared. Please clear the bills before archiving");
+			}
+		}
+		
+		if(qty > storage_.get().getCurrentQty()) {
+			throw new InvalidOperationException("Archive quantity should not be more than available quantity");
+		}
+		
+		if(qty <= 0) {
+			throw new InvalidOperationException("Archive quantity should be more than zero");
+		}
+		
+		if(reason.isBlank()) {
+			throw new InvalidOperationException("Reason is required");
+		}
+		
+		Storage storage = storage_.get();
+		
+		storage.setCurrentQty(storage.getCurrentQty() - qty);
+		
+		storage = storageRepository.save(storage);
+		
+		RemovedGood removedGood = new RemovedGood();
+		removedGood.setQty(qty);
+		removedGood.setReason(reason);
+		removedGood.setStorage(storage);
+		removedGood.setCreatedByUser(userService.getUser(request));
+		removedGood.setCreatedDateTime(dayService.getTimeStamp());
+		
+		removedGoodRepository.save(removedGood);
+		
 	}
 }
 
