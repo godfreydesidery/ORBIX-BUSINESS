@@ -89,6 +89,7 @@ export interface IStorageCashCollection {
   ownerFirstName: string
   ownerLastName: string
   ownerPhoneNo: string
+  dateTime: string
   createdDateTime: string
   days: number
   discount: number

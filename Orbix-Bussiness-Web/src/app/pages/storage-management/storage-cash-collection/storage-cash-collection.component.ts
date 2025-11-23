@@ -791,9 +791,109 @@ export class StorageCashCollectionComponent {
     
       pdfMake.createPdf(docDefinition).print();
     };
-  
-  
+
     printStorageCollectionReport = async () => {
+        // Set up VFS for pdfMake - try different approaches
+        try {
+          const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+          // Try different possible structures
+          if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+            (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+          } else if (vfsFonts.vfs) {
+            (window as any).pdfMake.vfs = vfsFonts.vfs;
+          } else {
+            (window as any).pdfMake.vfs = vfsFonts;
+          }
+        } catch (error) {
+          console.log('VFS setup failed, continuing without custom fonts:', error);
+        }
+        this.documentHeader = await this.data.getDocumentHeaderLandScape();
+        const title = 'Storage Collection Report';
+        const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
+        let total: number = 0;
+        let discount: number = 0;
+      
+        const report: any[] = [];
+      
+        // Add header row
+        report.push([
+          { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+          { text: 'Good', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+          { text: 'Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+          { text: 'Phone No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+          { text: 'Date Registered', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+          { text: 'Days', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+          { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+          { text: 'Discount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+          { text: 'Payment Date', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+          { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+        ]);
+      
+        // Add rows dynamically
+        this.storageCashCollections.forEach((element) => {
+           total = total + (+element.amount) || 0;
+           discount = discount + (+element.discount) || 0;
+      
+          report.push([
+            { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+            { text: element.goodName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+            { text: `${element.ownerFirstName || ''} ${element.ownerLastName || ''}`, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+            { text: element.ownerPhoneNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+            { text: element.createdDateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+            { text: element.days || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
+            { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+            { text: (Number(element.discount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+            { text: element.dateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+            { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+          ]);
+        });
+      
+        // Add summary row
+        report.push([
+          { text: ''},
+          {},
+          {},
+          {},
+          {},
+          { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
+          { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+          { text: discount.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+          {},
+          {},
+        ]);
+      
+        // Define document structure
+        const docDefinition: any = {
+          header: '',
+          pageOrientation: 'landscape',
+          footer: (currentPage: any, pageCount: any) => ({
+            text: `${currentPage} of ${pageCount}`,
+            alignment: 'center',
+            fontSize: 8,
+          }),
+          content: [
+            {
+              columns: [
+                this.documentHeader,
+              ],
+            },
+            {text : ' '},
+            {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+            {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+            {
+              table: {
+                widths: [25, 100, 100, 60, 60, 50, 60, 60, 60, 80],
+                body: report,
+              },
+            },
+          ],
+        };
+      
+        pdfMake.createPdf(docDefinition).print();
+      };
+  
+  
+    printStorageCollectionReport1 = async () => {
       this.documentHeader = await this.data.getDocumentHeaderLandScape();
       const title = 'Storage Collection Report';
       const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
@@ -812,6 +912,7 @@ export class StorageCashCollectionComponent {
         { text: 'Days', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
         { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
         { text: 'Discount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+        { text: 'Payment Date', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
         { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       ]);
     
@@ -829,6 +930,7 @@ export class StorageCashCollectionComponent {
           { text: element.days || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
           { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
           { text: (Number(element.discount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+          { text: element.dateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
           { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         ]);
       });
@@ -842,6 +944,7 @@ export class StorageCashCollectionComponent {
         { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
         { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
         { text: discount.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+        {},
         { text: '', fontSize: 9, alignment: 'left' },
       ]);
     
@@ -866,7 +969,7 @@ export class StorageCashCollectionComponent {
           {text: 'Cashier: ' + cashierName , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
           {
             table: {
-              widths: [25, 130, 120, 60, 40, 80, 70, 100],
+              widths: [25, 120, 110, 60, 40, 80, 70, 60, 90],
               body: report,
             },
           },

@@ -52,6 +52,7 @@
                                     <td><b>Days</b></td>
                                     <td><b>Amount</b></td>
                                     <td><b>Discount</b></td>
+                                    <td><b>Payment Date</b></td>
                                     <td><b>Cashier Name</b></td>
                                 </thead>
                                 <tbody>
@@ -64,6 +65,7 @@
                                         <td>{{p.days}}</td>
                                         <td style="text-align: right;">{{p.amount | currency:'':''}}</td>
                                         <td style="text-align: right;">{{p.discount | currency:'':''}}</td>
+                                        <td>{{p.dateTime}}</td>
                                         <td>{{p.cashierName}}</td>                                 
                                     </tr>
                                     <tr>

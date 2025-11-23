@@ -227,6 +227,22 @@ export class RestaurantProductStockLogComponent {
 
 
   printReport = async () => {
+
+    // Set up VFS for pdfMake - try different approaches
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
+
     this.documentHeader = await this.data.getDocumentHeader()
     var header = ''
     var footer = ''

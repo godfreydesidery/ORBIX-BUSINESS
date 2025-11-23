@@ -751,6 +751,10 @@ export const menuItems = [
                     {
                         title: 'Goods Archive Report',
                         routerLink: '/app/storage-management/goods-removed-report'
+                    },
+                    {
+                        title: 'Storage Report',
+                        routerLink: '/app/storage-management/storage-report'
                     }
                 ]
             }
