@@ -23,7 +23,7 @@
 
                 <br>    
 
-                <div class="table-responsive table-sm">
+                <div class="table-responsive table-striped table-sm table-bordered">
                     <table class="table">
                         <thead>
                             <tr>
@@ -33,7 +33,7 @@
                                 <th>Vehicle Type</th>
                                 <th>Owner Contacts</th>
                                 <th>Agent Name</th>
-                                <th>Agent Contacts</th>
+                                <!-- <th>Agent Contacts</th> -->
                                 <th>Billing Type</th>
                                 <th>Price</th>
                                 <th>Check Status</th>
@@ -48,7 +48,7 @@
                                     <td>{{p.vehicleEquipmentTypeName}}</td>
                                     <td>{{p.ownerPhoneNo}}</td>
                                     <td>{{p.agentName}}</td>
-                                    <td>{{p.agentAddress}} {{p.agentPhoneNo}} {{p.agentEmail}}</td>
+                                    <!-- <td>{{p.agentAddress}} {{p.agentPhoneNo}} {{p.agentEmail}}</td> -->
                                     <td><span class="badge badge-primary">{{p.billingType}}</span></td>
                                     <td class="text-danger" style="text-align: right; font-weight: bold;">{{p.billingAmount | currency:'':''}}</td> 
                                     <td>

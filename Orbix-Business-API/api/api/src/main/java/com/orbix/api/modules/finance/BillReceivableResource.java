@@ -60,6 +60,20 @@ public class BillReceivableResource {
 		return ResponseEntity.ok().body(billReceivableService.getAllByStorage(storageId, request));
 	}
 	
+	@GetMapping("/bill_receivables/get_all_by_weigh")
+	public ResponseEntity<List<BillReceivableResponseDTO>>getAllByWeigh(
+			@RequestParam(name = "weigh_id") Long weighId,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(billReceivableService.getAllByWeigh(weighId, request));
+	}
+	
+	@GetMapping("/bill_receivables/get_all_by_machine")
+	public ResponseEntity<List<BillReceivableResponseDTO>>getAllByMachine(
+			@RequestParam(name = "machine_id") Long machineId,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(billReceivableService.getAllByMachine(machineId, request));
+	}
+	
 	
 	
 	

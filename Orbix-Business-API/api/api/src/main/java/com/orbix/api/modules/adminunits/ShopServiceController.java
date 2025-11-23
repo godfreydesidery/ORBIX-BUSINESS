@@ -78,6 +78,8 @@ public class ShopServiceController implements ShopService {
 		shop.setLocationName(shopRequest.getLocationName());		
 		shop.setBranch(branch_.get());
 		
+		shop.setShopCategory(shopRequest.getShopCategory());
+		
 		shop.setCreatedByUser(userService.getUser(request));
 		shop.setCreatedDateTime(dayService.getTimeStamp());
 		
@@ -98,10 +100,12 @@ public class ShopServiceController implements ShopService {
 		}		
 		if(!validateShopData(shopRequest)) {
 			throw new InvalidEntryException("Could not validate shop data");
-		}		
+		}	
+		
 		Shop shop = shop_.get();
 		shop.setName(shopRequest.getName());
-		shop.setLocationName(shopRequest.getLocationName());		
+		shop.setLocationName(shopRequest.getLocationName());
+		shop.setShopCategory(shopRequest.getShopCategory());
 		shop = shopRepository.save(shop);		
 		return shopResponseDTOMapper(shop);
 	}
@@ -112,6 +116,7 @@ public class ShopServiceController implements ShopService {
 		shopResponse.setCode(shop.getCode());
 		shopResponse.setName(shop.getName());
 		shopResponse.setLocationName(shop.getLocationName());
+		shopResponse.setShopCategory(String.valueOf(shop.getShopCategory()));
 		shopResponse.setBranchId(shop.getBranch().getId().toString());		
 		if(shop.isActive()) {
 			shopResponse.setActive("Active");

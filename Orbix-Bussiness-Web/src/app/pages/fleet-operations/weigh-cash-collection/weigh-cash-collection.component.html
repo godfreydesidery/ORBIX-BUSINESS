@@ -1,0 +1,92 @@
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>Cash Collections</span>
+            </div>
+            <div class="card-body widget-body text-white">
+                <div class="row">
+                    <div class="col-lg-2">
+                        <div class="form-group">
+                            <label class="form-control">From</label>
+                            <input type="date" class="form-control" [(ngModel)]="from">
+                        </div>
+                    </div>
+                    <div class="col-lg-2">
+                        <div class="form-group">
+                            <label class="form-control">To</label>
+                            <input type="date" class="form-control" [(ngModel)]="to">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label class="form-control">Cashier Name</label>
+                            <select class="form-control" [(ngModel)]="nickname">
+                                <option></option>
+                                <option *ngFor="let cashier of userNames">{{cashier}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <br><br>
+                            <button class="btn btn-outline-success btn-round-custom"
+                                (click)="getWeighDetailedTotalsByDates(from, to)"><i class="fa fa-refresh"></i> Run
+                                Report</button>
+                        </div>
+                    </div>
+                    <div class="col-lg-2" *ngIf="weighCashCollections.length > 0">
+                        <div class="form-group">
+                            <label class="form-control text-primary" style="font-weight: bolder;"><b>Total</b></label>
+                            <span class="form-control text-primary"
+                                style="text-align: right; font-weight: bolder;"><b>{{totalWeighCashCollections |
+                                    currency :'':''}}</b></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <div class="table-responsive">
+                            <table class="table table-bordered table-sm table-striped">
+                                <thead>
+                                    <td><b>SN</b></td>
+                                    <td><b>Name</b></td>
+                                    <td><b>Reg No</b></td>
+                                    <td><b>Date Time</b></td>
+                                    <td><b>Amount</b></td>
+                                    <td><b>Axle One</b></td>
+                                    <td><b>Axle Two</b></td>
+                                    <td><b>Axle Three</b></td>
+                                    <td><b>Axle Four</b></td>
+                                    <td><b>Cashier Name</b></td>
+                                </thead>
+                                <tbody>
+                                    <tr *ngFor="let p of weighCashCollections">
+                                        <td>{{p.sn}}</td>
+                                        <td>{{p.ownerFirstName}}</td>
+                                        <td>{{p.regNo}}</td>
+                                        <td>{{p.createdDateTime}}</td>
+                                        <td class="text-danger" style="text-align: right;"><b>{{p.amount |
+                                                currency:'':''}}</b></td>
+                                        <td class="text-primary"><b>{{p.weightOne}}</b></td>
+                                        <td class="text-primary"><b>{{p.weightTwo}}</b></td>
+                                        <td class="text-primary"><b>{{p.weightThree}}</b></td>
+                                        <td class="text-primary"><b>{{p.weightFour}}</b></td>
+                                        <td>{{p.cashierName}}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <div class="row">
+                            <div class="col-lg-12" style="text-align: center;" *ngIf="weighCashCollections.length > 0">
+                                <button class="btn btn-outline-primary btn-round-custom"
+                                    (click)="printWeighCollectionReport()"><i class="fa fa-print"></i> Print
+                                    Report</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>

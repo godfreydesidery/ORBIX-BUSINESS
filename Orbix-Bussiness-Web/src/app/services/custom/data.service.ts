@@ -353,8 +353,8 @@ export class DataService {
             [{ text: location, fontSize: 8, bold: true, alignment: 'center' }],
             [{ text: email, fontSize: 8, bold: true, alignment: 'center' }],
             [{ text: website, fontSize: 8, bold: true, alignment: 'center' }],
-            [{ text: tin, fontSize: 8, bold: true, alignment: 'center' }],
-            [{ text: vrn, fontSize: 8, bold: true, alignment: 'center' }],
+            // [{ text: tin, fontSize: 8, bold: true, alignment: 'center' }],
+            // [{ text: vrn, fontSize: 8, bold: true, alignment: 'center' }],
           ],
         };
   

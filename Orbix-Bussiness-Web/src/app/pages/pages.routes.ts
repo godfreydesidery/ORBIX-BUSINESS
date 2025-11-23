@@ -12,6 +12,8 @@ import { SystemProfileComponent } from './system/system-profile/system-profile.c
 import { RoleAccessComponent } from './identity-and-access/role-access/role-access.component';
 import { AuthGuard } from '../auth-guard';
 import { ProductComponent } from './inventory/product/product.component';
+import { RestaurantComponent } from './administration-units/restaurant/restaurant.component';
+import { WorkshopComponent } from './administration-units/workshop/workshop.component';
 
 export const routes: Routes = [
   {
@@ -90,9 +92,21 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
       {
+        path : 'admin-unit/workshop',
+        loadComponent : () => import('./administration-units/administration-units.routes').then(c => WorkshopComponent),
+        data : { breadcrumb : 'Admin Unit/Workshop'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'admin-unit/shop-till',
         loadComponent : () => import('./administration-units/administration-units.routes').then(c => ShopTillComponent),
         data : { breadcrumb : 'Admin Unit/Shop Till'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'admin-unit/restaurant',
+        loadComponent : () => import('./administration-units/administration-units.routes').then(c => RestaurantComponent),
+        data : { breadcrumb : 'Admin Unit/Restaurant'},
         canActivate : [AuthGuard]
       },
 
@@ -102,6 +116,19 @@ export const routes: Routes = [
         path : 'inventory/product',
         loadComponent: () => import('./inventory/product/product.component').then(c => c.ProductComponent),
         data : { breadcrumb : 'Product/Product'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'inventory/service',
+        loadComponent: () => import('./inventory/service/service.component').then(c => c.ServiceComponent),
+        data : { breadcrumb : 'Service/Service'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'inventory/dineable',
+        loadComponent: () => import('./inventory/dineable/dineable.component').then(c => c.DineableComponent),
+        data : { breadcrumb : 'Dineable/Dineable'},
         canActivate : [AuthGuard]
       },
       {
@@ -121,9 +148,34 @@ export const routes: Routes = [
       },
 
       {
+        path : 'mechandizing/select-restaurant',
+        loadComponent: () => import('./mechandizing/select-restaurant/select-restaurant.component').then(c => c.SelectRestaurantComponent),
+        data : { breadcrumb : 'Mechandizing/Select Restaurant'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/restaurant-dineable-stock-status',
+        loadComponent: () => import('./mechandizing/restaurant-dineable-stock-status/restaurant-dineable-stock-status.component').then(c => c.RestaurantDineableStockStatusComponent),
+        data : { breadcrumb : 'Mechandizing/Restaurant Dineable Stock Status'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/restaurant-dineable-product',
+        loadComponent: () => import('./mechandizing/restaurant-dineable-product/restaurant-dineable-product.component').then(c => c.RestaurantDineableProductComponent),
+        data : { breadcrumb : 'Mechandizing/Restaurant Dineable Product'},
+        canActivate : [AuthGuard]
+      },
+
+      {
         path : 'mechandizing/shop-product-stock-status',
         loadComponent: () => import('./mechandizing/shop-product-stock-status/shop-product-stock-status.component').then(c => c.ShopProductStockStatusComponent),
         data : { breadcrumb : 'Mechandizing/Shop Stock Status'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/restaurant-product-stock-status',
+        loadComponent: () => import('./mechandizing/restaurant-product-stock-status/restaurant-product-stock-status.component').then(c => c.RestaurantProductStockStatusComponent),
+        data : { breadcrumb : 'Mechandizing/Restaurant Stock Status'},
         canActivate : [AuthGuard]
       },
       {
@@ -147,6 +199,13 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
 
+      {
+        path : 'mechandizing/restaurant-product-stock-log',
+        loadComponent: () => import('./mechandizing/restaurant-product-stock-log/restaurant-product-stock-log.component').then(c => c.RestaurantProductStockLogComponent),
+        data : { breadcrumb : 'Mechandizing/Restaurant Stock Card'},
+        canActivate : [AuthGuard]
+      },
+
 
 
       {
@@ -156,9 +215,39 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
       {
+        path : 'mechandizing/import-restaurant-product',
+        loadComponent: () => import('./mechandizing/import-restaurant-product/import-restaurant-product.component').then(c => c.ImportRestaurantProductComponent),
+        data : { breadcrumb : 'Mechandizing/Import Restaurant Product'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/import-dineable',
+        loadComponent: () => import('./mechandizing/import-dineable/import-dineable.component').then(c => c.ImportDineableComponent),
+        data : { breadcrumb : 'Mechandizing/Import Dineable'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/restaurant-badge',
+        loadComponent: () => import('./mechandizing/restaurant-badge/restaurant-badge.component').then(c => c.RestaurantBadgeComponent),
+        data : { breadcrumb : 'Mechandizing/Restaurant Badge'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/restaurant-agent',
+        loadComponent: () => import('./mechandizing/restaurant-agent/restaurant-agent.component').then(c => c.RestaurantAgentComponent),
+        data : { breadcrumb : 'Mechandizing/Restaurant Agent'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'mechandizing/shop-sales-order',
         loadComponent: () => import('./mechandizing/shop-sales-order/shop-sales-order.component').then(c => c.ShopSalesOrderComponent),
         data : { breadcrumb : 'Mechandizing/Sales Order'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'mechandizing/restaurant-sales-order',
+        loadComponent: () => import('./mechandizing/restaurant-sales-order/restaurant-sales-order.component').then(c => c.RestaurantSalesOrderComponent),
+        data : { breadcrumb : 'Mechandizing/Restaurant Sales Order'},
         canActivate : [AuthGuard]
       },
       {
@@ -179,10 +268,24 @@ export const routes: Routes = [
         data : { breadcrumb : 'Mechandizing/Reports/Sales Listing Report'},
         canActivate : [AuthGuard]
       },
+
+      {
+        path : 'mechandizing/restaurant-sales-listing-report',
+        loadComponent: () => import('./mechandizing/reports/restaurant-sales-listing-report/restaurant-sales-listing-report.component').then(c => c.RestaurantSalesListingReportComponent),
+        data : { breadcrumb : 'Mechandizing/Reports/Sales Listing Report'},
+        canActivate : [AuthGuard]
+      },
       {
         path : 'mechandizing/fast-moving-products-report',
         loadComponent: () => import('./mechandizing/reports/fast-moving-products-report/fast-moving-products-report.component').then(c => c.FastMovingProductsReportComponent),
         data : { breadcrumb : 'Mechandizing/Reports/Fast Moving Products Report'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'mechandizing/fast-moving-dineables-report',
+        loadComponent: () => import('./mechandizing/reports/fast-moving-dineables-report/fast-moving-dineables-report.component').then(c => c.FastMovingDineablesReportComponent),
+        data : { breadcrumb : 'Mechandizing/Reports/Fast Moving Meals Report'},
         canActivate : [AuthGuard]
       },
 
@@ -316,10 +419,46 @@ export const routes: Routes = [
         data : { breadcrumb : 'Warehouse/Select Warehouse'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'storage-management/cash-collections',
+        loadComponent: () => import('./storage-management/storage-cash-collection/storage-cash-collection.component').then(c => c.StorageCashCollectionComponent),
+        data : { breadcrumb : 'Warehouse/Cash Collections'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'storage-management/storage-report',
+        loadComponent: () => import('./storage-management/reports/storage-report/storage-report.component').then(c => c.StorageReportComponent),
+        data : { breadcrumb : 'Warehouse/Reports/Storage Report'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'storage-management/goods-removed-report',
+        loadComponent: () => import('./storage-management/reports/goods-removed-report/goods-removed-report.component').then(c => c.GoodsRemovedReportComponent),
+        data : { breadcrumb : 'Warehouse/Reports/Goods Removed Report'},
+        canActivate : [AuthGuard]
+      },
 
 
 
       /**End Storage Management */
+
+      /**Service Bay */
+
+      {
+        path : 'service-bay/select-workshop',
+        loadComponent: () => import('./service-bay/select-workshop/select-workshop.component').then(c => c.SelectWorkshopComponent),
+        data : { breadcrumb : 'Workshop/Select Workshop'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'workshop-management/cash-collections',
+        loadComponent: () => import('./service-bay/service-cash-collection/service-cash-collection.component').then(c => c.ServiceCashCollectionComponent),
+        data : { breadcrumb : 'Workshop Cash Collections'},
+        canActivate : [AuthGuard]
+      },
+
+      /** End of Service Bay */
 
 
       {
@@ -349,9 +488,27 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
       {
+        path : 'accounts-and-finance/parking-discounts',
+        loadComponent: () => import('./accounts-and-finance/parking-discounts/parking-discounts.component').then(c => c.ParkingDiscountsComponent),
+        data : { breadcrumb : 'Accounts & Finance | Parking Discounts'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'accounts-and-finance/discounts',
+        loadComponent: () => import('./accounts-and-finance/discounts/discounts.component').then(c => c.DiscountsComponent),
+        data : { breadcrumb : 'Accounts & Finance | Discounts'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'accounts-and-finance/storage-billing',
         loadComponent: () => import('./accounts-and-finance/storage-billing/storage-billing.component').then(c => c.StorageBillingComponent),
         data : { breadcrumb : 'Accounts & Finance | Storage Billing'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'accounts-and-finance/storage-discounts',
+        loadComponent: () => import('./accounts-and-finance/storage-discounts/storage-discounts.component').then(c => c.StorageDiscountsComponent),
+        data : { breadcrumb : 'Accounts & Finance | Storage Discounts'},
         canActivate : [AuthGuard]
       },
       {
@@ -382,6 +539,32 @@ export const routes: Routes = [
         path : 'accounts-and-finance/maintenance-vehicle-equipment-billing',
         loadComponent: () => import('./accounts-and-finance/maintenance-vehicle-equipment-billing/maintenance-vehicle-equipment-billing.component').then(c => c.MaintenanceVehicleEquipmentBillingComponent),
         data : { breadcrumb : 'Accounts & Finance | Maintenance Veh/Eq Billing'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'accounts-and-finance/weigh-billing',
+        loadComponent: () => import('./accounts-and-finance/weigh-billing/weigh-billing.component').then(c => c.WeighBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Weigh Billing'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'accounts-and-finance/weight-billing',
+        loadComponent: () => import('./accounts-and-finance/weight-billing/weight-billing.component').then(c => c.WeightBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Weight Billing'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'accounts-and-finance/service-bay-billing',
+        loadComponent: () => import('./accounts-and-finance/service-bay-billing/service-bay-billing.component').then(c => c.ServiceBayBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Service Bay Billing'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'accounts-and-finance/machine-service-billing',
+        loadComponent: () => import('./accounts-and-finance/machine-service-billing/machine-service-billing.component').then(c => c.MachineServiceBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Machine Service Billing'},
         canActivate : [AuthGuard]
       },
 
@@ -470,8 +653,19 @@ export const routes: Routes = [
 
       // End of Procurement
 
-
-
+      // Fleet operations
+      {
+        path : 'fleet-operations/weighbridge',
+        loadComponent: () => import('./fleet-operations/weighbridge/weighbridge.component').then(c => c.WeighbridgeComponent),
+        data : { breadcrumb : 'Fleet Operations/Weigh Bridge'}, 
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'fleet-management/cash-collections',
+        loadComponent: () => import('./fleet-operations/weigh-cash-collection/weigh-cash-collection.component').then(c => c.WeighCashCollectionComponent),
+        data : { breadcrumb : 'Weight/Cash Collections'},
+        canActivate : [AuthGuard]
+      },
       { 
         path: 'blank', 
         loadComponent: () => import('./blank/blank.component').then(c => c.BlankComponent),

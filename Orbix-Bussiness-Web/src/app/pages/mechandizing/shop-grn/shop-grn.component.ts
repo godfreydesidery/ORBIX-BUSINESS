@@ -23,6 +23,7 @@ import { ISupplierProduct } from 'src/app/domain/supplier-product';
 import { IGrn, IGrnDetail } from 'src/app/domain/grn';
 
 import * as pdfMake from 'pdfmake/build/pdfmake';
+import { ICustomer } from 'src/app/domain/customer';
 
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
@@ -749,6 +750,12 @@ shopName : string = ''
           item.qty = element.qty
           items.push(item)
         })
+
+        var customer: ICustomer = {
+              name: this.supplierName,
+              address: '',
+              phone: ''
+            }
     
         this.printer.print(items, 'NA', 0)
         //this.toPrintReceipt = false

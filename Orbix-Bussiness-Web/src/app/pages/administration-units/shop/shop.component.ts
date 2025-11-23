@@ -28,6 +28,7 @@ export class ShopComponent {
   code : string = ''
   name : string = ''
   locationName : string = ''
+  shopCategory : string = 'NORMAL'
   active : string = 'Inactive'
 
   shop : IShop
@@ -95,7 +96,8 @@ export class ShopComponent {
       id : this.id,
       code : this.code,
       name : this.name,
-      locationName : this.locationName
+      locationName : this.locationName,
+      shopCategory : this.shopCategory
     }
 
     if(shop.id === null){
@@ -213,6 +215,7 @@ export class ShopComponent {
     this.code = data!.code
     this.name = data!.name
     this.locationName = data!.locationName
+    this.shopCategory = data!.shopCategory
     
   }
 

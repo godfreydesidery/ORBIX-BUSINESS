@@ -286,7 +286,7 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 			ShopProduct shopProduct = shopProductRepository.findByProductAndShop(shopSalesOrderDetail.getProduct(), shopSalesOrder.getShop()).orElseThrow();
 			
 			if(shopProduct.getCurrentStock() < shopSalesOrderDetail.getQty()) {
-				throw new InvalidOperationException("Exceeds available stock in product " + shopProduct.getProduct().getName());
+				//throw new InvalidOperationException("Exceeds available stock in product " + shopProduct.getProduct().getName());
 			}
 			
 			double newStock = shopProduct.getCurrentStock() - shopSalesOrderDetail.getQty();
@@ -308,14 +308,10 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 		shopSalesOrder.setConfirmedDateTime(dayService.getTimeStamp());
 		
 		shopSalesOrderRepository.save(shopSalesOrder);
-		for(int i = 1; i < 100; i++) {
-			System.out.println(sale.getId());
-		}
-		
 		
 		for(SaleDetail saleDetail : sale.getSaleDetails()) {
 			
-			double amount = (saleDetail.getCostPriceVatIncl() * saleDetail.getQty()) - saleDetail.getDiscount();
+			double amount = (saleDetail.getSellingPriceVatIncl() * saleDetail.getQty()) - saleDetail.getDiscount();
 			
 			// Create a bill receivable
 			
@@ -338,7 +334,7 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 			saleDetailBillReceivable.setSaleDetail(saleDetail);
 			saleDetailBillReceivable.setDiscount(0);
 			saleDetailBillReceivable.setQty(saleDetail.getQty());
-			saleDetailBillReceivable.setPrice(saleDetail.getCostPriceVatIncl());
+			saleDetailBillReceivable.setPrice(saleDetail.getSellingPriceVatIncl());
 			saleDetailBillReceivableRepository.save(saleDetailBillReceivable);
 			
 			Collection collection = new Collection();

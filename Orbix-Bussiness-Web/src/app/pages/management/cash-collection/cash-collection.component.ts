@@ -12,7 +12,7 @@ import { HttpHeaders } from '@angular/common/http';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 
 import { environment } from 'src/environments/environment';
-import { ICashCollection, IMaintenanceCashCollection, IParkingCashCollection, IParkingServiceCashCollection, ISalesCashCollection, IStorageCashCollection } from 'src/app/domain/cash-collection';
+import { ICashCollection, IMaintenanceCashCollection, IParkingCashCollection, IParkingServiceCashCollection, IRestaurantSalesCashCollection, ISalesCashCollection, IStorageCashCollection, IWeighCashCollection, IWorkshopCashCollection } from 'src/app/domain/cash-collection';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
 
@@ -276,6 +276,59 @@ export class CashCollectionComponent {
     return 0; 
   }
 
+  restaurantSalesCashCollections : IRestaurantSalesCashCollection[] = []
+  totalRestaurantSalesCashCollections : number = 0
+  async getRestaurantSalesDetailedTotalsByDates(from : Date | string | null, to : Date | string | null) {
+    if(from == null || to == null) {
+      from = new Date()
+      to = new Date()
+    }
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    var args = {
+      from : from,
+      to : to,
+    }
+
+    this.restaurantSalesCashCollections = []
+    this.totalRestaurantSalesCashCollections = 0
+    
+
+    await this.http.post<IRestaurantSalesCashCollection[]>(API_URL+'/finance_reports/get_restaurant_sales_detailed_collections_by_dates', args, options)
+        .toPromise()
+        .then(
+          data => {
+
+            this.restaurantSalesCashCollections = data!
+
+            var sn = 1
+            this.totalRestaurantSalesCashCollections = 0
+            this.restaurantSalesCashCollections.forEach(element => {
+              element.sn = sn
+              this.totalRestaurantSalesCashCollections = this.totalRestaurantSalesCashCollections + (+element.amount)
+              sn = sn + 1
+            })
+
+
+            
+            console.log(data)
+          }
+        )
+        .catch(
+          error => {
+            this.msg.showErrorMessage(error, 'Error')
+            
+            console.log(error)
+          }
+        )
+
+
+    return 0; 
+  }
+
 
   storageCashCollections : IStorageCashCollection[] = []
   totalStorageCashCollections : number = 0
@@ -386,6 +439,110 @@ export class CashCollectionComponent {
     return 0; 
   }
 
+  weighCashCollections : IWeighCashCollection[] = []
+  totalWeighCashCollections : number = 0
+
+ 
+
+  async getWeighDetailedTotalsByDates(from : Date | string | null, to : Date | string | null) {
+    if(from == null || to == null) {
+      from = new Date()
+      to = new Date()
+    }
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    var args = {
+      from : from,
+      to : to,
+    }
+
+    this.weighCashCollections = []
+    this.totalWeighCashCollections = 0
+    
+
+    await this.http.post<IWeighCashCollection[]>(API_URL+'/finance_reports/get_weigh_detailed_collections_by_dates', args, options)
+        .toPromise()
+        .then(
+          data => {
+
+            this.weighCashCollections = data!
+
+            var sn = 1
+            this.totalWeighCashCollections = 0
+            this.weighCashCollections.forEach(element => {
+              element.sn = sn
+              this.totalWeighCashCollections = this.totalWeighCashCollections + (+element.amount)
+              sn = sn + 1
+            })
+
+
+            
+            console.log(data)
+          }
+        )
+        .catch(
+          error => {
+            this.msg.showErrorMessage(error, 'Error')
+            
+            console.log(error)
+          }
+        )
+
+
+    return 0; 
+  }
+
+  
+   workshopCashCollections: IWorkshopCashCollection[] = []
+    totalWorkshopCashCollections: number = 0
+  
+    async getWorkshopDetailedTotalsByDates(from: Date | string | null, to: Date | string | null) {
+      if (from == null || to == null) {
+        from = new Date()
+        to = new Date()
+      }
+  
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      }
+  
+      var args = {
+        from: from,
+        to: to,
+        nickname: this.nickname
+      }
+  
+      this.workshopCashCollections = []
+      this.totalWorkshopCashCollections = 0
+  
+      await this.http.post<IWorkshopCashCollection[]>(API_URL + '/finance_reports/get_workshop_detailed_collections_by_dates', args, options)
+        .toPromise()
+        .then(
+          data => {
+            this.workshopCashCollections = data!
+            var sn = 1
+            this.totalWorkshopCashCollections = 0
+            this.workshopCashCollections.forEach(element => {
+              element.sn = sn
+              this.totalWorkshopCashCollections = this.totalWorkshopCashCollections + (+element.amount)
+              sn = sn + 1
+            })
+            console.log(data)
+          }
+        )
+        .catch(
+          error => {
+            this.msg.showErrorMessage(error, 'Error')
+  
+            console.log(error)
+          }
+        )
+      return 0;
+    }
+
 
   userNames : string[] = []
   async getBranchUserNames(){
@@ -420,6 +577,22 @@ export class CashCollectionComponent {
 
 
   printParkingCollectionReport1 = async () => {
+
+    // Set up VFS for pdfMake - try different approaches
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
+
     this.documentHeader = await this.data.getDocumentHeader()
     var header = ''
     var footer = ''
@@ -533,6 +706,22 @@ export class CashCollectionComponent {
   }
 
   printParkingCollectionReport = async () => {
+
+    // Set up VFS for pdfMake - try different approaches
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
+
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Parking Collection Report';
     const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
@@ -711,6 +900,20 @@ export class CashCollectionComponent {
 
 
   printSalesCollectionReport = async () => {
+    // Set up VFS for pdfMake - try different approaches
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Sales Collection Report';
     const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
@@ -788,8 +991,114 @@ export class CashCollectionComponent {
     pdfMake.createPdf(docDefinition).print();
   };
 
+  printRestaurantSalesCollectionReport = async () => {
+    // Set up VFS for pdfMake - try different approaches
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
+    this.documentHeader = await this.data.getDocumentHeaderLandScape();
+    const title = 'Restaurant Sales Collection Report';
+    const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
+    let total: number = 0;
+    let discount: number = 0;
+  
+    const report: any[] = [];
+  
+    // Add header row
+    report.push([
+      { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Meal/Service', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Qty', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Date Time', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+    ]);
+  
+    // Add rows dynamically
+    this.restaurantSalesCashCollections.forEach((element) => {
+      // total += parseFloat(element.amount) || 0;
+      // discount += parseFloat(element.discount) || 0;
+
+      if(Number(element.amount) > 0) total += Number(element.amount) || 0;
+      
+      if(Number(element.discount) > 0) discount += Number(element.discount) || 0;
+  
+      report.push([
+        { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },  
+        { text: element.productName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },    
+        { text: element.qty || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
+        { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+        { text: element.dateTime, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+      ]);
+    });
+  
+    // Add summary row
+    report.push([
+      { text: '', colSpan: 3 },     
+      {},
+      { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
+      { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+      {},
+      { text: '', fontSize: 9, alignment: 'left' },
+    ]);
+  
+    // Define document structure
+    const docDefinition: any = {
+      header: '',
+      pageOrientation: 'potrait',
+      footer: (currentPage: any, pageCount: any) => ({
+        text: `${currentPage} of ${pageCount}`,
+        alignment: 'center',
+        fontSize: 8,
+      }),
+      content: [
+        {
+          columns: [
+            this.documentHeader,
+          ],
+        },
+        {text : ' '},
+        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {
+          table: {
+            widths: [25, 120, 40, 60, 100, 100],
+            body: report,
+          },
+        },
+      ],
+    };
+  
+    pdfMake.createPdf(docDefinition).print();
+  };
+
 
   printStorageCollectionReport = async () => {
+    // Set up VFS for pdfMake - try different approaches
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Storage Collection Report';
     const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
@@ -803,9 +1112,12 @@ export class CashCollectionComponent {
       { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Good', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Phone No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Date Registered', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Days', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Discount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Payment Date', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
     ]);
   
@@ -813,17 +1125,17 @@ export class CashCollectionComponent {
     this.storageCashCollections.forEach((element) => {
        total = total + (+element.amount) || 0;
        discount = discount + (+element.discount) || 0;
-
-      total += Number(element.amount) || 0;
-      discount += Number(element.discount) || 0;
   
       report.push([
         { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.goodName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: `${element.ownerFirstName || ''} ${element.ownerLastName || ''}`, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.ownerPhoneNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.createdDateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.days || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
         { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+        { text: (Number(element.discount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+        { text: element.dateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       ]);
     });
@@ -834,9 +1146,12 @@ export class CashCollectionComponent {
       {},
       {},
       {},
+      {},
       { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
       { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
-      { text: '', fontSize: 9, alignment: 'left' },
+      { text: discount.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+      {},
+      {},
     ]);
   
     // Define document structure
@@ -859,7 +1174,7 @@ export class CashCollectionComponent {
         {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         {
           table: {
-            widths: [25, 100, 100, 60, 50, 80, 80],
+            widths: [25, 100, 100, 60, 60, 50, 60, 60, 60, 80],
             body: report,
           },
         },
@@ -871,6 +1186,20 @@ export class CashCollectionComponent {
 
 
   printMaintenanceCollectionReport = async () => {
+    // Set up VFS for pdfMake - try different approaches
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Maintenance Collection Report';
     const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
@@ -955,6 +1284,207 @@ export class CashCollectionComponent {
   
     pdfMake.createPdf(docDefinition).print();
   };
+
+  printWeighCollectionReport = async () => {
+    // Set up VFS for pdfMake - try different approaches
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
+    
+    this.documentHeader = await this.data.getDocumentHeaderLandScape();
+    const title = 'Weigh Bridge Collection Report';
+    const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
+    let total: number = 0;
+    let discount: number = 0;
+  
+    const report: any[] = [];
+  
+    // Add header row
+    report.push([
+      { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Plate No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Date Registered', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Axle One', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Axle Two', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Axle Three', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Axle Four', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+    ]);
+  
+    // Add rows dynamically
+    this.weighCashCollections.forEach((element) => {
+
+      total += Number(element.amount) || 0;
+      discount += Number(element.discount) || 0;
+  
+      report.push([
+        { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: `${element.ownerFirstName || ''}`, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.regNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.createdDateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+        { text: element.weightOne || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.weightTwo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.weightThree || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.weightFour || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+      ]);
+    });
+  
+    // Add summary row
+    report.push([
+      { text: ''},
+      {},
+      {},
+      { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
+      { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+      {},
+      {},
+      {},
+      {},
+      { text: '', fontSize: 9, alignment: 'left' },
+    ]);
+  
+    // Define document structure
+    const docDefinition: any = {
+      header: '',
+      pageOrientation: 'landscape',
+      footer: (currentPage: any, pageCount: any) => ({
+        text: `${currentPage} of ${pageCount}`,
+        alignment: 'center',
+        fontSize: 8,
+      }),
+      content: [
+        {
+          columns: [
+            this.documentHeader,
+          ],
+        },
+        {text : ' '},
+        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {
+          table: {
+            widths: [25, 100, 100, 60, 80, 50, 50, 50, 50, 80],
+            body: report,
+          },
+        },
+      ],
+    };
+  
+    pdfMake.createPdf(docDefinition).print();
+  };
+
+  printWorkshopCollectionReport = async () => {
+      // Set up VFS for pdfMake - try different approaches
+      try {
+        const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+        // Try different possible structures
+        if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+          (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+        } else if (vfsFonts.vfs) {
+          (window as any).pdfMake.vfs = vfsFonts.vfs;
+        } else {
+          (window as any).pdfMake.vfs = vfsFonts;
+        }
+      } catch (error) {
+        console.log('VFS setup failed, continuing without custom fonts:', error);
+      }
+  
+      this.documentHeader = await this.data.getDocumentHeaderLandScape();
+      const title = 'Workshop Collection Report';
+      const fromTo = 'From: ' + this.from?.toString() + ' To: ' + this.to?.toString();
+      let total: number = 0;
+      let discount: number = 0;
+  
+      const report: any[] = [];
+  
+      // Add header row
+      report.push([
+        { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+        { text: 'Owner Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+        { text: 'Phone No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+         { text: 'Machine Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+        { text: 'Reg No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+        { text: 'Service Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+        { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+        { text: 'Date Time', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+        { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      ]);
+  
+      // Add rows dynamically
+      this.workshopCashCollections.forEach((element) => {
+  
+        total += Number(element.amount) || 0;
+        discount += Number(element.discount) || 0;
+  
+        report.push([
+          { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+          { text: element.ownerName, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+          { text: element.ownerPhoneNo, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+          { text: element.machineName, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+          { text: element.regNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+          { text: element.serviceName, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+          { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+          { text: element.createdDateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+          { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        ]);
+      });
+  
+      // Add summary row
+      report.push([
+        { text: '' },
+        {},
+        {},
+        {},
+        {},
+        { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
+        { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+        {},
+        { text: '', fontSize: 9, alignment: 'left' },
+      ]);
+  
+      // Define document structure
+      const docDefinition: any = {
+        header: '',
+        pageOrientation: 'landscape',
+        footer: (currentPage: any, pageCount: any) => ({
+          text: `${currentPage} of ${pageCount}`,
+          alignment: 'center',
+          fontSize: 8,
+        }),
+        content: [
+          {
+            columns: [
+              this.documentHeader,
+            ],
+          },
+          { text: ' ' },
+          { text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+          { text: fromTo, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+          {
+            table: {
+              widths: [25, 100, 100, 60, 80, 100, 50, 50, 100],
+              body: report,
+            },
+          },
+        ],
+      };
+  
+      pdfMake.createPdf(docDefinition).print();
+    };
 
 
 }

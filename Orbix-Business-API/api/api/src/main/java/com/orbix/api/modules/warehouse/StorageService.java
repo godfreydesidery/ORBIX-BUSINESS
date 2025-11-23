@@ -5,12 +5,17 @@ import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 
+import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponseDTO;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
+
 
 
 public interface StorageService {
 	List<StorageResponseDTO> getAllStorages(HttpServletRequest request);	
 	List<StorageResponseDTO> getAllPendingOrCheckedInStorages(HttpServletRequest request);
 	List<StorageResponseDTO> getAllPendingOrCheckedInStoragesByWarehouse(Long warehouseId, HttpServletRequest request);
+	List<StorageResponseDTO> getAllWithDiscounts(HttpServletRequest request);
+	List<StorageResponseDTO> getAllCheckedInStoragesByWarehouse(Long warehouseId, HttpServletRequest request);
 	List<StorageResponseDTO> getAllRecentCheckedOutStoragesByWarehouse(Long warehouseId, HttpServletRequest request);
 	List<StorageResponseDTO> getAllCleared(HttpServletRequest request);
 	List<StorageResponseDTO> getTodayCheckedOut(HttpServletRequest request);
@@ -26,4 +31,10 @@ public interface StorageService {
 //	ApiCustomResponse deactivateStorage(StorageRequestDTO storageRequest, HttpServletRequest request);
 	
 	StorageBillReceivableResponseDTO createStorageBillReceivable(Long storageId, LocalDateTime startedAt, LocalDateTime endedAt, String billingType, double qty, double price, double discount, int autoBilling, HttpServletRequest request);
+
+	StorageCustomBillDetail showStorageCustomBillDetail(Long storageId, HttpServletRequest request);
+	
+	List<MonthlyStorageStatusResponseDTO> getMonthlyStats(int year, HttpServletRequest request);
+	
+	void removeGoods(Long storageId, double qty, String reason, HttpServletRequest request);
 }

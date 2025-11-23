@@ -23,5 +23,7 @@ public interface ParkingBillReceivableRepository extends JpaRepository<ParkingBi
 
 	Optional<ParkingBillReceivable> findByBillReceivable(BillReceivable billReceivable);
 
+	List<ParkingBillReceivable> findByParkingAndDiscountStatus(Parking parking, String string);
+
 	
 }

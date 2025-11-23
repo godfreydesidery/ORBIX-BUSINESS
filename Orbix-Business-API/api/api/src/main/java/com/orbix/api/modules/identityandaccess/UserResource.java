@@ -56,6 +56,8 @@ import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.modules.adminunits.Branch;
 import com.orbix.api.modules.adminunits.CompanyRequestDTO;
 import com.orbix.api.modules.adminunits.DayService;
+import com.orbix.api.modules.salesandmarketing.RestaurantAgent;
+import com.orbix.api.modules.salesandmarketing.RestaurantAgentRepository;
 import com.orbix.api.modules.utilities.Shortcut;
 import com.orbix.api.security.Object_;
 import com.orbix.api.security.Operation;
@@ -86,6 +88,8 @@ public class UserResource {
 	
 	private final RoleRepository roleRepository;
 	private final PrivilegeRepository privilegeRepository;
+	
+	private final RestaurantAgentRepository restaurantAgentRepository;
 	
 	
 	@GetMapping("/users/load_user")
@@ -158,19 +162,19 @@ public class UserResource {
 	@PostMapping("/users/create")
 	@PreAuthorize("hasAnyAuthority('USER-ALL','ADMIN-ACCESS')")
 	public ResponseEntity<User>createUser(
-			@RequestBody User user,
+			@RequestBody UserRequestDTO user,
 			HttpServletRequest request){
 		if(user.getUsername().equals("root")) {
 			throw new InvalidOperationException("Username not available");
 		}
 		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/create").toUriString());
-		return ResponseEntity.created(uri).body(userService.saveUser(user, request));
+		return ResponseEntity.created(uri).body(userService.saveUserWithDto(user, request));
 	}
 		
 	@PutMapping("/users/update")
 	@PreAuthorize("hasAnyAuthority('USER-ALL','ADMIN-ACCESS')")
 	public ResponseEntity<User>updateUser(
-			@RequestBody User user, 
+			@RequestBody UserRequestDTO user, 
 			HttpServletRequest request){
 		String authorizationHeader = request.getHeader("Authorization");
 		String username = getUsernameFromAuthorizationHeader(authorizationHeader);		
@@ -190,7 +194,7 @@ public class UserResource {
 			}
 			boolean active = user.isActive();
 			userToUpdate.setActive(active);
-			user = userToUpdate;
+			//user = userToUpdate;
 			user.setPassword("");//ensure that the root password is not changed in the operation
 		}
 		
@@ -199,7 +203,7 @@ public class UserResource {
 			throw new InvalidOperationException("Updating the ROOT profile is not allowed");
 		}
 		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/api/users/update").toUriString());
-		return ResponseEntity.created(uri).body(userService.saveUser(user, request));
+		return ResponseEntity.created(uri).body(userService.saveUserWithDto(user, request));
 	}
 	
 	@DeleteMapping("/users/delete")
@@ -607,6 +611,25 @@ public class UserResource {
 			List<User> users = userRepository.findAllByBranch(branch);
 			for(User user : users) {
 				nicknames.add(user.getNickname());
+			}	
+		}catch(Exception e) {
+			return nicknames;
+		}
+		return nicknames;		
+	}	
+	
+	@GetMapping("/users/get_branch_agent_names")
+	public List<String> getBranchAgentnames(
+			HttpServletRequest request
+			){
+		List<String> nicknames = new ArrayList<>();
+		try {
+			Branch branch = null;
+			branch = userService.getUser(request).getBranch();
+			
+			List<RestaurantAgent> users = restaurantAgentRepository.findAll();
+			for(RestaurantAgent user : users) {
+				nicknames.add(user.getName());
 			}	
 		}catch(Exception e) {
 			return nicknames;

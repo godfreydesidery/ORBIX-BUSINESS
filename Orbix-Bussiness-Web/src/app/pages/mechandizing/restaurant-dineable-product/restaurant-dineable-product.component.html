@@ -1,0 +1,177 @@
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span>Restaurant Name: </span>
+            </div>
+            <div class="card-body widget-body">
+
+                <div class="row">
+                    <div class="col-md-6">
+                        <span class="form-control text-primary"
+                            style="border-width: 0px; font-size: x-large; font-weight: bolder;">Menu List</span>
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <p>Menu available in restaurant</p>
+                            </div>
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords"
+                                    placeholder="Search..." style="max-width: 8cm;">
+                            </div>
+                        </div>
+                        <br>
+                        <table class="table table-bordered table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>SN</th>
+                                    <th>Code</th>
+                                    <th>Name</th>
+                                    <th>Description</th>
+                                    <th>Select</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    *ngFor="let restaurantDineable of restaurantDineables | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }">
+                                    <td>{{restaurantDineable.sn}}</td>
+                                    <td>{{restaurantDineable.dineableCode}}</td>
+                                    <td>{{restaurantDineable.dineableName}}</td>
+                                    <td>{{restaurantDineable.dineableDescription}}</td>
+                                    <td><button class="btn btn-outline-primary btn-round-custom btn-sm"
+                                            (click)="loadRestaurantDinableProducts(restaurantDineable.dineableId, restaurantDineable.dineableCode, restaurantDineable.dineableName)">Select</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <br>
+                        <div class="row">
+                            <div class="col-sm-12" style="text-align: right;">
+                                <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="form-control text-primary"
+                            style="border-width: 0px; font-size: x-large; font-weight: bolder;">Composition for ::
+                            {{selectedDineableName}}
+                            <button class="btn btn-outline-primary pull-right btn-round-custom"
+                                (click)="clearRestaurantProduct()" data-toggle="modal" data-target="#add-modal">+
+                                Add</button></span>
+                        <br>
+                        <table class="table table-bordered table-striped table-sm">
+                            <thead>
+                                <tr>
+                                    <th>SN</th>
+                                    <th>Product Code</th>
+                                    <th>Product Name</th>
+                                    <th>Qty</th>
+                                    <th>Uom</th>
+                                    <th>Select</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr *ngFor="let rdp of restaurantDinableProducts">
+                                    <td>{{rdp.sn}}</td>
+                                    <td>{{rdp.productCode}}</td>
+                                    <td>{{rdp.productName}}</td>
+                                    <td>{{rdp.productQty}}</td>
+                                    <td>PTN</td>
+                                    <td>
+                                        <button class="btn btn-outline-primary btn-round-custom btn-sm"
+                                            (click)="get(rdp.id)" data-toggle="modal"
+                                            data-target="#edit-modal">Edit</button>
+                                        <button class="btn btn-outline-danger btn-round-custom btn-sm"
+                                            (click)="remove(rdp.id)">Remove</button>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="add-modal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">
+                <h4 class="modal-title" id="modal-large-label">Add Composition</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="dropdown">
+                    <input type="text" id="dineableSearch" class="form-control" [(ngModel)]="searchTerm"
+                        (input)="searchProducts()" (focus)="isDropdownOpen = true" style="font-weight: bold;"
+                        placeholder="Type to search meal/service..." autocomplete="off" />
+                    <div class="dropdown-menu show mt-1" *ngIf="isDropdownOpen && filteredProducts.length > 0"
+                        style="max-height: 200px; overflow-y: auto; width: 100%;">
+                        <button class="dropdown-item form-control" style="font-weight: bold;"
+                            *ngFor="let product of filteredProducts" (click)="selectProduct(product)">
+                            {{ product.name }}
+                        </button>
+                    </div>
+
+                    <div class="dropdown-menu show mt-1 text-muted"
+                        *ngIf="isDropdownOpen && filteredProducts.length === 0">
+                        No dineables found.
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <br>
+                        <input type="text" class="form-control" [(ngModel)]="qty" style="text-align: center;"
+                            placeholder="Enter Qty">
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-round-custom"
+                    (click)="createRestaurantDineableProduct()" data-dismiss="modal">Save</button>
+                <button type="button" class="btn btn-danger btn-round-custom" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="edit-modal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">
+                <h4 class="modal-title" id="modal-large-label">Edit Composition</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row">
+                    <div class="col-md-12">
+                        <span class="form-control">{{productName}}</span>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <br>
+                        <input type="text" class="form-control" [(ngModel)]="qty" style="text-align: center;"
+                            placeholder="Enter Qty">
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary btn-round-custom"
+                    (click)="updateRestaurantDineableProduct()" data-dismiss="modal">Save</button>
+                <button type="button" class="btn btn-danger btn-round-custom" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>

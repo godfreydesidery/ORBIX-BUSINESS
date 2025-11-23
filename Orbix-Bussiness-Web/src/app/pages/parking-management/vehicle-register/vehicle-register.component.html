@@ -23,7 +23,7 @@
 
                 <br>    
 
-                <div class="table-responsive table-sm">
+                <div class="table-responsive table-striped table-sm">
                     <table class="table">
                         <thead>
                             <tr>
@@ -33,8 +33,8 @@
                                 <th>Chasis No</th>
                                 <th>Vehicle Type</th>
                                 <th>Owner Contacts</th>
-                                <th>Agent Name</th>
-                                <th>Agent Contacts</th>
+                                <!-- <th>Agent Name</th>
+                                <th>Agent Contacts</th> -->
                                 <th>Billing Type</th>
                                 <th>Price</th>
                                 <th>Check Status</th>
@@ -49,8 +49,8 @@
                                     <td><b style="color: rgb(228, 85, 8);">{{p.chasisNo}}</b></td>
                                     <td><b class="text-primary">{{p.vehicleEquipmentTypeName}}</b></td>
                                     <td>{{p.ownerPhoneNo}}</td>
-                                    <td>{{p.agentName}}</td>
-                                    <td>{{p.agentAddress}} {{p.agentPhoneNo}} {{p.agentEmail}}</td>
+                                    <!-- <td>{{p.agentName}}</td>
+                                    <td>{{p.agentAddress}} {{p.agentPhoneNo}} {{p.agentEmail}}</td> -->
                                     <td><span class="badge badge-primary">{{p.billingType}}</span></td>
                                     <td style="text-align: right;"><b class="text-danger">{{p.billingAmount | currency:'':''}}</b></td>
                                     <td>
@@ -524,7 +524,8 @@
                                 <p><b>Device Information</b></p>
                             </thead>
                             <tbody>
-                                <tr><td><b>Sub T1 Form</b></td><td>{{tformNumber}}</td></tr>
+                                <tr><td><b>Sub T1 Number</b></td><td>{{tformNumber}}</td></tr>
+                                <tr><td><b>Device Status</b></td><td>{{deviceStatus}}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -536,14 +537,14 @@
                             <tbody>
                                 <tr><td><b>Parking No</b></td><td>{{parkingNo}}</td></tr>
                                 <tr><td><b>Model/Type</b></td><td>{{vehicleEquipmentTypeName}}</td></tr>
-                                <tr><td><b>Chassis No</b></td><td>{{chasisNo}}</td></tr> 
+                                <tr><td><b>Chassis No</b></td><td style="color: red;"><b>{{chasisNo}}</b></td></tr>
                                 <tr><td><b>Billing Type</b></td><td>{{billingType}}</td></tr>
                                 <tr><td><b>Billing Start Date</b></td><td style="color: red;"><b>{{startBillingAt}}</b></td></tr> 
                                 <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}</td></tr>   
                                 <tr><td><b>Parking No</b></td><td>{{parkingNo}}</td></tr>   
-                                <tr><td><b>Vhc/Eq Category</b></td><td>{{vehicleEquipmentCategory}}</td></tr>   
-                                <tr><td><b>Keys</b></td><td>{{hasKeys}}</td></tr>  
-                                <tr><td><b>Card No</b></td><td>{{cardNo}}</td></tr>    
+                                <tr><td><b>Vhc/Eq Category</b></td><td>{{vehicleEquipmentCategory}}</td></tr>
+                                <tr><td><b>Keys</b></td><td>{{hasKeys}}</td></tr>
+                                <tr><td><b>Card No</b></td><td style="color: red;"><b>{{cardNo}}</b></td></tr>   
                                 <tr><td><b>Status</b></td><td>{{status}}</td></tr>    
                             </tbody>
                         </table>
@@ -628,6 +629,7 @@
                             </thead>
                             <tbody>
                                 <tr><td><b>Sub T1 Number</b></td><td>{{tformNumber}}</td></tr>
+                                <tr><td><b>Device Status</b></td><td>{{deviceStatus}}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -756,6 +758,7 @@
                             </thead>
                             <tbody>
                                 <tr><td><b>Sub T1 Number</b></td><td>{{tformNumber}}</td></tr>
+                                <tr><td><b>Device Status</b></td><td>{{deviceStatus}}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -845,32 +848,7 @@
             </div>
             <div class="modal-body">
 
-                <div class="row">
-                    <div class="col-lg-3">
-                        <div class="form-group">
-                            <label>Keys</label>
-                            <select class="form-control" [(ngModel)]="hasKeys">
-                                <option>YES</option>
-                                <option>NO</option>
-                            </select>
-                        </div>
-                    </div> 
-                    <div class="col-lg-3">
-                        <div class="form-group">
-                            <label>Card No</label><br>
-                            <input class="form-control" type="tel" [(ngModel)]="cardNo" autocomplete="nope">
-                        </div>
-                    </div> 
-                    <div class="col-lg-3">
-                        <div class="form-group">
-                            <label>Select Billing Start Date</label>
-                            <!-- <input type="date" class="form-control" [(ngModel)]="startBillingAt"> -->
-                            <input type="date" class="form-control" 
-                                [ngModel]="startBillingAt | date:'yyyy-MM-dd'"
-                                (ngModelChange)="startBillingAt = $event">
-                        </div>
-                    </div>
-                </div>
+                
 
                 <h6>Driver/Owner Information</h6><hr>
                 <div class="row">
@@ -1275,6 +1253,36 @@
                         </div>
                     </div>  
                 </div>
+
+                <hr>
+
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Keys</label>
+                            <select class="form-control" [(ngModel)]="hasKeys">
+                                <option>YES</option>
+                                <option>NO</option>
+                            </select>
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Card No</label><br>
+                            <input class="form-control" type="tel" [(ngModel)]="cardNo" autocomplete="nope">
+                        </div>
+                    </div> 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Select Billing Start Date</label>
+                            <!-- <input type="date" class="form-control" [(ngModel)]="startBillingAt"> -->
+                            <input type="date" class="form-control" 
+                                [ngModel]="startBillingAt | date:'yyyy-MM-dd'"
+                                (ngModelChange)="startBillingAt = $event">
+                        </div>
+                    </div>
+                </div>
+
             </div>
             <div class="modal-footer">
                 <button type="button" class="btn btn-primary" (click)="modify()" data-dismiss="modal">Modify</button>

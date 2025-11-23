@@ -14,10 +14,14 @@ public class ParkingBillReceivableResponseDTO {
 	String price;
 	
 	String discount;
+	String discountStatus;
 	
 	String amount;
 	
 	String parkingId;
 	
 	String payStatus;
+	
+	String discountApprovedBy;
+	String discountApprovedDateTime;
 }

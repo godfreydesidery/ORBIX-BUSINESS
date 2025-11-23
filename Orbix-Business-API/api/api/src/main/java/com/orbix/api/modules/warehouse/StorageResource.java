@@ -19,6 +19,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponseDTO;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
+
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 
@@ -29,6 +32,7 @@ import lombok.RequiredArgsConstructor;
 @Transactional
 public class StorageResource {
 	private final StorageService storageService;
+	private final StorageBillReceivableService storageBillReceivableService;
 	
 	private final StorageBillReceivableRepository storageBillReceivableRepository;
 	
@@ -44,11 +48,23 @@ public class StorageResource {
 		return ResponseEntity.ok().body(storageService.getAllPendingOrCheckedInStorages(request));
 	}
 	
+	@GetMapping("/storages/get_all_with_discounts")
+	public ResponseEntity<List<StorageResponseDTO>>getAllWithDiscounts(HttpServletRequest request){
+		return ResponseEntity.ok().body(storageService.getAllWithDiscounts(request));
+	}
+	
 	@GetMapping("/storages/get_all_pending_or_checked_in_by_warehouse")
 	public ResponseEntity<List<StorageResponseDTO>>getAllPendingAndCheckedInByWarehouse(
 			@RequestParam(name = "warehouse_id") Long warehouseId,
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(storageService.getAllPendingOrCheckedInStoragesByWarehouse(warehouseId, request));
+	}
+	
+	@GetMapping("/storages/get_all_checked_in_by_warehouse")
+	public ResponseEntity<List<StorageResponseDTO>>getAllCheckedInByWarehouse(
+			@RequestParam(name = "warehouse_id") Long warehouseId,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(storageService.getAllCheckedInStoragesByWarehouse(warehouseId, request));
 	}
 	
 	@GetMapping("/storages/get_all_recent_checked_out_by_warehouse")
@@ -106,6 +122,17 @@ public class StorageResource {
 		return ResponseEntity.created(uri).body(storageService.updateStorage(storageRequest, request));
 	}
 	
+	@PostMapping("/storages/remove")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public void remove(
+			@RequestParam(name = "storage_id") Long storageId,
+			@RequestParam(name = "qty") double qty,
+			@RequestParam(name = "reason") String reason,
+			HttpServletRequest request){		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/storages/remove").toUriString());
+		storageService.removeGoods(storageId, qty, reason, request);
+	}
+	
 	@PostMapping("/storages/check_in")
 	public ResponseEntity<StorageResponseDTO>checkIn(
 			@RequestBody StorageRequestDTO storageRequest,
@@ -157,8 +184,40 @@ public class StorageResource {
 		return ResponseEntity.created(uri).body(storageService.createStorageBillReceivable(storageBillReceivableRequest.getStorageId(), startedAt, endedAt, storageBillReceivableRequest.getBillingType(), storageBillReceivableRequest.getQty(), storageBillReceivableRequest.getPrice(), storageBillReceivableRequest.getDiscount(), storageBillReceivableRequest.getAutoBilling(), request));
 	}
 	
+	@PostMapping("/storages/create_storage_custom_bill_receivable")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<StorageBillReceivableResponseDTO>createStorageCustomBillReceivable(
+			@RequestBody StorageBillReceivableRequestDTO storageBillReceivableRequest,
+			HttpServletRequest request){		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/storages/create").toUriString());
+		
+//		String dateString = storageBillReceivableRequest.getStartedAt() + " 00:00:00";
+//		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//		LocalDateTime startedAt = LocalDateTime.parse(dateString, formatter);
+//		dateString = storageBillReceivableRequest.getEndedAt() + " 00:00:00";
+//		LocalDateTime endedAt = LocalDateTime.parse(dateString, formatter);
 
+		
+		return ResponseEntity.created(uri).body(storageBillReceivableService.createStorageCustomBillReceivable(storageBillReceivableRequest, request));
+	}
 	
+
+	@GetMapping("/storages/get_custom_bill_item")
+	public ResponseEntity<StorageCustomBillDetail>getCustomBill(
+			@RequestParam(name = "storage_id") Long storageId,
+			HttpServletRequest request){
+		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/storages/create").toUriString());
+		
+		return ResponseEntity.created(uri).body(storageService.showStorageCustomBillDetail(storageId, request));
+	}
+	
+	@GetMapping("/storages/get_storage_summary")
+	public ResponseEntity<List<MonthlyStorageStatusResponseDTO>>getStorageSummary(
+			@RequestParam(name = "year") int year,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(storageService.getMonthlyStats(year, request));
+	}
 	
 	
 	

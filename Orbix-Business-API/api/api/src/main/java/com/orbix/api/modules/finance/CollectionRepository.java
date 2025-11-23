@@ -322,6 +322,30 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
 		    @Param("startDate") LocalDateTime startDate,
 		    @Param("endDate") LocalDateTime endDate
 		);
+	
+	@Query(
+		    value = "SELECT " +
+		            "brc.amount AS amount, " +  
+		            "ps.name AS productName, " + 
+		            "c.pay_code AS payCode, " +
+		            "c.collection_date_time AS dateTime, " +
+		            "pbr.qty AS qty, " +
+		            "pbr.discount AS discount, " +
+		            "u.nickname AS cashierName " +
+		            "FROM bill_receivable_collections brc " +
+		            "JOIN collections c ON brc.collection_id = c.id " +
+		            "JOIN users u ON c.collected_by_user_id = u.id " +
+		            "JOIN bill_receivables br ON brc.bill_receivable_id = br.id " +
+		            "JOIN restaurant_sale_detail_bill_receivables pbr ON pbr.bill_receivable_id = br.id " +
+		            "JOIN restaurant_sale_details p ON p.id = pbr.restaurant_sale_detail_id " +
+		            "JOIN dineables ps ON p.dineable_id = ps.id " +
+		            "WHERE c.collection_date_time BETWEEN :startDate AND :endDate", 
+		    nativeQuery = true
+		)
+		List<IRestaurantSalesCollection> findRestaurantSalesCollectionsBetweenDates(
+		    @Param("startDate") LocalDateTime startDate,
+		    @Param("endDate") LocalDateTime endDate
+		);
 
 	@Query(
 		    value = "SELECT " +
@@ -384,6 +408,70 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
 		    @Param("startDate") LocalDateTime startDate,
 		    @Param("endDate") LocalDateTime endDate
 		);
+	
+	@Query(
+		    value = "SELECT " +
+		            "brc.amount AS amount, " +  
+		            "c.pay_code AS payCode, " +
+		            "c.collection_date_time AS dateTime, " +
+		            "brc.reason AS reason, " +
+		            "p.reg_no AS regNo, " +
+		            "p.owner_first_name AS ownerFirstName, " +
+		            "p.owner_last_name AS ownerLastName, " +
+		            "p.owner_phone_no AS ownerPhoneNo, " +
+		            "p.created_date_time AS createdDateTime, " +
+		            "pbr.discount AS discount, " +
+		            "NULLIF(pbr.weight_one, 0) AS weightOne, " +
+		            "NULLIF(pbr.weight_two, 0) AS weightTwo, " +
+		            "NULLIF(pbr.weight_three, 0) AS weightThree, " +
+		            "NULLIF(pbr.weight_four, 0) AS weightFour, " +
+		            "u.nickname AS cashierName " +
+		            "FROM bill_receivable_collections brc " +
+		            "JOIN collections c ON brc.collection_id = c.id " +
+		            "JOIN users u ON c.collected_by_user_id = u.id " +
+		            "JOIN bill_receivables br ON brc.bill_receivable_id = br.id " +
+		            "JOIN weigh_bill_receivables pbr ON pbr.bill_receivable_id = br.id " +
+		            "JOIN weighs p ON p.id = pbr.weigh_id " +
+		            "WHERE c.collection_date_time BETWEEN :startDate AND :endDate" +
+		            " AND (:nickname IS NULL OR :nickname = '' OR u.nickname = :nickname)",
+		    nativeQuery = true
+		)
+		List<IWeighCollection> findWeighCollectionsBetweenDates(
+		    @Param("startDate") LocalDateTime startDate,
+		    @Param("endDate") LocalDateTime endDate,
+		    @Param("nickname") String nickname
+		);
+	
+	@Query(
+		    value = "SELECT " +
+		            "brc.amount AS amount, " +  
+		            "c.pay_code AS payCode, " +
+		            "c.collection_date_time AS dateTime, " +
+		            "brc.reason AS reason, " +
+		            "p.reg_no AS regNo, " +
+		            "p.owner_name AS ownerName, " +
+		            "p.name AS machineName, " +
+		            "p.owner_phone_no AS ownerPhoneNo, " +
+		            "s.name AS serviceName, " +
+		            "p.created_date_time AS createdDateTime, " +
+		            "u.nickname AS cashierName " +
+		            "FROM bill_receivable_collections brc " +
+		            "JOIN collections c ON brc.collection_id = c.id " +
+		            "JOIN users u ON c.collected_by_user_id = u.id " +
+		            "JOIN bill_receivables br ON brc.bill_receivable_id = br.id " +
+		            "JOIN machine_service_bill_receivables pbr ON pbr.bill_receivable_id = br.id " +
+		            "JOIN machine_services ms ON pbr.machine_service_id = ms.id " +
+		            "JOIN machines p ON p.id = ms.machine_id " +
+		            "JOIN services s ON s.id = ms.service_id " +
+		            "WHERE c.collection_date_time BETWEEN :startDate AND :endDate" +
+		            " AND (:nickname IS NULL OR :nickname = '' OR u.nickname = :nickname)",
+		    nativeQuery = true
+		)
+		List<IWorkshopCollection> findWorkshopCollectionsBetweenDates(
+		    @Param("startDate") LocalDateTime startDate,
+		    @Param("endDate") LocalDateTime endDate,
+		    @Param("nickname") String nickname
+		);
 
 }
 
@@ -442,6 +530,17 @@ interface ISalesCollection {
     String getCashierName();
 }
 
+interface IRestaurantSalesCollection {
+	String getProductName();
+    String getAmount();
+    String getPayCode();
+    String getDateTime();
+    String getCreatedDateTime();
+    double getQty();
+    double getDiscount();
+    String getCashierName();
+}
+
 interface IStorageCollection {
     String getAmount();
     String getPayCode();
@@ -474,6 +573,43 @@ interface IMaintenanceCollection {
     double getDays();
     double getDiscount();
     String getCashierName();
+}
+
+interface IWeighCollection {
+    String getAmount();
+    String getPayCode();
+    String getDateTime();
+    String getReason();
+    String getRegNo();
+    String getOwnerFirstName();
+    String getOwnerLastName();
+    String getOwnerPhoneNo();
+    String getCreatedDateTime();
+    double getDiscount();
+    String getCashierName();
+    String getWeightOne();
+    String getWeightTwo();
+    String getWeightThree();
+    String getWeightFour();
+}
+
+interface IWorkshopCollection {
+	String getSn();
+    String getAmount();
+    String getPayCode();
+    String getDateTime();
+    String getReason();
+    String getRegNo();
+    String getOwnerName();
+    String getMachineName();
+    String getServiceName();
+    String getOwnerPhoneNo();
+    String getCreatedDateTime();
+    String getCashierName();
+    String getWeightOne();
+    String getWeightTwo();
+    String getWeightThree();
+    String getWeightFour();
 }
 
 

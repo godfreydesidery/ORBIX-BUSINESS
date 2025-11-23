@@ -52,6 +52,11 @@ public class ParkingResource {
 		return ResponseEntity.ok().body(parkingService.getAllCheckedInParkings(request));
 	}
 	
+	@GetMapping("/parkings/get_all_with_discounts")
+	public ResponseEntity<List<ParkingResponseDTO>>getAllWithDiscounts(HttpServletRequest request){
+		return ResponseEntity.ok().body(parkingService.getAllWithDiscounts(request));
+	}
+	
 	@GetMapping("/parkings/get_all_cleared")
 	public ResponseEntity<List<ParkingResponseDTO>>getAllCleared(HttpServletRequest request){
 		return ResponseEntity.ok().body(parkingService.getAllCleared(request));
@@ -65,6 +70,13 @@ public class ParkingResource {
 	@GetMapping("/parkings/get_recent_checked_out")
 	public ResponseEntity<List<ParkingResponseDTO>>getRecentCheckedOut(HttpServletRequest request){
 		return ResponseEntity.ok().body(parkingService.getRecentCheckedOut(request));
+	}
+	
+	@GetMapping("/parkings/get_parking_summary")
+	public ResponseEntity<List<MonthlyParkingStatusResponseDTO>>getParkingSummary(
+			@RequestParam(name = "year") int year,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(parkingService.getMonthlyStats(year, request));
 	}
 	
 	

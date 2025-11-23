@@ -27,215 +27,215 @@ const API_URL = environment.apiUrl;
   styleUrl: './product.component.scss'
 })
 export class ProductComponent {
-/**Data */
-id : any = null
-code : string = ''
-name : string = ''
-description : string = ''
-baseUom : string = ''
-active : string = 'Inactive'
+  /**Data */
+  id: any = null
+  code: string = ''
+  name: string = ''
+  description: string = ''
+  baseUom: string = ''
+  active: string = 'Inactive'
 
-product : IProduct
+  product: IProduct
 
-/**Collections */
+  /**Collections */
 
-products : IProduct[] = []
+  products: IProduct[] = []
 
-/**Identifiers */
-productId : string = ''
+  /**Identifiers */
+  productId: string = ''
 
 
-page: number = 1; // Initialize the current page to 1
-filterRecords : string = ''
-selectedOption: string = '';
+  page: number = 1; // Initialize the current page to 1
+  filterRecords: string = ''
+  selectedOption: string = '';
 
-constructor(
-  private http :HttpClient,
-  private auth : AuthService,
-  private msg : MsgBoxService
-) {}
+  constructor(
+    private http: HttpClient,
+    private auth: AuthService,
+    private msg: MsgBoxService
+  ) { }
 
-ngOnInit(){
-  this.getAllProducts()
-}
-
-async getAllProducts(){
-  let options = {
-    headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+  ngOnInit() {
+    this.getAllProducts()
   }
-  this.products = []
 
-  await this.http.get<IProduct[]>(API_URL+'/products', options)
-  .toPromise()
-  .then(
-    data => {
-      var sn = 1
-      data?.forEach(element => {
-        element.sn = sn
-        this.products.push(element)
-        sn = sn + 1
-      })
-      console.log(data)
+  async getAllProducts() {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
-  )
-}
+    this.products = []
 
-
-
-async get(id : any){
-  let options = {
-    headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    await this.http.get<IProduct[]>(API_URL + '/products', options)
+      .toPromise()
+      .then(
+        data => {
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.products.push(element)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
   }
-  await this.http.get<IProduct>(API_URL+'/products/get?id=' + id, options)
-  .toPromise()
-  .then(
-    data => {
-      this.showProductData(data!)
-      console.log(data)
+
+
+
+  async get(id: any) {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
-  )
-}
-
-
-
-public async save(){
-  let options = {
-    headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    await this.http.get<IProduct>(API_URL + '/products/get?id=' + id, options)
+      .toPromise()
+      .then(
+        data => {
+          this.showProductData(data!)
+          console.log(data)
+        }
+      )
   }
 
-  var product = {
-    id : this.id,
-    code : this.code,
-    name : this.name,
-    description : this.description,
-    baseUom : this.baseUom
+
+
+  public async save() {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+
+    var product = {
+      id: this.id,
+      code: this.code,
+      name: this.name,
+      description: this.description,
+      baseUom: this.baseUom
+    }
+
+    if (product.id === null) {
+      /**Create new product */
+      await this.http.post<IProduct>(API_URL + '/products/create', product, options)
+        .toPromise()
+        .then(
+          data => {
+            this.showProductData(data!)
+
+            console.log(data)
+
+            this.getAllProducts()
+
+            this.msg.showSuccessMessage('Product created successifully')
+
+          }
+
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+          }
+        )
+    } else {
+      /**Update an existing product */
+      await this.http.post<IProduct>(API_URL + '/products/update', product, options)
+        .toPromise()
+        .then(
+          data => {
+            this.showProductData(data!)
+
+            console.log(data)
+
+            this.getAllProducts()
+
+            this.msg.showSuccessMessage('Product updated successifully')
+          }
+
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+          }
+        )
+    }
   }
 
-  if(product.id === null){
-    /**Create new product */
-    await this.http.post<IProduct>(API_URL+'/products/create', product, options)
-    .toPromise()
-    .then(
-      data => {
-        this.showProductData(data!)
+  async activate(id: any) {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
 
-        console.log(data)
+    var company = {
+      id: id
+    }
 
-        this.getAllProducts()
+    await this.http.post<String>(API_URL + '/products/activate', company, options)
+      .toPromise()
+      .then(
+        data => {
 
-        this.msg.showSuccessMessage('Product created successifully')
+          console.log(data)
 
-      }
+          this.getAllProducts()
 
-    )
-    .catch(
-      error => {
-        console.log(error)
-        this.msg.showErrorMessage(error, 'Error')
-      }
-    )
-  }else{
-    /**Update an existing product */
-    await this.http.post<IProduct>(API_URL+'/products/update', product, options)
-    .toPromise()
-    .then(
-      data => {
-        this.showProductData(data!)
+          this.msg.showSuccessMessage('Product activated successifully')
 
-        console.log(data)
+        }
 
-        this.getAllProducts()
-
-        this.msg.showSuccessMessage('Product updated successifully')
-      }
-
-    )
-    .catch(
-      error => {
-        console.log(error)
-        this.msg.showErrorMessage(error, 'Error')
-      }
-    )
-  }
-}
-
-async activate(id : any){
-  let options = {
-    headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      )
+      .catch(
+        error => {
+          console.log(error)
+          this.msg.showErrorMessage(error, 'Error')
+        }
+      )
   }
 
-  var company = {
-    id : id
+  async deactivate(id: any) {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+
+    var company = {
+      id: id
+    }
+
+    await this.http.post<String>(API_URL + '/products/deactivate', company, options)
+      .toPromise()
+      .then(
+        data => {
+
+          console.log(data)
+
+          this.getAllProducts()
+          this.msg.showSuccessMessage('Product deactivated successifully')
+
+
+        }
+
+      )
+      .catch(
+        error => {
+          console.log(error)
+          this.msg.showErrorMessage(error, 'Error')
+        }
+      )
   }
 
-  await this.http.post<String>(API_URL+'/products/activate', company, options)
-    .toPromise()
-    .then(
-      data => {
+  showProductData(data: IProduct) {
+    this.id = data?.id
+    this.code = data!.code
+    this.name = data!.name
+    this.description = data!.description
+    this.baseUom = data!.baseUom
 
-        console.log(data)
-
-        this.getAllProducts()
-
-        this.msg.showSuccessMessage('Product activated successifully')
-
-      }
-
-    )
-    .catch(
-      error => {
-        console.log(error)
-        this.msg.showErrorMessage(error, 'Error')
-      }
-    )
-}
-
-async deactivate(id : any){
-  let options = {
-    headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
   }
 
-  var company = {
-    id : id
+  clearProductData() {
+    this.id = null
+    this.code = ''
+    this.name = ''
+    this.description = ''
+    this.baseUom = ''
+
   }
-
-  await this.http.post<String>(API_URL+'/products/deactivate', company, options)
-    .toPromise()
-    .then(
-      data => {
-
-        console.log(data)
-
-        this.getAllProducts()
-        this.msg.showSuccessMessage('Product deactivated successifully')
-
-
-      }
-
-    )
-    .catch(
-      error => {
-        console.log(error)
-        this.msg.showErrorMessage(error, 'Error')
-      }
-    )
-}
-
-showProductData(data : IProduct){
-  this.id = data?.id
-  this.code = data!.code
-  this.name = data!.name
-  this.description = data!.description
-  this.baseUom = data!.baseUom
-  
-}
-
-clearProductData(){
-  this.id = null
-  this.code = ''
-  this.name = ''
-  this.description = ''
-  this.baseUom = ''
-
-}
 }

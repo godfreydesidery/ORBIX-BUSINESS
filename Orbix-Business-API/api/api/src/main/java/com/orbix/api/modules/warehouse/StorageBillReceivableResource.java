@@ -60,4 +60,12 @@ public class StorageBillReceivableResource {
 		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/storage_bill_receivables/update_storage_bill_receivable").toUriString());
 		return ResponseEntity.created(uri).body(storageBillReceivableService.updateStorageBillReceivable(storageBillReceivableRequest, request));
 	}
+	
+	@GetMapping("/storage_bill_receivables/get_bill_view")
+	public ResponseEntity<BillViewResponseDTO> getBillView(
+			@RequestParam(name = "storage_id") Long storageId,
+			HttpServletRequest request)
+			{			
+		return ResponseEntity.ok().body(storageBillReceivableService.getBillView(storageId, request));
+	}
 }

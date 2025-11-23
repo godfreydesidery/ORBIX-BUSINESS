@@ -1,9 +1,6 @@
 package com.orbix.api.modules.adminunits;
 
-import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.Collection;
-
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -42,6 +39,8 @@ public class Shop {
 	private String name; 	
 	private String locationName;
 	private boolean active = false;
+	
+	private String shopCategory = "NORMAL";
 	
 	@ManyToOne(targetEntity = Branch.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "branch_id", nullable = false , updatable = true)

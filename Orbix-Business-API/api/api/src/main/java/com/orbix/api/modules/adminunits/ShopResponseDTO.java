@@ -17,4 +17,6 @@ public class ShopResponseDTO {
 	
 	private String otherInfo;
 	
+	private String shopCategory;
+	
 }

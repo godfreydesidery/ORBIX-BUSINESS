@@ -68,10 +68,20 @@ export class AuthService {
     localStorage.removeItem('selected-shop-code')
     localStorage.removeItem('selected-shop-name')
 
+    // Remove restaurants
+    localStorage.removeItem('selected-restaurant-id')
+    localStorage.removeItem('selected-restaurant-code')
+    localStorage.removeItem('selected-restaurant-name')
+
     // Remove warehouses
     localStorage.removeItem('selected-warehouse-id')
     localStorage.removeItem('selected-warehouse-code')
     localStorage.removeItem('selected-warehouse-name')
+
+    // Remove workshops
+    localStorage.removeItem('selected-workshop-id')
+    localStorage.removeItem('selected-workshop-code')
+    localStorage.removeItem('selected-workshop-name')
 
     //remove pharmacy data
     localStorage.removeItem('selected-pharmacy-id')

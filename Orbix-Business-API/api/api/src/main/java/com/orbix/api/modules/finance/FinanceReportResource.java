@@ -120,6 +120,22 @@ public class FinanceReportResource {
 
 	}
 	
+	@PostMapping("/finance_reports/get_restaurant_sales_detailed_collections_by_dates")
+	public ResponseEntity<List<IRestaurantSalesCollection>>getRestaurantSalesDetailedCollectionByDates(
+			@RequestBody DateRange dateRange,
+	        @RequestParam(name = "nickname", required = false) String nickname,
+			HttpServletRequest request){
+		
+		List<IRestaurantSalesCollection> collections;
+		
+		collections = collectionRepository.findRestaurantSalesCollectionsBetweenDates(
+				dateRange.getFrom().atStartOfDay(),
+                dateRange.getTo().atStartOfDay().plusDays(1)
+				);
+	    return ResponseEntity.ok().body(collections);
+
+	}
+	
 	@PostMapping("/finance_reports/get_storage_detailed_collections_by_dates")
 	public ResponseEntity<List<IStorageCollection>>getStorageDetailedCollectionByDates(
 			@RequestBody DateRange dateRange,
@@ -152,6 +168,39 @@ public class FinanceReportResource {
 
 	}
 	
+	@PostMapping("/finance_reports/get_weigh_detailed_collections_by_dates")
+	public ResponseEntity<List<IWeighCollection>>getWeighDetailedCollectionByDates(
+			@RequestBody DateRange dateRange,
+	        @RequestParam(name = "nickname", required = false) String nickname,
+			HttpServletRequest request){
+		
+		List<IWeighCollection> collections;
+		
+		collections = collectionRepository.findWeighCollectionsBetweenDates(
+				dateRange.getFrom().atStartOfDay(),
+                dateRange.getTo().atStartOfDay().plusDays(1),
+                dateRange.getNickname()
+				);
+	    return ResponseEntity.ok().body(collections);
+
+	}
+	
+	@PostMapping("/finance_reports/get_workshop_detailed_collections_by_dates")
+	public ResponseEntity<List<IWorkshopCollection>>getWorkshopDetailedCollectionByDates(
+			@RequestBody DateRange dateRange,
+	        @RequestParam(name = "nickname", required = false) String nickname,
+			HttpServletRequest request){
+		
+		List<IWorkshopCollection> collections;
+		
+		collections = collectionRepository.findWorkshopCollectionsBetweenDates(
+				dateRange.getFrom().atStartOfDay(),
+                dateRange.getTo().atStartOfDay().plusDays(1),
+                dateRange.getNickname()
+				);
+	    return ResponseEntity.ok().body(collections);
+	}
+	
 }
 
 @Data
@@ -166,5 +215,6 @@ class CollectionResponseDTO{
 class DateRange {
 	LocalDate from;
 	LocalDate to;
+	String nickname;
 }
 

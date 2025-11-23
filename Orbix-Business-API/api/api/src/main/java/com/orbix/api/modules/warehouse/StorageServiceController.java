@@ -1,11 +1,13 @@
 package com.orbix.api.modules.warehouse;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -14,6 +16,10 @@ import org.springframework.stereotype.Service;
 
 import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.api.commons.WorkFlowStatus;
+import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponseDTO;
+import com.orbix.api.api.vehicleandequipmentparking.Parking;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingBillReceivable;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
@@ -57,6 +63,8 @@ public class StorageServiceController implements StorageService {
 	
 	private final InvoiceReceivableRepository invoiceReceivableRepository;
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
+	
+	private final RemovedGoodRepository removedGoodRepository;
 	
 		
 	
@@ -103,6 +111,46 @@ public class StorageServiceController implements StorageService {
 
 		for(Storage storage : storages) {
 			storageResponses.add(storageResponseDTOMapper(storage));					
+		}		
+		return storageResponses;
+	}
+	
+	@Override
+	public List<StorageResponseDTO> getAllCheckedInStoragesByWarehouse(Long warehouseId, HttpServletRequest request) {
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+		
+		Warehouse warehouse = warehouseRepository.findById(warehouseId)
+		        .orElseThrow(() -> new NotFoundException("Warehouse not found"));
+		
+		List<Storage> storages = storageRepository.findAllByWarehouseAndStatusIn(warehouse, statuses);
+		List<StorageResponseDTO> storageResponses = new ArrayList<>();
+
+		for(Storage storage : storages) {
+			storageResponses.add(storageResponseDTOMapper(storage));					
+		}		
+		return storageResponses;
+	}
+	
+	@Override
+	public List<StorageResponseDTO> getAllWithDiscounts(HttpServletRequest request) {
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+		
+		List<Storage> storages = storageRepository.findAllByStatusIn(statuses);
+		List<StorageResponseDTO> storageResponses = new ArrayList<>();
+
+		for(Storage storage : storages) {
+			
+			List<StorageBillReceivable> sbrs = storageBillReceivableRepository.findByStorage(storage);
+			for(StorageBillReceivable sbr : sbrs) {
+				if(sbr.getDiscountStatus() != null && sbr.getDiscountStatus().equals("Requested")) {
+					storageResponses.add(storageResponseDTOMapper(storage));
+					break;
+				}
+			}							
 		}		
 		return storageResponses;
 	}
@@ -283,8 +331,37 @@ public class StorageServiceController implements StorageService {
 		storage.setHeight(storageRequest.getHeight());
 		storage.setWeight(storageRequest.getWeight());
 		
-		storage.setBillingType("DAILY");
+		if(storageRequest.getBillingAmount() <= 0) throw new InvalidOperationException("Price can not be zero");	
 		storage.setBillingAmount(storageRequest.getBillingAmount());
+		
+		if(storageRequest.getInitialQty() <= 0) throw new InvalidOperationException("Qty can not be zero");
+				
+//		storage.setBillingType("DAILY");		
+		if(storageRequest.getBillingType().equals("DAILY")) {
+			storage.setInitialQty(storageRequest.getInitialQty());
+			storage.setCurrentQty(storageRequest.getInitialQty());
+			storage.setBillingType("DAILY");
+		}else if(storageRequest.getBillingType().equals("FLAT-RATE")) {
+			storage.setInitialQty(storageRequest.getInitialQty());
+			storage.setCurrentQty(storageRequest.getInitialQty());
+			storage.setBillingType("FLAT-RATE");
+		}else {
+			throw new InvalidOperationException("Invalid Billing Type");
+		}
+		
+		
+		if(storageRequest.startBillingAt == null) {
+			storage.setStartBillingAt(dayService.getTimeStamp()); // You can change this depending on user billing preferences
+		}else {			
+			//String dateString = "2024-10-26 15:30:45" ;
+			String dateString = storageRequest.getStartBillingAt() + " 00:00:00";
+			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+			storage.setStartBillingAt(dateTime);			
+			if(dateTime.isAfter(dayService.getTimeStamp())) {
+				throw new InvalidOperationException("The selected date cannot be in the future. Please choose today or an earlier date.");
+			}				
+		}	
 		
 		//storage.setImage(storageRequest.getImage());
 		storage.setStatus("PENDING");
@@ -387,6 +464,22 @@ public class StorageServiceController implements StorageService {
 		
 		storage.setBillingType(storageRequest.getBillingType());
 		storage.setBillingAmount(storageRequest.getBillingAmount());
+		
+		if(storageRequest.startBillingAt != null && storage.getStatus().equals("PENDING")) {		
+			LocalDateTime dateTime;
+			String raw = storageRequest.getStartBillingAt();
+			if (raw.contains("T")) {
+			    dateTime = LocalDateTime.parse(raw);
+			} else {
+			    String dateString = raw + " 00:00:00";
+			    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+			    dateTime = LocalDateTime.parse(dateString, formatter);
+			}			
+			if(dateTime.isAfter(dayService.getTimeStamp())) {
+				throw new InvalidOperationException("The selected date cannot be in the future. Please choose today or an earlier date.");
+			}
+			storage.setStartBillingAt(dateTime);
+		}
 				
 		storage = storageRepository.save(storage);
 		
@@ -412,6 +505,7 @@ public class StorageServiceController implements StorageService {
 		storageResponse.setLength(String.valueOf(storage.getLength()));
 		storageResponse.setHeight(String.valueOf(storage.getHeight()));
 		storageResponse.setWeight(String.valueOf(storage.getWeight()));
+		storageResponse.setInitialQty(String.valueOf(storage.getInitialQty()));
 		
 		storageResponse.setBillingStartAt(
 			    Optional.ofNullable(storage.getStartBillingAt())
@@ -438,6 +532,8 @@ public class StorageServiceController implements StorageService {
 		storageResponse.setGoodTypeName(storage.getGoodType().getName());
 		storageResponse.setGoodName(storage.getGoodName());
 		storageResponse.setGoodDescription(storage.getGoodDescription());
+		storageResponse.setInitialQty(String.valueOf(storage.getInitialQty()));
+		storageResponse.setCurrentQty(String.valueOf(storage.getCurrentQty()));
 		
 		storageResponse.setWarehouseName(
 				storage.getWarehouse() != null && storage.getWarehouse().getName() != null
@@ -496,15 +592,15 @@ public class StorageServiceController implements StorageService {
 		storage.setCheckedInByUser(userService.getUser(request));
 		storage.setCheckedInDateTime(dayService.getTimeStamp());
 		
-		if(storageRequest.startBillingAt == null) {
-			storage.setStartBillingAt(dayService.getTimeStamp()); // You can change this depending on user billing preferences
-		}else {			
-			//String dateString = "2024-10-26 15:30:45" ;
-			String dateString = storageRequest.getStartBillingAt() + " 00:00:00";
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
-			storage.setStartBillingAt(dateTime);
-		}		
+//		if(storageRequest.startBillingAt == null) {
+//			storage.setStartBillingAt(dayService.getTimeStamp()); // You can change this depending on user billing preferences
+//		}else {			
+//			//String dateString = "2024-10-26 15:30:45" ;
+//			String dateString = storageRequest.getStartBillingAt() + " 00:00:00";
+//			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+//			storage.setStartBillingAt(dateTime);
+//		}		
 		storage = storageRepository.save(storage);
 		
 //		//generate bill, for day 1 depending on billing type
@@ -608,14 +704,22 @@ public class StorageServiceController implements StorageService {
 		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage_.get());
 		LocalDateTime lastDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
 		LocalDateTime lastBillDate = LocalDateTime.now().toLocalDate().atStartOfDay();
+		double billedQty = 0;
 		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
+			billedQty = billedQty + storageBillReceivable.getQty();
 			if(storageBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.UNPAID)) {
 				throw new InvalidOperationException("Can not check out, bills  not cleared");
 			}
 			lastBillDate = storageBillReceivable.getEndedAt();
 		}
-		if(lastBillDate.isBefore(lastDate)) {
+		if(storage_.get().getCurrentQty() > 0 && (!storage_.get().getBillingType().equals("FLAT-RATE"))) {
 			throw new InvalidOperationException("Could not checkout. Some storage days have not been billed. Please generate and clear bills");
+		}
+		
+		if(storage_.get().getBillingType().equals("FLAT-RATE")) {
+			if(billedQty < storage_.get().getInitialQty()) {
+				throw new InvalidOperationException("Could not check out. Billed qty is less than total qty, for flat rate");
+			}
 		}
 		
 		Storage storage = storage_.get();
@@ -769,6 +873,99 @@ public class StorageServiceController implements StorageService {
 		
 		return null;
 	}
+
+	@Override
+	public StorageCustomBillDetail showStorageCustomBillDetail(Long storageId, HttpServletRequest request) {
+		
+		Storage storage = storageRepository.findById(storageId)
+		        .orElseThrow(() -> new NotFoundException("Storage not found"));
+		
+		LocalDateTime startBillingAt = storage.getStartBillingAt();
+		double noOfDays = (long) Math.floor((double) Duration.between(startBillingAt, LocalDateTime.now()).toHours() / 24);
+		if(noOfDays <=0 ) {
+			noOfDays = 1;
+		}
+		
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findByStorage(storage);
+		StorageCustomBillDetail storageCustomBillDetail = new StorageCustomBillDetail();
+		
+		storageCustomBillDetail.setTotalQty(storage.getInitialQty());
+		double billedQty = 0;
+		
+		for(StorageBillReceivable sbr : storageBillReceivables) {
+			billedQty = billedQty + sbr.getQty();
+		}
+		
+		storageCustomBillDetail.setBilledQty(billedQty);
+		
+		storageCustomBillDetail.setUnbilledQty(storage.getInitialQty() - billedQty);
+		
+		storageCustomBillDetail.setBillingRate(storage.getBillingAmount());
+		storageCustomBillDetail.setNoOfDays(noOfDays);
+		storageCustomBillDetail.setBillingType(storage.getBillingType());
+		
+		return storageCustomBillDetail;
+	}
+	
+	@Override
+	public List<MonthlyStorageStatusResponseDTO> getMonthlyStats(int year, HttpServletRequest request) {
+		List<Object[]> rawStats = storageRepository.getMonthlyStats(year);
+		return rawStats.stream().map(row -> new MonthlyStorageStatusResponseDTO(((Number) row[0]).intValue(),
+				((Number) row[1]).longValue(), ((Number) row[2]).longValue())).collect(Collectors.toList());
+
+	}
+
+	@Override
+	public void removeGoods(Long storageId, double qty, String reason, HttpServletRequest request) {
+		Optional<Storage> storage_ = storageRepository.findById(storageId);
+		if(storage_.isEmpty()) throw new NotFoundException("Storage not found in database");
+		
+		if(!storage_.get().getStatus().equals("CHECKED-IN")) throw new NotFoundException("Can only archive goods from checked in storage");
+		
+			
+		Optional<Company> company_ = companyRepository.findById(userService.getUserCompany(request).getId());
+		if(company_.isEmpty()) throw new NotFoundException("Company not found");
+			
+		Optional<Branch> branch_ = branchRepository.findById(userService.getUserBranch(request).getId());
+		if(branch_.isEmpty()) throw new NotFoundException("Branch not found");
+			
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage_.get());
+		double billedQty = 0;
+		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
+			billedQty = billedQty + storageBillReceivable.getQty();
+			if(storageBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.UNPAID)) {
+				throw new InvalidOperationException("Can not archive, some generated bills  not cleared. Please clear the bills before archiving");
+			}
+		}
+		
+		if(qty > storage_.get().getCurrentQty()) {
+			throw new InvalidOperationException("Archive quantity should not be more than available quantity");
+		}
+		
+		if(qty <= 0) {
+			throw new InvalidOperationException("Archive quantity should be more than zero");
+		}
+		
+		if(reason.isBlank()) {
+			throw new InvalidOperationException("Reason is required");
+		}
+		
+		Storage storage = storage_.get();
+		
+		storage.setCurrentQty(storage.getCurrentQty() - qty);
+		
+		storage = storageRepository.save(storage);
+		
+		RemovedGood removedGood = new RemovedGood();
+		removedGood.setQty(qty);
+		removedGood.setReason(reason);
+		removedGood.setStorage(storage);
+		removedGood.setCreatedByUser(userService.getUser(request));
+		removedGood.setCreatedDateTime(dayService.getTimeStamp());
+		
+		removedGoodRepository.save(removedGood);
+		
+	}
 }
 
 @Data
@@ -778,4 +975,14 @@ class ServiceBillItem {
 	double qty;
 	String payStatus;
 	double amount;
+}
+
+@Data
+class StorageCustomBillDetail{
+	double totalQty;
+	double billedQty;
+	double unbilledQty;
+	double billingRate;
+	double noOfDays;
+	String billingType;
 }

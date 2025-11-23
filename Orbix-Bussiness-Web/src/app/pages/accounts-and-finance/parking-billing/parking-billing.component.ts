@@ -343,6 +343,12 @@ export class ParkingBillingComponent {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
+
+    this.billPaid = 0
+    this.billGenerated = 0
+    this.billUngenerated = 0
+    this.billUnpaid = 0
+
     await this.http.get<IBillView>(API_URL+'/parking_bill_receivables/get_bill_view?parking_id=' + id, options)
     .toPromise()
     .then(

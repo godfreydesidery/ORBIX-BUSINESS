@@ -57,6 +57,8 @@ public class StorageResponseDTO {
     String length;
     String height;
     String weight;
+    String initialQty;
+    String currentQty;
 	
     List<ServiceBillItem> serviceBillItems;
 }

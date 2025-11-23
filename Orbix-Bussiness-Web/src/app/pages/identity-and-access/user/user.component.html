@@ -1,22 +1,29 @@
-
-
-
-
-
 <div class="row bottom-30">
     <div class="col">
         <div widget class="card">
             <div class="card-header">
                 <span>User List</span>
             </div>
-            <div class="card-body widget-body"> 
+            <div class="card-body widget-body">
 
                 <div class="row">
                     <div class="col-sm-12">
-                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="clearFields()" data-toggle="modal" data-target="#user-modal">New User</button>
-                    <br><br>
+                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="clearFields()"
+                            data-toggle="modal" data-target="#user-modal">New User</button>
+                        <br><br>
                     </div>
                 </div>
+
+                <div class="row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords"
+                            placeholder="Search..." style="max-width: 8cm;">
+                    </div>
+                </div>
+
+                <br>
 
                 <div class="row">
                     <div class="col-sm-12">
@@ -36,32 +43,41 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    @for (user of users; track user.id) {
-                                        <tr>
-                                            <td>{{user.code}}</td>
-                                            <td>{{user.username}}</td>
-                                            <td>{{user.lastName}}, {{user.firstName}}</td>
-                                            <td>{{user.nickname}}</td>
-                                            <td>{{user.type}}</td>
-                                            <td>{{user.companyName}}</td>
-                                            <td>{{user.branchName}}</td>
-                                            <td>
-                                                <span *ngIf="user.active ==='Active'">Lock__</span><span *ngIf="user.active ==='Inactive'">Unlock </span> | 
-                                                <button *ngIf="user.active ==='Active'" (click)="deactivate(user.id)"><i class="fa fa-unlock text-success"></i></button>
-                                                <button *ngIf="user.active ==='Inactive'" (click)="activate(user.id)"><i class="fa fa-lock text-danger"></i></button>
-                                            </td>
-                                            <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(user.id)" style="cursor: pointer;" data-toggle="modal" data-target="#user-modal">Select</button></td>
-                                        </tr>
-                                    }
+                                    <tr
+                                        *ngFor="let user of users | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                        <td>{{user.code}}</td>
+                                        <td>{{user.username}}</td>
+                                        <td>{{user.lastName}}, {{user.firstName}}</td>
+                                        <td>{{user.nickname}}</td>
+                                        <td>{{user.type}}</td>
+                                        <td>{{user.companyName}}</td>
+                                        <td>{{user.branchName}}</td>
+                                        <td>
+                                            <span *ngIf="user.active ==='Active'">Lock__</span><span
+                                                *ngIf="user.active ==='Inactive'">Unlock </span> |
+                                            <button *ngIf="user.active ==='Active'" (click)="deactivate(user.id)"><i
+                                                    class="fa fa-unlock text-success"></i></button>
+                                            <button *ngIf="user.active ==='Inactive'" (click)="activate(user.id)"><i
+                                                    class="fa fa-lock text-danger"></i></button>
+                                        </td>
+                                        <td><button type="button" class="btn btn-primary btn-round-custom"
+                                                (click)="get(user.id)" style="cursor: pointer;" data-toggle="modal"
+                                                data-target="#user-modal">Select</button></td>
+                                    </tr>
                                 </tbody>
                             </table>
+                            <div class="row">
+                                <div class="col-sm-12" style="text-align: right;">
+                                    <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
-                
 
-                
+
+
 
             </div>
         </div>
@@ -71,12 +87,14 @@
 
 
 
-<div class="modal fade" id="user-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0 !important;">
+<div class="modal fade" id="user-modal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="modal-large-label" style="top: 0 !important;">
     <div class="modal-dialog modal-xl" role="document" style="top: 0;">
         <div class="modal-content">
-            <div class="modal-header state modal-default">                                    
+            <div class="modal-header state modal-default">
                 <h4 class="modal-title" id="modal-large-label">New/Edit User</h4>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
             </div>
             <div class="modal-body">
                 <div class="row">
@@ -111,7 +129,7 @@
                             <input class="form-control" type="text" [(ngModel)]="nickname" autocomplete="nope">
                         </div>
                     </div>
-                    
+
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label>Username</label>
@@ -127,9 +145,10 @@
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label>Confirm Password</label>
-                            <input class="form-control" type="password" [(ngModel)]="confirmPassword" autocomplete="nope">
+                            <input class="form-control" type="password" [(ngModel)]="confirmPassword"
+                                autocomplete="nope">
                         </div>
-                    </div>  
+                    </div>
                     <div class="col-lg-4">
                         <div class="form-group">
                             <label>Select User Type : System user or Company User</label>
@@ -144,9 +163,9 @@
                         <div class="form-group">
                             <label>Select Company</label>
                             <select class="form-control" [(ngModel)]="companyName">
-                                <option></option>  
+                                <option></option>
                                 @for (company of companies; track company.id) {
-                                    <option >{{company.name}}</option>
+                                <option>{{company.name}}</option>
                                 }
                             </select>
                         </div>
@@ -155,13 +174,13 @@
                         <div class="form-group">
                             <label>Select Branch</label>
                             <select class="form-control" [(ngModel)]="branchName">
-                                <option></option>  
+                                <option></option>
                                 @for (branch of branches; track branch.id) {
-                                    <option >{{branch.name}}</option>
+                                <option>{{branch.name}}</option>
                                 }
                             </select>
                         </div>
-                    </div>                                  
+                    </div>
                 </div>
 
 
@@ -181,7 +200,9 @@
                                         <div class="row">
                                             <div class="col-12" *ngFor="let role of roles">
                                                 <span *ngIf="role.owner === 'SYSTEM'">
-                                                    <input type="checkbox" id="role.name" name="role.name" [(ngModel)]="role.granted"><label for="{{role.name}}">{{role.name}}</label>
+                                                    <input type="checkbox" id="role.name" name="role.name"
+                                                        [(ngModel)]="role.granted"><label
+                                                        for="{{role.name}}">{{role.name}}</label>
                                                 </span>
                                             </div>
                                         </div>
@@ -190,12 +211,14 @@
                                         <div class="row">
                                             <div class="col-12" *ngFor="let role of roles">
                                                 <span *ngIf="role.owner === 'ORGANIZATION'">
-                                                    <input type="checkbox" id="role.name" name="role.name" [(ngModel)]="role.granted"><label for="{{role.name}}">{{role.name}}</label>
+                                                    <input type="checkbox" id="role.name" name="role.name"
+                                                        [(ngModel)]="role.granted"><label
+                                                        for="{{role.name}}">{{role.name}}</label>
                                                 </span>
                                             </div>
                                         </div>
                                     </td>
-                                    
+
                                 </tr>
                             </tbody>
                         </table>
@@ -216,9 +239,9 @@
 
 
 
-    
-  
-  
+
+
+
 
 
 

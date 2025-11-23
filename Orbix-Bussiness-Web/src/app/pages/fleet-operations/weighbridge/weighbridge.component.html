@@ -1,0 +1,301 @@
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <!-- <div class="card-header">
+                <span>Discounts</span>
+            </div> -->
+            <div class="card-body widget-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <button type="button" class="btn btn-success btn-round-custom" (click)="clearWeigh()"
+                            (click)="changeStatus('single')" data-toggle="modal" data-target="#weigh-modal"><i
+                                class="fa fa-refresh"></i>
+                            New Weight Vehicle</button>
+                        <button type="button" class="btn btn-success btn-round-custom" (click)="getAllRecent()"
+                            (click)="changeStatus('list')"><i class="fa fa-refresh"></i>
+                            Vehicle Weight List</button>
+                        <!-- <button class="btn btn-outline-success btn-round-custom" (click)="getAllPendingOrders()" data-toggle="modal" data-target="#sales-order-list-modal">Sales Order List</button> -->
+                    </div>
+                    <br>
+                </div>
+                <br>
+
+                <div class="row">
+                    <div class="col-sm-12" *ngIf="pageStatus === 'single'">
+
+
+                        <div class="row">
+
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <input type="hidden" [(ngModel)]="id">
+                                <label style="font-size: large; font-weight: bold;">Code No</label>
+                                <input class="form-control" [(ngModel)]="no"
+                                    style="font-size: large; font-weight: bold;" readonly>
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label style="font-size: large; font-weight: bold;">Driver Name</label>
+                                <input class="form-control" [(ngModel)]="ownerName"
+                                    style="font-size: large; font-weight: bold;">
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label style="font-size: large; font-weight: bold;">Phone Number</label>
+                                <input class="form-control" [(ngModel)]="ownerPhoneNo"
+                                    style="font-size: large; font-weight: bold;">
+                            </div>
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label style="font-size: large; font-weight: bold;">Plate No</label>
+                                <input class="form-control" [(ngModel)]="regNo"
+                                    style="font-size: large;" placeholder="T 820 EBZ">
+                            </div>
+                        </div>
+                        <hr>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <button class="btn btn-round-custom btn-outline-primary" (click)="save()"><i
+                                        class="fa fa-save"></i> Save</button>
+                            </div>
+
+                        </div>
+                        <hr>
+                        <div class="row" *ngIf="id != null">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label style="font-size: large; font-weight: bold;">Tare : Select Tare
+                                    Type</label>
+                                <select id="tare" class="form-control" [(ngModel)]="selectedTareValue"
+                                    (change)="onTareChange()" style="font-size: large; font-weight: bold;">
+                                    <option value="">-- Select Tare --</option>
+                                    <option *ngFor="let option of tareOptions" [value]="option.value">
+                                        {{ option.label }}
+                                    </option>
+                                </select>
+                            </div>
+                            <!-- Excel One -->
+                            <div class="col-lg-2 col-md-2 col-sm-6"
+                                *ngIf="selectedTareLabel === 'Axle One-Two' || selectedTareLabel === 'Axle Three-Four'">
+                                <label style="font-size: large; font-weight: bold;">Axle One</label>
+                                <input class="form-control" [(ngModel)]="weightOne"
+                                    style="font-size: large; font-weight: bold;">
+                            </div>
+
+                            <!-- Excel Two -->
+                            <div class="col-lg-2 col-md-2 col-sm-6"
+                                *ngIf="selectedTareLabel === 'Axle One-Two' || selectedTareLabel === 'Axle Three-Four'">
+                                <label style="font-size: large; font-weight: bold;">Axle Two</label>
+                                <input class="form-control" [(ngModel)]="weightTwo"
+                                    style="font-size: large; font-weight: bold;">
+                            </div>
+
+                            <!-- Excel Three -->
+                            <div class="col-lg-2 col-md-2 col-sm-6" *ngIf="selectedTareLabel === 'Axle Three-Four'">
+                                <label style="font-size: large; font-weight: bold;">Axle Three</label>
+                                <input class="form-control" [(ngModel)]="weightThree"
+                                    style="font-size: large; font-weight: bold;">
+                            </div>
+
+                            <!-- Excel Four -->
+                            <div class="col-lg-2 col-md-2 col-sm-6" *ngIf="selectedTareLabel === 'Axle Three-Four'">
+                                <label style="font-size: large; font-weight: bold;">Axle Four</label>
+                                <input class="form-control" [(ngModel)]="weightFour"
+                                    style="font-size: large; font-weight: bold;">
+                            </div>
+
+                        </div>
+
+                        <div class="row"
+                            *ngIf="selectedTareLabel === 'Axle One-Two' || selectedTareLabel === 'Axle Three-Four'">
+                            <div class="col-lg-3 col-md-6 col-sm-12">
+                                <label style="font-size: large; font-weight: bold;">Select Weigh Status</label>
+                                <select class="form-control" [(ngModel)]="weighStatus"
+                                    style="font-size: large; font-weight: bold; color: red;">
+                                    <option>NORMAL</option>
+                                    <option>OVERWEIGHT</option>
+                                    <option>UNDERWEIGHT</option>
+                                </select>
+                            </div>
+                            <div class="col-lg-1 col-md-1 col-sm-6">
+                                <br>
+                                <button type="button" class="btn btn-outline-primary btn-round-custom pull-right"
+                                    (click)="addBill()"><i class="fa fa-pencil"></i>
+                                    Add</button>
+                            </div>
+                        </div>
+
+                        <div class="row" *ngIf="id != null">
+                            <div class="col-sm-12">
+                                <hr>
+                                <table class="table table-striped table-sm table-bordered">
+                                    <thead style="font-weight: bold;">
+                                        <tr>
+                                            <td style="font-weight: bold;">SN</td>
+                                            <td style="font-weight: bold;">Tare Type</td>
+                                            <td style="font-weight: bold;">Axle One</td>
+                                            <td style="font-weight: bold;">Axle Two</td>
+                                            <td style="font-weight: bold;">Axle Three</td>
+                                            <td style="font-weight: bold;">Axle Four</td>
+                                            <td style="font-weight: bold;">Weight Status</td>
+                                            <td style="font-weight: bold;">Amount</td>
+                                            <td style="font-weight: bold;">Pay Status</td>
+                                            <td style="font-weight: bold;">Created By</td>
+                                            <td style="font-weight: bold;">Action</td>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr style="font-size: large;" *ngFor="let bill of bills">
+                                            <td>1</td>
+                                            <td>{{bill.description}}</td>
+                                            <td>{{bill.weightOne}}</td>
+                                            <td>{{bill.weightTwo}}</td>
+                                            <td>{{bill.weightThree}}</td>
+                                            <td>{{bill.weightFour}}</td>
+                                            <td>{{bill.weighStatus}}</td>
+                                            <td style="text-align: right;">{{bill.amount | currency:'':''}}</td>
+                                            <td style="text-align: center;">{{bill.payStatus}}</td>
+                                            <td>{{bill.createdBy}}</td>
+                                            <td style="text-align: center;"><button type="button"
+                                                    class="btn btn-outline-danger btn-round-custom"
+                                                    *ngIf="bill.payStatus == 'UNPAID'" (click)="removeBill(bill.id)"><i
+                                                        class="fa fa-trash"></i>
+                                                    Remove</button></td>
+                                        </tr>
+                                    </tbody>
+                                    <tfoot>
+                                        <tr style="font-size: large;">
+                                            <td style="text-align: right;"></td>
+                                            <td style="text-align: right;"></td>
+                                            <td style="text-align: right;"></td>
+                                            <td style="text-align: right;"></td>
+                                            <td style="text-align: right;"></td>
+                                            <td style="text-align: right;">Total</td>
+                                            <td style="text-align: right;">{{totalAmount | currency:'':''}}</td>
+                                            <td></td>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        </div>
+
+                    </div>
+                    <div class="col-sm-12" *ngIf="pageStatus === 'list'">
+                        <div class="row">
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4"></div>
+                            <div class="col-sm-4">
+                                <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords"
+                                    placeholder="Search..." style="max-width: 8cm;">
+                            </div>
+                        </div>
+                        <br>
+
+                        <div class="row">
+                            <div class="col-md-12">
+                                <table class="table table-sm table-bordered table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th scope="col">SN</th>
+                                            <th scope="col">No</th>
+                                            <th scope="col">Customer Name</th>
+                                            <th scope="col">Phone No</th>
+                                            <th scope="col">Reg No</th>
+                                            <th scope="col">Ref No</th>
+                                            <th scope="col">Weigh Status</th>
+                                            <th scope="col">Recheck Count</th>
+                                            <th scope="col">Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr
+                                            *ngFor="let weigh of weighs | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                            <td>{{weigh.sn}}</td>
+                                            <td>{{weigh.no}}</td>
+                                            <td>{{weigh.ownerName}}</td>
+                                            <td>{{weigh.ownerPhoneNo}}</td>
+                                            <td>{{weigh.regNo}}</td>
+                                            <td>{{weigh.regNo}}</td>
+                                            <td>{{weigh.weighStatus}}</td>
+                                            <td>{{weigh.recheck}}</td>
+                                            <td>
+                                                <button class="btn btn-sm btn-outline-primary btn-round-custom" (click)="get(weigh.id)"
+                                                    data-dismiss="modal">Select</button>
+                                                <button class="btn btn-sm btn-outline-success btn-round-custom" *ngIf="weigh.weighStatus === 'OVERWEIGHT' && weigh.recheck < 1" (click)="recheck(weigh.id)"
+                                                    data-dismiss="modal"><i class="fa fa-check"></i> Recheck</button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                                <div class="row">
+                                    <div class="col-sm-12" style="text-align: right;">
+                                        <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="weigh-list-modal" tabindex="-1" role="dialog" aria-labelledby="weighModalLabel"
+    aria-hidden="true">
+    <div class="modal-dialog modal-lg" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="weighModalLabel">Weigh List</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords"
+                            placeholder="Search..." style="max-width: 8cm;">
+                    </div>
+                </div>
+                <br>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="table table-sm">
+                            <thead>
+                                <tr>
+                                    <th scope="col">No</th>
+                                    <th scope="col">Customer Name</th>
+                                    <th scope="col">Plate No</th>
+                                    <th scope="col">Ref No</th>
+                                    <!-- <th scope="col">Weigh Status</th> -->
+                                    <th scope="col">Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    *ngFor="let weigh of weighs | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                    <td>{{weigh.no}}</td>
+                                    <td>{{weigh.ownerName}}</td>
+                                    <td>{{weigh.regNo}}</td>
+                                    <td>{{weigh.regNo}}</td>
+                                    <!-- <td>{{weigh.weighStatus}}</td> -->
+                                    <td><button class="btn btn-success btn-round-custom" (click)="get(weigh.id)"
+                                            data-dismiss="modal">Select</button></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-sm-12" style="text-align: right;">
+                                <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

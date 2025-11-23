@@ -26,4 +26,12 @@ public interface BillReceivableService {
 	List<BillReceivableResponseDTO> getAllByMaintenance( 
 			Long maintenanceId,
 			HttpServletRequest request);
+	
+	List<BillReceivableResponseDTO> getAllByWeigh( 
+			Long weighId,
+			HttpServletRequest request);
+	
+	List<BillReceivableResponseDTO> getAllByMachine( 
+			Long machineId,
+			HttpServletRequest request);
 }

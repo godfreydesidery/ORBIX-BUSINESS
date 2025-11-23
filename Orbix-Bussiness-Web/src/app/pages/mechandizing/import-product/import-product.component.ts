@@ -140,6 +140,7 @@ export class ImportProductComponent {
           
           console.log(data)
           this.msg.showSuccessMessage('Product imported successfully')
+          this.getProductsToImportByShop()
           this.loadShopProductStockStatus()
         }
       )

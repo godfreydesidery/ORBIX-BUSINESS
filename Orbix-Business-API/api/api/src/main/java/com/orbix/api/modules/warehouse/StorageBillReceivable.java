@@ -18,10 +18,13 @@ import org.hibernate.annotations.OnDeleteAction;
 import com.orbix.api.api.vehicleandequipmentparking.Parking;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingBillReceivable;
 import com.orbix.api.modules.finance.BillReceivable;
+import com.orbix.api.modules.identityandaccess.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
+import lombok.ToString;
 
 @Entity
 @Data 
@@ -37,12 +40,14 @@ public class StorageBillReceivable {
 	private LocalDateTime endedAt;
 	
 	private String billingType = "";
+	private double noOfDays = 1;
 	@Column(nullable = false)
 	private double qty;
 	@Column(nullable = false)
 	private double price;
 	
 	private double discount = 0;
+	private String discountStatus;
 	
 	@ManyToOne(targetEntity = Storage.class, fetch = FetchType.EAGER,  optional = false)
     @JoinColumn(name = "storage_id", nullable = false , updatable = false)
@@ -53,4 +58,13 @@ public class StorageBillReceivable {
     @JoinColumn(name = "bill_receivable_id", nullable = false , updatable = false)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private BillReceivable billReceivable;
+	
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = true)
+    @JoinColumn(name = "discount_approved_by_user_id", nullable = true , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User discountApprovedByUser;
+		
+	private LocalDateTime discountApprovedDateTime;
 }

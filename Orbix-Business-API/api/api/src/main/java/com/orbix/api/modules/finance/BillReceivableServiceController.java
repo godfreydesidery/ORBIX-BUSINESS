@@ -24,6 +24,14 @@ import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.modules.salesandmarketing.RestaurantSaleDetailBillReceivable;
+import com.orbix.api.modules.salesandmarketing.RestaurantSaleDetailBillReceivableRepository;
+import com.orbix.api.modules.servicebay.Machine;
+import com.orbix.api.modules.servicebay.MachineRepository;
+import com.orbix.api.modules.servicebay.MachineService;
+import com.orbix.api.modules.servicebay.MachineServiceBillReceivable;
+import com.orbix.api.modules.servicebay.MachineServiceBillReceivableRepository;
+import com.orbix.api.modules.servicebay.MachineServiceRepository;
 import com.orbix.api.modules.vehicleandequipmentmaintenance.Maintenance;
 import com.orbix.api.modules.vehicleandequipmentmaintenance.MaintenanceJobCardIssueBillReceivable;
 import com.orbix.api.modules.vehicleandequipmentmaintenance.MaintenanceJobCardIssueBillReceivableRepository;
@@ -32,6 +40,10 @@ import com.orbix.api.modules.warehouse.Storage;
 import com.orbix.api.modules.warehouse.StorageBillReceivable;
 import com.orbix.api.modules.warehouse.StorageBillReceivableRepository;
 import com.orbix.api.modules.warehouse.StorageRepository;
+import com.orbix.api.modules.weighbridge.Weigh;
+import com.orbix.api.modules.weighbridge.WeighBillReceivable;
+import com.orbix.api.modules.weighbridge.WeighBillReceivableRepository;
+import com.orbix.api.modules.weighbridge.WeighRepository;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -45,12 +57,18 @@ public class BillReceivableServiceController implements BillReceivableService {
 	private final BillReceivableRepository billReceivableRepository;
 	private final ParkingRepository parkingRepository;
 	private final StorageRepository storageRepository;
+	private final WeighRepository weighRepository;
+	private final MachineRepository machineRepository;
 	private final MaintenanceRepository maintenanceRepository;
 	private final ParkingBillReceivableRepository parkingBillReceivableRepository;
 	private final ParkingServiceBillReceivableRepository parkingServiceBillReceivableRepository;
 	private final StorageBillReceivableRepository storageBillReceivableRepository;
+	private final WeighBillReceivableRepository weighBillReceivableRepository;
 	private final MaintenanceJobCardIssueBillReceivableRepository maintenanceJobCardIssueBillReceivableRepository;
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
+	private final MachineServiceRepository machineServiceRepository;
+	private final MachineServiceBillReceivableRepository machineServiceBillReceivableRepository;
+	private final RestaurantSaleDetailBillReceivableRepository restaurantSaleDetailBillReceivableRepository;
 	
 	private final BillReceivableCollectionRepository billReceivableCollectionRepository;
 	
@@ -125,6 +143,24 @@ public class BillReceivableServiceController implements BillReceivableService {
 				qty = 1; //maintenanceJobCardIssueBillReceivable.get().getQty();
 			}
 			
+			Optional<WeighBillReceivable> weighBillReceivable = weighBillReceivableRepository.findByBillReceivable(billReceivable);
+			if(weighBillReceivable.isPresent()) {
+				billReceivableCollection.setReason("Weigh Bridge");
+				qty = 1;
+			}
+			
+			Optional<RestaurantSaleDetailBillReceivable> restaurantSaleDetailBillReceivable = restaurantSaleDetailBillReceivableRepository.findByBillReceivable(billReceivable);
+			if(restaurantSaleDetailBillReceivable.isPresent()) {
+				billReceivableCollection.setReason("Restaurant Sales");
+				qty = restaurantSaleDetailBillReceivable.get().getQty();
+			}
+			
+			Optional<MachineServiceBillReceivable> machineServiceBillReceivable = machineServiceBillReceivableRepository.findByBillReceivable(billReceivable);
+			if(machineServiceBillReceivable.isPresent()) {
+				billReceivableCollection.setReason("Machine/Vehicle Service");
+				qty = machineServiceBillReceivable.get().getQty();
+			}
+			
 			billReceivableCollection = billReceivableCollectionRepository.save(billReceivableCollection);
 			billReceivable = billReceivableRepository.save(billReceivable);
 			billReceivable.setQty(qty); 
@@ -170,6 +206,19 @@ public class BillReceivableServiceController implements BillReceivableService {
 	}
 	
 	@Override
+	public List<BillReceivableResponseDTO> getAllByWeigh(Long weighId, HttpServletRequest request) {
+		Weigh weigh = weighRepository.findById(weighId)
+			    .orElseThrow(() -> new NotFoundException("Weigh with ID " + weighId + " not found"));
+		
+		List<WeighBillReceivable> weighBillReceivables = weighBillReceivableRepository.findAllByWeigh(weigh);
+		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
+		for(WeighBillReceivable weighBillReceivable : weighBillReceivables) {
+			billReceivableResponses.add(billReceivableResponseDTOMapper(weighBillReceivable.getBillReceivable()));
+		}		
+		return billReceivableResponses;
+	}
+	
+	@Override
 	public List<BillReceivableResponseDTO> getAllByMaintenance(Long maintenanceId, HttpServletRequest request) {
 		Maintenance maintenance = maintenanceRepository.findById(maintenanceId)
 			    .orElseThrow(() -> new NotFoundException("Maintenance with ID " + maintenanceId + " not found"));
@@ -178,6 +227,21 @@ public class BillReceivableServiceController implements BillReceivableService {
 		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
 		for(MaintenanceJobCardIssueBillReceivable maintenanceJobCardIssueBillReceivable : maintenanceJobCardIssueBillReceivables) {
 			billReceivableResponses.add(billReceivableResponseDTOMapper(maintenanceJobCardIssueBillReceivable.getBillReceivable()));
+		}		
+		return billReceivableResponses;
+	}
+	
+	@Override
+	public List<BillReceivableResponseDTO> getAllByMachine(Long machineId, HttpServletRequest request) {
+		Machine machine = machineRepository.findById(machineId)
+			    .orElseThrow(() -> new NotFoundException("Machine with ID " + machineId + " not found"));
+		
+		List<MachineService> machineServices = machineServiceRepository.findAllByMachine(machine);
+		
+		List<MachineServiceBillReceivable> machineServiceBillReceivables = machineServiceBillReceivableRepository.findAllByMachineServiceIn(machineServices);
+		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
+		for(MachineServiceBillReceivable machineServiceBillReceivable : machineServiceBillReceivables) {
+			billReceivableResponses.add(billReceivableResponseDTOMapper(machineServiceBillReceivable.getBillReceivable()));
 		}		
 		return billReceivableResponses;
 	}

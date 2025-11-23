@@ -37,6 +37,8 @@ public class Operation {
 	 public static String ARCHIVE = "ARCHIVE";
 	 public static String ALLOW = "ALLOW";
 	 //public static String DENY = "DENY";
+	 public static String SALE = "SALE";
+	 public static String ADMIN = "ADMIN";
 			 
 	 
 	 

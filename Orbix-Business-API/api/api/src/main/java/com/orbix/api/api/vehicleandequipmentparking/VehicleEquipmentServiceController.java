@@ -154,6 +154,19 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 	@Override
 	public VehicleEquipmentResponseDTO createVehicleEquipment(VehicleEquipmentRequestDTO vehicleEquipmentRequest, HttpServletRequest request) {
 		
+		if(vehicleEquipmentRequest.getService().equals("PARKING")) {
+			// After creating, save also to parking
+			
+			if (vehicleEquipmentRequest.getChasisNo() != null && !vehicleEquipmentRequest.getChasisNo().trim().isEmpty()) {
+				List<String> statuses = new ArrayList<>();
+				statuses.add("PENDING");
+				statuses.add("CHECKED-IN");
+			    if (parkingRepository.existsByChasisNoAndStatusIn(vehicleEquipmentRequest.getChasisNo(), statuses)) {
+			        throw new InvalidOperationException("Chasis number already exist in parking");
+			    }		    
+			}
+		}
+		
 		if(!(vehicleEquipmentRequest.getService().equals("PARKING") || vehicleEquipmentRequest.getService().equals("MAINTENANCE"))) {
 			throw new InvalidOperationException("Valid Service not specified");
 		}
@@ -224,9 +237,12 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 			// After creating, save also to parking
 			
 			if (vehicleEquipment.getChasisNo() != null && !vehicleEquipment.getChasisNo().trim().isEmpty()) {
-			    if (parkingRepository.existsByChasisNoAndStatus(vehicleEquipment.getChasisNo(), "CHECKED-IN")) {
-			        throw new InvalidOperationException("Vehicle/Equipment with similar chasis number already checked in");
-			    }
+				List<String> statuses = new ArrayList<>();
+				statuses.add("PENDING");
+				statuses.add("CHECKED-IN");
+			    if (parkingRepository.existsByChasisNoAndStatusIn(vehicleEquipment.getChasisNo(), statuses)) {
+			        throw new InvalidOperationException("Chasis number already exist in parking");
+			    }		    
 			}
 			
 			ParkingRequestDTO parkingRequest = new ParkingRequestDTO();

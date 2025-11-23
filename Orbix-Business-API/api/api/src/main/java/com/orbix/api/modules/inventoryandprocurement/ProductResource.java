@@ -110,6 +110,13 @@ public class ProductResource {
 		return ResponseEntity.ok().body(productService.getCompanySellableProductsByShop(shopId, request));
 	}
 	
+	@GetMapping("/products/get_company_sellable_products_by_restaurant")
+	public ResponseEntity<List<ProductResponseDTO>>getCompanySellableProductsByRestaurant(
+			@RequestParam(name = "restaurant_id") Long restaurantId,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(productService.getCompanySellableProductsByRestaurant(restaurantId, request));
+	}
+	
 	@GetMapping("/products/get_products_by_company_containing")
 	public ResponseEntity<List<ProductResponseDTO>>getAllProductsByCompanyContaining( 
 			@RequestParam(name = "product_name_like")String productNameLike,

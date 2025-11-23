@@ -61,7 +61,9 @@ export class CashierCollectionComponent {
     }
 
     cashierCollections : ICashierCollection[] = []
+    totalAmount : number = 0
     totalCollections : number = 0
+    totalDiscounts : number = 0
 
   async getTotalsByDates(from : Date | string | null, to : Date | string | null) {
     if(from == null || to == null) {
@@ -79,9 +81,12 @@ export class CashierCollectionComponent {
     }
 
     this.cashierCollections = []
+    this.totalAmount = 0
     this.totalCollections = 0
-    
+    this.totalDiscounts = 0
 
+    if(this.nickname === '--All--') this.nickname = ''
+    
     await this.http.post<ICashierCollection[]>(API_URL+'/finance_reports/get_cashier_collections_by_dates?nickname=' + this.nickname, args, options)
         .toPromise()
         .then(
@@ -93,7 +98,9 @@ export class CashierCollectionComponent {
             this.totalCollections = 0
             this.cashierCollections.forEach(element => {
               element.sn = sn
+              this.totalAmount = this.totalAmount + ((+element.amount) + (+element.discount))
               this.totalCollections = this.totalCollections + (+element.amount)
+              this.totalDiscounts = this.totalDiscounts + (+element.discount)
               sn = sn + 1
             })
 
@@ -257,14 +264,31 @@ export class CashierCollectionComponent {
 
 
   printCashierCollectionReport = async () => {
-    this.documentHeader = await this.data.getDocumentHeader()
+    this.documentHeader = await this.data.getDocumentHeaderLandScape()
+
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
+
     var header = ''
     var footer = ''
     var title  = 'Cashier Collection Report'
     const from = this.from?.toString();
     const to = this.to?.toString();
     var logo : any = ''
-    var total : number = 0
+    var totalUndiscounted : number = 0
+    var totalCollections : number = 0
+    var totalDiscounts : number = 0
     var discount : number = 0
     var tax : number = 0
 
@@ -277,28 +301,40 @@ export class CashierCollectionComponent {
       { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Chasis No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Vehicle Type', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Qty', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Service Type', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Days', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Checkin Date', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Time', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Checkout Date', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Time', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Discount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Pay Code', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Cashier Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Discount Approved', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
     ]);
 
     // Add rows dynamically
 
 
     this.cashierCollections.forEach(element => {
-      total += Number(element.amount) || 0;
+      totalUndiscounted += Number((+element.amount) + (+element.discount)) || 0;
+      totalCollections += Number(element.amount) || 0;
+      totalDiscounts += Number(element.discount) || 0;
 
       report.push([
         { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.chasisNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.vehicleEquipmentTypeName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.qty || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-        { text: element.serviceType || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.checkedInDate || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.checkedInTime || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.checkedOutDate || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.checkedOutTime || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: (Number(element.discount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
         { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
         { text: element.payCode || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: (element.discountApprovedBy || '') + ' ' + (element.discountApprovedDate || ''), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       ])
     })
     
@@ -307,15 +343,45 @@ export class CashierCollectionComponent {
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-      { text: 'Total', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: (Number(total) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: true },
+      { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+      { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+      { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+      { text: 'Totals', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+      { text: (Number(totalDiscounts) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: true },
+      { text: (Number(totalCollections) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: true },
+      { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },        
+    ])
+    report.push([
+      { text: 'Total before discount', colSpan: 9, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+      {}, {}, {}, {}, {}, {}, {}, {},  // Empty cells for colSpan
+      { text: (Number(totalUndiscounted) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: true },
+      { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+      { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false }, 
+      { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },       
+    ])
+
+    report.push([
+      { text: 'Total discount', colSpan: 9, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+      {}, {}, {}, {}, {}, {}, {}, {},  // Empty cells for colSpan
+      { text: (Number(totalDiscounts) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: true },
+      { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+      { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },  
+      { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },      
+    ])
+    report.push([
+      { text: 'Total after discount', colSpan: 9, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+      {}, {}, {}, {}, {}, {}, {}, {},  // Empty cells for colSpan
+      { text: (Number(totalCollections) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: true },
+      { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+      { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false }, 
+      { text: '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },       
     ])
 
     const docDefinition : any = {
       header: '',
-      pageOrientation: 'potrait', // Set the orientation to landscape
+      pageOrientation: 'landscape', // Set the orientation to landscape
       footer: function (currentPage: { toString: () => string; }, pageCount: string) {
         return currentPage.toString() + " of " + pageCount;
       },
@@ -333,7 +399,7 @@ export class CashierCollectionComponent {
           //layout : 'noBorders',
           table : {
               headerRows : 1,
-              widths : [20, 50, 80, 20, 50, 60, 50, 100],                
+              widths : [20, 50, 70, 30, 50, 50, 50, 50, 60, 50, 70, 70, 60],                
               body : report
           }
         },                   
@@ -344,12 +410,30 @@ export class CashierCollectionComponent {
 
   printParkingCollectionReport = async () => {
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
+
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
+
+    
+
     const title = 'Parking Collection Report';
     const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;
     let discount: number = 0;
   
     const report: any[] = [];
+    
   
     // Add header row
     report.push([
@@ -432,6 +516,21 @@ export class CashierCollectionComponent {
 
   printParkingServiceCollectionReport = async () => {
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
+
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
+
     const title = 'Vehicle Services Collection Report';
     const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;
@@ -528,12 +627,23 @@ export class CashierCollectionComponent {
 export interface ICashierCollection {
   sn : number
   chasisNo : string
+  checkedInDateTime : string
+  checkedOutDateTime : string
+  checkedInDate : string
+  checkedInTime : string
+  checkedOutDate : string
+  checkedOutTime : string
   vehicleEquipmentTypeName : string
   qty : string
   serviceType : string
   amount : string
+  discount : string
   payCode : string
   cashierName : string
+  discountApprovedBy : string
+  discountApprovedDateTime : string
+  discountApprovedDate : string
+  discountApprovedTime : string
 }
 
 

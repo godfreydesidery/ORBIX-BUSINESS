@@ -6,6 +6,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -238,6 +239,28 @@ public class ParkingServiceController implements ParkingService {
 		}		
 		return parkingResponses;
 	}
+	
+	@Override
+	public List<ParkingResponseDTO> getAllWithDiscounts(HttpServletRequest request) {
+		
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+		
+		List<Parking> parkings = parkingRepository.findAllByStatusIn(statuses);
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+
+		for(Parking parking : parkings) {
+			
+			List<ParkingBillReceivable> pbrs = parkingBillReceivableRepository.findByParking(parking);
+			for(ParkingBillReceivable pbr : pbrs) {
+				if(pbr.getDiscountStatus() != null && pbr.getDiscountStatus().equals("Requested")) {
+					parkingResponses.add(parkingResponseDTOMapper(parking));
+					break;
+				}
+			}							
+		}		
+		return parkingResponses;
+	}
 
 	@Override
 	public ParkingResponseDTO get(Long id, HttpServletRequest request) {		
@@ -271,8 +294,11 @@ public class ParkingServiceController implements ParkingService {
 	public ParkingResponseDTO createParking(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
 		
 		if (parkingRequest.getChasisNo() != null && !parkingRequest.getChasisNo().trim().isEmpty()) {
-		    if (parkingRepository.existsByChasisNoAndStatus(parkingRequest.getChasisNo(), "CHECKED-IN")) {
-		        throw new InvalidOperationException("Vehicle/Equipment with similar chasis number already checked in");
+			List<String> statuses = new ArrayList<>();
+			statuses.add("PENDING");
+			statuses.add("CHECKED-IN");
+		    if (parkingRepository.existsByChasisNoAndStatusIn(parkingRequest.getChasisNo(), statuses)) {
+		        throw new InvalidOperationException("Chasis number already exist");
 		    }
 		}
 		
@@ -340,7 +366,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setRoundMirror(parkingRequest.isRoundMirror());
 		parking.setTireIndicator(parkingRequest.isTireIndicator());
 		parking.setHasKeys(true);
-		parking.setDeviceStatus(true);
+		parking.setDeviceStatus(parkingRequest.isDeviceStatus());
 		
 		parking.setComments(parkingRequest.getComments());
 		
@@ -563,7 +589,7 @@ public class ParkingServiceController implements ParkingService {
 			String dateString = parkingRequest.getStartBillingAt() + " 00:00:00";
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
-			parking.setStartBillingAt(dateTime);
+			parking.setStartBillingAt(dateTime.plusDays(1));
 		}	
 		
 		
@@ -848,7 +874,6 @@ public class ParkingServiceController implements ParkingService {
 		
 		Parking parking = parking_.get();
 		parking.setStatus("CHECKED-OUT");
-		parking.setCardNo(parkingRequest.getCardNo());
 		parking.setCheckedOutByUser(userService.getUser(request));
 		parking.setCheckedOutDateTime(dayService.getTimeStamp());
 		
@@ -997,6 +1022,14 @@ public class ParkingServiceController implements ParkingService {
 		}
 		
 		return null;
+	}
+
+	@Override
+	public List<MonthlyParkingStatusResponseDTO> getMonthlyStats(int year, HttpServletRequest request) {
+		List<Object[]> rawStats = parkingRepository.getMonthlyStats(year);
+		return rawStats.stream().map(row -> new MonthlyParkingStatusResponseDTO(((Number) row[0]).intValue(),
+				((Number) row[1]).longValue(), ((Number) row[2]).longValue())).collect(Collectors.toList());
+
 	}
 
 }

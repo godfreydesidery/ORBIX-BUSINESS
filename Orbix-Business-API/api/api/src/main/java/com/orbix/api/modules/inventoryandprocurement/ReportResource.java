@@ -34,6 +34,7 @@ import lombok.RequiredArgsConstructor;
 public class ReportResource {
 	
 	private final ShopProductLogRepository shopProductLogRepository;
+	private final RestaurantProductLogRepository restaurantProductLogRepository;
 	private final LpoRepository lpoRepository;
 	private final GrnRepository grnRepository;
 	
@@ -82,6 +83,18 @@ public class ReportResource {
 	        @RequestBody DateRange dateRange,
 	        HttpServletRequest request) {
 	    List<IGrnProjection> report = grnRepository.getGrnReportByApprovalDateRange(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atTime(LocalTime.MAX));	    
+	    return ResponseEntity.ok(report);
+	}
+	
+	@PostMapping("/restaurant_stock_logs/get_stock_logs_report_by_dates")
+	public ResponseEntity<List<RestaurantStockLogReportProjection>> getRestaurantSalesListingReportByDates(
+			@RequestParam(name = "restaurant_id") Long restaurantId,
+			@RequestParam(name = "product_id") Long productId,
+	        @RequestBody DateRange dateRange,
+	        HttpServletRequest request) {
+
+	    List<RestaurantStockLogReportProjection> report = restaurantProductLogRepository.getStockLogReportByRestaurant(restaurantId, productId, dateRange.getFrom().atStartOfDay(), dateRange.getTo().atStartOfDay().plusDays(1));
+	    
 	    return ResponseEntity.ok(report);
 	}
 }
