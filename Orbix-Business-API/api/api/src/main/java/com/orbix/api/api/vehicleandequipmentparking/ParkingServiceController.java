@@ -600,6 +600,8 @@ public class ParkingServiceController implements ParkingService {
 		parking.setParkingZone(parkingZone_.get());
 		
 		parking.setBillingType(parkingRequest.getBillingType());
+		
+		parking.setBillingAmount(parking.getVehicleEquipmentType().getDailyPrice());
 				
 		parking = parkingRepository.save(parking);
 		
