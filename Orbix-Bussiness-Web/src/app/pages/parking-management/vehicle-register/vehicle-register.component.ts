@@ -174,6 +174,12 @@ export class VehicleRegisterComponent {
     )
   }
 
+  reasonToRemove : string = '';
+
+  clearRemove(){
+    this.reasonToRemove = ''
+  }
+
   async getAllCompanyActiveVehicleAndEquipmentTypes(){
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
@@ -698,6 +704,31 @@ export class VehicleRegisterComponent {
 
     this.billingType = 'DAILY'
   }
+
+  public async remove() {
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      }
+
+      await this.http.post<null>(API_URL + '/parkings/remove?parking_id=' + this.parkingId + '&qty=' + '&reason=' + this.reasonToRemove, null, options)
+          .toPromise()
+          .then(
+            data => {
+              // this.showStorageData(data!)
+              // console.log(data)
+              // // this.getAllPendingOrCheckedInParkings()
+                this.getAllPendingOrCheckedInParkings()
+              this.msg.showSuccessMessage('Archived Successifully')
+            }
+          )
+          .catch(
+            error => {
+              console.log(error)
+              this.msg.showErrorMessage(error, '')
+            }
+          )
+  
+    }
 
 
   printGatePass1() {
