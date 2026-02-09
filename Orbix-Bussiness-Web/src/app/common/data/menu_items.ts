@@ -302,8 +302,12 @@ export const menuItems = [
                         routerLink: '/app/management/vehicle-registration-report'
                     }
                 ],
-            }
-
+            },
+            {
+                title: 'Archives',
+                show: grant(['PKNG-ARCHIVE']),
+                routerLink: '/app/parking-management/reports/vehicle-removed-report'
+            },
         ]
     },
     /*{
@@ -755,6 +759,10 @@ export const menuItems = [
                     {
                         title: 'Storage Report',
                         routerLink: '/app/storage-management/storage-report'
+                    },
+                    {
+                        title: 'Vehicle Archive Report',
+                        routerLink: '/app/parking-management/reports/vehicle-removed-report'
                     }
                 ]
             }

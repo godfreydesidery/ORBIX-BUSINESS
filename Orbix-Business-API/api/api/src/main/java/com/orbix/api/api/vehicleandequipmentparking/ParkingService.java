@@ -29,4 +29,6 @@ public interface ParkingService {
 	ParkingBillReceivableResponseDTO createParkingBillReceivable(Long parkingId, LocalDateTime startedAt, LocalDateTime endedAt, String billingType, double qty, double price, double discount, int autoBilling, HttpServletRequest request);
 	
 	List<MonthlyParkingStatusResponseDTO> getMonthlyStats(int year, HttpServletRequest request);
+	
+	void removeVehicleEquipment(Long parkingId, String reason, HttpServletRequest request);
 }

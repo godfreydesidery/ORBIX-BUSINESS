@@ -92,6 +92,7 @@ D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\DineableResource.java
 D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\warehouse\GoodType.java
 D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\salesandmarketing\RestaurantSalesOrderDetailResponseDTO.java
+D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\RemovedVehicleEquipmentRepository.java
 D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\reports\models\MaterialUsageReport.java
 D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\SystemProfileServiceController.java
 D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\BranchRepository.java
@@ -188,6 +189,7 @@ D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\ap
 D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\adminunits\DayResource.java
 D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\LpoResponseDTO.java
 D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\SupplierProductRepository.java
+D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\vehicleandequipmentparking\RemovedVehicleEquipment.java
 D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\RestaurantDineableProductRepository.java
 D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\modules\inventoryandprocurement\ShopProduct.java
 D:\My_Works\ORBIX-BUSINESS\Orbix-Business-API\api\api\src\main\java\com\orbix\api\api\commons\PayStatus.java

@@ -17,7 +17,7 @@ import { DirectivesModule } from 'src/app/theme/directives/directives.module';
 import { environment } from 'src/environments/environment';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
+var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 
 import * as pdfMake from 'pdfmake/build/pdfmake';
@@ -45,55 +45,67 @@ const API_URL = environment.apiUrl;
 })
 export class ManagementBoardComponent {
 
-  from : Date | string | null = null
-  to : Date | string | null = null
+  from: Date | string | null = null
+  to: Date | string | null = null
 
-  registered : string = ''
-  paid : string= ''
-  checkedOut : string = ''
+  registered: string = ''
+  paid: string = ''
+  checkedOut: string = ''
 
-  currentUnpaid : string = ''
-  currentTotalInYards : string = ''
+  currentUnpaid: string = ''
+  currentTotalInYards: string = ''
 
-  documentHeader! : any
+  documentHeader!: any
+
+  // Clamp year to allowed range (2024 → next year)
+  year: number = Math.min(
+    new Date().getFullYear() + 1,
+    Math.max(2024, new Date().getFullYear())
+  );
+
+  // Years initialized synchronously (2024 → next year)
+  availableYears: number[] = Array.from(
+    { length: (new Date().getFullYear() + 1) - 2024 + 1 },
+    (_, i) => 2024 + i
+  );
 
 
   ///////////////////////////////////////
 
-  public settings: any; 
-  
-    public verticalBarChartType: any = 'bar';
-    public verticalBarChartLegend: boolean = true;
-    public verticalBarChartPlugins = [];
-    public verticalBarChartData: ChartConfiguration<'bar'>['data'] = { datasets: [] };
-    public verticalBarChartOptions: ChartOptions<'bar'>;
-  
-    public horizontalBarChartType: any = 'bar';
-    public horizontalBarChartLegend: boolean = true;
-    public horizontalBarChartPlugins = [];
-    public horizontalBarChartData: ChartConfiguration<'bar'>['data'] = { datasets: [] };
-    public horizontalBarChartOptions: ChartOptions<'bar'>;
-  
-    public lineChartType: any = 'line';
-    public lineChartLegend: boolean = true;
-    public lineChartData: ChartConfiguration<'line'>['data'] = { datasets: [] };
-    public lineChartOptions: ChartOptions<'line'>;
-  
-    public doughnutChartType: any = 'doughnut';
-    public pieChartType: any = 'pie';
-    public pieChartData: ChartConfiguration<'pie'>['data'] = { datasets: [] };
-    public pieChartOptions: ChartOptions<'pie'>;
-    public pieChartLegend: boolean = true;
-  
-    public radarChartType: any = 'radar';
-    public radarChartLegend: boolean = true;
-    public radarChartData: ChartConfiguration<'radar'>['data'] = { datasets: [] };
-    public radarChartOptions: ChartOptions<'radar'>;
-  
-    public polarAreaChartType: any = 'polarArea';
-    public polarAreaChartLegend: boolean = true;
-    public polarAreaChartData: ChartConfiguration<'polarArea'>['data'] = { datasets: [] };
-    public polarAreaChartOptions: ChartOptions<'polarArea'>;
+  public settings: any;
+
+  public verticalBarChartType: any = 'bar';
+  public verticalBarChartLegend: boolean = true;
+  public verticalBarChartPlugins = [];
+  public verticalBarChartData: ChartConfiguration<'bar'>['data'] = { datasets: [] };
+  public verticalBarChartOptions: ChartOptions<'bar'>;
+
+  public horizontalBarChartType: any = 'bar';
+  public horizontalBarChartLegend: boolean = true;
+  public horizontalBarChartPlugins = [];
+  public horizontalBarChartData: ChartConfiguration<'bar'>['data'] = { datasets: [] };
+  public horizontalBarChartOptions: ChartOptions<'bar'>;
+
+  public lineChartType: any = 'line';
+  public lineChartLegend: boolean = true;
+  public lineChartData: ChartConfiguration<'line'>['data'] = { datasets: [] };
+  public lineChartOptions: ChartOptions<'line'>;
+
+  public doughnutChartType: any = 'doughnut';
+  public pieChartType: any = 'pie';
+  public pieChartData: ChartConfiguration<'pie'>['data'] = { datasets: [] };
+  public pieChartOptions: ChartOptions<'pie'>;
+  public pieChartLegend: boolean = true;
+
+  public radarChartType: any = 'radar';
+  public radarChartLegend: boolean = true;
+  public radarChartData: ChartConfiguration<'radar'>['data'] = { datasets: [] };
+  public radarChartOptions: ChartOptions<'radar'>;
+
+  public polarAreaChartType: any = 'polarArea';
+  public polarAreaChartLegend: boolean = true;
+  public polarAreaChartData: ChartConfiguration<'polarArea'>['data'] = { datasets: [] };
+  public polarAreaChartOptions: ChartOptions<'polarArea'>;
 
 
 
@@ -101,17 +113,17 @@ export class ManagementBoardComponent {
 
 
   constructor(
-    private http :HttpClient,
-    private auth : AuthService,
+    private http: HttpClient,
+    private auth: AuthService,
     private route: ActivatedRoute,
-    private router : Router,
-    private printer : PosReceiptPrinterService,
-    private data : DataService,
-    private msg : MsgBoxService,
+    private router: Router,
+    private printer: PosReceiptPrinterService,
+    private data: DataService,
+    private msg: MsgBoxService,
     private _settingsService: SettingsService
-    ){
-        this.settings = this._settingsService.settings;
-    } //{(window as any).pdfMake.vfs = pdfFonts.pdfMake.vfs;}
+  ) {
+    this.settings = this._settingsService.settings;
+  } //{(window as any).pdfMake.vfs = pdfFonts.pdfMake.vfs;}
 
 
   async ngOnInit() {
@@ -123,8 +135,8 @@ export class ManagementBoardComponent {
     this.getTotalsByDates(this.from, this.to);
     this.getStorageTotalsByDates(this.from, this.to);
 
-    await this.getParkingSummary()
-    await this.getStorageSummary()
+    await this.getParkingSummary(this.year)
+    await this.getStorageSummary(this.year)
 
 
     /////////////////////////////////////
@@ -356,145 +368,199 @@ export class ManagementBoardComponent {
     /////////////////////////////////////
   }
 
+  async refreshYearlyStats() {
+    await this.getParkingSummary(this.year);
+    await this.getStorageSummary(this.year);
+
+    // Rebuild Vertical Bar Chart
+    this.verticalBarChartData = {
+      labels: this.parkingSummary.map(x => x.monthName),
+      datasets: [
+        {
+          data: this.parkingSummary.map(x => x.checkedIn),
+          label: 'Checked In',
+          borderWidth: 2,
+          backgroundColor: this._settingsService.rgba(this.settings.colors.info, 0.5),
+          borderColor: this.settings.colors.info,
+          hoverBackgroundColor: this.settings.colors.info
+        },
+        {
+          data: this.parkingSummary.map(x => x.checkedOut),
+          label: 'Checked Out',
+          borderWidth: 2,
+          backgroundColor: this._settingsService.rgba(this.settings.colors.danger, 0.5),
+          borderColor: this.settings.colors.danger,
+          hoverBackgroundColor: this.settings.colors.danger
+        }
+      ]
+    };
+
+    // Rebuild Line Chart
+    this.lineChartData = {
+      labels: this.storageSummary.map(x => x.monthName),
+      datasets: [
+        {
+          data: this.storageSummary.map(x => x.checkedIn),
+          label: 'Checked In',
+          fill: true,
+          tension: 0.5,
+          borderWidth: 2,
+          backgroundColor: this._settingsService.rgba(this.settings.colors.info, 0.5),
+          borderColor: this.settings.colors.info
+        },
+        {
+          data: this.storageSummary.map(x => x.checkedOut),
+          label: 'Checked Out',
+          fill: true,
+          tension: 0.5,
+          borderWidth: 2,
+          backgroundColor: this._settingsService.rgba(this.settings.colors.danger, 0.5),
+          borderColor: this.settings.colors.danger
+        }
+      ]
+    };
+  }
+
+
   public chartClicked(e: any): void {
     //console.log(e);
   }
 
   public chartHovered(e: any): void {
     //console.log(e);
-  } 
+  }
 
-  async getTotalsByDates(from : Date | string | null, to : Date | string | null) {
+  async getTotalsByDates(from: Date | string | null, to: Date | string | null) {
 
-    if(from == null || to == null) {
+    if (from == null || to == null) {
       from = new Date()
       to = new Date()
     }
 
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var args = {
-      from : from,
-      to : to,
+      from: from,
+      to: to,
     }
 
-    await this.http.post<IParkingTotalsByDates>(API_URL+'/parking_reports/get_totals_by_dates', args, options)
-        .toPromise()
-        .then(
-          data => {
+    await this.http.post<IParkingTotalsByDates>(API_URL + '/parking_reports/get_totals_by_dates', args, options)
+      .toPromise()
+      .then(
+        data => {
 
-            this.registered = data!.registered
-            this.paid = data!.paid
-            this.checkedOut = data!.checkedOut
+          this.registered = data!.registered
+          this.paid = data!.paid
+          this.checkedOut = data!.checkedOut
 
-            this.currentUnpaid = data!.currentUnpaid
-            this.currentTotalInYards = data!.currentTotalInYards 
-            
-            console.log(data)
-          }
-        )
-        .catch(
-          error => {
-            this.msg.showErrorMessage(error, 'Error')
-            
-            console.log(error)
-          }
-        )
+          this.currentUnpaid = data!.currentUnpaid
+          this.currentTotalInYards = data!.currentTotalInYards
+
+          console.log(data)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+
+          console.log(error)
+        }
+      )
 
 
-    return 0; 
+    return 0;
   }
 
 
-  storageCheckedIn : any = 0
-  async getStorageTotalsByDates(from : Date | string | null, to : Date | string | null) {
+  storageCheckedIn: any = 0
+  async getStorageTotalsByDates(from: Date | string | null, to: Date | string | null) {
 
     this.storageCheckedIn = 0
 
-    if(from == null || to == null) {
+    if (from == null || to == null) {
       from = new Date()
       to = new Date()
     }
 
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var args = {
-      from : from,
-      to : to,
+      from: from,
+      to: to,
     }
 
-    await this.http.post<IStorageTotalsByDates>(API_URL+'/storage_reports/get_totals_by_dates', args, options)
-        .toPromise()
-        .then(
-          data => {
-            this.storageCheckedIn = data!.checkedIn
-            console.log(data)
-          }
-        )
-        .catch(
-          error => {
-            this.msg.showErrorMessage(error, 'Error')
-            console.log(error)
-          }
-        )
-    return 0; 
+    await this.http.post<IStorageTotalsByDates>(API_URL + '/storage_reports/get_totals_by_dates', args, options)
+      .toPromise()
+      .then(
+        data => {
+          this.storageCheckedIn = data!.checkedIn
+          console.log(data)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+          console.log(error)
+        }
+      )
+    return 0;
   }
 
 
-  parkingSummary : IParkingSummary[] = []
+  parkingSummary: IParkingSummary[] = []
 
-  async getParkingSummary() {
+  async getParkingSummary(y: number) {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
     this.parkingSummary = []
-    await this.http.get<IParkingSummary[]>(API_URL+'/parkings/get_parking_summary?year=2025', options)
-        .toPromise()
-        .then(
-          data => {
-            this.parkingSummary = data!
-            console.log(this.parkingSummary)
-          }
-        )
-        .catch(
-          error => {
-            this.msg.showErrorMessage(error, 'Error')
-            console.log(error)
-          }
-        )
-    return 0; 
+    await this.http.get<IParkingSummary[]>(API_URL + '/parkings/get_parking_summary?year=' + y.toString(), options)
+      .toPromise()
+      .then(
+        data => {
+          this.parkingSummary = data!
+          console.log(this.parkingSummary)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+          console.log(error)
+        }
+      )
+    return 0;
   }
 
-  storageSummary : IStorageSummary[] = []
+  storageSummary: IStorageSummary[] = []
 
-  async getStorageSummary() {
+  async getStorageSummary(y: number) {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
     this.storageSummary = []
-    await this.http.get<IStorageSummary[]>(API_URL+'/storages/get_storage_summary?year=2025', options)
-        .toPromise()
-        .then(
-          data => {
-            this.storageSummary = data!
-            console.log(this.storageSummary)
-          }
-        )
-        .catch(
-          error => {
-            this.msg.showErrorMessage(error, 'Error')
-            console.log(error)
-          }
-        )
-    return 0; 
+    await this.http.get<IStorageSummary[]>(API_URL + '/storages/get_storage_summary?year=' + y.toString(), options)
+      .toPromise()
+      .then(
+        data => {
+          this.storageSummary = data!
+          console.log(this.storageSummary)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+          console.log(error)
+        }
+      )
+    return 0;
   }
 
 
-  
+
 
 
 
@@ -507,12 +573,12 @@ export class ManagementBoardComponent {
     this.documentHeader = await this.data.getDocumentHeader()
     var header = ''
     var footer = ''
-    var title  = 'Report Template'
-    var logo : any = ''
-    var total : number = 0
-    var discount : number = 0
-    var tax : number = 0
-    
+    var title = 'Report Template'
+    var logo: any = ''
+    var total: number = 0
+    var discount: number = 0
+    var tax: number = 0
+
     /*this.report.forEach((element) => {
       total = total + element.amount
       discount = discount + element.discount
@@ -532,58 +598,58 @@ export class ManagementBoardComponent {
       {text : tax.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', fillColor : '#CCCCCC'},        
     ]
     report.push(detailSummary)*/
-    const docDefinition : any = {
+    const docDefinition: any = {
       header: '',
       footer: function (currentPage: { toString: () => string; }, pageCount: string) {
         return currentPage.toString() + " of " + pageCount;
       },
       //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
-        content : [
-          {
-            columns : 
+      content: [
+        {
+          columns:
             [
               this.documentHeader
             ]
+        },
+        '  ',
+        '  ',
+        { text: title, fontSize: 14, bold: true, alignment: 'center' },
+        this.data.getHorizontalLine(),
+        '  ',
+        '  ',
+        '  ',
+        { text: title, fontSize: 12, bold: true },
+        '  ',
+        {
+          layout: 'noBorders',
+          table: {
+            widths: [75, 300],
+            body: [
+              [
+                { text: 'From', fontSize: 9 },
+                { text: '', fontSize: 9 }
+              ],
+              [
+                { text: 'To', fontSize: 9 },
+                { text: '', fontSize: 9 }
+              ],
+              [
+                { text: 'Agent/Route', fontSize: 9 },
+                { text: "", fontSize: 9 }
+              ],
+            ]
           },
-          '  ',
-          '  ',
-          {text : title, fontSize : 14, bold : true, alignment : 'center'},
-          this.data.getHorizontalLine(),
-          '  ',
-          '  ',
-          '  ',
-          {text : title, fontSize : 12, bold : true},
-          '  ',
-          {
-            layout : 'noBorders',
-            table : {
-              widths : [75, 300],
-              body : [
-                [
-                  {text : 'From', fontSize : 9}, 
-                  {text : '', fontSize : 9} 
-                ],
-                [
-                  {text : 'To', fontSize : 9}, 
-                  {text : '', fontSize : 9} 
-                ],
-                [
-                  {text : 'Agent/Route', fontSize : 9}, 
-                  {text : "", fontSize : 9} 
-                ],
-              ]
-            },
-          },
-          '  ',
-          //{
-            //layout : 'noBorders',
-            //table : {
-                //headerRows : 1,
-                //widths : [100, 100, 100, 100, 100],
-                //body : report
-            //}
+        },
+        '  ',
+        //{
+        //layout : 'noBorders',
+        //table : {
+        //headerRows : 1,
+        //widths : [100, 100, 100, 100, 100],
+        //body : report
+        //}
         //},                   
-      ]     
+      ]
     };
     pdfMake.createPdf(docDefinition).print()
   }
@@ -598,32 +664,32 @@ export class ManagementBoardComponent {
 }
 
 interface IParkingTotalsByDates {
-  from : string;
-  to : string;
-  registered : string
-  paid : string
-  checkedOut : string
-  currentUnpaid : string
-  currentTotalInYards : string
+  from: string;
+  to: string;
+  registered: string
+  paid: string
+  checkedOut: string
+  currentUnpaid: string
+  currentTotalInYards: string
 }
 
 interface IStorageTotalsByDates {
-  from : string;
-  to : string;
-  checkedIn : string
+  from: string;
+  to: string;
+  checkedIn: string
 }
 
-interface IParkingSummary{
-  month : number
-  checkedIn : number
-  checkedOut : number
-  monthName : string
+interface IParkingSummary {
+  month: number
+  checkedIn: number
+  checkedOut: number
+  monthName: string
 }
 
-interface IStorageSummary{
-  month : number
-  checkedIn : number
-  checkedOut : number
-  monthName : string
+interface IStorageSummary {
+  month: number
+  checkedIn: number
+  checkedOut: number
+  monthName: string
 }
 

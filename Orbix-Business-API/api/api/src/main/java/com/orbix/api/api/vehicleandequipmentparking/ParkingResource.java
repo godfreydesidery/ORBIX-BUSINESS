@@ -72,6 +72,16 @@ public class ParkingResource {
 		return ResponseEntity.ok().body(parkingService.getRecentCheckedOut(request));
 	}
 	
+	@PostMapping("/parkings/remove")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public void remove(
+			@RequestParam(name = "parking_id") Long parkingId,
+			@RequestParam(name = "reason") String reason,
+			HttpServletRequest request){		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/parkings/remove").toUriString());
+		parkingService.removeVehicleEquipment(parkingId, reason, request);
+	}
+	
 	@GetMapping("/parkings/get_parking_summary")
 	public ResponseEntity<List<MonthlyParkingStatusResponseDTO>>getParkingSummary(
 			@RequestParam(name = "year") int year,

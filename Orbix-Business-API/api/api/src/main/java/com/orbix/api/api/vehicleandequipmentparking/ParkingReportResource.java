@@ -25,6 +25,7 @@ import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.modules.warehouse.RemovedGood;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -40,6 +41,9 @@ public class ParkingReportResource {
 	private final ParkingBillReceivableRepository parkingBillReceivableRepository;
 	private final UserService userService;
 	private final UserRepository userRepository;
+	
+	private final RemovedVehicleEquipmentRepository removedVehicleEquipmentRepository;
+	
 	
 	
 	@PostMapping("/parking_reports/get_totals_by_dates")
@@ -248,7 +252,57 @@ public class ParkingReportResource {
 		}
 		return ResponseEntity.ok().body(parkingResponses);
 		
-	}	
+	}
+	
+	
+	@PostMapping("/parking_reports/get_vehicle_equipment_removed_report")
+	public ResponseEntity<List<VehicleEquipmentRemovedResponseDTO>>getVehicleEquipmentRemovedReport(
+			@RequestBody DateRange dateRange,
+			HttpServletRequest request){
+		
+		List<RemovedVehicleEquipment> removedVehicleEquipments = removedVehicleEquipmentRepository.findAllByCreatedDateTimeBetween(dateRange.getFrom().atStartOfDay(),
+		        dateRange.getTo().atTime(LocalTime.MAX));
+		
+		List<VehicleEquipmentRemovedResponseDTO> removedVehicleEquipmentResponses = new ArrayList<>();
+		
+		int sn = 1;
+		for(RemovedVehicleEquipment removedVehicleEquipment : removedVehicleEquipments) {
+			VehicleEquipmentRemovedResponseDTO removedVehicleEquipmentResponse = new VehicleEquipmentRemovedResponseDTO();
+			removedVehicleEquipmentResponse.setSn(String.valueOf(sn));
+			removedVehicleEquipmentResponse.setOwnerName(removedVehicleEquipment.getParking().getOwnerFirstName() + " " + removedVehicleEquipment.getParking().getOwnerLastName());
+			if(removedVehicleEquipment.getParking().getOwnerPhoneNo() != null) {
+				removedVehicleEquipmentResponse.setPhoneNo(removedVehicleEquipment.getParking().getOwnerPhoneNo());
+			}else {
+				removedVehicleEquipmentResponse.setPhoneNo("");
+			}
+			
+			if(removedVehicleEquipment.getParking().getChasisNo() != null) {
+				removedVehicleEquipmentResponse.setRegNo(removedVehicleEquipment.getParking().getChasisNo());
+			}else {
+				removedVehicleEquipmentResponse.setRegNo("");
+			}
+			
+			if(removedVehicleEquipment.getParking().getVehicleEquipmentName() != null) {
+				removedVehicleEquipmentResponse.setVehicleName(removedVehicleEquipment.getParking().getVehicleEquipmentName());
+			}else {
+				removedVehicleEquipmentResponse.setVehicleName("");
+			}
+			
+			
+			
+			removedVehicleEquipmentResponse.setPrice(String.valueOf(removedVehicleEquipment.getParking().getBillingAmount()));
+			removedVehicleEquipmentResponse.setReason(removedVehicleEquipment.getReason());
+			removedVehicleEquipmentResponse.setDateTime(removedVehicleEquipment.getCreatedDateTime().toString());
+			removedVehicleEquipmentResponse.setRegisteredBy(removedVehicleEquipment.getParking().getCheckedInByUser().getNickname());
+			removedVehicleEquipmentResponse.setRemovedBy(removedVehicleEquipment.getCreatedByUser().getNickname());
+			removedVehicleEquipmentResponses.add(removedVehicleEquipmentResponse);
+			sn++;
+		}
+		return ResponseEntity.ok().body(removedVehicleEquipmentResponses);
+		
+	}
+	
+	
 }
 
 @Data
@@ -276,4 +330,18 @@ class RegistrationResponseDTO{
 	String keyStatus;
 	String registeredDate;
 	String registeredBy;	
+}
+
+@Data
+class VehicleEquipmentRemovedResponseDTO{
+	String sn;
+	String ownerName;
+	String phoneNo;
+	String vehicleName;
+	String price;
+	String regNo;
+	String reason;
+	String dateTime;
+	String registeredBy;
+	String removedBy;
 }

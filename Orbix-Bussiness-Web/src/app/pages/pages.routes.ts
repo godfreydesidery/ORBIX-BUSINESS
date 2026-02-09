@@ -14,6 +14,7 @@ import { AuthGuard } from '../auth-guard';
 import { ProductComponent } from './inventory/product/product.component';
 import { RestaurantComponent } from './administration-units/restaurant/restaurant.component';
 import { WorkshopComponent } from './administration-units/workshop/workshop.component';
+import { version } from 'moment';
 
 export const routes: Routes = [
   {
@@ -349,6 +350,12 @@ export const routes: Routes = [
         path : 'parking-management/reports/parking-report',
         loadComponent: () => import('./parking-management/reports/parking-report/parking-report.component').then(c => c.ParkingReportComponent),
         data : { breadcrumb : 'Parking Management/Reports/Parking Report'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'parking-management/reports/vehicle-removed-report',
+        loadComponent: () => import('./parking-management/reports/vehicle-equipment-removed-report/vehicle-equipment-removed-report.component').then(c => c.VehicleEquipmentRemovedReportComponent),
+        data : { breadcrumb : 'Parking Management/Reports/Vehicle Archived Report'},
         canActivate : [AuthGuard]
       },
 

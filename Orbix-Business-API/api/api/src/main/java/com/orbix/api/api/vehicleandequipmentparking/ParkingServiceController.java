@@ -30,6 +30,9 @@ import com.orbix.api.modules.finance.InvoiceReceivableDetail;
 import com.orbix.api.modules.finance.InvoiceReceivableDetailRepository;
 import com.orbix.api.modules.finance.InvoiceReceivableRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.modules.warehouse.RemovedGood;
+import com.orbix.api.modules.warehouse.Storage;
+import com.orbix.api.modules.warehouse.StorageBillReceivable;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +64,8 @@ public class ParkingServiceController implements ParkingService {
 	
 	private final InvoiceReceivableRepository invoiceReceivableRepository;
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
+	
+	private final RemovedVehicleEquipmentRepository removedVehicleEquipmentRepository;
 	
 		
 	
@@ -493,8 +498,6 @@ public class ParkingServiceController implements ParkingService {
 		
 		parking.setComments(parkingRequest.getComments());
 		
-		
-		
 		parking.setParkingZone(parkingZone_.get());
 		
 		parking.setBillingType(parkingRequest.getBillingType());
@@ -597,6 +600,8 @@ public class ParkingServiceController implements ParkingService {
 		parking.setParkingZone(parkingZone_.get());
 		
 		parking.setBillingType(parkingRequest.getBillingType());
+		
+		parking.setBillingAmount(parking.getVehicleEquipmentType().getDailyPrice());
 				
 		parking = parkingRepository.save(parking);
 		
@@ -1030,6 +1035,50 @@ public class ParkingServiceController implements ParkingService {
 		return rawStats.stream().map(row -> new MonthlyParkingStatusResponseDTO(((Number) row[0]).intValue(),
 				((Number) row[1]).longValue(), ((Number) row[2]).longValue())).collect(Collectors.toList());
 
+	}
+	
+	@Override
+	public void removeVehicleEquipment(Long parkingId, String reason, HttpServletRequest request) {
+		Optional<Parking> parking_ = parkingRepository.findById(parkingId);
+		if(parking_.isEmpty()) throw new NotFoundException("Parking not found in database");
+		
+		if(!parking_.get().getStatus().equals("CHECKED-IN")) throw new NotFoundException("Can only archive vehicles/equipments from checked in parkings");
+		
+			
+		Optional<Company> company_ = companyRepository.findById(userService.getUserCompany(request).getId());
+		if(company_.isEmpty()) throw new NotFoundException("Company not found");
+			
+		Optional<Branch> branch_ = branchRepository.findById(userService.getUserBranch(request).getId());
+		if(branch_.isEmpty()) throw new NotFoundException("Branch not found");
+			
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		
+		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
+			if(parkingBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
+				throw new InvalidOperationException("Can not archive. The parking has already a paid bill.");
+			}
+		}
+		
+		if(reason.isBlank()) {
+			throw new InvalidOperationException("Reason is required");
+		}
+		
+		Parking parking = parking_.get();
+		
+		parking.setStatus("CHECKED-OUT");
+		parking.setCheckedOutByUser(userService.getUser(request));
+		parking.setCheckedOutDateTime(dayService.getTimeStamp());
+		
+		parking = parkingRepository.save(parking);
+		
+		RemovedVehicleEquipment removedVehicleEquipment = new RemovedVehicleEquipment();
+		removedVehicleEquipment.setReason(reason);
+		removedVehicleEquipment.setParking(parking);
+		removedVehicleEquipment.setCreatedByUser(userService.getUser(request));
+		removedVehicleEquipment.setCreatedDateTime(dayService.getTimeStamp());
+		
+		removedVehicleEquipmentRepository.save(removedVehicleEquipment);
+		
 	}
 
 }
