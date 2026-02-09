@@ -276,8 +276,8 @@ public class ParkingReportResource {
 				removedVehicleEquipmentResponse.setPhoneNo("");
 			}
 			
-			if(removedVehicleEquipment.getParking().getRegistrationNo() != null) {
-				removedVehicleEquipmentResponse.setRegNo(removedVehicleEquipment.getParking().getRegistrationNo());
+			if(removedVehicleEquipment.getParking().getChasisNo() != null) {
+				removedVehicleEquipmentResponse.setRegNo(removedVehicleEquipment.getParking().getChasisNo());
 			}else {
 				removedVehicleEquipmentResponse.setRegNo("");
 			}

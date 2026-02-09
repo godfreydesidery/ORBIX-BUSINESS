@@ -679,6 +679,8 @@ export class VehicleEquipmentBillingComponent {
           this.msg.showSuccessMessage('Checked out Successifully')
 
           this.printGatePassRcpt(data!.serviceBillItems, '', 0);
+
+          this.router.navigate(['/app/accounts-and-finance/parking-billing']);
         }
       )
       .catch(
@@ -687,6 +689,8 @@ export class VehicleEquipmentBillingComponent {
           this.msg.showErrorMessage(error, 'Error')
         }
       )
+
+      // Put the redirect here
   }
 
 
