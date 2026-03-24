@@ -19,6 +19,7 @@ com\orbix\api\modules\adminunits\WorkshopRepository.class
 com\orbix\api\modules\identityandaccess\RoleResource.class
 com\orbix\api\modules\inventoryandprocurement\DateRange.class
 com\orbix\api\reports\service\InventoryReportService.class
+com\orbix\api\api\vehicleandequipmentparking\RemovedVehicleEquipmentRepository.class
 com\orbix\api\modules\salesandmarketing\RestaurantBadgeResource.class
 com\orbix\api\MainApplication.class
 com\orbix\api\api\vehicleandequipmentparking\ParkingTotalsResponseDTO.class
@@ -179,6 +180,7 @@ com\orbix\api\modules\adminunits\CurrencyRepository.class
 com\orbix\api\modules\servicebay\MachineResource.class
 com\orbix\api\modules\vehicleandequipmentmaintenance\ServiceSpecialistResponseDTO.class
 com\orbix\api\reports\models\DailySummaryReport.class
+com\orbix\api\api\vehicleandequipmentparking\RemovedVehicleEquipment.class
 com\orbix\api\modules\inventoryandprocurement\RestaurantDineableProductResource.class
 com\orbix\api\api\vehicleandequipmentparking\ParkingZoneRepository.class
 com\orbix\api\modules\inventoryandprocurement\Dineable.class
@@ -447,6 +449,7 @@ com\orbix\api\modules\inventoryandprocurement\UomServiceController.class
 com\orbix\api\modules\warehouse\StorageInvoiceReceivable.class
 com\orbix\api\modules\adminunits\BranchRequestDTO.class
 com\orbix\api\modules\weighbridge\WeighBillReceivableRequestDTO.class
+com\orbix\api\api\vehicleandequipmentparking\VehicleEquipmentRemovedResponseDTO.class
 com\orbix\api\modules\vehicleandequipmentmaintenance\MaintenanceRepository.class
 com\orbix\api\modules\inventoryandprocurement\ShopProductLog.class
 com\orbix\api\modules\inventoryandprocurement\UomRepository.class
