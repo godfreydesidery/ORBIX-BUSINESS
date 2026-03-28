@@ -397,6 +397,11 @@ export const menuItems = [
                 routerLink: '/app/accounts-and-finance/storage-billing'
             },
             {
+                title: 'Bond Billing',
+                show: grant(['FINCSTRG-ACCESS']),
+                routerLink: '/app/accounts-and-finance/bond-billing'
+            },
+            {
                 title: 'Storage Discounts',
                 show: grant(['FINCDISC-ACCESS', 'STRGDISC-ACCESS']),
                 routerLink: '/app/accounts-and-finance/storage-discounts'
@@ -533,6 +538,36 @@ export const menuItems = [
                     },
                     {
                         title: 'Storage Report',
+                        routerLink: '/app/storage-management/storage-report'
+                    }
+                ]
+            },
+        ]
+    },
+    {
+        title: 'Bond Parking',
+        icon: 'fa-cogs',
+        selected: false,
+        expanded: false,
+        show: grant(['WRHOUSE-ACCESS']),
+        order: 700,
+        subMenu: [
+            {
+                title: 'Select Bond Zone',
+                show: true,
+                routerLink: '/app/bond-management/select-bond-zone'
+            },
+            {
+                title: 'Reports',
+                url: '#',
+                show: true,
+                subMenu: [
+                    {
+                        title: 'Collection Report',
+                        routerLink: '/app/storage-management/cash-collections'
+                    },
+                    {
+                        title: 'Bond Report',
                         routerLink: '/app/storage-management/storage-report'
                     }
                 ]
@@ -916,11 +951,22 @@ export const menuItems = [
                     {
                         title: 'Good Types',
                         routerLink: '/app/storage-management/good-type'
+                    },                
+                ]
+            },
+            {
+                title: 'Bond Management',
+                url: '#',
+                show: true,
+                subMenu: [
+                    {
+                        title: 'Bond Zone',
+                        routerLink: '/app/bond-management/bond-zone'
                     },
-                    // {
-                    //     title: 'Vehicle Type',
-                    //     routerLink: '/app/parking-management/vehicle-and-equipment-type'
-                    // },                  
+                    {
+                        title: 'Bond Item Types',
+                        routerLink: '/app/bond-management/bond-item-type'
+                    },                
                 ]
             },
             {
