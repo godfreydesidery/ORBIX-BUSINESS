@@ -15,8 +15,6 @@ import javax.persistence.Table;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
-import com.orbix.api.api.vehicleandequipmentparking.Parking;
-import com.orbix.api.api.vehicleandequipmentparking.ParkingBillReceivable;
 import com.orbix.api.modules.finance.BillReceivable;
 import com.orbix.api.modules.identityandaccess.User;
 
