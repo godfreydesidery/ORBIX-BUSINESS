@@ -3,6 +3,7 @@ package com.orbix.api.modules.adminunits;
 import java.time.LocalDateTime;
 import java.util.Currency;
 
+import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
@@ -38,16 +39,18 @@ public class CurrencyConversion {
     private Long id;
 
     private boolean active = true;
+    
+    @Column(name = "source_currency_code")
+    private Currency sourceCurrencyCode;
 
-    private LocalDateTime createdDateTime = LocalDateTime.now();
+    private Double sourceCurrencyValue;
 
+    @Column(name = "final_currency_code")
     private Currency finalCurrencyCode;
 
     private Double finalCurrencyValue;
 
-    private Currency sourceCurrencyCode;
-
-    private Double sourceCurrencyValue;
+    private LocalDateTime createdDateTime = LocalDateTime.now();
 
     @ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "created_by_user_id", nullable = false, updatable = false)
