@@ -99,7 +99,7 @@ export class SelectBondZoneComponent {
   bondZoneName: string = ''
 
   qtyToRemove: number = 0;
-  reasonToRemove : string = '';
+  reasonToRemove: string = '';
 
 
 
@@ -108,54 +108,54 @@ export class SelectBondZoneComponent {
 
   /////////////////////////
 
-  
-  
-  
 
-  
-    // Agent Information
-    agentName: string = ''
-    agentAddress: string = ''
-    agentPhoneNo: string = ''
-    agentEmail: string = ''
-    tformNumber: string = ''
-  
-    // Vehicle or Equipment Information
-    registrationNo: string = ''
-    transardNo:string = ''
-    chasisNo: string = ''
-    leftFrontLamp: string = ''
-    rightFrontLamp: string = ''
-    leftRearLamp: string = ''
-    rightRearLamp: string = ''
-    leftSideMirror: string = ''
-    rightSideMirror: string = ''
-    leftWiper: string = ''
-    rightWiper: string = ''
-    backWiper: string = ''
-    fuelCap: string = ''
-    spareTire: string = ''
-    battery: string = ''
-    starter: string = ''
-    aerial: string = ''
-    wheelCap: string = ''
-    roundMirror: string = ''
-    tireIndicator: string = ''
-    hasKeys : string = ''
-  
-  
-  
-    deviceStatus : string = 'ATTACHED'
-  
-    vehicleEquipmentColor : string = ''
 
-    cardNo : string = ''
-  
-  
 
-  
 
-  
+
+  // Agent Information
+  agentName: string = ''
+  agentAddress: string = ''
+  agentPhoneNo: string = ''
+  agentEmail: string = ''
+  tformNumber: string = ''
+
+  // Vehicle or Equipment Information
+  registrationNo: string = ''
+  transardNo: string = ''
+  chasisNo: string = ''
+  leftFrontLamp: string = 'YES'
+  rightFrontLamp: string = 'YES'
+  leftRearLamp: string = 'YES'
+  rightRearLamp: string = 'YES'
+  leftSideMirror: string = 'YES'
+  rightSideMirror: string = 'YES'
+  leftWiper: string = 'YES'
+  rightWiper: string = 'YES'
+  backWiper: string = 'YES'
+  fuelCap: string = 'YES'
+  spareTire: string = 'YES'
+  battery: string = 'YES'
+  starter: string = 'YES'
+  aerial: string = 'YES'
+  wheelCap: string = 'YES'
+  roundMirror: string = 'YES'
+  tireIndicator: string = 'YES'
+  hasKeys: string = 'YES'
+
+
+
+  deviceStatus: string = 'ATTACHED'
+
+  vehicleEquipmentColor: string = ''
+
+  cardNo: string = ''
+
+
+
+
+
+
 
 
 
@@ -345,6 +345,7 @@ export class SelectBondZoneComponent {
       startBillingAt: this.startBillingAt,
 
 
+
       ////////////////////////////
 
 
@@ -380,16 +381,16 @@ export class SelectBondZoneComponent {
       wheelCap: this.wheelCap === 'YES' ? 1 : 0,
       roundMirror: this.roundMirror === 'YES' ? 1 : 0,
       tireIndicator: this.tireIndicator === 'YES' ? 1 : 0,
-      hasKeys : this.hasKeys === 'YES' ? 1 : 0,
+      hasKeys: this.hasKeys === 'YES' ? 1 : 0,
 
-      deviceStatus : this.deviceStatus === 'ATTACHED' ? 1 : 0,
+      deviceStatus: this.deviceStatus === 'ATTACHED' ? 1 : 0,
 
 
-      vehicleEquipmentColor : this.vehicleEquipmentColor,
+      vehicleEquipmentColor: this.vehicleEquipmentColor,
 
-      cardNo : this.cardNo,
+      cardNo: this.cardNo,
 
-      billintType : this.billingType,
+      billintType: this.billingType,
 
 
 
@@ -439,7 +440,7 @@ export class SelectBondZoneComponent {
     }
   }
 
-  clearRemove(){
+  clearRemove() {
     this.reasonToRemove = ''
     this.qtyToRemove = 0
   }
@@ -458,24 +459,24 @@ export class SelectBondZoneComponent {
     }
 
     await this.http.post<null>(API_URL + '/bond_items/remove?bond_item_id=' + this.id + '&qty=' + this.qtyToRemove + '&reason=' + this.reasonToRemove, null, options)
-        .toPromise()
-        .then(
-          data => {
-            // this.showBondItemData(data!)
-            // console.log(data)
-            // // this.getAllPendingOrCheckedInParkings()
-            if (this.mode === 'existing') { // If in existing mode, reload bondItems to reflect the changes
-              this.getAllCheckedInAndPendingBondItems()
-            }
-            this.msg.showSuccessMessage('Archived Successifully')
+      .toPromise()
+      .then(
+        data => {
+          // this.showBondItemData(data!)
+          // console.log(data)
+          // // this.getAllPendingOrCheckedInParkings()
+          if (this.mode === 'existing') { // If in existing mode, reload bondItems to reflect the changes
+            this.getAllCheckedInAndPendingBondItems()
           }
-        )
-        .catch(
-          error => {
-            console.log(error)
-            this.msg.showErrorMessage(error, '')
-          }
-        )
+          this.msg.showSuccessMessage('Archived Successifully')
+        }
+      )
+      .catch(
+        error => {
+          console.log(error)
+          this.msg.showErrorMessage(error, '')
+        }
+      )
 
   }
 
@@ -559,10 +560,10 @@ export class SelectBondZoneComponent {
 
     this.vehicleEquipmentColor = data!.vehicleEquipmentColor
 
-     this.cardNo = data!.cardNo
+    this.cardNo = data!.cardNo
 
-     this.billingType = data!.billingType
-     this.startBillingAt = data!.billingStartAt
+    this.billingType = data!.billingType
+    this.startBillingAt = data!.billingStartAt
 
     /////////////////////////
   }
@@ -622,23 +623,23 @@ export class SelectBondZoneComponent {
     this.registrationNo = ''
     this.chasisNo = ''
     this.transardNo = ''
-    this.leftFrontLamp = ''
-    this.rightFrontLamp = ''
-    this.leftRearLamp = ''
-    this.rightRearLamp = ''
-    this.leftSideMirror = ''
-    this.rightSideMirror = ''
-    this.leftWiper = ''
-    this.rightWiper = ''
-    this.backWiper = ''
-    this.fuelCap = ''
-    this.spareTire = ''
-    this.battery = ''
-    this.starter = ''
-    this.aerial = ''
-    this.wheelCap = ''
-    this.roundMirror = ''
-    this.tireIndicator = ''
+    this.leftFrontLamp = 'YES'
+    this.rightFrontLamp = 'YES'
+    this.leftRearLamp = 'YES'
+    this.rightRearLamp = 'YES'
+    this.leftSideMirror = 'YES'
+    this.rightSideMirror = 'YES'
+    this.leftWiper = 'YES'
+    this.rightWiper = 'YES'
+    this.backWiper = 'YES'
+    this.fuelCap = 'YES'
+    this.spareTire = 'YES'
+    this.battery = 'YES'
+    this.starter = 'YES'
+    this.aerial = 'YES'
+    this.wheelCap = 'YES'
+    this.roundMirror = 'YES'
+    this.tireIndicator = 'YES'
 
     this.comments = ''
 

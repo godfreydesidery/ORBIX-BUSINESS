@@ -461,7 +461,7 @@ export class BondItemBillingComponent {
     }
     this.bondItemBillReceivables = []
 
-    await this.http.get<IBondItemBillReceivable[]>(API_URL + '/bond_item_bill_receivables/get_all_by_bondItem?bond_item_id=' + bondItemId, options)
+    await this.http.get<IBondItemBillReceivable[]>(API_URL + '/bond_item_bill_receivables/get_all_by_bond_item?bond_item_id=' + bondItemId, options)
       .toPromise()
       .then(
         data => {
@@ -486,7 +486,7 @@ export class BondItemBillingComponent {
     }
     this.serviceBillReceivables = []
 
-    await this.http.get<IServiceBillReceivable[]>(API_URL + '/service_bill_receivables/get_all_by_bondItem?bond_item_id=' + bondItemId, options)
+    await this.http.get<IServiceBillReceivable[]>(API_URL + '/service_bill_receivables/get_all_by_bond_item?bond_item_id=' + bondItemId, options)
       .toPromise()
       .then(
         data => {
@@ -514,7 +514,7 @@ export class BondItemBillingComponent {
     this.billReceivables = []
     this.totalBillReceivable = 0
 
-    await this.http.get<IBillReceivable[]>(API_URL + '/bill_receivables/get_all_by_bondItem?bond_item_id=' + bondItemId, options)
+    await this.http.get<IBillReceivable[]>(API_URL + '/bill_receivables/get_all_by_bond_item?bond_item_id=' + bondItemId, options)
       .toPromise()
       .then(
         data => {
@@ -1088,7 +1088,7 @@ export class BondItemBillingComponent {
 
     }
 
-    await this.http.post<IBondItemGoodReleaseDetail>(API_URL + '/bond_item_bondItem_releases/create_bond_item_release', bondItemGoodRelease, options)
+    await this.http.post<IBondItemGoodReleaseDetail>(API_URL + '/bond_item_releases/create_bond_item_release', bondItemGoodRelease, options)
       .toPromise()
       .then(
         data => {
@@ -1276,7 +1276,7 @@ export class BondItemBillingComponent {
     }
     this.releases = []
 
-    await this.http.get<IBondItemGoodRelease[]>(API_URL + '/bond_item_bondItem_releases/get_by_bond_item?bond_item_id=' + bondItemId, options)
+    await this.http.get<IBondItemGoodRelease[]>(API_URL + '/bond_item_releases/get_by_bond_item?bond_item_id=' + bondItemId, options)
       .toPromise()
       .then(
         data => {

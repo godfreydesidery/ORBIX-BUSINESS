@@ -23,6 +23,10 @@ import com.orbix.api.api.vehicleandequipmentparking.ParkingServiceBillReceivable
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.DayService;
+import com.orbix.api.modules.bond.BondItem;
+import com.orbix.api.modules.bond.BondItemBillReceivable;
+import com.orbix.api.modules.bond.BondItemBillReceivableRepository;
+import com.orbix.api.modules.bond.BondItemRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.salesandmarketing.RestaurantSaleDetailBillReceivable;
 import com.orbix.api.modules.salesandmarketing.RestaurantSaleDetailBillReceivableRepository;
@@ -57,12 +61,14 @@ public class BillReceivableServiceController implements BillReceivableService {
 	private final BillReceivableRepository billReceivableRepository;
 	private final ParkingRepository parkingRepository;
 	private final StorageRepository storageRepository;
+	private final BondItemRepository bondItemRepository;
 	private final WeighRepository weighRepository;
 	private final MachineRepository machineRepository;
 	private final MaintenanceRepository maintenanceRepository;
 	private final ParkingBillReceivableRepository parkingBillReceivableRepository;
 	private final ParkingServiceBillReceivableRepository parkingServiceBillReceivableRepository;
 	private final StorageBillReceivableRepository storageBillReceivableRepository;
+	private final BondItemBillReceivableRepository bondItemBillReceivableRepository;
 	private final WeighBillReceivableRepository weighBillReceivableRepository;
 	private final MaintenanceJobCardIssueBillReceivableRepository maintenanceJobCardIssueBillReceivableRepository;
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
@@ -201,6 +207,19 @@ public class BillReceivableServiceController implements BillReceivableService {
 		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
 		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
 			billReceivableResponses.add(billReceivableResponseDTOMapper(storageBillReceivable.getBillReceivable()));
+		}		
+		return billReceivableResponses;
+	}
+	
+	@Override
+	public List<BillReceivableResponseDTO> getAllByBondItem(Long bondItemId, HttpServletRequest request) {
+		BondItem bondItem = bondItemRepository.findById(bondItemId)
+			    .orElseThrow(() -> new NotFoundException("Bond Item with ID " + bondItemId + " not found"));
+		
+		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
+		for(BondItemBillReceivable bondItemBillReceivable : bondItemBillReceivables) {
+			billReceivableResponses.add(billReceivableResponseDTOMapper(bondItemBillReceivable.getBillReceivable()));
 		}		
 		return billReceivableResponses;
 	}

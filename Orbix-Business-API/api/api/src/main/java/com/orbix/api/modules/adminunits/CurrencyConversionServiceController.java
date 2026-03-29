@@ -84,6 +84,40 @@ public class CurrencyConversionServiceController implements CurrencyConversionSe
 
 		return currencyConversionResponseDTOMapper(existingConversion);
 	}
+	
+	/**
+	 * 
+	 */
+	@Override
+	public ApiCustomResponse activateCurrencyConversion(CurrencyConversionRequestDTO shop, HttpServletRequest request) {
+		Optional<CurrencyConversion> shop_ = currencyConversionRepository.findById(shop.getId());		
+		if(shop_.isEmpty()) {
+			throw new NotFoundException("Currency Conversion not found");
+		}		
+		if(shop_.get().isActive() == true) {
+			throw new InvalidOperationException("Shop already active");
+		}
+		shop_.get().setActive(true);
+		currencyConversionRepository.save(shop_.get());		
+		return new ApiCustomResponse(200, "OK", "Success", "Currency Conversion Activated successifully");
+	}
+
+	/**
+	 * 
+	 */
+	@Override
+	public ApiCustomResponse deactivateCurrencyConversion(CurrencyConversionRequestDTO shop, HttpServletRequest request) {
+		Optional<CurrencyConversion> shop_ = currencyConversionRepository.findById(shop.getId());		
+		if(shop_.isEmpty()) {
+			throw new NotFoundException("Currency Conversion not found");
+		}		
+		if(shop_.get().isActive() == false) {
+			throw new InvalidOperationException("Shop already inactive");
+		}
+		shop_.get().setActive(false);
+		currencyConversionRepository.save(shop_.get());		
+		return new ApiCustomResponse(200, "OK", "Success", "Currency Conversion Deactivated successifully");
+	}
     
     private CurrencyConversionResponseDTO currencyConversionResponseDTOMapper(CurrencyConversion conversion) {
         CurrencyConversionResponseDTO response = new CurrencyConversionResponseDTO();

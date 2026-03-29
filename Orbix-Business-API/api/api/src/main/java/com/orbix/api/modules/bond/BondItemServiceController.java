@@ -390,19 +390,13 @@ public class BondItemServiceController implements BondItemService {
 
 		bondItem.setBillingType("MONTHLY");
 
-		if (bondItemRequest.startBillingAt == null) {
-			bondItem.setStartBillingAt(dayService.getTimeStamp()); // You can change this depending on user billing
-																	// preferences
-		} else {
-			// String dateString = "2024-10-26 15:30:45" ;
-			String dateString = bondItemRequest.getStartBillingAt() + " 00:00:00";
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
-			bondItem.setStartBillingAt(dateTime);
-			if (dateTime.isAfter(dayService.getTimeStamp())) {
-				throw new InvalidOperationException(
-						"The selected date cannot be in the future. Please choose today or an earlier date.");
-			}
+		String dateString = bondItemRequest.getStartBillingAt() + " 00:00:00";
+		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+		LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+		bondItem.setStartBillingAt(dateTime);
+		if (dateTime.isAfter(dayService.getTimeStamp())) {
+			throw new InvalidOperationException(
+					"The selected date cannot be in the future. Please choose today or an earlier date.");
 		}
 
 		// bondItem.setImage(bondItemRequest.getImage());
@@ -718,18 +712,18 @@ public class BondItemServiceController implements BondItemService {
 		bondItem.setCheckedInByUser(userService.getUser(request));
 		bondItem.setCheckedInDateTime(dayService.getTimeStamp());
 
-		if (bondItemRequest.startBillingAt == null) {
-			bondItem.setStartBillingAt(dayService.getTimeStamp().toLocalDate().atStartOfDay()); // You can change this
-																								// depending on user
-																								// billing preferences
-		} else {
-
-			// String dateString = "2024-10-26 15:30:45" ;
-			String dateString = bondItemRequest.getStartBillingAt() + " 00:00:00";
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
-			bondItem.setStartBillingAt(dateTime);
-		}
+//		if (bondItemRequest.startBillingAt == null) {
+//			bondItem.setStartBillingAt(dayService.getTimeStamp().toLocalDate().atStartOfDay()); // You can change this
+//																								// depending on user
+//																								// billing preferences
+//		} else {
+//
+//			// String dateString = "2024-10-26 15:30:45" ;
+//			String dateString = bondItemRequest.getStartBillingAt() + " 00:00:00";
+//			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+//			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+//			bondItem.setStartBillingAt(dateTime);
+//		}
 
 		bondItem = bondItemRepository.save(bondItem);
 

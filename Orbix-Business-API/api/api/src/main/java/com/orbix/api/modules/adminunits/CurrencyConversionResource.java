@@ -4,6 +4,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.orbix.api.api.commons.ApiCustomResponse;
+
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
 import java.util.List;
@@ -40,6 +42,26 @@ public class CurrencyConversionResource {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/currency-conversions/update").toUriString());
         return ResponseEntity.created(uri).body(currencyConversionService.updateCurrencyConversion(conversionRequest, request));
     }
+    
+    @PostMapping("/currency_conversions/activate")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<ApiCustomResponse>activate(
+			@RequestBody CurrencyConversionRequestDTO currencyConversionRequest,
+			HttpServletRequest request){
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/currency_conversions/activate").toUriString());
+		return ResponseEntity.created(uri).body(currencyConversionService.activateCurrencyConversion(currencyConversionRequest, request));
+	}
+    
+    @PostMapping("/currency_conversions/deactivate")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<ApiCustomResponse>deactivate(
+			@RequestBody CurrencyConversionRequestDTO currencyConversionRequest,
+			HttpServletRequest request){
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/currency_conversions/deactivate").toUriString());
+		return ResponseEntity.created(uri).body(currencyConversionService.deactivateCurrencyConversion(currencyConversionRequest, request));
+	}
+	
+	
 
 //    @PostMapping("/currency-conversions/reset-rates")
 //    public ResponseEntity<ApiCustomResponse> resetAllRates(HttpServletRequest request) {

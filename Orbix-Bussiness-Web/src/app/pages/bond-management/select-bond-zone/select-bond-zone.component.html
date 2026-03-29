@@ -33,10 +33,10 @@
                             class="fa fa-pencil-square-o"></i> New Vehicle</button>
                     <button class="btn btn-outline-primary btn-round-custom" (click)="setExisting()"
                         (click)="getAllCheckedInAndPendingBondItems()"><i class="fa fa-list"></i> Vehicle List</button>
-                    <button class="btn btn-success btn-round-custom" (click)="setExisting()"
-                        (click)="getAllRecentCheckedOutBondItems()">Checked Out</button>
-                    <button class="btn btn-outline-primary btn-round-custom" (click)="setReleased()"
-                        (click)="getAllCheckedInBondItems()"><i class="fa fa-sign-out"></i> Released List</button>
+                    <!-- <button class="btn btn-success btn-round-custom" (click)="setExisting()"
+                        (click)="getAllRecentCheckedOutBondItems()">Checked Out</button> -->
+                    <!-- <button class="btn btn-outline-primary btn-round-custom" (click)="setReleased()"
+                        (click)="getAllCheckedInBondItems()"><i class="fa fa-sign-out"></i> Released List</button> -->
                     <button class="btn btn-outline-danger btn-round-custom" (click)="setReleased()"
                         (click)="getAllRecentCheckedOutBondItems()"><i class="fa fa-sign-out"></i> Checked Out
                         List</button>
@@ -218,9 +218,9 @@
                                             autocomplete="nope">
                                     </div>
                                 </div>
-                                
 
-                                
+
+
                                 <!-- <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Height(cm)</label>
@@ -250,8 +250,8 @@
                                         style="text-align: center; font-weight: bold;">
                                 </div>
                             </div> -->
-                                
-                                
+
+
 
 
 
@@ -265,7 +265,7 @@
                                     <input class="form-control" type="text" [(ngModel)]="registrationNo" autocomplete="nope">
                                 </div>
                             </div> -->
-                                
+
 
                                 <div class="col-lg-3">
                                     <div class="form-group">
@@ -311,7 +311,7 @@
 
                                 <!-- </div> -->
                                 <!-- </div> -->
-                                
+
 
                                 <div class="col-lg-3">
                                     <div class="form-group">
@@ -332,7 +332,7 @@
                                 <div class="col-lg-3">
                                     <div class="form-group">
                                         <label>Vehicle Comment</label>
-                                        <textarea class="form-control" [(ngModel)]="bondItemDescription"
+                                        <textarea class="form-control" [(ngModel)]="comments"
                                             autocomplete="nope"></textarea>
                                     </div>
                                 </div>
@@ -657,12 +657,13 @@
                                 <tr>
                                     <th>SN</th>
                                     <th>No</th>
-                                    <th>Good Name</th>
-                                    <!-- <th>Good Description</th> -->
+                                    <th>Vehicle Name</th>
                                     <th>Owner Name</th>
-                                    <th>Owner ID</th>
-                                    <th>ID Type</th>
+                                    <th>Chasis No</th>
+                                    <th>Vehicle Type</th>
+                                    <th>Owner Contact</th>
                                     <th>Billing Type</th>
+                                    <th>Currency</th>
                                     <th>Price &#64;</th>
                                     <th>Check Status</th>
                                     <th>Action</th>
@@ -674,13 +675,15 @@
                                     <td>{{bondItem.sn}}</td>
                                     <td>{{bondItem.no}}</td>
                                     <td>{{bondItem.bondItemName}}</td>
-                                    <!-- <td>{{bondItem.bondItemDescription}}</td> -->
+
                                     <td>{{bondItem.ownerFirstName}} {{bondItem.ownerMiddleName}}
                                         {{bondItem.ownerLastName}}
                                     </td>
-                                    <td>{{bondItem.ownerIdNo}}</td>
+                                    <td>{{bondItem.chasisNo}}</td>
+                                    <td>{{bondItem.ownerAddress}}</td>
                                     <td>{{bondItem.ownerIdType}}</td>
                                     <td><span class="badge badge-primary">{{bondItem.billingType}}</span></td>
+                                    <td>{{bondItem.currency}}</td>
                                     <td class="text-danger" style="text-align: right;"><b>{{bondItem.billingAmount |
                                             currency:'':''}}</b></td>
                                     <td>
@@ -700,24 +703,16 @@
                                     <td class="d-flex flex-wrap gap-2">
                                         <div class="d-flex flex-row flex-wrap align-items-center gap-2">
                                             <button class="btn btn-warning btn-round-custom btn-sm"
-                                                *ngIf="(bondItem.status === 'PENDING' || bondItem.status === 'CHECKED-IN') && grant(['STRG-UPDATE'])"
+                                                *ngIf="(bondItem.status === 'PENDING') && grant(['STRG-UPDATE'])"
                                                 (click)="getBondItem(bondItem.id)" data-toggle="modal"
                                                 data-target="#edit-modal"><i class="fa fa-cogs"></i> Edit</button>
                                             <button class="btn btn-primary btn-round-custom btn-sm"
                                                 (click)="get(bondItem.id)" data-toggle="modal"
                                                 data-target="#view-modal"><i class="fa fa-eye"></i> View</button>
-                                            <button class="btn btn-warning btn-round-custom btn-sm"
-                                                *ngIf="(bondItem.status === 'CHECKED-IN') && grant(['STRG-ARCHIVE'])"
-                                                (click)="getBondItem(bondItem.id)" (click)="clearRemove()"
-                                                data-toggle="modal" data-target="#remove-modal"><i
-                                                    class="fa fa-cogs"></i> Archive</button>
-                                            <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="bondItem.status === 'CHECKED-IN'" (click)="getBondItemGoodReleaseDetail(bondItem.id)" data-toggle="modal" data-target="#bondItem-good-release-modal">Release</button> -->
-                                            <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="bondItem.status === 'CHECKED-IN'" (click)="getBondItemGoodReleases(bondItem.id)" data-toggle="modal" data-target="#bondItem-good-releases-modal">Releases</button> -->
                                             <button class="btn btn-success btn-round-custom btn-sm"
-                                                *ngIf="bondItem.status === 'PENDING'"
+                                                *ngIf="(bondItem.status === 'PENDING')"
                                                 (click)="checkIn(bondItem.id, bondItem.no, bondItem.bondItemName)"><i
                                                     class="fa fa-sign-in"></i> Carry-In</button>
-                                            <!-- <button class="btn btn-warning btn-round-custom btn-sm" *ngIf="bondItem.status === 'CHECKED-IN'" (click)="checkOut(bondItem.id, bondItem.no, bondItem.bondItemName)" >Check-Out</button> -->
                                         </div>
                                     </td>
                                 </tr>
@@ -749,13 +744,14 @@
                                 <tr>
                                     <th>SN</th>
                                     <th>No</th>
-                                    <th>Good Name</th>
-                                    <th>Good Description</th>
+                                    <th>Vehicle Name</th>
                                     <th>Owner Name</th>
-                                    <th>Owner ID</th>
-                                    <th>ID Type</th>
+                                    <th>Chasis No</th>
+                                    <th>Vehicle Type</th>
+                                    <th>Owner Contact</th>
                                     <th>Billing Type</th>
-                                    <th>Price</th>
+                                    <th>Currency</th>
+                                    <th>Price &#64;</th>
                                     <th>Check Status</th>
                                     <th>Action</th>
                                 </tr>
@@ -766,13 +762,15 @@
                                     <td>{{bondItem.sn}}</td>
                                     <td>{{bondItem.no}}</td>
                                     <td>{{bondItem.bondItemName}}</td>
-                                    <td>{{bondItem.bondItemDescription}}</td>
+
                                     <td>{{bondItem.ownerFirstName}} {{bondItem.ownerMiddleName}}
                                         {{bondItem.ownerLastName}}
                                     </td>
-                                    <td>{{bondItem.ownerIdNo}}</td>
+                                    <td>{{bondItem.chasisNo}}</td>
+                                    <td>{{bondItem.ownerAddress}}</td>
                                     <td>{{bondItem.ownerIdType}}</td>
                                     <td><span class="badge badge-primary">{{bondItem.billingType}}</span></td>
+                                    <td>{{bondItem.currency}}</td>
                                     <td class="text-danger" style="text-align: right;"><b>{{bondItem.billingAmount |
                                             currency:'':''}}</b></td>
                                     <td>
@@ -907,31 +905,30 @@
                             </div>
                         </div>
 
-                        <p><b class="text-primary" style="font-size: large;">Good Information</b></p>
+                        <p><b class="text-primary" style="font-size: large;">Vehicle Information</b></p>
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>Good Name</label>
+                                    <label>Vehicle Name</label>
                                     <input class="form-control" type="text" [(ngModel)]="bondItemName"
                                         autocomplete="nope">
                                 </div>
                             </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>Select Good Type</label>
-                                    <select class="form-control" [(ngModel)]="bondItemTypeName">
+                                    <label>Select Vehicle Type</label>
+                                    <input type="text" class="form-control" [(ngModel)]="bondItemTypeName"
+                                        list="vehicleTypes" placeholder="Select Vehicle Type">
+
+                                    <datalist id="vehicleTypes">
+                                        <option *ngFor="let option of bondItemTypes" [value]="option.name"></option>
+                                    </datalist>
+                                    <!-- <select class="form-control" [(ngModel)]="bondItemTypeName">
                                         <option></option>
                                         <option *ngFor="let option of bondItemTypes" [value]="option.name">{{
                                             option.name }}
                                         </option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Good Description</label>
-                                    <textarea class="form-control" [(ngModel)]="bondItemDescription"
-                                        autocomplete="nope"></textarea>
+                                    </select> -->
                                 </div>
                             </div>
                             <div class="col-lg-3">
@@ -1048,7 +1045,7 @@
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>Good Name</label>
+                                    <label>Vehicle Name</label>
                                     <input class="form-control" type="text" [(ngModel)]="bondItemName"
                                         autocomplete="nope">
                                 </div>
@@ -1156,15 +1153,15 @@
                             </thead>
                             <tbody>
                                 <tr>
-                                    <td><b>BondItem No</b></td>
+                                    <td><b>Bond Item No</b></td>
                                     <td>{{no}}</td>
                                 </tr>
                                 <tr>
-                                    <td><b>Good Name</b></td>
+                                    <td><b>Vehicle Name</b></td>
                                     <td>{{bondItemName}}</td>
                                 </tr>
                                 <tr>
-                                    <td><b>Good Type</b></td>
+                                    <td><b>Vehicle Type</b></td>
                                     <td>{{bondItemTypeName}}</td>
                                 </tr>
                                 <!-- <tr><td><b>Initial Qty</b></td><td>{{initialQty}}</td></tr> -->
@@ -1330,12 +1327,12 @@
                     <div class="col-sm-12">
 
                         <div class="form-group">
-                            <label>Good No</label>
+                            <label>Vehicle No</label>
                             <input class="form-control" type="text" [(ngModel)]="no" autocomplete="nope" readonly>
                         </div>
 
                         <div class="form-group">
-                            <label>Good Name</label>
+                            <label>Vehicle Name</label>
                             <input class="form-control" type="text" [(ngModel)]="bondItemName" autocomplete="nope"
                                 readonly>
                         </div>

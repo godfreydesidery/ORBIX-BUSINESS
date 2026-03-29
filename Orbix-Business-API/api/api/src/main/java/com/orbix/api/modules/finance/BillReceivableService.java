@@ -23,6 +23,10 @@ public interface BillReceivableService {
 			Long storageId,
 			HttpServletRequest request);
 	
+	List<BillReceivableResponseDTO> getAllByBondItem( 
+			Long bondItemId,
+			HttpServletRequest request);
+	
 	List<BillReceivableResponseDTO> getAllByMaintenance( 
 			Long maintenanceId,
 			HttpServletRequest request);

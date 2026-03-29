@@ -18,6 +18,8 @@ import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
+import com.orbix.api.modules.adminunits.CurrencyConversion;
+import com.orbix.api.modules.adminunits.CurrencyConversionRepository;
 import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.finance.BillReceivable;
 import com.orbix.api.modules.finance.BillReceivableRepository;
@@ -39,6 +41,8 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 	private final BondItemRepository bondItemRepository;
 	private final BillReceivableRepository billReceivableRepository;
 	private final DayService dayService;
+	
+	private final CurrencyConversionRepository currencyConversionRepository;
 
 	@Override
 	public List<BondItemBillReceivableResponseDTO> getAllByBondItem(Long bondItemId, HttpServletRequest request) {
@@ -213,9 +217,23 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 
 	    // 7. Derive TO date (catch-up billing)
 	    LocalDateTime toDate = fromDate.plusDays(months * 30L);
+	    
+	    java.util.Currency currency = bondItem.getCurrency();
+	    double rate = 1;
+	    if(currency != null) {
+	    	CurrencyConversion conv = currencyConversionRepository.findBySourceCurrencyCodeAndFinalCurrencyCode(currency, java.util.Currency.getInstance("TZS"));
+	    	if(conv == null) {
+	    		throw new NotFoundException("No conversion rate found");
+	    	}
+	    	if(!conv.isActive() || conv.getSourceCurrencyValue() <= 0 || conv.getFinalCurrencyValue() <= 0) {
+	    		throw new NotFoundException("Invalid or expited rate");
+	    	}
+	    	rate = Math.abs((conv.getFinalCurrencyValue()/conv.getSourceCurrencyValue()));
+	    }
+	    
 
 	    // 8. Calculate billing amount
-	    double totalAmount = (bondItem.getBillingAmount() * months) - request.getDiscount();
+	    double totalAmount = (bondItem.getBillingAmount() * months * rate);
 
 	    // 9. Create BillReceivable
 	    BillReceivable billReceivable = new BillReceivable();
@@ -226,7 +244,7 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 	    billReceivable.setBranch(bondItem.getBranch());
 	    billReceivable.setCreatedDateTime(dayService.getTimeStamp());
 	    billReceivable.setPayStatus(PayStatus.UNPAID);
-	    billReceivable.setSummary("BondItem bill for bondItem#: " + bondItem.getNo());
+	    billReceivable.setSummary("Bond Item bill for bond Item#: " + bondItem.getNo());
 
 	    billReceivable = billReceivableRepository.save(billReceivable);
 	    billReceivable.setNo("BR" + billReceivable.getId());
