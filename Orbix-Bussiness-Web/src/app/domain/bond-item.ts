@@ -30,6 +30,8 @@ export interface IBondItem {
     bondItemTypeId: any
     bondItemTypeName: string
 
+    currency : string
+
     serviceBillItems : IServiceBillItem[]
 
     // numbering
