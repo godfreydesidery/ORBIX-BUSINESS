@@ -591,6 +591,12 @@ public class BondItemServiceController implements BondItemService {
 		bondItemResponse.setHeight(String.valueOf(bondItem.getHeight()));
 		bondItemResponse.setWeight(String.valueOf(bondItem.getWeight()));
 		bondItemResponse.setInitialQty(String.valueOf(bondItem.getInitialQty()));
+		
+		if(bondItem.getCurrency() != null) {
+			bondItemResponse.setCurrency(bondItem.getCurrency().getCurrencyCode());
+		}else {
+			bondItemResponse.setCurrency("");
+		}
 
 		bondItemResponse
 				.setBillingStartAt(Optional.ofNullable(bondItem.getStartBillingAt()).map(Object::toString).orElse(""));

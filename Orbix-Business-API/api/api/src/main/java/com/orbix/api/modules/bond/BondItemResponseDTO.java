@@ -54,6 +54,8 @@ public class BondItemResponseDTO {
     String billingAmount;
     String billingStartAt;
     
+    String currency;
+    
     String width;
     String length;
     String height;

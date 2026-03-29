@@ -1,6 +1,7 @@
 package com.orbix.api.modules.bond;
 
 import java.time.LocalDateTime;
+import java.util.Currency;
 
 import javax.persistence.Column;
 import javax.persistence.Entity;
@@ -113,6 +114,9 @@ public class BondItem {
 	/**Billing*/
 	private String billingType;
 	private double billingAmount;
+	
+	@Column(name = "currency")
+    private java.util.Currency currency;
 	
 	private double initialQty = 1;
 	private double currentQty = 1;

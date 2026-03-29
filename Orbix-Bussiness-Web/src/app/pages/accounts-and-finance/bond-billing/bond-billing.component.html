@@ -24,9 +24,9 @@
                                 <th>BondItem Type</th>
                                 <th>BondZone</th>
                                 <th>Owner Contacts</th>
-                                <th>Qty</th>
                                 <th>Billing Type</th>
                                 <th>Price</th>
+                                <th>Currency</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -38,9 +38,9 @@
                                 <td>{{bondItem.bondItemTypeName}}</td>
                                 <td>{{bondItem.bondZoneName}}</td>
                                 <td>{{bondItem.ownerPhoneNo}}</td>  
-                                <td class="text-danger"><b>{{bondItem.initialQty}}/{{bondItem.currentQty}}</b></td>                          
                                 <td><span class="badge badge-primary">{{bondItem.billingType}}</span></td>
                                 <td style="text-align: right;"><span class="badge badge-danger">{{bondItem.billingAmount | currency:'':''}}</span></td>
+                                <td>{{bondItem.currency}}</td>
                                 
                                 <td>
                                     <table>
