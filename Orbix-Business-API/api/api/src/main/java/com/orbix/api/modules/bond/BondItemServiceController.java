@@ -375,6 +375,7 @@ public class BondItemServiceController implements BondItemService {
 		// bondItem.setImage(bondItemRequest.getImage());
 		bondItem.setStatus("PENDING");
 		bondItem.setBondItemType(bondItemType_.get());
+		bondItem.setCurrency(bondItemType_.get().getCurrency());
 
 		bondItem.setBondItemName(bondItemType_.get().getName()); // Look here later
 		bondItem.setBondItemColor(bondItemRequest.getBondItemColor());

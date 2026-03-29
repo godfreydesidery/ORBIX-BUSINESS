@@ -194,7 +194,7 @@ page: number = 1; // Initialize the current page to 1
     }
     this.bondItemBillReceivables = []
 
-    await this.http.get<IBondItemBillReceivable[]>(API_URL + '/bond_items/get_bondItem_bill_receivables?bondItem_id=' + bondItemId, options)
+    await this.http.get<IBondItemBillReceivable[]>(API_URL + '/bond_items/get_bond_item_bill_receivables?bond_tem_id=' + bondItemId, options)
       .toPromise()
       .then(
         data => {
@@ -245,7 +245,7 @@ page: number = 1; // Initialize the current page to 1
       bondItemId: this.bondItemId
     }
 
-    await this.http.post<IBondItemBillReceivable>(API_URL + '/bond_items/create_bondItem_bill_receivable', bondItemBillReceivable, options)
+    await this.http.post<IBondItemBillReceivable>(API_URL + '/bond_items/create_bond_item_bill_receivable', bondItemBillReceivable, options)
       .toPromise()
       .then(
         data => {
@@ -292,8 +292,8 @@ page: number = 1; // Initialize the current page to 1
     localStorage.setItem('bondItem-id', '');
     localStorage.setItem('bondItem-id', bondItemId);
 
-    await this.router.navigate(['app/accounts-and-finance/bondItem-billing'], {
-      queryParams: { bondItem_id: bondItemId }
+    await this.router.navigate(['app/accounts-and-finance/bond-item-billing'], {
+      queryParams: { bond_item_id: bondItemId }
     });
 
   }
@@ -409,7 +409,7 @@ page: number = 1; // Initialize the current page to 1
 
     this.qtyToRelease = 0
 
-    await this.http.get<IBondItemGoodReleaseDetail>(API_URL + '/bondItem_bondItem_releases/get_bondItem_bondItem_release_detail?bondItem_id=' + bondItemId, options)
+    await this.http.get<IBondItemGoodReleaseDetail>(API_URL + '/bond_item_releases/get_bond_item_release_detail?bond_item_id=' + bondItemId, options)
       .toPromise()
       .then(
         data => {
@@ -441,7 +441,7 @@ page: number = 1; // Initialize the current page to 1
 
     }
 
-    await this.http.post<IBondItemGoodReleaseDetail>(API_URL + '/bondItem_bondItem_releases/create_bondItem_bondItem_release', bondItemGoodRelease, options)
+    await this.http.post<IBondItemGoodReleaseDetail>(API_URL + '/bond_item_releases/create_bond_item_release', bondItemGoodRelease, options)
       .toPromise()
       .then(
         data => {
@@ -476,7 +476,7 @@ page: number = 1; // Initialize the current page to 1
     this.billUngenerated = 0
     this.billUnpaid = 0
 
-    await this.http.get<IBillView>(API_URL + '/bondItem_bill_receivables/get_bill_view?bondItem_id=' + id, options)
+    await this.http.get<IBillView>(API_URL + '/bond_item_bill_receivables/get_bill_view?bond_item_id=' + id, options)
       .toPromise()
       .then(
         data => {
@@ -533,7 +533,7 @@ page: number = 1; // Initialize the current page to 1
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
-    await this.http.get<IModel>(API_URL + '/bond_items/get_last_bondItem_bill_date?id=' + bondItemId, options)
+    await this.http.get<IModel>(API_URL + '/bond_items/get_last_bond_item_bill_date?id=' + bondItemId, options)
       .toPromise()
       .then(
         data => {
