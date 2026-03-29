@@ -10,6 +10,7 @@ public class BondItemTypeRequestDTO {
 
 	private Long companyId;
 	private String companyName;
+	private java.util.Currency currency;
 	
 	double dailyPrice;
 	double hourlyPrice;

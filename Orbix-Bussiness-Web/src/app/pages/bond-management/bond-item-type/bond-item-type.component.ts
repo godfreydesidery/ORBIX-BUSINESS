@@ -31,6 +31,8 @@ export class BondItemTypeComponent {
 
   dailyPrice : number = 0;
 
+  currency : string = ''
+
   /**Collections */
   bondItemTypes : IBondItemType[] = []
 
@@ -99,6 +101,8 @@ export class BondItemTypeComponent {
       name: this.name,
       dailyPrice : this.dailyPrice,
 
+      currency : this.currency,
+
       active: this.active,
 
       company : {id : "" },
@@ -106,6 +110,11 @@ export class BondItemTypeComponent {
       branch : {id : ""},
 
       sn : 0
+    }
+
+    if(this.currency === ''){
+      this.msg.showErrorMessage3("Please select currency")
+      return
     }
 
     if(bondItemType.id === null){
@@ -222,6 +231,7 @@ export class BondItemTypeComponent {
     this.code = data!.code
     this.name = data!.name
     this.dailyPrice = data!.dailyPrice
+    this.currency = data!.currency
   }
 
   clearBondItemTypeData(){
@@ -229,5 +239,6 @@ export class BondItemTypeComponent {
     this.code = ''
     this.name = ''
     this.dailyPrice = 0
+    this.currency = ''
   }
 }

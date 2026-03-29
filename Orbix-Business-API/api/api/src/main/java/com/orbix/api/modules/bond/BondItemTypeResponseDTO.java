@@ -13,6 +13,8 @@ public class BondItemTypeResponseDTO {
 	private String companyId;
 	private String companyName;
 	
+	private String currency;
+	
 	private String dailyPrice;
 	private String hourlyPrice;
 }

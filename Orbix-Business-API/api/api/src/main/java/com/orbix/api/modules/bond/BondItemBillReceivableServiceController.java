@@ -63,107 +63,190 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 		return bondItemBillReceivableDTOMapper(bondItemBillReceivable);
 	}
 	
-	@Override
-	public BondItemBillReceivableResponseDTO createBondItemBillReceivable(
-			BondItemBillReceivableRequestDTO bondItemBillReceivableRequest,
-			HttpServletRequest request) {
-		
-		BondItem bondItem = bondItemRepository.findById(bondItemBillReceivableRequest.getBondItemId())
-                .orElseThrow(() -> new NotFoundException("BondItem not found."));
-		
-		// if(!validateBondItemBill(bondItemBillReceivableRequest)) throw new InvalidOperationException("Invalid entries");
-		
-		// Check if is first bill
-		
-		List<BondItemBillReceivable> rcvs = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
-		
-		LocalDateTime fromDate = null;
-		LocalDateTime toDate = null;
-		double qty = 0;
-		
-		if(bondItemBillReceivableRequest.getEndedAt() != null) {
-			String dateString = bondItemBillReceivableRequest.getEndedAt() + " 00:00:00";
-			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-			toDate = LocalDateTime.parse(dateString, formatter).plusDays(1).toLocalDate().atStartOfDay();
-		}
-		
-		if(rcvs.isEmpty()) {			
-			// Check for first billing date		
-			fromDate = bondItem.getStartBillingAt().toLocalDate().atStartOfDay();
-			
-			if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();	
-			
-			if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is before bill starting date");
-			
-			long dayCount = ChronoUnit.DAYS.between(fromDate, toDate);
-			
-			qty = dayCount;
-			
-		}else {
-			// Take the last bill
-			fromDate = rcvs.get(rcvs.size() - 1).getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
-			
-			if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
-			
-			if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is invalid " + toDate.toString() + fromDate.toString());
-			
-			long dayCount = ChronoUnit.DAYS.between(fromDate, toDate) + 1;
-			
-			qty = dayCount;
-			
-		}
-		
-		if(qty > 1) qty = qty - 1;
-			
-		BillReceivable billReceivable = new BillReceivable();
-		billReceivable.setNo(String.valueOf(Math.random()));
-		billReceivable.setAmount((bondItem.getBillingAmount() * qty) - bondItemBillReceivableRequest.getDiscount());
-		billReceivable.setPaid(0);
-		billReceivable.setDue((bondItem.getBillingAmount() * qty) - bondItemBillReceivableRequest.getDiscount());
-		billReceivable.setBranch(bondItem.getBranch());
-		billReceivable.setCreatedDateTime(dayService.getTimeStamp());
-		
-		billReceivable.setPayStatus(PayStatus.UNPAID);
-		billReceivable.setSummary("BondItem bill for bondItem#: " + bondItem.getNo());
-		
-		billReceivable = billReceivableRepository.save(billReceivable);
-		billReceivable.setNo("BR" + billReceivable.getId().toString());
-		billReceivable = billReceivableRepository.save(billReceivable);
-		
-		BondItemBillReceivable bondItemBillReceivable = new BondItemBillReceivable();
-		
-		bondItemBillReceivable.setStartedAt(fromDate);
-		bondItemBillReceivable.setEndedAt(toDate);
-		
-//		if(bondItemBillReceivableRequest.getStartedAt() == null) {
-//			bondItemBillReceivable.setStartedAt(dayService.getTimeStamp().toLocalDate().atStartOfDay()); // You can change this depending on user billing preferences
-//		}else {
-//			//String dateString = "2024-10-26 15:30:45" ;
-//			String dateString = bondItemBillReceivableRequest.getStartedAt() + " 00:00:00";
-//			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
-//			bondItemBillReceivable.setStartedAt(dateTime);
-//		}
-		
-//		if(bondItemBillReceivableRequest.getEndedAt() == null) {
-//			bondItemBillReceivable.setEndedAt(dayService.getTimeStamp().toLocalDate().atStartOfDay()); // You can change this depending on user billing preferences
-//		}else {
-//			//String dateString = "2024-10-26 15:30:45" ;
+//	@Override
+//	public BondItemBillReceivableResponseDTO createBondItemBillReceivable(
+//			BondItemBillReceivableRequestDTO bondItemBillReceivableRequest,
+//			HttpServletRequest request) {
+//		
+//		BondItem bondItem = bondItemRepository.findById(bondItemBillReceivableRequest.getBondItemId())
+//                .orElseThrow(() -> new NotFoundException("BondItem not found."));
+//		
+//		// if(!validateBondItemBill(bondItemBillReceivableRequest)) throw new InvalidOperationException("Invalid entries");
+//		
+//		// Check if is first bill
+//		
+//		List<BondItemBillReceivable> rcvs = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+//		
+//		LocalDateTime fromDate = null;
+//		LocalDateTime toDate = null;
+//		double qty = 0;
+//		
+//		if(bondItemBillReceivableRequest.getEndedAt() != null) {
 //			String dateString = bondItemBillReceivableRequest.getEndedAt() + " 00:00:00";
 //			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-//			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
-//			bondItemBillReceivable.setEndedAt(dateTime);
+//			toDate = LocalDateTime.parse(dateString, formatter).plusDays(1).toLocalDate().atStartOfDay();
 //		}
-		
-		bondItemBillReceivable.setPrice(bondItem.getBillingAmount());
-		bondItemBillReceivable.setQty(qty);
-		bondItemBillReceivable.setDiscount(bondItemBillReceivableRequest.getDiscount());
-		bondItemBillReceivable.setBillReceivable(billReceivable);
-		bondItemBillReceivable.setBondItem(bondItem);
-		
-		bondItemBillReceivable = bondItemBillReceivableRepository.save(bondItemBillReceivable);
+//		
+//		if(rcvs.isEmpty()) {			
+//			// Check for first billing date		
+//			fromDate = bondItem.getStartBillingAt().toLocalDate().atStartOfDay();
+//			
+//			if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();	
+//			
+//			if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is before bill starting date");
+//			
+//			long dayCount = ChronoUnit.DAYS.between(fromDate, toDate);
+//			
+//			qty = dayCount;
+//			
+//		}else {
+//			// Take the last bill
+//			fromDate = rcvs.get(rcvs.size() - 1).getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
+//			
+//			if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
+//			
+//			if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is invalid " + toDate.toString() + fromDate.toString());
+//			
+//			long dayCount = ChronoUnit.DAYS.between(fromDate, toDate) + 1;
+//			
+//			qty = dayCount;
+//			
+//		}
+//		
+//		if(qty > 1) qty = qty - 1;
+//			
+//		BillReceivable billReceivable = new BillReceivable();
+//		billReceivable.setNo(String.valueOf(Math.random()));
+//		billReceivable.setAmount((bondItem.getBillingAmount() * qty) - bondItemBillReceivableRequest.getDiscount());
+//		billReceivable.setPaid(0);
+//		billReceivable.setDue((bondItem.getBillingAmount() * qty) - bondItemBillReceivableRequest.getDiscount());
+//		billReceivable.setBranch(bondItem.getBranch());
+//		billReceivable.setCreatedDateTime(dayService.getTimeStamp());
+//		
+//		billReceivable.setPayStatus(PayStatus.UNPAID);
+//		billReceivable.setSummary("BondItem bill for bondItem#: " + bondItem.getNo());
+//		
+//		billReceivable = billReceivableRepository.save(billReceivable);
+//		billReceivable.setNo("BR" + billReceivable.getId().toString());
+//		billReceivable = billReceivableRepository.save(billReceivable);
+//		
+//		BondItemBillReceivable bondItemBillReceivable = new BondItemBillReceivable();
+//		
+//		bondItemBillReceivable.setStartedAt(fromDate);
+//		bondItemBillReceivable.setEndedAt(toDate);
+//		
+////		if(bondItemBillReceivableRequest.getStartedAt() == null) {
+////			bondItemBillReceivable.setStartedAt(dayService.getTimeStamp().toLocalDate().atStartOfDay()); // You can change this depending on user billing preferences
+////		}else {
+////			//String dateString = "2024-10-26 15:30:45" ;
+////			String dateString = bondItemBillReceivableRequest.getStartedAt() + " 00:00:00";
+////			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+////			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+////			bondItemBillReceivable.setStartedAt(dateTime);
+////		}
+//		
+////		if(bondItemBillReceivableRequest.getEndedAt() == null) {
+////			bondItemBillReceivable.setEndedAt(dayService.getTimeStamp().toLocalDate().atStartOfDay()); // You can change this depending on user billing preferences
+////		}else {
+////			//String dateString = "2024-10-26 15:30:45" ;
+////			String dateString = bondItemBillReceivableRequest.getEndedAt() + " 00:00:00";
+////			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+////			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
+////			bondItemBillReceivable.setEndedAt(dateTime);
+////		}
+//		
+//		bondItemBillReceivable.setPrice(bondItem.getBillingAmount());
+//		bondItemBillReceivable.setQty(qty);
+//		bondItemBillReceivable.setDiscount(bondItemBillReceivableRequest.getDiscount());
+//		bondItemBillReceivable.setBillReceivable(billReceivable);
+//		bondItemBillReceivable.setBondItem(bondItem);
+//		
+//		bondItemBillReceivable = bondItemBillReceivableRepository.save(bondItemBillReceivable);
+//
+//		return bondItemBillReceivableDTOMapper(bondItemBillReceivable);
+//	}
+	
+	@Override
+	public BondItemBillReceivableResponseDTO createBondItemBillReceivable(
+	        BondItemBillReceivableRequestDTO request, HttpServletRequest httpRequest) {
 
-		return bondItemBillReceivableDTOMapper(bondItemBillReceivable);
+	    // Formatter for parsing String date (yyyy-MM-dd)
+	    DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+
+	    // 1. Fetch bond item
+	    BondItem bondItem = bondItemRepository.findById(request.getBondItemId())
+	            .orElseThrow(() -> new NotFoundException("BondItem not found."));
+
+	    // 2. Fetch previous receivables
+	    List<BondItemBillReceivable> rcvs = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+
+	    // 3. Resolve FROM date
+	    LocalDateTime fromDate;
+	    if (rcvs.isEmpty()) {
+	        fromDate = bondItem.getStartBillingAt().toLocalDate().atStartOfDay();
+	    } else {
+	        fromDate = rcvs.get(rcvs.size() - 1)
+	                .getEndedAt()
+	                .plusDays(1)
+	                .toLocalDate()
+	                .atStartOfDay();
+	    }
+
+	    // 4. Resolve reference date (endedAt or now)
+	    LocalDateTime referenceDate;
+	    if (request.getEndedAt() != null && !request.getEndedAt().isEmpty()) {
+	        referenceDate = LocalDate.parse(request.getEndedAt(), dateFormatter).atStartOfDay();
+	    } else {
+	        referenceDate = LocalDateTime.now();
+	    }
+
+	    // 5. Calculate elapsed days
+	    long elapsedDays = ChronoUnit.DAYS.between(fromDate, referenceDate);
+
+	    if (elapsedDays <= 0) {
+	        throw new InvalidOperationException(
+	                "Reference date must be after start date: from=" + fromDate + ", ref=" + referenceDate);
+	    }
+
+	    // 6. Convert days → months (1–30 = 1, 31–60 = 2, etc.)
+	    int months = (int) ((elapsedDays - 1) / 30) + 1;
+
+	    // 7. Derive TO date (catch-up billing)
+	    LocalDateTime toDate = fromDate.plusDays(months * 30L);
+
+	    // 8. Calculate billing amount
+	    double totalAmount = (bondItem.getBillingAmount() * months) - request.getDiscount();
+
+	    // 9. Create BillReceivable
+	    BillReceivable billReceivable = new BillReceivable();
+	    billReceivable.setNo(String.valueOf(Math.random())); // TODO: replace with proper generator
+	    billReceivable.setAmount(totalAmount);
+	    billReceivable.setPaid(0);
+	    billReceivable.setDue(totalAmount);
+	    billReceivable.setBranch(bondItem.getBranch());
+	    billReceivable.setCreatedDateTime(dayService.getTimeStamp());
+	    billReceivable.setPayStatus(PayStatus.UNPAID);
+	    billReceivable.setSummary("BondItem bill for bondItem#: " + bondItem.getNo());
+
+	    billReceivable = billReceivableRepository.save(billReceivable);
+	    billReceivable.setNo("BR" + billReceivable.getId());
+	    billReceivable = billReceivableRepository.save(billReceivable);
+
+	    // 10. Create BondItemBillReceivable
+	    BondItemBillReceivable entity = new BondItemBillReceivable();
+	    entity.setStartedAt(fromDate);
+	    entity.setEndedAt(toDate);
+	    entity.setPrice(bondItem.getBillingAmount());
+	    entity.setQty((double) months);
+	    entity.setNoOfDays(months * 30);
+	    entity.setDiscount(request.getDiscount());
+	    entity.setBillReceivable(billReceivable);
+	    entity.setBondItem(bondItem);
+
+	    entity = bondItemBillReceivableRepository.save(entity);
+
+	    // 11. Return DTO
+	    return bondItemBillReceivableDTOMapper(entity);
 	}
 	
 	@Override
@@ -300,55 +383,100 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 		return billResponse;
 	}
 	
+//	private double getUngeneratedBill(BondItem bondItem) {
+//		
+//		double bill = 0;
+//		
+//		List<BondItemBillReceivable> rcvs = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+//		
+//		LocalDateTime fromDate = null;
+//		LocalDateTime toDate = null;
+//		double qty = 0;
+//		
+//		try {
+//			if(rcvs.isEmpty()) {			
+//				// Check for first billing date	// also check issue with timezone, this is temporary solution	
+//				fromDate = bondItem.getStartBillingAt().toLocalDate().atStartOfDay();
+//				
+//				if(toDate == null) toDate = (LocalDateTime.now().plusHours(3)).plusDays(1).toLocalDate().atStartOfDay();	
+//				
+//				if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is before bill starting date");
+//				
+//				long dayCount = ChronoUnit.DAYS.between(fromDate, toDate);
+//				
+//				qty = dayCount;
+//				
+//			}else {
+//				// Take the last bill
+//				fromDate = rcvs.get(rcvs.size() - 1).getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
+//				
+//				if(toDate == null) toDate = (LocalDateTime.now().plusHours(3)).plusDays(1).toLocalDate().atStartOfDay();
+//				
+//				if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is invalid" + toDate.toString() + fromDate.toString());
+//				
+//				long dayCount = ChronoUnit.DAYS.between(fromDate, toDate) + 1;
+//				
+//				qty = dayCount;
+//				
+//			}
+//			
+//			if(qty > 1) qty = qty - 1;
+//			
+//			bill = qty * bondItem.getBillingAmount() * bondItem.getCurrentQty();
+//			if(bondItem.getBillingType().equals("FLAT-RATE")) {
+//				bill = bondItem.getCurrentQty() * bondItem.getBillingAmount();
+//			}
+//			
+//		}catch(Exception e) {
+//			// Do nothing
+//		}
+//		
+//		return bill;
+//	}
+	
 	private double getUngeneratedBill(BondItem bondItem) {
-		
-		double bill = 0;
-		
-		List<BondItemBillReceivable> rcvs = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
-		
-		LocalDateTime fromDate = null;
-		LocalDateTime toDate = null;
-		double qty = 0;
-		
-		try {
-			if(rcvs.isEmpty()) {			
-				// Check for first billing date	// also check issue with timezone, this is temporary solution	
-				fromDate = bondItem.getStartBillingAt().toLocalDate().atStartOfDay();
-				
-				if(toDate == null) toDate = (LocalDateTime.now().plusHours(3)).plusDays(1).toLocalDate().atStartOfDay();	
-				
-				if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is before bill starting date");
-				
-				long dayCount = ChronoUnit.DAYS.between(fromDate, toDate);
-				
-				qty = dayCount;
-				
-			}else {
-				// Take the last bill
-				fromDate = rcvs.get(rcvs.size() - 1).getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
-				
-				if(toDate == null) toDate = (LocalDateTime.now().plusHours(3)).plusDays(1).toLocalDate().atStartOfDay();
-				
-				if(!toDate.isAfter(fromDate)) throw new InvalidOperationException("Current date is invalid" + toDate.toString() + fromDate.toString());
-				
-				long dayCount = ChronoUnit.DAYS.between(fromDate, toDate) + 1;
-				
-				qty = dayCount;
-				
-			}
-			
-			if(qty > 1) qty = qty - 1;
-			
-			bill = qty * bondItem.getBillingAmount() * bondItem.getCurrentQty();
-			if(bondItem.getBillingType().equals("FLAT-RATE")) {
-				bill = bondItem.getCurrentQty() * bondItem.getBillingAmount();
-			}
-			
-		}catch(Exception e) {
-			// Do nothing
-		}
-		
-		return bill;
+
+	    List<BondItemBillReceivable> rcvs = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+
+	    // 1. Determine start point (last billed + 1 day OR initial start)
+	    LocalDateTime fromDate;
+	    if (rcvs.isEmpty()) {
+	        fromDate = bondItem.getStartBillingAt().toLocalDate().atStartOfDay();
+	    } else {
+	        fromDate = rcvs.get(rcvs.size() - 1)
+	                .getEndedAt()
+	                .plusDays(1)
+	                .toLocalDate()
+	                .atStartOfDay();
+	    }
+
+	    // 2. Use today as reference
+	    LocalDateTime today = LocalDate.now().atStartOfDay();
+
+	    // 3. If nothing to bill yet
+	    if (!today.isAfter(fromDate)) {
+	        return 0;
+	    }
+
+	    // 4. Calculate elapsed days
+	    long elapsedDays = ChronoUnit.DAYS.between(fromDate, today);
+
+	    if (elapsedDays <= 0) {
+	        return 0;
+	    }
+
+	    // 5. Convert to 30-day buckets
+	    int months = (int) ((elapsedDays - 1) / 30) + 1;
+
+	    // 6. Calculate bill
+	    double bill;
+	    if ("FLAT-RATE".equals(bondItem.getBillingType())) {
+	        bill = bondItem.getBillingAmount() * bondItem.getCurrentQty();
+	    } else {
+	        bill = months * bondItem.getBillingAmount() * bondItem.getCurrentQty();
+	    }
+
+	    return bill;
 	}
 	
 	private BondItemBillReceivableResponseDTO bondItemBillReceivableDTOMapper(BondItemBillReceivable bondItemBillReceivable) {

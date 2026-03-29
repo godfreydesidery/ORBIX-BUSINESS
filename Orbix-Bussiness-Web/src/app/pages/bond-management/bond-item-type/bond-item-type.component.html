@@ -22,8 +22,8 @@
                                 <th>SN</th>
                                 <th>Type Code</th>
                                 <th>Type Name</th>
-                                <th>Company</th>
-                                <th>Price(Daily)</th>
+                                <th>Price(Monthly)</th>
+                                <th>Currency</th>
                                 <th>Active</th>
                                 <th>Action</th>
                             </tr>
@@ -34,8 +34,8 @@
                                     <td>{{v.sn}}</td>
                                     <td>{{v.code}}</td>
                                     <td>{{v.name}}</td>
-                                    <td>{{v.companyName}}</td>
-                                    <td style="text-align: right;">{{v.dailyPrice | currency:'':''}}</td>
+                                    <td style="text-align: center;">{{v.dailyPrice | currency:'':''}}</td>
+                                    <td>{{v.currency}}</td>
                                     <td>
                                         <span *ngIf="v.active ==='Active'">Lock__</span><span *ngIf="v.active ==='Inactive'">Unlock </span> | 
                                         <button *ngIf="v.active ==='Active'" (click)="deactivate(v.id)"><i class="fa fa-unlock text-success"></i></button>
@@ -75,16 +75,25 @@
                     </div>
                 </div>
                 <div class="row">
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                         <div class="form-group">
                             <label>Type Name</label>
                             <input class="form-control" type="text" [(ngModel)]="name" autocomplete="nope">
                         </div>   
                     </div>  
-                    <div class="col-lg-6">
+                    <div class="col-lg-4">
                         <div class="form-group">
-                            <label>Price(Daily)</label>
+                            <label>Price(Monthly)</label>
                             <input class="form-control" type="text" [(ngModel)]="dailyPrice" autocomplete="nope" style="text-align: right;">
+                        </div>               
+                    </div> 
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label>Select Currency</label>
+                            <select class="form-control" [(ngModel)]="currency">
+                                <option>TZS</option>
+                                <option>USD</option>
+                            </select>
                         </div>               
                     </div>                   
                 </div>

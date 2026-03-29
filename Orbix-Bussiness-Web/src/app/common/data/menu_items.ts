@@ -894,6 +894,10 @@ export const menuItems = [
                         routerLink: '/app/admin-unit/shop'
                     },
                     {
+                        title: 'Currency Conv',
+                        routerLink: '/app/admin-unit/currency-conversion'
+                    },
+                    {
                         title: 'Workshop',
                         routerLink: '/app/admin-unit/workshop'
                     },

@@ -58,22 +58,32 @@ public class CurrencyConversionServiceController implements CurrencyConversionSe
         return currencyConversionResponseDTOMapper(conversion);
     }
 
-    @Override
-    public CurrencyConversionResponseDTO updateCurrencyConversion(CurrencyConversionRequestDTO conversionRequest, HttpServletRequest request) {
-        Optional<CurrencyConversion> conversion = currencyConversionRepository.findById(conversionRequest.getId());
-        if(conversion.isEmpty()) {
-            throw new NotFoundException("Currency Conversion not found");
-        }
-        
-        CurrencyConversion existingConversion = conversion.get();
-        existingConversion.setSourceCurrencyValue(conversionRequest.getSourceCurrencyValue());
-        existingConversion.setFinalCurrencyValue(conversionRequest.getFinalCurrencyValue());
-        existingConversion.setActive(conversionRequest.isActive());
+	@Override
+	public CurrencyConversionResponseDTO updateCurrencyConversion(CurrencyConversionRequestDTO conversionRequest,
+			HttpServletRequest request) {
+		Optional<CurrencyConversion> conversion = currencyConversionRepository.findById(conversionRequest.getId());
+		if (conversion.isEmpty()) {
+			throw new NotFoundException("Currency Conversion not found");
+		}
 
-        existingConversion = currencyConversionRepository.save(existingConversion);
-        
-        return currencyConversionResponseDTOMapper(existingConversion);
-    }
+		if (!conversion.get().getSourceCurrencyCode()
+				.equals(java.util.Currency.getInstance(conversionRequest.getSourceCurrencyCode().getCurrencyCode())))
+			throw new InvalidOperationException("Changing source currency code is not allowed");
+		
+		if (!conversion.get().getFinalCurrencyCode()
+				.equals(java.util.Currency.getInstance(conversionRequest.getFinalCurrencyCode().getCurrencyCode())))
+			throw new InvalidOperationException("Changing final currency code is not allowed");
+
+
+		CurrencyConversion existingConversion = conversion.get();
+		existingConversion.setSourceCurrencyValue(conversionRequest.getSourceCurrencyValue());
+		existingConversion.setFinalCurrencyValue(conversionRequest.getFinalCurrencyValue());
+		existingConversion.setActive(conversionRequest.isActive());
+
+		existingConversion = currencyConversionRepository.save(existingConversion);
+
+		return currencyConversionResponseDTOMapper(existingConversion);
+	}
     
     private CurrencyConversionResponseDTO currencyConversionResponseDTOMapper(CurrencyConversion conversion) {
         CurrencyConversionResponseDTO response = new CurrencyConversionResponseDTO();

@@ -12,6 +12,8 @@ export interface IBondItemType {
 
     active : string
 
+    currency : string
+
     company : ICompany
 
     companyName : string

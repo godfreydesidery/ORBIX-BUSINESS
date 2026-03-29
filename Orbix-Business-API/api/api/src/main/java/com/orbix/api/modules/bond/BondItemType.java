@@ -42,6 +42,9 @@ public class BondItemType {
 	@Column(nullable = false)
 	private String name;
 	
+	@Column(name = "currency")
+	java.util.Currency currency;
+	
 	double dailyPrice = 0;
 	boolean dailyPriceActive = true;
 	double hourlyPrice = 0;

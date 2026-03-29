@@ -93,6 +93,8 @@ public class BondItemTypeServiceController implements BondItemTypeService {
 		bondItemType.setDailyPrice(bondItemTypeRequest.getDailyPrice());
 		bondItemType.setCompany(company_.get());
 		
+		bondItemType.setCurrency(java.util.Currency.getInstance(bondItemTypeRequest.getCurrency().getCurrencyCode()));
+		
 		bondItemType.setCreatedByUser(userService.getUser(request));
 		bondItemType.setCreatedDateTime(dayService.getTimeStamp());
 		
@@ -119,6 +121,9 @@ public class BondItemTypeServiceController implements BondItemTypeService {
 		BondItemType bondItemType = bondItemType_.get();
 		bondItemType.setName(bondItemTypeRequest.getName());
 		bondItemType.setDailyPrice(bondItemTypeRequest.getDailyPrice());
+		
+		bondItemType.setCurrency(java.util.Currency.getInstance(bondItemTypeRequest.getCurrency().getCurrencyCode()));
+
 				
 		bondItemType = bondItemTypeRepository.save(bondItemType);
 		
@@ -163,6 +168,7 @@ public class BondItemTypeServiceController implements BondItemTypeService {
 		bondItemTypeResponse.setName(bondItemType.getName());
 		bondItemTypeResponse.setDailyPrice(String.valueOf(bondItemType.getDailyPrice()));
 		bondItemTypeResponse.setCompanyName(bondItemType.getCompany().getName());
+		bondItemTypeResponse.setCurrency(bondItemType.getCurrency().toString());
 	
 		if(bondItemType.isActive()) {
 			bondItemTypeResponse.setActive("Active");

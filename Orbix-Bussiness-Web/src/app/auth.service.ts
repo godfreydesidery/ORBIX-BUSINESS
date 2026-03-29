@@ -78,6 +78,11 @@ export class AuthService {
     localStorage.removeItem('selected-warehouse-code')
     localStorage.removeItem('selected-warehouse-name')
 
+    // Remove warehouses
+    localStorage.removeItem('selected-bond-zone-id')
+    localStorage.removeItem('selected-bond-zone-code')
+    localStorage.removeItem('selected-bond-zone-name')
+
     // Remove workshops
     localStorage.removeItem('selected-workshop-id')
     localStorage.removeItem('selected-workshop-code')

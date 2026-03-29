@@ -123,23 +123,6 @@ public class MainApplication {
 		SpringApplication.run(MainApplication.class, args);
 	}
 	
-	
-	
-	
-	
-	
-	
-	//@Bean
-	//void updateRecords() {
-		//thread to update patient records periodically
-		//UpdatePatient updatePatient = new UpdatePatient(
-		
-				//dayService
-				//;
-	   // Thread updatePatientThread = new Thread(updatePatient);
-	   // updatePatientThread.start();
-	//}
-	
 	@Bean
 	PasswordEncoder passwordEncoder() {
 		return new BCryptPasswordEncoder();

@@ -15,6 +15,7 @@ import { ProductComponent } from './inventory/product/product.component';
 import { RestaurantComponent } from './administration-units/restaurant/restaurant.component';
 import { WorkshopComponent } from './administration-units/workshop/workshop.component';
 import { version } from 'moment';
+import { CurrencyConversionComponent } from './administration-units/currency-conversion/currency-conversion.component';
 
 export const routes: Routes = [
   {
@@ -90,6 +91,12 @@ export const routes: Routes = [
         path : 'admin-unit/shop',
         loadComponent : () => import('./administration-units/administration-units.routes').then(c => ShopComponent),
         data : { breadcrumb : 'Admin Unit/Shop'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'admin-unit/currency-conversion',
+        loadComponent : () => import('./administration-units/administration-units.routes').then(c => CurrencyConversionComponent),
+        data : { breadcrumb : 'Admin Unit/Currency Conversion'},
         canActivate : [AuthGuard]
       },
       {
