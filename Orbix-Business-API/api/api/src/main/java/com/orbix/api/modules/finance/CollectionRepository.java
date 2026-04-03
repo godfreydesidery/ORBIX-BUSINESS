@@ -377,6 +377,37 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
 	
 	@Query(
 		    value = "SELECT " +
+		            "brc.amount AS amount, " +  
+		            "c.pay_code AS payCode, " +
+		            "c.collection_date_time AS dateTime, " +
+		            "brc.reason AS reason, " +
+		            "p.bond_item_name AS bondItemName, " +
+		            "p.owner_first_name AS ownerFirstName, " +
+		            "p.owner_last_name AS ownerLastName, " +
+		            "p.owner_phone_no AS ownerPhoneNo, " +
+		            "p.created_date_time AS createdDateTime, " +
+		            "pbr.qty AS days, " +
+		            "pbr.discount AS discount, " +
+		            "u.nickname AS cashierName, " +
+		            "bz.id AS bondZoneId, " +              
+		            "bz.name AS bondZoneName " +          
+		            "FROM bill_receivable_collections brc " +
+		            "JOIN collections c ON brc.collection_id = c.id " +
+		            "JOIN users u ON c.collected_by_user_id = u.id " +
+		            "JOIN bill_receivables br ON brc.bill_receivable_id = br.id " +
+		            "JOIN bond_item_bill_receivables pbr ON pbr.bill_receivable_id = br.id " +
+		            "JOIN bond_items p ON p.id = pbr.bond_item_id " +
+		            "JOIN bond_zones bz ON p.bond_zone_id = bz.id " +   
+		            "WHERE c.collection_date_time BETWEEN :startDate AND :endDate",
+		    nativeQuery = true
+		)
+		List<IBondItemCollection> findBondItemCollectionsBetweenDates(
+		    @Param("startDate") LocalDateTime startDate,
+		    @Param("endDate") LocalDateTime endDate
+		);
+	
+	@Query(
+		    value = "SELECT " +
 		            "bill_receivable_collections.amount AS amount, " +  
 		            "collections.pay_code AS payCode, " +
 		            "collections.collection_date_time AS dateTime, " +
@@ -554,6 +585,23 @@ interface IStorageCollection {
     double getDays();
     double getDiscount();
     String getCashierName();
+}
+
+interface IBondItemCollection {
+    String getAmount();
+    String getPayCode();
+    String getDateTime();
+    String getReason();
+    String getBondItemName();
+    String getOwnerFirstName();
+    String getOwnerLastName();
+    String getOwnerPhoneNo();
+    String getCreatedDateTime();
+    double getDays();
+    double getDiscount();
+    String getCashierName();
+    Long getBondZoneId();
+    String getBondZoneName();
 }
 
 interface IMaintenanceCollection {

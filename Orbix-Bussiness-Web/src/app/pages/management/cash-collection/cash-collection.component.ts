@@ -1,7 +1,7 @@
 import { CommonModule, formatDate } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Component } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { PosReceiptPrinterService } from '@services/custom/pos-receipt-printer.service';
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -12,12 +12,14 @@ import { HttpHeaders } from '@angular/common/http';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 
 import { environment } from 'src/environments/environment';
-import { ICashCollection, IMaintenanceCashCollection, IParkingCashCollection, IParkingServiceCashCollection, IRestaurantSalesCashCollection, ISalesCashCollection, IStorageCashCollection, IWeighCashCollection, IWorkshopCashCollection } from 'src/app/domain/cash-collection';
+import { IBondItemCashCollection, ICashCollection, IMaintenanceCashCollection, IParkingCashCollection, IParkingServiceCashCollection, IRestaurantSalesCashCollection, ISalesCashCollection, IStorageCashCollection, IWeighCashCollection, IWorkshopCashCollection } from 'src/app/domain/cash-collection';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
 
+import { FormControl } from '@angular/forms';
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
+
+var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 @Component({
@@ -28,530 +30,611 @@ const API_URL = environment.apiUrl;
     CommonModule,
     SearchFilterPipe,
     NgxPaginationModule,
-    RouterModule
+    RouterModule,
+    ReactiveFormsModule
   ],
   templateUrl: './cash-collection.component.html',
   styleUrl: './cash-collection.component.scss'
 })
 export class CashCollectionComponent {
-  documentHeader! : any
+  documentHeader!: any
 
-  from : Date | string | null = null
-  to : Date | string | null = null
+  from: Date | string | null = null
+  to: Date | string | null = null
+
+  zoneControl = new FormControl('');
+
 
   nickname = ''
 
   constructor(
-    private http :HttpClient,
-    private auth : AuthService,
+    private http: HttpClient,
+    private auth: AuthService,
     private route: ActivatedRoute,
-    private router : Router,
-    private printer : PosReceiptPrinterService,
-    private msg : MsgBoxService,
-    private data : DataService,
-    ){} //{(window as any).pdfMake.vfs = pdfFonts.pdfMake.vfs;}
+    private router: Router,
+    private printer: PosReceiptPrinterService,
+    private msg: MsgBoxService,
+    private data: DataService,
+  ) { } //{(window as any).pdfMake.vfs = pdfFonts.pdfMake.vfs;}
 
-    ngOnInit() {
-      const today = new Date();
-      this.from = today.toISOString().split('T')[0];
-      this.to = today.toISOString().split('T')[0];
+  ngOnInit() {
+    const today = new Date();
+    this.from = today.toISOString().split('T')[0];
+    this.to = today.toISOString().split('T')[0];
 
-      this.getTotalsByDates(this.from, this.to);
-      this.getBranchUserNames();
-    }
+    this.getTotalsByDates(this.from, this.to);
+    this.getBranchUserNames();
 
-    cashCollections : ICashCollection[] = []
-    totalCollections : number = 0
+  }
 
-  async getTotalsByDates(from : Date | string | null, to : Date | string | null) {
-    if(from == null || to == null) {
+  cashCollections: ICashCollection[] = []
+  totalCollections: number = 0
+
+  async getTotalsByDates(from: Date | string | null, to: Date | string | null) {
+    if (from == null || to == null) {
       from = new Date()
       to = new Date()
     }
 
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var args = {
-      from : from,
-      to : to,
+      from: from,
+      to: to,
     }
 
     this.cashCollections = []
     this.totalCollections = 0
-    
-
-    await this.http.post<ICashCollection[]>(API_URL+'/finance_reports/get_cash_collections_by_dates?nickname=' + this.nickname, args, options)
-        .toPromise()
-        .then(
-          data => {
-
-            this.cashCollections = data!
-
-            var sn = 1
-            this.totalCollections = 0
-            this.cashCollections.forEach(element => {
-              element.sn = sn
-              this.totalCollections = this.totalCollections + (+element.amount)
-              sn = sn + 1
-            })
 
 
-            
-            console.log(data)
-          }
-        )
-        .catch(
-          error => {
-            this.msg.showErrorMessage(error, 'Error')
-            
-            console.log(error)
-          }
-        )
+    await this.http.post<ICashCollection[]>(API_URL + '/finance_reports/get_cash_collections_by_dates?nickname=' + this.nickname, args, options)
+      .toPromise()
+      .then(
+        data => {
+
+          this.cashCollections = data!
+
+          var sn = 1
+          this.totalCollections = 0
+          this.cashCollections.forEach(element => {
+            element.sn = sn
+            this.totalCollections = this.totalCollections + (+element.amount)
+            sn = sn + 1
+          })
 
 
-    return 0; 
+
+          console.log(data)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+
+          console.log(error)
+        }
+      )
+
+
+    return 0;
   }
 
-  parkingCashCollections : IParkingCashCollection[] = []
-  totalParkingCashCollections : number = 0
+  parkingCashCollections: IParkingCashCollection[] = []
+  totalParkingCashCollections: number = 0
 
-  async getParkingDetailedTotalsByDates(from : Date | string | null, to : Date | string | null) {
-    if(from == null || to == null) {
+  async getParkingDetailedTotalsByDates(from: Date | string | null, to: Date | string | null) {
+    if (from == null || to == null) {
       from = new Date()
       to = new Date()
     }
 
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var args = {
-      from : from,
-      to : to,
+      from: from,
+      to: to,
     }
 
     this.parkingCashCollections = []
     this.totalParkingCashCollections = 0
-    
-
-    await this.http.post<IParkingCashCollection[]>(API_URL+'/finance_reports/get_parking_detailed_collections_by_dates', args, options)
-        .toPromise()
-        .then(
-          data => {
-
-            this.parkingCashCollections = data!
-
-            var sn = 1
-            this.totalParkingCashCollections = 0
-            this.parkingCashCollections.forEach(element => {
-              element.sn = sn
-              this.totalParkingCashCollections = this.totalParkingCashCollections + (+element.amount)
-              sn = sn + 1
-            })
 
 
-            
-            console.log(data)
-          }
-        )
-        .catch(
-          error => {
-            this.msg.showErrorMessage(error, 'Error')
-            
-            console.log(error)
-          }
-        )
+    await this.http.post<IParkingCashCollection[]>(API_URL + '/finance_reports/get_parking_detailed_collections_by_dates', args, options)
+      .toPromise()
+      .then(
+        data => {
+
+          this.parkingCashCollections = data!
+
+          var sn = 1
+          this.totalParkingCashCollections = 0
+          this.parkingCashCollections.forEach(element => {
+            element.sn = sn
+            this.totalParkingCashCollections = this.totalParkingCashCollections + (+element.amount)
+            sn = sn + 1
+          })
 
 
-    return 0; 
+
+          console.log(data)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+
+          console.log(error)
+        }
+      )
+
+
+    return 0;
   }
 
 
-  parkingServiceCashCollections : IParkingServiceCashCollection[] = []
-    totalParkingServiceCashCollections : number = 0
+  parkingServiceCashCollections: IParkingServiceCashCollection[] = []
+  totalParkingServiceCashCollections: number = 0
 
-  async getParkingServiceDetailedTotalsByDates(from : Date | string | null, to : Date | string | null) {
-    if(from == null || to == null) {
+  async getParkingServiceDetailedTotalsByDates(from: Date | string | null, to: Date | string | null) {
+    if (from == null || to == null) {
       from = new Date()
       to = new Date()
     }
 
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var args = {
-      from : from,
-      to : to,
+      from: from,
+      to: to,
     }
 
     this.parkingServiceCashCollections = []
     this.totalParkingServiceCashCollections = 0
-    
-
-    await this.http.post<IParkingServiceCashCollection[]>(API_URL+'/finance_reports/get_parking_service_detailed_collections_by_dates', args, options)
-        .toPromise()
-        .then(
-          data => {
-
-            this.parkingServiceCashCollections = data!
-
-            var sn = 1
-            this.totalParkingServiceCashCollections = 0
-            this.parkingServiceCashCollections.forEach(element => {
-              element.sn = sn
-              this.totalParkingServiceCashCollections = this.totalParkingServiceCashCollections + (+element.amount)
-              sn = sn + 1
-            })
 
 
-            
-            console.log(data)
-          }
-        )
-        .catch(
-          error => {
-            this.msg.showErrorMessage(error, 'Error')
-            
-            console.log(error)
-          }
-        )
+    await this.http.post<IParkingServiceCashCollection[]>(API_URL + '/finance_reports/get_parking_service_detailed_collections_by_dates', args, options)
+      .toPromise()
+      .then(
+        data => {
+
+          this.parkingServiceCashCollections = data!
+
+          var sn = 1
+          this.totalParkingServiceCashCollections = 0
+          this.parkingServiceCashCollections.forEach(element => {
+            element.sn = sn
+            this.totalParkingServiceCashCollections = this.totalParkingServiceCashCollections + (+element.amount)
+            sn = sn + 1
+          })
 
 
-    return 0; 
+
+          console.log(data)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+
+          console.log(error)
+        }
+      )
+
+
+    return 0;
   }
 
-  salesCashCollections : ISalesCashCollection[] = []
-  totalSalesCashCollections : number = 0
-  async getSalesDetailedTotalsByDates(from : Date | string | null, to : Date | string | null) {
-    if(from == null || to == null) {
+  salesCashCollections: ISalesCashCollection[] = []
+  totalSalesCashCollections: number = 0
+  async getSalesDetailedTotalsByDates(from: Date | string | null, to: Date | string | null) {
+    if (from == null || to == null) {
       from = new Date()
       to = new Date()
     }
 
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var args = {
-      from : from,
-      to : to,
+      from: from,
+      to: to,
     }
 
     this.salesCashCollections = []
     this.totalSalesCashCollections = 0
-    
-
-    await this.http.post<ISalesCashCollection[]>(API_URL+'/finance_reports/get_sales_detailed_collections_by_dates', args, options)
-        .toPromise()
-        .then(
-          data => {
-
-            this.salesCashCollections = data!
-
-            var sn = 1
-            this.totalSalesCashCollections = 0
-            this.salesCashCollections.forEach(element => {
-              element.sn = sn
-              this.totalSalesCashCollections = this.totalSalesCashCollections + (+element.amount)
-              sn = sn + 1
-            })
 
 
-            
-            console.log(data)
-          }
-        )
-        .catch(
-          error => {
-            this.msg.showErrorMessage(error, 'Error')
-            
-            console.log(error)
-          }
-        )
+    await this.http.post<ISalesCashCollection[]>(API_URL + '/finance_reports/get_sales_detailed_collections_by_dates', args, options)
+      .toPromise()
+      .then(
+        data => {
+
+          this.salesCashCollections = data!
+
+          var sn = 1
+          this.totalSalesCashCollections = 0
+          this.salesCashCollections.forEach(element => {
+            element.sn = sn
+            this.totalSalesCashCollections = this.totalSalesCashCollections + (+element.amount)
+            sn = sn + 1
+          })
 
 
-    return 0; 
+
+          console.log(data)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+
+          console.log(error)
+        }
+      )
+
+
+    return 0;
   }
 
-  restaurantSalesCashCollections : IRestaurantSalesCashCollection[] = []
-  totalRestaurantSalesCashCollections : number = 0
-  async getRestaurantSalesDetailedTotalsByDates(from : Date | string | null, to : Date | string | null) {
-    if(from == null || to == null) {
+  restaurantSalesCashCollections: IRestaurantSalesCashCollection[] = []
+  totalRestaurantSalesCashCollections: number = 0
+  async getRestaurantSalesDetailedTotalsByDates(from: Date | string | null, to: Date | string | null) {
+    if (from == null || to == null) {
       from = new Date()
       to = new Date()
     }
 
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var args = {
-      from : from,
-      to : to,
+      from: from,
+      to: to,
     }
 
     this.restaurantSalesCashCollections = []
     this.totalRestaurantSalesCashCollections = 0
-    
-
-    await this.http.post<IRestaurantSalesCashCollection[]>(API_URL+'/finance_reports/get_restaurant_sales_detailed_collections_by_dates', args, options)
-        .toPromise()
-        .then(
-          data => {
-
-            this.restaurantSalesCashCollections = data!
-
-            var sn = 1
-            this.totalRestaurantSalesCashCollections = 0
-            this.restaurantSalesCashCollections.forEach(element => {
-              element.sn = sn
-              this.totalRestaurantSalesCashCollections = this.totalRestaurantSalesCashCollections + (+element.amount)
-              sn = sn + 1
-            })
 
 
-            
-            console.log(data)
-          }
-        )
-        .catch(
-          error => {
-            this.msg.showErrorMessage(error, 'Error')
-            
-            console.log(error)
-          }
-        )
+    await this.http.post<IRestaurantSalesCashCollection[]>(API_URL + '/finance_reports/get_restaurant_sales_detailed_collections_by_dates', args, options)
+      .toPromise()
+      .then(
+        data => {
+
+          this.restaurantSalesCashCollections = data!
+
+          var sn = 1
+          this.totalRestaurantSalesCashCollections = 0
+          this.restaurantSalesCashCollections.forEach(element => {
+            element.sn = sn
+            this.totalRestaurantSalesCashCollections = this.totalRestaurantSalesCashCollections + (+element.amount)
+            sn = sn + 1
+          })
 
 
-    return 0; 
+
+          console.log(data)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+
+          console.log(error)
+        }
+      )
+
+
+    return 0;
   }
 
 
-  storageCashCollections : IStorageCashCollection[] = []
-  totalStorageCashCollections : number = 0
+  storageCashCollections: IStorageCashCollection[] = []
+  totalStorageCashCollections: number = 0
 
-  async getStorageDetailedTotalsByDates(from : Date | string | null, to : Date | string | null) {
-    if(from == null || to == null) {
+  async getStorageDetailedTotalsByDates(from: Date | string | null, to: Date | string | null) {
+    if (from == null || to == null) {
       from = new Date()
       to = new Date()
     }
 
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var args = {
-      from : from,
-      to : to,
+      from: from,
+      to: to,
     }
 
     this.storageCashCollections = []
     this.totalStorageCashCollections = 0
-    
-
-    await this.http.post<IStorageCashCollection[]>(API_URL+'/finance_reports/get_storage_detailed_collections_by_dates', args, options)
-        .toPromise()
-        .then(
-          data => {
-
-            this.storageCashCollections = data!
-
-            var sn = 1
-            this.totalStorageCashCollections = 0
-            this.storageCashCollections.forEach(element => {
-              element.sn = sn
-              this.totalStorageCashCollections = this.totalStorageCashCollections + (+element.amount)
-              sn = sn + 1
-            })
 
 
-            
-            console.log(data)
-          }
-        )
-        .catch(
-          error => {
-            this.msg.showErrorMessage(error, 'Error')
-            
-            console.log(error)
-          }
-        )
+    await this.http.post<IStorageCashCollection[]>(API_URL + '/finance_reports/get_storage_detailed_collections_by_dates', args, options)
+      .toPromise()
+      .then(
+        data => {
+
+          this.storageCashCollections = data!
+
+          var sn = 1
+          this.totalStorageCashCollections = 0
+          this.storageCashCollections.forEach(element => {
+            element.sn = sn
+            this.totalStorageCashCollections = this.totalStorageCashCollections + (+element.amount)
+            sn = sn + 1
+          })
 
 
-    return 0; 
+
+          console.log(data)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+
+          console.log(error)
+        }
+      )
+
+
+    return 0;
   }
 
 
-  maintenanceCashCollections : IMaintenanceCashCollection[] = []
-  totalMaintenanceCashCollections : number = 0
+  bondItemCashCollections: IBondItemCashCollection[] = []
+  filteredBondItemCashCollections: IBondItemCashCollection[] = []
+  totalBondItemCashCollections: number = 0
 
-  async getMaintenanceDetailedTotalsByDates(from : Date | string | null, to : Date | string | null) {
-    if(from == null || to == null) {
+  selectedBondItemName: string = ''
+
+  async getBondItemDetailedTotalsByDates(from: Date | string | null, to: Date | string | null) {
+    if (from == null || to == null) {
       from = new Date()
       to = new Date()
     }
 
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var args = {
-      from : from,
-      to : to,
+      from: from,
+      to: to,
+    }
+
+    this.bondItemCashCollections = []
+    this.filteredBondItemCashCollections = []
+    this.totalBondItemCashCollections = 0
+
+
+    await this.http.post<IBondItemCashCollection[]>(API_URL + '/finance_reports/get_bond_item_detailed_collections_by_dates', args, options)
+      .toPromise()
+      .then(
+        data => {
+          this.bondItemCashCollections = data!
+          this.filteredBondItemCashCollections = this.bondItemCashCollections
+          var sn = 1
+          this.totalBondItemCashCollections = 0
+          this.filteredBondItemCashCollections.forEach(element => {
+            element.sn = sn
+            this.totalBondItemCashCollections = this.totalBondItemCashCollections + (+element.amount)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+          console.log(error)
+        }
+      )
+    return 0;
+  }
+
+  selectedBondZoneName = '--All--'
+
+  filterBondItems(bondZoneName: string) {
+    this.filteredBondItemCashCollections = [];
+    this.totalBondItemCashCollections = 0;
+
+    let sn = 1;
+
+    this.filteredBondItemCashCollections = this.bondItemCashCollections
+      .filter(element => {
+        return !bondZoneName || element.bondZoneName === bondZoneName;
+      })
+      .map(element => ({
+        ...element,
+        sn: sn++
+      }));
+
+    this.totalBondItemCashCollections =
+      this.filteredBondItemCashCollections.reduce(
+        (sum, item) => sum + (+item.amount),
+        0
+      );
+  }
+
+
+  maintenanceCashCollections: IMaintenanceCashCollection[] = []
+  totalMaintenanceCashCollections: number = 0
+
+  async getMaintenanceDetailedTotalsByDates(from: Date | string | null, to: Date | string | null) {
+    if (from == null || to == null) {
+      from = new Date()
+      to = new Date()
+    }
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+
+    var args = {
+      from: from,
+      to: to,
     }
 
     this.maintenanceCashCollections = []
     this.totalMaintenanceCashCollections = 0
-    
-
-    await this.http.post<IMaintenanceCashCollection[]>(API_URL+'/finance_reports/get_maintenance_detailed_collections_by_dates', args, options)
-        .toPromise()
-        .then(
-          data => {
-
-            this.maintenanceCashCollections = data!
-
-            var sn = 1
-            this.totalMaintenanceCashCollections = 0
-            this.maintenanceCashCollections.forEach(element => {
-              element.sn = sn
-              this.totalMaintenanceCashCollections = this.totalMaintenanceCashCollections + (+element.amount)
-              sn = sn + 1
-            })
 
 
-            
-            console.log(data)
-          }
-        )
-        .catch(
-          error => {
-            this.msg.showErrorMessage(error, 'Error')
-            
-            console.log(error)
-          }
-        )
+    await this.http.post<IMaintenanceCashCollection[]>(API_URL + '/finance_reports/get_maintenance_detailed_collections_by_dates', args, options)
+      .toPromise()
+      .then(
+        data => {
+
+          this.maintenanceCashCollections = data!
+
+          var sn = 1
+          this.totalMaintenanceCashCollections = 0
+          this.maintenanceCashCollections.forEach(element => {
+            element.sn = sn
+            this.totalMaintenanceCashCollections = this.totalMaintenanceCashCollections + (+element.amount)
+            sn = sn + 1
+          })
 
 
-    return 0; 
+
+          console.log(data)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+
+          console.log(error)
+        }
+      )
+
+
+    return 0;
   }
 
-  weighCashCollections : IWeighCashCollection[] = []
-  totalWeighCashCollections : number = 0
+  weighCashCollections: IWeighCashCollection[] = []
+  totalWeighCashCollections: number = 0
 
- 
 
-  async getWeighDetailedTotalsByDates(from : Date | string | null, to : Date | string | null) {
-    if(from == null || to == null) {
+
+  async getWeighDetailedTotalsByDates(from: Date | string | null, to: Date | string | null) {
+    if (from == null || to == null) {
       from = new Date()
       to = new Date()
     }
 
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var args = {
-      from : from,
-      to : to,
+      from: from,
+      to: to,
     }
 
     this.weighCashCollections = []
     this.totalWeighCashCollections = 0
-    
-
-    await this.http.post<IWeighCashCollection[]>(API_URL+'/finance_reports/get_weigh_detailed_collections_by_dates', args, options)
-        .toPromise()
-        .then(
-          data => {
-
-            this.weighCashCollections = data!
-
-            var sn = 1
-            this.totalWeighCashCollections = 0
-            this.weighCashCollections.forEach(element => {
-              element.sn = sn
-              this.totalWeighCashCollections = this.totalWeighCashCollections + (+element.amount)
-              sn = sn + 1
-            })
 
 
-            
-            console.log(data)
-          }
-        )
-        .catch(
-          error => {
-            this.msg.showErrorMessage(error, 'Error')
-            
-            console.log(error)
-          }
-        )
+    await this.http.post<IWeighCashCollection[]>(API_URL + '/finance_reports/get_weigh_detailed_collections_by_dates', args, options)
+      .toPromise()
+      .then(
+        data => {
+
+          this.weighCashCollections = data!
+
+          var sn = 1
+          this.totalWeighCashCollections = 0
+          this.weighCashCollections.forEach(element => {
+            element.sn = sn
+            this.totalWeighCashCollections = this.totalWeighCashCollections + (+element.amount)
+            sn = sn + 1
+          })
 
 
-    return 0; 
+
+          console.log(data)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+
+          console.log(error)
+        }
+      )
+
+
+    return 0;
   }
 
-  
-   workshopCashCollections: IWorkshopCashCollection[] = []
-    totalWorkshopCashCollections: number = 0
-  
-    async getWorkshopDetailedTotalsByDates(from: Date | string | null, to: Date | string | null) {
-      if (from == null || to == null) {
-        from = new Date()
-        to = new Date()
-      }
-  
-      let options = {
-        headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
-      }
-  
-      var args = {
-        from: from,
-        to: to,
-        nickname: this.nickname
-      }
-  
-      this.workshopCashCollections = []
-      this.totalWorkshopCashCollections = 0
-  
-      await this.http.post<IWorkshopCashCollection[]>(API_URL + '/finance_reports/get_workshop_detailed_collections_by_dates', args, options)
-        .toPromise()
-        .then(
-          data => {
-            this.workshopCashCollections = data!
-            var sn = 1
-            this.totalWorkshopCashCollections = 0
-            this.workshopCashCollections.forEach(element => {
-              element.sn = sn
-              this.totalWorkshopCashCollections = this.totalWorkshopCashCollections + (+element.amount)
-              sn = sn + 1
-            })
-            console.log(data)
-          }
-        )
-        .catch(
-          error => {
-            this.msg.showErrorMessage(error, 'Error')
-  
-            console.log(error)
-          }
-        )
-      return 0;
+
+  workshopCashCollections: IWorkshopCashCollection[] = []
+  totalWorkshopCashCollections: number = 0
+
+  async getWorkshopDetailedTotalsByDates(from: Date | string | null, to: Date | string | null) {
+    if (from == null || to == null) {
+      from = new Date()
+      to = new Date()
     }
 
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
 
-  userNames : string[] = []
-  async getBranchUserNames(){
+    var args = {
+      from: from,
+      to: to,
+      nickname: this.nickname
+    }
+
+    this.workshopCashCollections = []
+    this.totalWorkshopCashCollections = 0
+
+    await this.http.post<IWorkshopCashCollection[]>(API_URL + '/finance_reports/get_workshop_detailed_collections_by_dates', args, options)
+      .toPromise()
+      .then(
+        data => {
+          this.workshopCashCollections = data!
+          var sn = 1
+          this.totalWorkshopCashCollections = 0
+          this.workshopCashCollections.forEach(element => {
+            element.sn = sn
+            this.totalWorkshopCashCollections = this.totalWorkshopCashCollections + (+element.amount)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
+      .catch(
+        error => {
+          this.msg.showErrorMessage(error, 'Error')
+
+          console.log(error)
+        }
+      )
+    return 0;
+  }
+
+
+  userNames: string[] = []
+  async getBranchUserNames() {
     this.userNames = []
 
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
-    await this.http.get<string[]>(API_URL+'/users/get_branch_user_names', options)
+    await this.http.get<string[]>(API_URL + '/users/get_branch_user_names', options)
       .toPromise()
       .then(
         data => {
@@ -587,12 +670,12 @@ export class CashCollectionComponent {
 
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Parking Collection Report';
-    const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
+    const fromTo = 'From: ' + this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;
     let discount: number = 0;
-  
+
     const report: any[] = [];
-  
+
     // Add header row
     report.push([
       { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
@@ -605,7 +688,7 @@ export class CashCollectionComponent {
       { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
     ]);
-  
+
     // Add rows dynamically
     this.parkingCashCollections.forEach((element) => {
       // total += parseFloat(element.amount) || 0;
@@ -613,7 +696,7 @@ export class CashCollectionComponent {
 
       total += Number(element.amount) || 0;
       discount += Number(element.discount) || 0;
-  
+
       report.push([
         { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.vehicleEquipmentCategory || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
@@ -626,7 +709,7 @@ export class CashCollectionComponent {
         { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       ]);
     });
-  
+
     // Add summary row
     report.push([
       { text: '', colSpan: 7 },
@@ -639,7 +722,7 @@ export class CashCollectionComponent {
       { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
       { text: '', fontSize: 9, alignment: 'left' },
     ]);
-  
+
     // Define document structure
     const docDefinition: any = {
       header: '',
@@ -655,9 +738,9 @@ export class CashCollectionComponent {
             this.documentHeader,
           ],
         },
-        {text : ' '},
-        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-        {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: ' ' },
+        { text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: fromTo, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         {
           table: {
             widths: [25, 75, 100, 100, 100, 60, 50, 80, 80],
@@ -666,7 +749,7 @@ export class CashCollectionComponent {
         },
       ],
     };
-  
+
     pdfMake.createPdf(docDefinition).print();
   };
 
@@ -675,12 +758,12 @@ export class CashCollectionComponent {
   printParkingServiceCollectionReport = async () => {
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Vehicle Services Collection Report';
-    const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
+    const fromTo = 'From: ' + this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;
     let discount: number = 0;
-  
+
     const report: any[] = [];
-  
+
     // Add header row
     report.push([
       { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
@@ -690,11 +773,11 @@ export class CashCollectionComponent {
       { text: 'Chassis No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Date Registered', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Service', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-      { text: 'Qty', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },      
+      { text: 'Qty', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
     ]);
-  
+
     // Add rows dynamically
     this.parkingServiceCashCollections.forEach((element) => {
       // total += parseFloat(element.amount) || 0;
@@ -702,7 +785,7 @@ export class CashCollectionComponent {
 
       total += Number(element.amount) || 0;
       discount += Number(element.discount) || 0;
-  
+
       report.push([
         { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.vehicleEquipmentCategory || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
@@ -716,7 +799,7 @@ export class CashCollectionComponent {
         { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       ]);
     });
-  
+
     // Add summary row
     report.push([
       { text: '', colSpan: 7 },
@@ -730,7 +813,7 @@ export class CashCollectionComponent {
       { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
       { text: '', fontSize: 9, alignment: 'left' },
     ]);
-  
+
     // Define document structure
     const docDefinition: any = {
       header: '',
@@ -746,9 +829,9 @@ export class CashCollectionComponent {
             this.documentHeader,
           ],
         },
-        {text : ' '},
-        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-        {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: ' ' },
+        { text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: fromTo, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         {
           table: {
             widths: [25, 70, 100, 100, 100, 60, 60, 30, 65, 80],
@@ -757,7 +840,7 @@ export class CashCollectionComponent {
         },
       ],
     };
-  
+
     pdfMake.createPdf(docDefinition).print();
   };
 
@@ -779,12 +862,12 @@ export class CashCollectionComponent {
     }
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Sales Collection Report';
-    const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
+    const fromTo = 'From: ' + this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;
     let discount: number = 0;
-  
+
     const report: any[] = [];
-  
+
     // Add header row
     report.push([
       { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
@@ -794,36 +877,36 @@ export class CashCollectionComponent {
       { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
     ]);
-  
+
     // Add rows dynamically
     this.salesCashCollections.forEach((element) => {
       // total += parseFloat(element.amount) || 0;
       // discount += parseFloat(element.discount) || 0;
 
-      if(Number(element.amount) > 0) total += Number(element.amount) || 0;
-      
-      if(Number(element.discount) > 0) discount += Number(element.discount) || 0;
-  
+      if (Number(element.amount) > 0) total += Number(element.amount) || 0;
+
+      if (Number(element.discount) > 0) discount += Number(element.discount) || 0;
+
       report.push([
-        { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },  
-        { text: element.productName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },    
+        { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.productName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.dateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.qty || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
         { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
         { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       ]);
     });
-  
+
     // Add summary row
     report.push([
-      { text: '', colSpan: 3 },     
+      { text: '', colSpan: 3 },
       {},
       {},
       { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
       { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
       { text: '', fontSize: 9, alignment: 'left' },
     ]);
-  
+
     // Define document structure
     const docDefinition: any = {
       header: '',
@@ -839,9 +922,9 @@ export class CashCollectionComponent {
             this.documentHeader,
           ],
         },
-        {text : ' '},
-        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-        {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: ' ' },
+        { text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: fromTo, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         {
           table: {
             widths: [25, 120, 50, 40, 70, 100],
@@ -850,7 +933,7 @@ export class CashCollectionComponent {
         },
       ],
     };
-  
+
     pdfMake.createPdf(docDefinition).print();
   };
 
@@ -871,12 +954,12 @@ export class CashCollectionComponent {
     }
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Restaurant Sales Collection Report';
-    const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
+    const fromTo = 'From: ' + this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;
     let discount: number = 0;
-  
+
     const report: any[] = [];
-  
+
     // Add header row
     report.push([
       { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
@@ -886,36 +969,36 @@ export class CashCollectionComponent {
       { text: 'Date Time', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
     ]);
-  
+
     // Add rows dynamically
     this.restaurantSalesCashCollections.forEach((element) => {
       // total += parseFloat(element.amount) || 0;
       // discount += parseFloat(element.discount) || 0;
 
-      if(Number(element.amount) > 0) total += Number(element.amount) || 0;
-      
-      if(Number(element.discount) > 0) discount += Number(element.discount) || 0;
-  
+      if (Number(element.amount) > 0) total += Number(element.amount) || 0;
+
+      if (Number(element.discount) > 0) discount += Number(element.discount) || 0;
+
       report.push([
-        { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },  
-        { text: element.productName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },    
+        { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.productName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.qty || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
         { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
         { text: element.dateTime, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       ]);
     });
-  
+
     // Add summary row
     report.push([
-      { text: '', colSpan: 3 },     
+      { text: '', colSpan: 3 },
       {},
       { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
       { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
       {},
       { text: '', fontSize: 9, alignment: 'left' },
     ]);
-  
+
     // Define document structure
     const docDefinition: any = {
       header: '',
@@ -931,9 +1014,9 @@ export class CashCollectionComponent {
             this.documentHeader,
           ],
         },
-        {text : ' '},
-        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-        {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: ' ' },
+        { text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: fromTo, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         {
           table: {
             widths: [25, 120, 40, 60, 100, 100],
@@ -942,7 +1025,7 @@ export class CashCollectionComponent {
         },
       ],
     };
-  
+
     pdfMake.createPdf(docDefinition).print();
   };
 
@@ -964,12 +1047,12 @@ export class CashCollectionComponent {
     }
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Storage Collection Report';
-    const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
+    const fromTo = 'From: ' + this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;
     let discount: number = 0;
-  
+
     const report: any[] = [];
-  
+
     // Add header row
     report.push([
       { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
@@ -983,12 +1066,12 @@ export class CashCollectionComponent {
       { text: 'Payment Date', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
     ]);
-  
+
     // Add rows dynamically
     this.storageCashCollections.forEach((element) => {
-       total = total + (+element.amount) || 0;
-       discount = discount + (+element.discount) || 0;
-  
+      total = total + (+element.amount) || 0;
+      discount = discount + (+element.discount) || 0;
+
       report.push([
         { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.goodName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
@@ -1002,10 +1085,10 @@ export class CashCollectionComponent {
         { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       ]);
     });
-  
+
     // Add summary row
     report.push([
-      { text: ''},
+      { text: '' },
       {},
       {},
       {},
@@ -1016,7 +1099,7 @@ export class CashCollectionComponent {
       {},
       {},
     ]);
-  
+
     // Define document structure
     const docDefinition: any = {
       header: '',
@@ -1032,9 +1115,9 @@ export class CashCollectionComponent {
             this.documentHeader,
           ],
         },
-        {text : ' '},
-        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-        {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: ' ' },
+        { text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: fromTo, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         {
           table: {
             widths: [25, 100, 100, 60, 60, 50, 60, 60, 60, 80],
@@ -1043,7 +1126,109 @@ export class CashCollectionComponent {
         },
       ],
     };
-  
+
+    pdfMake.createPdf(docDefinition).print();
+  };
+
+  printBondItemCollectionReport = async () => {
+    // Set up VFS for pdfMake - try different approaches
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
+      }
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
+    this.documentHeader = await this.data.getDocumentHeaderLandScape();
+    const title = 'Bond Collection Report';
+    const fromTo = 'From: ' + this.from?.toString() + ' To: ' + this.to?.toString();
+    let total: number = 0;
+    let discount: number = 0;
+
+    const report: any[] = [];
+
+    // Add header row
+    report.push([
+      { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Vehicle', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Phone No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Date Registered', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Days', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Discount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Payment Date', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Bond Zone', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+    ]);
+
+    // Add rows dynamically
+    this.filteredBondItemCashCollections.forEach((element) => {
+      total = total + (+element.amount) || 0;
+      discount = discount + (+element.discount) || 0;
+
+      report.push([
+        { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.bondItemName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: `${element.ownerFirstName || ''} ${element.ownerLastName || ''}`, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.ownerPhoneNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.createdDateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.days || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
+        { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+        { text: (Number(element.discount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+        { text: element.dateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.bondZoneName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+      ]);
+    });
+
+    // Add summary row
+    report.push([
+      { text: '' },
+      {},
+      {},
+      {},
+      {},
+      { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
+      { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+      { text: discount.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+      {},
+      {},
+      {},
+    ]);
+
+    // Define document structure
+    const docDefinition: any = {
+      header: '',
+      pageOrientation: 'landscape',
+      footer: (currentPage: any, pageCount: any) => ({
+        text: `${currentPage} of ${pageCount}`,
+        alignment: 'center',
+        fontSize: 8,
+      }),
+      content: [
+        {
+          columns: [
+            this.documentHeader,
+          ],
+        },
+        { text: ' ' },
+        { text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: fromTo, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {
+          table: {
+            widths: [25, 100, 100, 60, 60, 30, 60, 40, 60, 80, 80],
+            body: report,
+          },
+        },
+      ],
+    };
     pdfMake.createPdf(docDefinition).print();
   };
 
@@ -1065,12 +1250,12 @@ export class CashCollectionComponent {
     }
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Maintenance Collection Report';
-    const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
+    const fromTo = 'From: ' + this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;
     let discount: number = 0;
-  
+
     const report: any[] = [];
-  
+
     // Add header row
     report.push([
       { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
@@ -1083,15 +1268,15 @@ export class CashCollectionComponent {
       { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
     ]);
-  
+
     // Add rows dynamically
     this.maintenanceCashCollections.forEach((element) => {
-       total = total + (+element.amount) || 0;
-       discount = discount + (+element.discount) || 0;
+      total = total + (+element.amount) || 0;
+      discount = discount + (+element.discount) || 0;
 
       total += Number(element.amount) || 0;
       discount += Number(element.discount) || 0;
-  
+
       report.push([
         { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: element.issueName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
@@ -1104,7 +1289,7 @@ export class CashCollectionComponent {
         { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       ]);
     });
-  
+
     // Add summary row
     report.push([
       { text: '' },
@@ -1117,7 +1302,7 @@ export class CashCollectionComponent {
       { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
       { text: '', fontSize: 9, alignment: 'left' },
     ]);
-  
+
     // Define document structure
     const docDefinition: any = {
       header: '',
@@ -1133,9 +1318,9 @@ export class CashCollectionComponent {
             this.documentHeader,
           ],
         },
-        {text : ' '},
-        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-        {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: ' ' },
+        { text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: fromTo, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         {
           table: {
             widths: [25, 75, 100, 100, 100, 60, 50, 80, 80],
@@ -1144,7 +1329,7 @@ export class CashCollectionComponent {
         },
       ],
     };
-  
+
     pdfMake.createPdf(docDefinition).print();
   };
 
@@ -1163,15 +1348,15 @@ export class CashCollectionComponent {
     } catch (error) {
       console.log('VFS setup failed, continuing without custom fonts:', error);
     }
-    
+
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Weigh Bridge Collection Report';
-    const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();
+    const fromTo = 'From: ' + this.from?.toString() + ' To: ' + this.to?.toString();
     let total: number = 0;
     let discount: number = 0;
-  
+
     const report: any[] = [];
-  
+
     // Add header row
     report.push([
       { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
@@ -1185,13 +1370,13 @@ export class CashCollectionComponent {
       { text: 'Axle Four', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
       { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
     ]);
-  
+
     // Add rows dynamically
     this.weighCashCollections.forEach((element) => {
 
       total += Number(element.amount) || 0;
       discount += Number(element.discount) || 0;
-  
+
       report.push([
         { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
         { text: `${element.ownerFirstName || ''}`, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
@@ -1205,10 +1390,10 @@ export class CashCollectionComponent {
         { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       ]);
     });
-  
+
     // Add summary row
     report.push([
-      { text: ''},
+      { text: '' },
       {},
       {},
       { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
@@ -1219,7 +1404,7 @@ export class CashCollectionComponent {
       {},
       { text: '', fontSize: 9, alignment: 'left' },
     ]);
-  
+
     // Define document structure
     const docDefinition: any = {
       header: '',
@@ -1235,9 +1420,9 @@ export class CashCollectionComponent {
             this.documentHeader,
           ],
         },
-        {text : ' '},
-        {text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-        {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: ' ' },
+        { text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: fromTo, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         {
           table: {
             widths: [25, 100, 100, 60, 80, 50, 50, 50, 50, 80],
@@ -1246,108 +1431,108 @@ export class CashCollectionComponent {
         },
       ],
     };
-  
+
     pdfMake.createPdf(docDefinition).print();
   };
 
   printWorkshopCollectionReport = async () => {
-      // Set up VFS for pdfMake - try different approaches
-      try {
-        const vfsFonts = require('pdfmake/build/vfs_fonts.js');
-        // Try different possible structures
-        if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
-          (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
-        } else if (vfsFonts.vfs) {
-          (window as any).pdfMake.vfs = vfsFonts.vfs;
-        } else {
-          (window as any).pdfMake.vfs = vfsFonts;
-        }
-      } catch (error) {
-        console.log('VFS setup failed, continuing without custom fonts:', error);
+    // Set up VFS for pdfMake - try different approaches
+    try {
+      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+      // Try different possible structures
+      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+      } else if (vfsFonts.vfs) {
+        (window as any).pdfMake.vfs = vfsFonts.vfs;
+      } else {
+        (window as any).pdfMake.vfs = vfsFonts;
       }
-  
-      this.documentHeader = await this.data.getDocumentHeaderLandScape();
-      const title = 'Workshop Collection Report';
-      const fromTo = 'From: ' + this.from?.toString() + ' To: ' + this.to?.toString();
-      let total: number = 0;
-      let discount: number = 0;
-  
-      const report: any[] = [];
-  
-      // Add header row
+    } catch (error) {
+      console.log('VFS setup failed, continuing without custom fonts:', error);
+    }
+
+    this.documentHeader = await this.data.getDocumentHeaderLandScape();
+    const title = 'Workshop Collection Report';
+    const fromTo = 'From: ' + this.from?.toString() + ' To: ' + this.to?.toString();
+    let total: number = 0;
+    let discount: number = 0;
+
+    const report: any[] = [];
+
+    // Add header row
+    report.push([
+      { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Owner Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Phone No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Machine Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Reg No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Service Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Date Time', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+      { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+    ]);
+
+    // Add rows dynamically
+    this.workshopCashCollections.forEach((element) => {
+
+      total += Number(element.amount) || 0;
+      discount += Number(element.discount) || 0;
+
       report.push([
-        { text: 'SN', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-        { text: 'Owner Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-        { text: 'Phone No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-         { text: 'Machine Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-        { text: 'Reg No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-        { text: 'Service Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-        { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-        { text: 'Date Time', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-        { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+        { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.ownerName, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.ownerPhoneNo, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.machineName, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.regNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.serviceName, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
+        { text: element.createdDateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+        { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
       ]);
-  
-      // Add rows dynamically
-      this.workshopCashCollections.forEach((element) => {
-  
-        total += Number(element.amount) || 0;
-        discount += Number(element.discount) || 0;
-  
-        report.push([
-          { text: element.sn || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-          { text: element.ownerName, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-          { text: element.ownerPhoneNo, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-          { text: element.machineName, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-          { text: element.regNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-          { text: element.serviceName, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-          { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
-          { text: element.createdDateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-          { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-        ]);
-      });
-  
-      // Add summary row
-      report.push([
-        { text: '' },
-        {},
-        {},
-        {},
-        {},
-        { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
-        { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
-        {},
-        { text: '', fontSize: 9, alignment: 'left' },
-      ]);
-  
-      // Define document structure
-      const docDefinition: any = {
-        header: '',
-        pageOrientation: 'landscape',
-        footer: (currentPage: any, pageCount: any) => ({
-          text: `${currentPage} of ${pageCount}`,
-          alignment: 'center',
-          fontSize: 8,
-        }),
-        content: [
-          {
-            columns: [
-              this.documentHeader,
-            ],
+    });
+
+    // Add summary row
+    report.push([
+      { text: '' },
+      {},
+      {},
+      {},
+      {},
+      { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
+      { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+      {},
+      { text: '', fontSize: 9, alignment: 'left' },
+    ]);
+
+    // Define document structure
+    const docDefinition: any = {
+      header: '',
+      pageOrientation: 'landscape',
+      footer: (currentPage: any, pageCount: any) => ({
+        text: `${currentPage} of ${pageCount}`,
+        alignment: 'center',
+        fontSize: 8,
+      }),
+      content: [
+        {
+          columns: [
+            this.documentHeader,
+          ],
+        },
+        { text: ' ' },
+        { text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: fromTo, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        {
+          table: {
+            widths: [25, 100, 100, 60, 80, 100, 50, 50, 100],
+            body: report,
           },
-          { text: ' ' },
-          { text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-          { text: fromTo, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
-          {
-            table: {
-              widths: [25, 100, 100, 60, 80, 100, 50, 50, 100],
-              body: report,
-            },
-          },
-        ],
-      };
-  
-      pdfMake.createPdf(docDefinition).print();
+        },
+      ],
     };
+
+    pdfMake.createPdf(docDefinition).print();
+  };
 
 
 }
