@@ -240,12 +240,15 @@ public class BondItemServiceController implements BondItemService {
 	}
 
 	@Override
-	public List<BondItemResponseDTO> getAllCheckedInBondItems(HttpServletRequest request) {
+	public List<BondItemResponseDTO> getAllCheckedInBondItems(Long bondZoneId, HttpServletRequest request) {
 
+		BondZone bondZone = bondZoneRepository.findById(bondZoneId)
+				.orElseThrow(() -> new NotFoundException("BondZone not found"));
+		
 		List<String> statuses = new ArrayList<>();
 		statuses.add("CHECKED-IN");
 
-		List<BondItem> bondItems = bondItemRepository.findAllByStatusIn(statuses);
+		List<BondItem> bondItems = bondItemRepository.findAllByBondZoneAndStatusIn(bondZone, statuses);
 		List<BondItemResponseDTO> bondItemResponses = new ArrayList<>();
 
 		for (BondItem bondItem : bondItems) {

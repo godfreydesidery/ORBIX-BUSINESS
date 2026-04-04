@@ -19,7 +19,7 @@ public interface BondItemService {
 	List<BondItemResponseDTO> getAllRecentCheckedOutBondItemsByBondZone(Long bondZoneId, HttpServletRequest request);
 	List<BondItemResponseDTO> getAllCleared(HttpServletRequest request);
 	List<BondItemResponseDTO> getTodayCheckedOut(HttpServletRequest request);
-	List<BondItemResponseDTO> getAllCheckedInBondItems(HttpServletRequest request);	
+	List<BondItemResponseDTO> getAllCheckedInBondItems(Long bondZoneId, HttpServletRequest request);	
 	BondItemResponseDTO get(Long id, HttpServletRequest request);
 	List<BondItemBillReceivableResponseDTO> getBondItemBillReceivables(Long id, HttpServletRequest request);
 	BondItemResponseDTO createBondItem(BondItemRequestDTO bondItemRequest, HttpServletRequest request);

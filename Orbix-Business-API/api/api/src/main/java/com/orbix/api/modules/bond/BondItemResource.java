@@ -75,8 +75,10 @@ public class BondItemResource {
 	}
 	
 	@GetMapping("/bond_items/get_all_checked_in")
-	public ResponseEntity<List<BondItemResponseDTO>>getAllCheckedIn(HttpServletRequest request){
-		return ResponseEntity.ok().body(bondItemService.getAllCheckedInBondItems(request));
+	public ResponseEntity<List<BondItemResponseDTO>>getAllCheckedIn(
+			@RequestParam(name = "bond_zone_id") Long bondZoneId,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(bondItemService.getAllCheckedInBondItems(bondZoneId, request));
 	}
 	
 	@GetMapping("/bond_items/get_all_cleared")

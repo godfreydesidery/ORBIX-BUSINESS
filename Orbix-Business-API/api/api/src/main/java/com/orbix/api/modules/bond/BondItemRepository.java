@@ -76,4 +76,6 @@ public interface BondItemRepository extends JpaRepository<BondItem, Long> {
 		List<Object[]> getMonthlyStats(@Param("year") int year);
 
 	int countByStatus(String string);
+
+	List<BondItem> findAllByStatusInAndBondZone(List<String> statuses, BondZone bondZone);
 }

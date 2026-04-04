@@ -17,6 +17,7 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
 
 import { FormControl } from '@angular/forms';
+import { IBondZone } from 'src/app/domain/bond-zone';
 
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js');
@@ -64,7 +65,25 @@ export class CashCollectionComponent {
 
     this.getTotalsByDates(this.from, this.to);
     this.getBranchUserNames();
+    this.loadAvailableBondZones()
 
+  }
+
+  availableBondZones: IBondZone[] = []
+
+  loadAvailableBondZones = async () => {
+    this.availableBondZones = []
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.get<IBondZone[]>(API_URL + '/bond_zones/get_branch_available_bond_zones_by_user', options)
+      .toPromise()
+      .then(
+        data => {
+          this.availableBondZones = data!
+          console.log(data)
+        }
+      )
   }
 
   cashCollections: ICashCollection[] = []
@@ -443,9 +462,9 @@ export class CashCollectionComponent {
     return 0;
   }
 
-  selectedBondZoneName = '--All--'
+  selectedBondZoneName: string = '--All--'
 
-  filterBondItems(bondZoneName: string) {
+  filterBondItems1(bondZoneName: string) {
     this.filteredBondItemCashCollections = [];
     this.totalBondItemCashCollections = 0;
 
@@ -465,6 +484,30 @@ export class CashCollectionComponent {
         (sum, item) => sum + (+item.amount),
         0
       );
+  }
+
+  filterBondItems(bondZoneName: string) {
+    this.filteredBondItemCashCollections = [];
+    this.totalBondItemCashCollections = 0;
+
+    let sn = 1;
+
+    if(bondZoneName === '--All--'){
+      this.filteredBondItemCashCollections = this.bondItemCashCollections
+
+    }else{
+      this.bondItemCashCollections.forEach(element => {
+        if(element.bondZoneName === bondZoneName){
+          this.filteredBondItemCashCollections.push(element)
+        }
+      })
+    }
+
+    this.filteredBondItemCashCollections.forEach(element => {
+        element.sn = sn
+        this.totalBondItemCashCollections = this.totalBondItemCashCollections + element.amount
+        sn ++
+      })
   }
 
 
@@ -1221,6 +1264,8 @@ export class CashCollectionComponent {
         { text: ' ' },
         { text: title, fontSize: 14, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
         { text: fromTo, fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
+        { text: 'Bond Zone: ' + this.selectedBondZoneName },
+        { text: ' ' },
         {
           table: {
             widths: [25, 100, 100, 60, 60, 30, 60, 40, 60, 80, 80],

@@ -17,6 +17,7 @@ import { DataService } from '@services/custom/data.service';
 import { IServiceBillItem } from 'src/app/domain/maintenance';
 import * as pdfMake from 'pdfmake/build/pdfmake';
 import { IBondItem } from 'src/app/domain/bond-item';
+import { IBondZone } from 'src/app/domain/bond-zone';
 
 var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
@@ -27,16 +28,16 @@ const API_URL = environment.apiUrl;
   standalone: true,
   imports: [
     FormsModule,
-        CommonModule,
-        SearchFilterPipe,
-        NgxPaginationModule,
-        RouterModule
+    CommonModule,
+    SearchFilterPipe,
+    NgxPaginationModule,
+    RouterModule
   ],
   templateUrl: './bond-billing.component.html',
   styleUrl: './bond-billing.component.scss'
 })
 export class BondBillingComponent {
-page: number = 1; // Initialize the current page to 1
+  page: number = 1; // Initialize the current page to 1
 
   filterRecords: string = ''
 
@@ -140,6 +141,13 @@ page: number = 1; // Initialize the current page to 1
   initialQty: number = 0
   currentQty: number = 0
 
+  availableBondZones: IBondZone[] = []
+  selectedBondZone: IBondZone | null = null
+  selectedBondZoneId: string | null = null
+  selectedBondZoneName: string | null = ''
+  bondZoneLoaded: boolean = false
+  //bondZoneId: any = null
+
 
 
 
@@ -162,8 +170,80 @@ page: number = 1; // Initialize the current page to 1
   ) { }
 
 
-  ngOnInit() {
-    this.getAllCheckedInBondItems()
+  async ngOnInit() {
+    this.selectedBondZoneId = localStorage.getItem('selected-bond-zone-id')
+    if (this.selectedBondZoneId == '' || this.selectedBondZoneId == null) {
+      this.bondZoneLoaded = false
+      await this.loadAvailableBondZones()
+    } else {
+      this.selectedBondZoneId = localStorage.getItem('selected-bond-zone-id')
+      this.selectedBondZoneName = localStorage.getItem('selected-bond-zone-name')
+      await this.loadSelectedBondZone()
+    }
+    await this.getAllCheckedInBondItems()
+  }
+
+  loadAvailableBondZones = async () => {
+    this.availableBondZones = []
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.get<IBondZone[]>(API_URL + '/bond_zones/get_branch_available_bond_zones_by_user', options)
+      .toPromise()
+      .then(
+        data => {
+          this.availableBondZones = data!
+          console.log(data)
+        }
+      )
+  }
+
+  loadSelectedBondZone = async () => {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.get<IBondZone>(API_URL + '/bond_zones/get_selected_bond_zone?bond_zone_id=' + this.selectedBondZoneId, options)
+      .toPromise()
+      .then(
+        data => {
+          console.log(data)
+          this.selectedBondZone = data!
+          localStorage.setItem('selected-bond-zone-id', this.selectedBondZone.id.toString());
+          localStorage.setItem('selected-bond-zone-name', this.selectedBondZone.name.toString());
+          //this.bondZoneId = this.selectedBondZone.id
+          this.selectedBondZoneName = this.selectedBondZone.name
+          this.bondZoneLoaded = true
+        }
+      )
+      .catch(error => {
+        console.log(error)
+        localStorage.setItem('selected-bond-zone-id', '');
+        localStorage.setItem('selected-bond-zone-name', '');
+        this.bondZoneLoaded = false
+      }
+      )
+  }
+
+  onBondZoneChange(event: any): void {
+    this.selectedBondZoneId = event.target.value;
+    console.log('Selected BondZone ID:', this.selectedBondZoneId);
+    //alert('Selected BondZone ID: ' + this.selectedBondZoneId);
+  }
+
+  clearSelectedBondZone() {
+    localStorage.setItem('selected-bond-zone-id', '');
+    this.selectedBondZoneId = ''
+
+  }
+
+  async selectBondZone() {
+    //localStorage.setItem('selected-bond-zone-id', this.selectedBondZoneId!);
+    if (this.selectedBondZoneId! === '' || this.selectedBondZoneId === null) {
+      this.msg.showErrorMessage3('Please select a bondZone first')
+      return
+    }
+    await this.loadSelectedBondZone()
+    await this.getAllCheckedInBondItems()
   }
 
   async getAllCheckedInBondItems() {
@@ -172,7 +252,7 @@ page: number = 1; // Initialize the current page to 1
     }
     this.bondItems = []
 
-    await this.http.get<IBondItem[]>(API_URL + '/bond_items/get_all_checked_in', options)
+    await this.http.get<IBondItem[]>(API_URL + '/bond_items/get_all_checked_in?bond_zone_id=' + this.selectedBondZoneId, options)
       .toPromise()
       .then(
         data => {
@@ -522,7 +602,7 @@ page: number = 1; // Initialize the current page to 1
           this.msg.showErrorMessage(error, 'Error')
         }
       )
-      this.getAllCheckedInBondItems()
+    this.getAllCheckedInBondItems()
   }
 
   lastBillingDate: string = ''

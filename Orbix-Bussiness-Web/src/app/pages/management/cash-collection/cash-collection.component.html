@@ -505,18 +505,17 @@
                                     <div class="row">
                                         <div class="col-lg-8"></div>
                                         <div class="col-lg-4">
-                                            <span>Select Bond Zone</span>
+                                            <span style="color: black;">Select Bond Zone</span>
+                                            <br>
 
                                             <select class="form-control" [(ngModel)]="selectedBondZoneName"
                                                 (change)="filterBondItems(selectedBondZoneName)">
-
-                                                <option value="">--All--</option>
-                                                <option value="Zone One">Zone One</option>
-                                                <option value="Zone Two">Zone Two</option>
-
+                                                <option>--All--</option>
+                                                <option *ngFor="let b of availableBondZones" value="{{b.name}}">{{b.name}}</option>
                                             </select>
                                         </div>
                                     </div>
+                                    <br>
                                     <div class="row">
                                         <div class="col-lg-12" *ngIf="filteredBondItemCashCollections.length > 0">
 
