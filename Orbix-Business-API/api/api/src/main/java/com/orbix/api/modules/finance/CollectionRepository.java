@@ -398,12 +398,13 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
 		            "JOIN bond_item_bill_receivables pbr ON pbr.bill_receivable_id = br.id " +
 		            "JOIN bond_items p ON p.id = pbr.bond_item_id " +
 		            "JOIN bond_zones bz ON p.bond_zone_id = bz.id " +   
-		            "WHERE c.collection_date_time BETWEEN :startDate AND :endDate",
+		            "WHERE c.collection_date_time BETWEEN :startDate AND :endDate AND (:bond_zone_id IS NULL OR bz.id = :bond_zone_id)",
 		    nativeQuery = true
 		)
 		List<IBondItemCollection> findBondItemCollectionsBetweenDates(
 		    @Param("startDate") LocalDateTime startDate,
-		    @Param("endDate") LocalDateTime endDate
+		    @Param("endDate") LocalDateTime endDate,
+		    @Param("bond_zone_id") Long bondZoneId
 		);
 	
 	@Query(

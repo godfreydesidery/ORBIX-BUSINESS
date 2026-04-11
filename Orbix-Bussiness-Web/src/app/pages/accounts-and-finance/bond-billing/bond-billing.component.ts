@@ -460,6 +460,10 @@ export class BondBillingComponent {
   }
 
 
+  loadCollectionReport(){
+    this.router.navigate(["app/bond-management/cash-collections"])
+  }
+
 
 
   /////////////////////////

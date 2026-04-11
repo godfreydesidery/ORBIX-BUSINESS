@@ -1598,7 +1598,7 @@ export class BondItemBillingComponent {
               [{ text: 'Released Time: ' + this.bondItemGoodReleaseReleaseDate.substring(11), alignment: 'left', fontSize: 9, bold: true }],
               [{ text: 'Number of Days: ' + this.noOfDays, alignment: 'left', fontSize: 9, bold: true }],
               //[{text : 'Checkout At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
-              //[{text : 'Day Out: ' + this.lastBillingDate, alignment : 'left', fontSize : 9, bold : true}],
+              [{text : 'Day Out: ' + Date(), alignment : 'left', fontSize : 9, bold : true}],
               [{ text: ' ' }],
               [{ text: 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment: 'left', fontSize: 9, bold: true }],
               [{ text: ' ' }],

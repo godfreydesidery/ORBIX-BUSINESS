@@ -156,13 +156,15 @@ public class FinanceReportResource {
 	public ResponseEntity<List<IBondItemCollection>>getBondItemDetailedCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,
+	        @RequestParam(name = "bond_zone_id", required = false) Long bondZoneId,
 			HttpServletRequest request){
 		
 		List<IBondItemCollection> collections;
 		
 		collections = collectionRepository.findBondItemCollectionsBetweenDates(
 				dateRange.getFrom().atStartOfDay(),
-                dateRange.getTo().atStartOfDay().plusDays(1)
+                dateRange.getTo().atStartOfDay().plusDays(1),
+                bondZoneId
 				);
 	    return ResponseEntity.ok().body(collections);
 

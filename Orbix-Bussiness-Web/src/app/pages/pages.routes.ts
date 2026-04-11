@@ -472,6 +472,12 @@ export const routes: Routes = [
         data : { breadcrumb : 'Bond/Select Bond Zone'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'bond-management/cash-collections',
+        loadComponent: () => import('./bond-management/bond-cash-collection/bond-cash-collection.component').then(c => c.BondCashCollectionComponent),
+        data : { breadcrumb : 'Bond/Cash Collections'},
+        canActivate : [AuthGuard]
+      },
       // {
       //   path : 'storage-management/cash-collections',
       //   loadComponent: () => import('./storage-management/storage-cash-collection/storage-cash-collection.component').then(c => c.StorageCashCollectionComponent),
