@@ -382,6 +382,7 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
 		            "c.collection_date_time AS dateTime, " +
 		            "brc.reason AS reason, " +
 		            "p.bond_item_name AS bondItemName, " +
+		            "p.chasis_no AS chasisNo, " +
 		            "p.owner_first_name AS ownerFirstName, " +
 		            "p.owner_last_name AS ownerLastName, " +
 		            "p.owner_phone_no AS ownerPhoneNo, " +
@@ -594,6 +595,7 @@ interface IBondItemCollection {
     String getDateTime();
     String getReason();
     String getBondItemName();
+    String getChasisNo();
     String getOwnerFirstName();
     String getOwnerLastName();
     String getOwnerPhoneNo();

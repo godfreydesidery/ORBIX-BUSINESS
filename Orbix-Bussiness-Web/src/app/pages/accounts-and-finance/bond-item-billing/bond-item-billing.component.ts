@@ -26,16 +26,16 @@ const API_URL = environment.apiUrl;
   standalone: true,
   imports: [
     FormsModule,
-        CommonModule,
-        SearchFilterPipe,
-        NgxPaginationModule,
-        RouterModule
+    CommonModule,
+    SearchFilterPipe,
+    NgxPaginationModule,
+    RouterModule
   ],
   templateUrl: './bond-item-billing.component.html',
   styleUrl: './bond-item-billing.component.scss'
 })
 export class BondItemBillingComponent {
-// BondItem attributes
+  // BondItem attributes
   bondItemId: any = null
   bondItemNo: string = ''
   bondItemBillReceivableId: any = null
@@ -1113,6 +1113,18 @@ export class BondItemBillingComponent {
 
   ///////////////////////////////////
 
+  now = new Date();
+
+  formatted = this.now.toLocaleString('en-GB', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+
 
   printGatePassRcpt = async (billItems: IServiceBillItem[], receiptNo: string, cash: number) => {
 
@@ -1206,7 +1218,7 @@ export class BondItemBillingComponent {
             widths: [200],
             body: [
               [{ text: 'Gate Pass', alignment: 'center', fontSize: 9, bold: true }],
-              [{ text: 'Client Name: ' + this.bondItemGoodReleaseClientName, alignment: 'left', fontSize: 9, bold: false }],
+              [{ text: 'Client Name: ' + this.ownerFirstName + ' ' + this.ownerLastName, alignment: 'left', fontSize: 9, bold: false }],
               [{ text: 'Client Address: ' + this.ownerAddress, alignment: 'left', fontSize: 9, bold: false }],
               [{ text: 'Client Phone: ' + this.ownerPhoneNo, alignment: 'left', fontSize: 9, bold: false }],
               [{ text: '________________________________' }],
@@ -1234,10 +1246,10 @@ export class BondItemBillingComponent {
               [{ text: this.comments, alignment: 'left', fontSize: 9, bold: false }],
               [{ text: ' ' }],
               [{ text: ' ' }],
-              [{ text: 'Issued At: ' + new Date().toString(), alignment: 'left', fontSize: 9, bold: true }],
-              [{ text: 'Checkout At: ' + new Date().toString(), alignment: 'left', fontSize: 9, bold: true }],
-              [{ text: 'Valid Until: ' + this.lastBillingDate, alignment: 'left', fontSize: 9, bold: true }],
-              [{ text: 'Number of Days: ' + this.noOfDays, alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: 'Issued At: ' + this.formatted, alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: 'Checkout At: ' + this.formatted, alignment: 'left', fontSize: 9, bold: true }],
+              //[{ text: 'Valid Until: ' + this.lastBillingDate, alignment: 'left', fontSize: 9, bold: true }],
+              //[{ text: 'Number of Days: ' + this.noOfDays, alignment: 'left', fontSize: 9, bold: true }],
               [{ text: ' ' }],
               [{ text: 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment: 'left', fontSize: 9, bold: true }],
               [{ text: ' ' }],
@@ -1598,7 +1610,7 @@ export class BondItemBillingComponent {
               [{ text: 'Released Time: ' + this.bondItemGoodReleaseReleaseDate.substring(11), alignment: 'left', fontSize: 9, bold: true }],
               [{ text: 'Number of Days: ' + this.noOfDays, alignment: 'left', fontSize: 9, bold: true }],
               //[{text : 'Checkout At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
-              [{text : 'Day Out: ' + Date(), alignment : 'left', fontSize : 9, bold : true}],
+              [{ text: 'Day Out: ' + Date(), alignment: 'left', fontSize: 9, bold: true }],
               [{ text: ' ' }],
               [{ text: 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment: 'left', fontSize: 9, bold: true }],
               [{ text: ' ' }],

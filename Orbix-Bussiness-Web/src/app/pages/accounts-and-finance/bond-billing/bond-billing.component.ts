@@ -149,6 +149,28 @@ export class BondBillingComponent {
   //bondZoneId: any = null
 
 
+  // Vehicle or Equipment Information
+  registrationNo: string = ''
+  chasisNo: string = ''
+  leftFrontLamp: string = ''
+  rightFrontLamp: string = ''
+  leftRearLamp: string = ''
+  rightRearLamp: string = ''
+  leftSideMirror: string = ''
+  rightSideMirror: string = ''
+  leftWiper: string = ''
+  rightWiper: string = ''
+  backWiper: string = ''
+  fuelCap: string = ''
+  spareTire: string = ''
+  battery: string = ''
+  starter: string = ''
+  aerial: string = ''
+  wheelCap: string = ''
+  roundMirror: string = ''
+  tireIndicator: string = ''
+  hasKeys : string = ''
+
 
 
 
@@ -425,6 +447,28 @@ export class BondBillingComponent {
     this.validUntilDate = null
     this.comments = data!.comments// check this
 
+    // Vehicle or Equipment Information
+    this.registrationNo = data?.registrationNo;
+    this.chasisNo = data?.chasisNo;
+    this.leftFrontLamp = data?.leftFrontLamp == true ? 'YES' : 'NO'
+    this.rightFrontLamp = data?.rightFrontLamp == true ? 'YES' : 'NO'
+    this.leftRearLamp = data?.leftRearLamp == true ? 'YES' : 'NO'
+    this.rightRearLamp = data?.rightRearLamp == true ? 'YES' : 'NO'
+    this.leftSideMirror = data?.leftSideMirror == true ? 'YES' : 'NO'
+    this.rightSideMirror = data?.rightSideMirror == true ? 'YES' : 'NO'
+    this.leftWiper = data?.leftWiper == true ? 'YES' : 'NO'
+    this.rightWiper = data?.rightWiper == true ? 'YES' : 'NO'
+    this.backWiper = data?.backWiper == true ? 'YES' : 'NO'
+    this.fuelCap = data?.fuelCap == true ? 'YES' : 'NO'
+    this.spareTire = data?.spareTire == true ? 'YES' : 'NO'
+    this.battery = data?.battery == true ? 'YES' : 'NO'
+    this.starter = data?.starter == true ? 'YES' : 'NO'
+    this.aerial = data?.aerial == true ? 'YES' : 'NO'
+    this.wheelCap = data?.wheelCap == true ? 'YES' : 'NO'
+    this.roundMirror = data?.roundMirror == true ? 'YES' : 'NO'
+    this.tireIndicator = data?.tireIndicator == true ? 'YES' : 'NO'
+    this.hasKeys = data?.hasKeys == true ? 'YES' : 'NO'
+
   }
 
   clearBondItemData() {
@@ -457,6 +501,26 @@ export class BondBillingComponent {
 
     this.color = ''
     this.comments = ''
+
+    // Vehicle or Equipment Information
+    this.registrationNo = ''
+    this.chasisNo = ''
+    this.leftFrontLamp = ''
+    this.rightFrontLamp = ''
+    this.leftRearLamp = ''
+    this.rightRearLamp = ''
+    this.leftSideMirror = ''
+    this.rightSideMirror = ''
+    this.leftWiper = ''
+    this.rightWiper = ''
+    this.backWiper = ''
+    this.fuelCap = ''
+    this.spareTire = ''
+    this.battery = ''
+    this.starter = ''
+    this.aerial = ''
+    this.wheelCap = ''
+    this.roundMirror = ''
   }
 
 

@@ -1,5 +1,6 @@
 package com.orbix.api.modules.adminunits;
 
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
@@ -11,6 +12,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.ArrayList;
 import javax.servlet.http.HttpServletRequest;
+import javax.transaction.Transactional;
 
 @Service
 public class CurrencyConversionServiceController implements CurrencyConversionService {
@@ -129,5 +131,12 @@ public class CurrencyConversionServiceController implements CurrencyConversionSe
         response.setActive(conversion.isActive() ? "Active" : "Inactive");
         
         return response;
+    }
+    
+    @Scheduled(cron = "0 0 0 * * *")
+    @Transactional
+    public void resetRatesDaily() {
+        int updatedRows = currencyConversionRepository.resetAllRates();
+        System.out.println("Reset completed. Rows affected: " + updatedRows);
     }
 }

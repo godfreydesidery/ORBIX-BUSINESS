@@ -1,6 +1,7 @@
 package com.orbix.api.modules.bond;
 
 import java.time.Duration;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
@@ -289,6 +290,10 @@ public class BondItemServiceController implements BondItemService {
 
 	@Override
 	public BondItemResponseDTO createBondItem(BondItemRequestDTO bondItemRequest, HttpServletRequest request) {
+
+		if (bondItemRepository.existsByChasisNo(bondItemRequest.getChasisNo())) {
+		    throw new InvalidOperationException("Chassis number already exists");
+		}
 
 		/** Validate data */
 		if (!validateBondItemData(bondItemRequest)) {
@@ -753,31 +758,30 @@ public class BondItemServiceController implements BondItemService {
 		if (branch_.isEmpty())
 			throw new NotFoundException("Branch not found");
 
-//		Optional<BondItemType> bondItemType_ = bondItemTypeRepository.findByNameAndCompany(bondItemRequest.getBondItemTypeName(), company_.get());
-//		if(bondItemType_.isEmpty()) throw new NotFoundException("Vehicle or equipment type not found");
-
 		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository
 				.findAllByBondItem(bondItem_.get());
-		LocalDateTime lastDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
-		LocalDateTime lastBillDate = LocalDateTime.now().toLocalDate().atStartOfDay();
-		double billedQty = 0;
-		for (BondItemBillReceivable bondItemBillReceivable : bondItemBillReceivables) {
-			billedQty = billedQty + bondItemBillReceivable.getQty();
-			if (bondItemBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.UNPAID)) {
-				throw new InvalidOperationException("Can not check out, bills  not cleared");
-			}
-			lastBillDate = bondItemBillReceivable.getEndedAt();
-		}
-		if (bondItem_.get().getCurrentQty() > 0 && (!bondItem_.get().getBillingType().equals("FLAT-RATE"))) {
-			throw new InvalidOperationException(
-					"Could not checkout. Some bondItem days have not been billed. Please generate and clear bills");
+
+		
+		LocalDateTime startOfTomorrow = LocalDate.now().plusDays(1).atStartOfDay();
+		LocalDateTime lastBillDate = null;
+
+		for (BondItemBillReceivable item : bondItemBillReceivables) {
+
+		    if (item.getBillReceivable().getPayStatus().equals(PayStatus.UNPAID)) {
+		        throw new InvalidOperationException("Cannot check out, bills not cleared");
+		    }
+
+		    LocalDateTime endedAt = item.getEndedAt();
+
+		    if (endedAt != null && (lastBillDate == null || endedAt.isAfter(lastBillDate))) {
+		        lastBillDate = endedAt;
+		    }
 		}
 
-		if (bondItem_.get().getBillingType().equals("FLAT-RATE")) {
-			if (billedQty < bondItem_.get().getInitialQty()) {
-				throw new InvalidOperationException(
-						"Could not check out. Billed qty is less than total qty, for flat rate");
-			}
+		// Core validation (only date-based)
+		if (lastBillDate == null || lastBillDate.isBefore(startOfTomorrow)) {
+		    throw new InvalidOperationException(
+		        "Cannot checkout. Billing is not up to date.");
 		}
 
 		BondItem bondItem = bondItem_.get();

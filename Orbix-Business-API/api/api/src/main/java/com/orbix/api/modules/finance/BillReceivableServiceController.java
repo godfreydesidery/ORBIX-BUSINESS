@@ -143,6 +143,12 @@ public class BillReceivableServiceController implements BillReceivableService {
 				qty = storageBillReceivable.get().getQty();
 			}
 			
+			Optional<BondItemBillReceivable> bondItemBillReceivable = bondItemBillReceivableRepository.findByBillReceivable(billReceivable);
+			if(bondItemBillReceivable.isPresent()) {
+				billReceivableCollection.setReason("Bond");
+				qty = bondItemBillReceivable.get().getQty();
+			}
+			
 			Optional<MaintenanceJobCardIssueBillReceivable> maintenanceJobCardIssueBillReceivable = maintenanceJobCardIssueBillReceivableRepository.findByBillReceivable(billReceivable);
 			if(maintenanceJobCardIssueBillReceivable.isPresent()) {
 				billReceivableCollection.setReason("V/Eq Maintenance");

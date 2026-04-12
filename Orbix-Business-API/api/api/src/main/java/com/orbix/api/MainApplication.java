@@ -22,6 +22,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.annotation.Order;
 import org.springframework.data.jpa.repository.config.EnableJpaAuditing;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -77,6 +78,7 @@ import springfox.documentation.swagger2.annotations.EnableSwagger2;
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 @Data
 @RequiredArgsConstructor
+@EnableScheduling
 public class MainApplication {
 	protected ConfigurableApplicationContext springContext;
 	

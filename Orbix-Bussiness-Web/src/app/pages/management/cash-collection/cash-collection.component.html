@@ -524,6 +524,7 @@
                                                     <thead>
                                                         <td><b>SN</b></td>
                                                         <td><b>Item Name</b></td>
+                                                        <td><b>Chasis No</b></td>
                                                         <td><b>Name</b></td>
                                                         <td><b>Phone</b></td>
                                                         <td><b>Date Registered</b></td>
@@ -538,6 +539,7 @@
                                                         <tr *ngFor="let p of filteredBondItemCashCollections">
                                                             <td>{{p.sn}}</td>
                                                             <td>{{p.bondItemName}}</td>
+                                                            <td>{{p.chasisNo}}</td>
                                                             <td>{{p.ownerFirstName}} {{p.ownerLastName}}</td>
                                                             <td>{{p.ownerPhoneNo}}</td>
                                                             <td>{{p.createdDateTime}}</td>
@@ -549,6 +551,22 @@
                                                             <td>{{p.dateTime}}</td>
                                                             <td>{{p.bondZoneName}}</td>
                                                             <td>{{p.cashierName}}</td>
+                                                        </tr>
+                                                        <tr>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td>Total</td>
+                                                            <td style="text-align: right;">{{totalBondItemCashCollections | currency:'':''}}
+                                                            </td>
+                                                            <td style="text-align: right;">{{0 |
+                                                                currency:'':''}}</td>
+                                                            <td></td>
+                                                            <td></td>
+                                                            <td></td>
                                                         </tr>
                                                     </tbody>
                                                 </table>

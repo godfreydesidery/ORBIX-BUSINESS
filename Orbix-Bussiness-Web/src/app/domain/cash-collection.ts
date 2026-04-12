@@ -112,6 +112,7 @@ export interface IBondItemCashCollection {
   days: number
   discount: number
   bondZoneName : string
+  chasisNo : string
 
   sn: number
 }

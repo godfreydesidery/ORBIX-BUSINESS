@@ -2,6 +2,7 @@ package com.orbix.api.modules.bond;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -19,6 +20,8 @@ public interface BondItemRepository extends JpaRepository<BondItem, Long> {
 	List<BondItem> findAllByBondZoneAndStatusIn(BondZone bondZone, List<String> statuses);
 	
 	/////////////////////////////////
+	
+	boolean existsByChasisNo(String chasisNo);
 	
 
 //	List<BondItem> findAllByVehicleEquipmentAndStatusIn(VehicleEquipment vehicleEquipment, List<String> statuses);

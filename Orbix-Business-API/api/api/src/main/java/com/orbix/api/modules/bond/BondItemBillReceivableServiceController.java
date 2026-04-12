@@ -205,12 +205,22 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 	    }
 
 	    // 5. Calculate elapsed days
+//	    long elapsedDays = ChronoUnit.DAYS.between(fromDate, referenceDate);
+//
+//	    if (elapsedDays <= 0) {
+//	        throw new InvalidOperationException(
+//	                "Reference date must be after start date: from=" + fromDate + ", ref=" + referenceDate);
+//	    }
+	    
+	    if (referenceDate.isBefore(fromDate)) {
+	        throw new InvalidOperationException(
+	            "Reference date must not be before start date: from=" + fromDate + ", ref=" + referenceDate);
+	    }
+
 	    long elapsedDays = ChronoUnit.DAYS.between(fromDate, referenceDate);
 
-	    if (elapsedDays <= 0) {
-	        throw new InvalidOperationException(
-	                "Reference date must be after start date: from=" + fromDate + ", ref=" + referenceDate);
-	    }
+	    // Allow same-day billing → normalize to minimum 1 day
+	    elapsedDays = Math.max(elapsedDays, 1);
 
 	    // 6. Convert days → months (1–30 = 1, 31–60 = 2, etc.)
 	    int months = (int) ((elapsedDays - 1) / 30) + 1;
@@ -472,12 +482,13 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 	    LocalDateTime today = LocalDate.now().atStartOfDay();
 
 	    // 3. If nothing to bill yet
-	    if (!today.isAfter(fromDate)) {
+	    if (today.isBefore(fromDate)) {
 	        return 0;
 	    }
 
 	    // 4. Calculate elapsed days
-	    long elapsedDays = ChronoUnit.DAYS.between(fromDate, today);
+	    
+	    long elapsedDays = ChronoUnit.DAYS.between(fromDate, today) + 1;
 
 	    if (elapsedDays <= 0) {
 	        return 0;
