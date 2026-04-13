@@ -398,7 +398,7 @@ export const menuItems = [
             },
             {
                 title: 'Bond Billing',
-                show: grant(['FINCSTRG-ACCESS']),
+                show: grant(['FINCBND-ACCESS']),
                 routerLink: '/app/accounts-and-finance/bond-billing'
             },
             {
@@ -549,7 +549,7 @@ export const menuItems = [
         icon: 'fa-cogs',
         selected: false,
         expanded: false,
-        show: grant(['WRHOUSE-ACCESS']),
+        show: grant(['BNDZN-ACCESS']),
         order: 700,
         subMenu: [
             {
@@ -557,21 +557,21 @@ export const menuItems = [
                 show: true,
                 routerLink: '/app/bond-management/select-bond-zone'
             },
-            {
-                title: 'Reports',
-                url: '#',
-                show: true,
-                subMenu: [
-                    {
-                        title: 'Collection Report',
-                        routerLink: '/app/storage-management/cash-collections'
-                    },
-                    {
-                        title: 'Bond Report',
-                        routerLink: '/app/storage-management/storage-report'
-                    }
-                ]
-            },
+            // {
+            //     title: 'Reports',
+            //     url: '#',
+            //     show: true,
+            //     subMenu: [
+            //         {
+            //             title: 'Collection Report',
+            //             routerLink: '/app/storage-management/cash-collections'
+            //         },
+            //         {
+            //             title: 'Bond Report',
+            //             routerLink: '/app/storage-management/storage-report'
+            //         }
+            //     ]
+            // },
         ]
     },
     {

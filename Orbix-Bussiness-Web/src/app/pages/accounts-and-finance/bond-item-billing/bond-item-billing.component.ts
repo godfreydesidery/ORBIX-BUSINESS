@@ -685,7 +685,7 @@ export class BondItemBillingComponent {
   printReceipt() {
 
     if (this.toPrintReceipt == false) {
-      return
+      //return
     }
 
     if (this.receiptData.length == 0) {

@@ -80,7 +80,7 @@ public class CurrencyConversionServiceController implements CurrencyConversionSe
 		CurrencyConversion existingConversion = conversion.get();
 		existingConversion.setSourceCurrencyValue(conversionRequest.getSourceCurrencyValue());
 		existingConversion.setFinalCurrencyValue(conversionRequest.getFinalCurrencyValue());
-		existingConversion.setActive(conversionRequest.isActive());
+		//existingConversion.setActive(conversionRequest.isActive());
 
 		existingConversion = currencyConversionRepository.save(existingConversion);
 
