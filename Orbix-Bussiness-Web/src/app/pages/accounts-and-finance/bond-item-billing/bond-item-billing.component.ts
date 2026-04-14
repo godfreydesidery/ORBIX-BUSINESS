@@ -87,6 +87,10 @@ export class BondItemBillingComponent {
   ownerEmail: string = ''
   ownerAddress: string = ''
 
+  vehicleName: string = ''
+  chasisNo: string = ''
+  color: string = ''
+
   validUntilDate: Date | null = new Date()
 
   comments: string = ''
@@ -932,6 +936,10 @@ export class BondItemBillingComponent {
     this.ownerEmail = data?.ownerEmail;
     this.ownerAddress = data?.ownerAddress;
 
+    this.vehicleName = data?.bondItemName
+    this.chasisNo = data?.chasisNo
+    this.color = data?.bondItemColor
+
     this.billingType = data?.billingType
     this.billingAmount = data?.billingAmount
 
@@ -973,6 +981,11 @@ export class BondItemBillingComponent {
     this.bondZoneName = ''
 
     this.billingType = ''
+
+    this.vehicleName = ''
+    this.chasisNo = ''
+    this.color = ''
+
   }
 
   totalQty: number = 0
@@ -1221,6 +1234,10 @@ export class BondItemBillingComponent {
               [{ text: 'Client Name: ' + this.ownerFirstName + ' ' + this.ownerLastName, alignment: 'left', fontSize: 9, bold: false }],
               [{ text: 'Client Address: ' + this.ownerAddress, alignment: 'left', fontSize: 9, bold: false }],
               [{ text: 'Client Phone: ' + this.ownerPhoneNo, alignment: 'left', fontSize: 9, bold: false }],
+              [{ text: 'Vehicle Information', alignment: 'center', fontSize: 9, bold: true }],
+              [{ text: 'Vehicle Name: ' + this.vehicleName, alignment: 'left', fontSize: 9, bold: false }],
+              [{ text: 'Chasis No: ' + this.chasisNo, alignment: 'left', fontSize: 9, bold: false }],
+              [{ text: 'Color: ' + this.color!, alignment: 'left', fontSize: 9, bold: false }],
               [{ text: '________________________________' }],
               [{ text: 'Payment Details', alignment: 'center', fontSize: 9, bold: true }],
               [{ text: ' ', alignment: 'center', fontSize: 9, bold: true }],

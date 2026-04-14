@@ -39,6 +39,8 @@ export interface IBondItem {
 
     //////////////////
 
+    bondItemColor : string
+
     vehicleEquipmentTypeName: string
         vehicleEquipmentName: string
         vehicleEquipmentColor: string

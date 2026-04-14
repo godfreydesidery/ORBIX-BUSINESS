@@ -386,7 +386,7 @@ export class SelectBondZoneComponent {
       deviceStatus: this.deviceStatus === 'ATTACHED' ? 1 : 0,
 
 
-      vehicleEquipmentColor: this.vehicleEquipmentColor,
+      bondItemColor: this.vehicleEquipmentColor,
 
       cardNo: this.cardNo,
 
