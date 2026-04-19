@@ -268,9 +268,9 @@ export class BondItemBillingComponent {
   }
 
   async requestDiscount() {
-    // if (await this.msg.showConfirmMessageDialog('Confirm', 'Confirm Requesting Discount?', 'question', 'Yes', 'No') == false) {
-    //   return
-    // }
+    if (await this.msg.showConfirmMessageDialog('Confirm', 'Confirm Requesting Discount?', 'question', 'Yes', 'No') == false) {
+      return
+    }
 
     if (this.bondItemId != null) {
       let options = {
@@ -279,11 +279,10 @@ export class BondItemBillingComponent {
 
       var discountRequest = {
         serviceBillId: this.bondItemBillReceivableId,
-        billAmount: (this.bondItemBillReceivablePrice * this.bondItemBillReceivableQty * this.bondItemBillReceivableNoOfDays),
+        billAmount: this.bondItemBillReceivableAmount, // (this.bondItemBillReceivablePrice * this.bondItemBillReceivableQty * this.bondItemBillReceivableNoOfDays),
         discountAmount: this.bondItemBillReceivableDiscount,
         serviceBillName: 'Bond',
         reason: this.discountReason
-
       }
 
       await this.http.post<IBondItemBillReceivable>(API_URL + '/discount_requests/create?service_bill_id=' + this.bondItemBillReceivableId + '&bill_amount=' + (this.bondItemBillReceivablePrice * this.bondItemBillReceivableQty * this.bondItemBillReceivableNoOfDays) + '&discount_amount=' + this.bondItemBillReceivableDiscount + '&service_bill_name=BondItem', discountRequest, options)
@@ -317,7 +316,7 @@ export class BondItemBillingComponent {
         headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
       }
 
-      await this.http.get<IDiscountRequest>(API_URL + '/discount_requests/get_discount?service_bill_id=' + this.bondItemBillReceivableId + '&bill_amount=' + (this.bondItemBillReceivablePrice * this.bondItemBillReceivableQty) + '&discount_amount=' + this.bondItemBillReceivableDiscount + '&service_bill_name=BondItem', options)
+      await this.http.get<IDiscountRequest>(API_URL + '/discount_requests/get_discount?service_bill_id=' + this.bondItemBillReceivableId + '&bill_amount=' + (this.bondItemBillReceivablePrice * this.bondItemBillReceivableQty) + '&discount_amount=' + this.bondItemBillReceivableDiscount + '&service_bill_name=Bond', options)
         .toPromise()
         .then(
           data => {

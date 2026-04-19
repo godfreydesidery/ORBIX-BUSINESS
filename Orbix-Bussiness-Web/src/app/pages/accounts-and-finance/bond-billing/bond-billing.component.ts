@@ -468,7 +468,6 @@ export class BondBillingComponent {
     this.roundMirror = data?.roundMirror == true ? 'YES' : 'NO'
     this.tireIndicator = data?.tireIndicator == true ? 'YES' : 'NO'
     this.hasKeys = data?.hasKeys == true ? 'YES' : 'NO'
-
   }
 
   clearBondItemData() {

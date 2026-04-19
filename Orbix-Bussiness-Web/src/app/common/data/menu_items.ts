@@ -408,7 +408,7 @@ export const menuItems = [
             },
             {
                 title: 'Bond Discounts',
-                show: grant(['FINCDISC-ACCESS', 'BNDDISC-ACCESS']),
+                show: grant(['BNDDISC-ACCESS']),
                 routerLink: '/app/accounts-and-finance/bond-discounts'
             },
             {

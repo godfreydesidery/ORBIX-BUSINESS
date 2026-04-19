@@ -146,6 +146,28 @@ page: number = 1; // Initialize the current page to 1
 
   ////////////////////////////////////////
 
+  // Vehicle or Equipment Information
+  registrationNo: string = ''
+  chasisNo: string = ''
+  leftFrontLamp: string = ''
+  rightFrontLamp: string = ''
+  leftRearLamp: string = ''
+  rightRearLamp: string = ''
+  leftSideMirror: string = ''
+  rightSideMirror: string = ''
+  leftWiper: string = ''
+  rightWiper: string = ''
+  backWiper: string = ''
+  fuelCap: string = ''
+  spareTire: string = ''
+  battery: string = ''
+  starter: string = ''
+  aerial: string = ''
+  wheelCap: string = ''
+  roundMirror: string = ''
+  tireIndicator: string = ''
+  hasKeys : string = ''
+
 
 
 
@@ -285,7 +307,7 @@ page: number = 1; // Initialize the current page to 1
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
-    await this.http.get<IBondItem>(API_URL + '/bonds/get?id=' + id, options)
+    await this.http.get<IBondItem>(API_URL + '/bond_items/get?id=' + id, options)
       .toPromise()
       .then(
         data => {
@@ -327,6 +349,27 @@ page: number = 1; // Initialize the current page to 1
     this.validUntilDate = null
     this.comments = data!.comments// check this
 
+    // Vehicle or Equipment Information
+    this.registrationNo = data?.registrationNo;
+    this.chasisNo = data?.chasisNo;
+    this.leftFrontLamp = data?.leftFrontLamp == true ? 'YES' : 'NO'
+    this.rightFrontLamp = data?.rightFrontLamp == true ? 'YES' : 'NO'
+    this.leftRearLamp = data?.leftRearLamp == true ? 'YES' : 'NO'
+    this.rightRearLamp = data?.rightRearLamp == true ? 'YES' : 'NO'
+    this.leftSideMirror = data?.leftSideMirror == true ? 'YES' : 'NO'
+    this.rightSideMirror = data?.rightSideMirror == true ? 'YES' : 'NO'
+    this.leftWiper = data?.leftWiper == true ? 'YES' : 'NO'
+    this.rightWiper = data?.rightWiper == true ? 'YES' : 'NO'
+    this.backWiper = data?.backWiper == true ? 'YES' : 'NO'
+    this.fuelCap = data?.fuelCap == true ? 'YES' : 'NO'
+    this.spareTire = data?.spareTire == true ? 'YES' : 'NO'
+    this.battery = data?.battery == true ? 'YES' : 'NO'
+    this.starter = data?.starter == true ? 'YES' : 'NO'
+    this.aerial = data?.aerial == true ? 'YES' : 'NO'
+    this.wheelCap = data?.wheelCap == true ? 'YES' : 'NO'
+    this.roundMirror = data?.roundMirror == true ? 'YES' : 'NO'
+    this.tireIndicator = data?.tireIndicator == true ? 'YES' : 'NO'
+    this.hasKeys = data?.hasKeys == true ? 'YES' : 'NO'
   }
 
   clearStorageData() {
@@ -359,6 +402,26 @@ page: number = 1; // Initialize the current page to 1
 
     this.color = ''
     this.comments = ''
+
+    // Vehicle or Equipment Information
+    this.registrationNo = ''
+    this.chasisNo = ''
+    this.leftFrontLamp = ''
+    this.rightFrontLamp = ''
+    this.leftRearLamp = ''
+    this.rightRearLamp = ''
+    this.leftSideMirror = ''
+    this.rightSideMirror = ''
+    this.leftWiper = ''
+    this.rightWiper = ''
+    this.backWiper = ''
+    this.fuelCap = ''
+    this.spareTire = ''
+    this.battery = ''
+    this.starter = ''
+    this.aerial = ''
+    this.wheelCap = ''
+    this.roundMirror = ''
   }
 
 
@@ -458,7 +521,7 @@ page: number = 1; // Initialize the current page to 1
     this.billUngenerated = 0
     this.billUnpaid = 0
 
-    await this.http.get<IBillView>(API_URL + '/storage_bill_receivables/get_bill_view?bond_item_id=' + id, options)
+    await this.http.get<IBillView>(API_URL + '/bond_item_bill_receivables/get_bill_view?bond_item_id=' + id, options)
       .toPromise()
       .then(
         data => {

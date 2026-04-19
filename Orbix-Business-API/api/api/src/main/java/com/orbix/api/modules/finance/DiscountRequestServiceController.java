@@ -333,6 +333,28 @@ public class DiscountRequestServiceController implements DiscountRequestService 
 			billReceivable.setAmount(storageBillReceivable.getPrice() * storageBillReceivable.getQty() * storageBillReceivable.getNoOfDays() - discountRequest.getDiscountAmount());
 			billReceivable.setDue(storageBillReceivable.getPrice() * storageBillReceivable.getQty() * storageBillReceivable.getNoOfDays() - discountRequest.getDiscountAmount());
 			billReceivable = billReceivableRepository.save(billReceivable);
+		}else if(discountRequest.getServiceBillName().equals("Bond")) {
+			BondItemBillReceivable bondItemBillReceivable = bondItemBillReceivableRepository
+				    .findById(discountRequest.getServiceBillId())
+				    .orElseThrow(() -> new NotFoundException("Bill not found"));
+			bondItemBillReceivable.setDiscount(discountRequest.getDiscountAmount());
+			bondItemBillReceivable.setDiscountApprovedByUser(userService.getUser(request));
+			bondItemBillReceivable.setDiscountApprovedDateTime(dayService.getTimeStamp());
+			bondItemBillReceivable.setDiscountStatus("Approved");
+			bondItemBillReceivable = bondItemBillReceivableRepository.save(bondItemBillReceivable);
+			discountRequest.setStatus(WorkFlowStatus.APPROVED);
+			discountRequest.setApprovedByUser(userService.getUser(request));
+			discountRequest.setApprovedDateTime(dayService.getTimeStamp());
+			discountRequest.setComments(discountRequestDTO.getComments());
+			discountRequestRepository.save(discountRequest);
+			
+			BillReceivable billReceivable = bondItemBillReceivable.getBillReceivable();
+			
+			if(!billReceivable.getPayStatus().equals(PayStatus.UNPAID)) throw new InvalidOperationException("Only unpaid bill can be edited");
+			double billAmount = bondItemBillReceivable.getBillReceivable().getAmount();
+			billReceivable.setAmount(billAmount - discountRequest.getDiscountAmount());
+			billReceivable.setDue(billAmount - discountRequest.getDiscountAmount());
+			billReceivable = billReceivableRepository.save(billReceivable);
 		}
 		
 		return true;
