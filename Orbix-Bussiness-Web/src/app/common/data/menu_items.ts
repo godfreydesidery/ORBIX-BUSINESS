@@ -429,7 +429,7 @@ export const menuItems = [
             {
                 title: 'Reports',
                 url: '#',
-                show: true,
+                show: grant(['FINCRPRT-ACCESS']),
                 subMenu: [
                     {
                         title: 'Parking Collections',

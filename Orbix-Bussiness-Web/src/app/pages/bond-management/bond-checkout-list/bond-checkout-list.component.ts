@@ -150,15 +150,16 @@ documentHeader!: any
     private data: DataService,
   ) { } //{(window as any).pdfMake.vfs = pdfFonts.pdfMake.vfs;}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.selectedBondZoneId = localStorage.getItem('selected-bond-zone-id')
     if (this.selectedBondZoneId == '' || this.selectedBondZoneId == null) {
       this.bondZoneLoaded = false
-      this.loadAvailableBondZones()
+      await this.loadAvailableBondZones()
     } else {
       this.selectedBondZoneId = localStorage.getItem('selected-bond-zone-id')
-      this.loadSelectedBondZone()
+      await this.loadSelectedBondZone()
     }
+    await this.getAllRecentCheckedOutBondItems()
   }
 
   loadAvailableBondZones = async () => {
@@ -741,6 +742,7 @@ documentHeader!: any
           this.clearBondItemData()
           this.startBillingAt = null
           this.showBondItemData(data!)
+          this.billItems = data!.serviceBillItems
           console.log(data)
         }
       )
@@ -1144,13 +1146,181 @@ documentHeader!: any
 
   }
 
+  now = new Date();
+
+  formatted = this.now.toLocaleString('en-GB', {
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+    hour: '2-digit',
+    minute: '2-digit',
+    second: '2-digit',
+    hour12: false
+  });
+
   async printReleaseNote(id: any) {
     await this.get(id)
     await this.printGatePassRcpt(this.billItems, '', id)
   }
 
-
   printGatePassRcpt = async (billItems: IServiceBillItem[], receiptNo: string, cash: number) => {
+  
+      //await this.get(this.bondItemId)
+      //await this.getLastBillingDate(this.bondItemId)
+  
+      var companyName = localStorage.getItem('company-name')!
+  
+      var header = ''
+      var footer = ''
+      var title = 'Gate Pass'
+      var total: number = 0
+      var discount: number = 0
+      var tax: number = 0
+  
+      // var address : any = await this.data.getReceiptHeader(receiptNo)
+      var address: any = await this.data.getBranchReceiptHeaderWithNoTinAndVrn(receiptNo)
+  
+      // Set up VFS for pdfMake - try different approaches
+      try {
+        const vfsFonts = require('pdfmake/build/vfs_fonts.js');
+        // Try different possible structures
+        if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
+          (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
+        } else if (vfsFonts.vfs) {
+          (window as any).pdfMake.vfs = vfsFonts.vfs;
+        } else {
+          (window as any).pdfMake.vfs = vfsFonts;
+        }
+      } catch (error) {
+        console.log('VFS setup failed, continuing without custom fonts:', error);
+      }
+  
+      var receipt = [
+        [
+          { text: 'SN', fontSize: 8, bold: true },
+          { text: 'Item', fontSize: 8, bold: true },
+          { text: 'Qty', fontSize: 8, bold: true },
+          { text: 'Amount', fontSize: 8, bold: true },
+        ]
+      ]
+  
+      var sn = 0
+  
+      billItems.forEach((element) => {
+        total = total + (+element.amount)
+        sn = sn + 1
+        var item = [
+          { text: sn.toString(), fontSize: 8, bold: false },
+          { text: element.item, fontSize: 8, bold: false },
+          { text: element.qty.toString(), fontSize: 8, bold: false },
+          { text: (element.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 8, alignment: 'right', bold: false },
+        ]
+        receipt.push(item)
+      })
+      var detailSummary = [
+        { text: ' ', fontSize: 8, bold: false },
+        { text: 'Total', fontSize: 9, bold: true },
+        { text: ' ', fontSize: 8, bold: false },
+        { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+      ]
+      receipt.push(detailSummary)
+  
+  
+      const docDefinition = {
+        header: '',
+  
+        //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
+        content: [
+          {
+            layout: 'noBorders',
+            table: address
+          },
+  
+  
+  
+          {
+            layout: 'noBorders',
+            table: {
+              headerRows: 0,
+              widths: [210],
+              body: [
+                [{ text: '==============================' }],
+              ]
+            }
+          },
+          {
+            layout: 'noBorders',
+            table: {
+              headerRows: 0,
+              widths: [200],
+              body: [
+                [{ text: 'Gate Pass', alignment: 'center', fontSize: 9, bold: true }],
+                [{ text: 'Client Name: ' + this.ownerFirstName + ' ' + this.ownerLastName, alignment: 'left', fontSize: 9, bold: false }],
+                [{ text: 'Client Address: ' + this.ownerAddress, alignment: 'left', fontSize: 9, bold: false }],
+                [{ text: 'Client Phone: ' + this.ownerPhoneNo, alignment: 'left', fontSize: 9, bold: false }],
+                [{ text: 'Vehicle Information', alignment: 'center', fontSize: 9, bold: true }],
+                [{ text: 'Vehicle Name: ' + this.bondItemDescription, alignment: 'left', fontSize: 9, bold: false }],
+                [{ text: 'Chasis No: ' + this.chasisNo, alignment: 'left', fontSize: 9, bold: false }],
+                [{ text: 'Color: ' + ''!, alignment: 'left', fontSize: 9, bold: false }],
+                [{ text: '________________________________' }],
+                [{ text: 'Payment Details', alignment: 'center', fontSize: 9, bold: true }],
+                [{ text: ' ', alignment: 'center', fontSize: 9, bold: true }],
+              ]
+            }
+          },
+          {
+            layout: 'noBorders',
+            table: {
+              headerRows: 1,
+              widths: [15, 100, 15, 50],
+              body: receipt
+            }
+          },
+          {
+            layout: 'noBorders',
+            table: {
+              headerRows: 0,
+              widths: [200],
+              body: [
+                [{ text: ' ' }],
+                [{ text: 'Cashier Comments', alignment: 'left', fontSize: 9, bold: true }],
+                [{ text: this.comments, alignment: 'left', fontSize: 9, bold: false }],
+                [{ text: ' ' }],
+                [{ text: ' ' }],
+                [{ text: 'Issued At: ' + this.formatted, alignment: 'left', fontSize: 9, bold: true }],
+                [{ text: 'Checkout At: ' + this.formatted, alignment: 'left', fontSize: 9, bold: true }],
+                //[{ text: 'Valid Until: ' + this.lastBillingDate, alignment: 'left', fontSize: 9, bold: true }],
+                //[{ text: 'Number of Days: ' + this.noOfDays, alignment: 'left', fontSize: 9, bold: true }],
+                [{ text: ' ' }],
+                [{ text: 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment: 'left', fontSize: 9, bold: true }],
+                [{ text: ' ' }],
+                [{ text: 'Signature: ......................' }],
+              ]
+            }
+          },
+          {
+            layout: 'noBorders',
+            table: {
+              headerRows: 0,
+              widths: [210],
+              body: [
+                [{ text: '==============================' }],
+                [{ text: '---Reprinted---', fontSize: 9, bold: true, alignment: 'center' }],
+                [{ text: 'Developed By @Davaghana', fontSize: 10, bold: true, alignment: 'center' }],
+                [{ text: '***End of Document***', fontSize: 9, alignment: 'center' }]
+              ]
+            }
+          },
+        ],
+        pageMargins: 10,
+      }
+      const win = window.open('', "tempWinForPdf")
+      pdfMake.createPdf(docDefinition).print({}, win)
+      //win!.onfocus = function () { setTimeout(function () { win!.close(); }, 10000); } //set to 10 seconds
+    }
+
+
+  printGatePassRcpt1 = async (billItems: IServiceBillItem[], receiptNo: string, cash: number) => {
   
       //await this.get(this.id)
       //await this.getLastBillingDate(this.parkingId)

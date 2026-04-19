@@ -34,6 +34,7 @@ public class Object_ {
 	public static String FINCBND = "FINCBND-ACCESS";
 	public static String FINCWEGH = "FINCWEGH-ACCESS";
 	public static String FINCMTNC = "FINCMTNC-ACCESS";
+	public static String FINCRPRT = "FINCRPRT-ACCESS";
 	public static String FINCSERVBAY = "FINCSERVBAY-ACCESS";
 	public static String SHOP = "SHOP-ACCESS";
 	public static String RESTAURANT = "RESTAURANT-ACCESS SALE ADMIN"; 
