@@ -528,6 +528,10 @@ export class BondBillingComponent {
     this.router.navigate(["app/bond-management/cash-collections"])
   }
 
+  loadCheckoutList(){
+    this.router.navigate(["app/bond-management/bond-checkout-list"])
+  }
+
 
 
   /////////////////////////

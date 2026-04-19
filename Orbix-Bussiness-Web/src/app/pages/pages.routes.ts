@@ -473,6 +473,12 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
       {
+        path : 'bond-management/bond-checkout-list',
+        loadComponent: () => import('./bond-management/bond-checkout-list/bond-checkout-list.component').then(c => c.BondCheckoutListComponent),
+        data : { breadcrumb : 'Bond/Checkout List'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'bond-management/cash-collections',
         loadComponent: () => import('./bond-management/bond-cash-collection/bond-cash-collection.component').then(c => c.BondCashCollectionComponent),
         data : { breadcrumb : 'Bond/Cash Collections'},
@@ -568,6 +574,12 @@ export const routes: Routes = [
         path : 'accounts-and-finance/storage-discounts',
         loadComponent: () => import('./accounts-and-finance/storage-discounts/storage-discounts.component').then(c => c.StorageDiscountsComponent),
         data : { breadcrumb : 'Accounts & Finance | Storage Discounts'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'accounts-and-finance/bond-discounts',
+        loadComponent: () => import('./accounts-and-finance/bond-discounts/bond-discounts.component').then(c => c.BondDiscountsComponent),
+        data : { breadcrumb : 'Accounts & Finance | Bond Discounts'},
         canActivate : [AuthGuard]
       },
       {

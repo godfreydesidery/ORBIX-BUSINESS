@@ -1,0 +1,104 @@
+<div class="col">
+    <div widget class="card">
+        <div class="card-header">
+            <span>Bond Zone: {{ selectedBondZone?.name || '' }}</span>
+        </div>
+        <div class="card-body widget-body">
+            <div class="row" *ngIf="bondZoneLoaded == false">
+                <div class="col-md-3"></div>
+                <div class="col-md-6">
+                    <span>Bond Zone not Selected</span>
+                </div>
+                <div class="col-md-3"></div>
+            </div>
+            <div class="row" *ngIf="bondZoneLoaded == true">
+                <div class="col-lg-12">
+                    <div class="row">
+                        <div class="col-sm-4">
+                            <button class="btn btn-outline-danger btn-round-custom"
+                                (click)="getAllRecentCheckedOutBondItems()"><i class="fa fa-sign-out"></i> Checked Out
+                                List</button>
+                        </div>
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords"
+                                placeholder="Search..." style="max-width: 8cm;">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="table-responsive table-striped table-sm table-bordered">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>SN</th>
+                                    <th>No</th>
+                                    <th>Vehicle Name</th>
+                                    <th>Owner Name</th>
+                                    <th>Chasis No</th>
+                                    <th>Owner Address</th>
+                                    <th>Owner Contact</th>
+                                    <th>Agent Name</th>
+                                    <th>Agent Phone</th>
+                                    <th>Billing Type</th>
+                                    <th>Currency</th>
+                                    <th>Price &#64;</th>
+                                    <th>Check Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    *ngFor="let bondItem of bondItems | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index">
+                                    <td>{{bondItem.sn}}</td>
+                                    <td>{{bondItem.no}}</td>
+                                    <td>{{bondItem.bondItemName}}</td>
+
+                                    <td>{{bondItem.ownerFirstName}} {{bondItem.ownerMiddleName}}
+                                        {{bondItem.ownerLastName}}
+                                    </td>
+                                    <td>{{bondItem.chasisNo}}</td>
+                                    <td>{{bondItem.ownerAddress}}</td>
+                                    <td>{{bondItem.ownerPhoneNo}}</td>
+                                    <td>{{bondItem.agentName}}</td>
+                                    <td>{{bondItem.agentPhoneNo}}</td>
+                                    <td><span class="badge badge-primary">{{bondItem.billingType}}</span></td>
+                                    <td>{{bondItem.currency}}</td>
+                                    <td class="text-danger" style="text-align: right;"><b>{{bondItem.billingAmount |
+                                            currency:'':''}}</b></td>
+                                    <td>
+                                        <span class="badge badge-success"
+                                            *ngIf="bondItem.status === 'PROCESSING'">{{bondItem.status}}</span>
+                                        <span class="badge badge-warning"
+                                            *ngIf="bondItem.status === 'PENDING'">{{bondItem.status}}</span>
+                                        <span class="badge badge-primary"
+                                            *ngIf="bondItem.status === 'APPROVED'">{{bondItem.status}}</span>
+                                        <span class="badge badge-danger"
+                                            *ngIf="bondItem.status === 'CANCELED'">{{bondItem.status}}</span>
+                                        <span class="badge badge-success"
+                                            *ngIf="bondItem.status === 'CHECKED-IN'">{{bondItem.status}}</span>
+                                        <span class="badge badge-danger"
+                                            *ngIf="bondItem.status === 'CHECKED-OUT'">{{bondItem.status}}</span>
+
+                                    <td class="d-flex flex-wrap gap-2">
+                                        <div class="d-flex flex-row flex-wrap align-items-center gap-2">
+                                            <button class="btn btn-primary btn-round-custom btn-sm"
+                                                (click)="printReleaseNote(bondItem.id)"
+                                                ><i class="fa fa-print"></i> Gate Pass</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <pagination-controls class="pull-right"
+                                    (pageChange)="page = $event"></pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>

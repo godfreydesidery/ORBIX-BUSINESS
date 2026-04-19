@@ -407,6 +407,11 @@ export const menuItems = [
                 routerLink: '/app/accounts-and-finance/storage-discounts'
             },
             {
+                title: 'Bond Discounts',
+                show: grant(['FINCDISC-ACCESS', 'BNDDISC-ACCESS']),
+                routerLink: '/app/accounts-and-finance/bond-discounts'
+            },
+            {
                 title: 'Maintenance Billing',
                 show: grant(['FINCMTNC-ACCESS']),
                 routerLink: '/app/accounts-and-finance/maintenance-billing'

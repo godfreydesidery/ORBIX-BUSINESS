@@ -281,7 +281,7 @@ export class BondItemBillingComponent {
         serviceBillId: this.bondItemBillReceivableId,
         billAmount: (this.bondItemBillReceivablePrice * this.bondItemBillReceivableQty * this.bondItemBillReceivableNoOfDays),
         discountAmount: this.bondItemBillReceivableDiscount,
-        serviceBillName: 'BondItem',
+        serviceBillName: 'Bond',
         reason: this.discountReason
 
       }

@@ -32,14 +32,14 @@ const API_URL = environment.apiUrl;
   styleUrl: './release-vehicle-equipment.component.scss'
 })
 export class ReleaseVehicleEquipmentComponent {
-  documentHeader! : any
+  documentHeader!: any
 
   page: number = 1; // Initialize the current page to 1
 
-  filterRecords : string = ''
+  filterRecords: string = ''
 
-  id : any = null
-  no : string = ''
+  id: any = null
+  no: string = ''
 
   // Owner information
   ownerFirstName: string = ''
@@ -79,186 +79,186 @@ export class ReleaseVehicleEquipmentComponent {
   wheelCap: string = ''
   roundMirror: string = ''
   tireIndicator: string = ''
-  hasKeys : string = ''
+  hasKeys: string = ''
 
-  color : string = ''
+  color: string = ''
 
-  validUntilDate : Date | null = new Date()
+  validUntilDate: Date | null = new Date()
 
-  comments : string = ''
+  comments: string = ''
 
-  cardNo : string = ''
+  cardNo: string = ''
 
-  vehicleEquipmentCategory : string = ''
+  vehicleEquipmentCategory: string = ''
 
-  billingType : string = ''
-  billingAmount : number = 0
+  billingType: string = ''
+  billingAmount: number = 0
   //image: Byte[]
 
   status: string = "PENDING"
 
-  
 
-  startBillingAt : Date | null
+
+  startBillingAt: Date | null
 
   // Foreign keys
   parkingId: any = ''
   vehicleEquipmentTypeId: any = ''
-  vehicleEquipmentTypeName : string = ''
+  vehicleEquipmentTypeName: string = ''
   branchId: any = ''
   companyId: any = ''
 
-  parkingZoneName : string = ''
+  parkingZoneName: string = ''
 
-  
+
 
   /**Collections */
-  parkings : IParking[] = []
+  parkings: IParking[] = []
 
-  vehicleEquipmentTypes  : IVehicleEquipmentType[] = []
+  vehicleEquipmentTypes: IVehicleEquipmentType[] = []
 
-  parkingZones : IParkingZone[] = []
+  parkingZones: IParkingZone[] = []
 
-  
+
   constructor(
-    private http :HttpClient,
-    private auth : AuthService,
-    private data : DataService,
-    private msg : MsgBoxService
-  ) {}
+    private http: HttpClient,
+    private auth: AuthService,
+    private data: DataService,
+    private msg: MsgBoxService
+  ) { }
 
-  ngOnInit(){
+  ngOnInit() {
     this.getTodayCheckedOut()
     this.getAllCompanyActiveVehicleAndEquipmentTypes()
     this.getAllBranchActiveParkingZones()
   }
 
-  async getAllClearedParkings(){
+  async getAllClearedParkings() {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
     this.parkings = []
 
-    await this.http.get<IParking[]>(API_URL+'/parkings/get_all_cleared', options)
-    .toPromise()
-    .then(
-      data => {
-        var sn = 1
-        data?.forEach(element => {
-          element.sn = sn
-          this.parkings.push(element)
-          sn = sn + 1
-        })
-        console.log(data)
-      }
-    )
+    await this.http.get<IParking[]>(API_URL + '/parkings/get_all_cleared', options)
+      .toPromise()
+      .then(
+        data => {
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.parkings.push(element)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
   }
 
-  async getTodayCheckedOut(){
+  async getTodayCheckedOut() {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
     this.parkings = []
 
-    await this.http.get<IParking[]>(API_URL+'/parkings/get_recent_checked_out', options)
-    .toPromise()
-    .then(
-      data => {
-        var sn = 1
-        data?.forEach(element => {
-          element.sn = sn
-          this.parkings.push(element)
-          sn = sn + 1
-        })
-        console.log(data)
-      }
-    )
+    await this.http.get<IParking[]>(API_URL + '/parkings/get_recent_checked_out', options)
+      .toPromise()
+      .then(
+        data => {
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.parkings.push(element)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
   }
 
-  async printGatePass(id : any){
+  async printGatePass(id: any) {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
-    await this.http.get<IParking>(API_URL+'/parkings/get?id=' + id, options)
-    .toPromise()
-    .then(
-      data => {
-        console.log(data)
-        this.parkingId = data!.id
-        this.printGatePassRcpt(data!.serviceBillItems, '', 0);
-      }
-    )
-    .catch(error => {
-      console.log(error)
-    })
+    await this.http.get<IParking>(API_URL + '/parkings/get?id=' + id, options)
+      .toPromise()
+      .then(
+        data => {
+          console.log(data)
+          this.parkingId = data!.id
+          this.printGatePassRcpt(data!.serviceBillItems, '', 0);
+        }
+      )
+      .catch(error => {
+        console.log(error)
+      })
   }
 
-  
 
-  async get(id : any){
+
+  async get(id: any) {
 
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
-    await this.http.get<IParking>(API_URL+'/parkings/get?id=' + id, options)
-    .toPromise()
-    .then(
-      data => {
-        this.startBillingAt = null
-        this.showParkingData(data!)
-        console.log(data)
-      }
-    )
+    await this.http.get<IParking>(API_URL + '/parkings/get?id=' + id, options)
+      .toPromise()
+      .then(
+        data => {
+          this.startBillingAt = null
+          this.showParkingData(data!)
+          console.log(data)
+        }
+      )
   }
 
-  async getAllCompanyActiveVehicleAndEquipmentTypes(){
+  async getAllCompanyActiveVehicleAndEquipmentTypes() {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
     this.vehicleEquipmentTypes = []
 
-    await this.http.get<IVehicleEquipmentType[]>(API_URL+'/vehicle_equipment_types/get_all_company_active', options)
-    .toPromise()
-    .then(
-      data => {
-        var sn = 1
-        data?.forEach(element => {
-          element.sn = sn
-          this.vehicleEquipmentTypes.push(element)
-          sn = sn + 1
-        })
-        console.log(data)
-      }
-    )
+    await this.http.get<IVehicleEquipmentType[]>(API_URL + '/vehicle_equipment_types/get_all_company_active', options)
+      .toPromise()
+      .then(
+        data => {
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.vehicleEquipmentTypes.push(element)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
   }
 
-  async getAllBranchActiveParkingZones(){
+  async getAllBranchActiveParkingZones() {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
     this.parkingZones = []
 
-    await this.http.get<IParkingZone[]>(API_URL+'/parking_zones/get_all_branch_active', options)
-    .toPromise()
-    .then(
-      data => {
-        var sn = 1
-        data?.forEach(element => {
-          element.sn = sn
-          this.parkingZones.push(element)
-          sn = sn + 1
-        })
-        console.log(data)
-      }
-    )
+    await this.http.get<IParkingZone[]>(API_URL + '/parking_zones/get_all_branch_active', options)
+      .toPromise()
+      .then(
+        data => {
+          var sn = 1
+          data?.forEach(element => {
+            element.sn = sn
+            this.parkingZones.push(element)
+            sn = sn + 1
+          })
+          console.log(data)
+        }
+      )
   }
 
   selectedOption: string = '';
   options: string[] = ['Option 1', 'Option 2', 'Option 3'];
 
-  public async save(){
+  public async save() {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var parking = {
@@ -281,9 +281,9 @@ export class ReleaseVehicleEquipmentComponent {
       agentEmail: this.agentEmail,
       tformNumber: this.tformNumber,
 
-      billingType : this.billingType,
+      billingType: this.billingType,
 
-      billingAmount : this.billingAmount,
+      billingAmount: this.billingAmount,
 
       // Vehicle or Equipment Information
       registrationNo: this.registrationNo,
@@ -306,80 +306,80 @@ export class ReleaseVehicleEquipmentComponent {
       wheelCap: this.wheelCap === 'YES' ? 1 : 0,
       roundMirror: this.roundMirror === 'YES' ? 1 : 0,
       tireIndicator: this.tireIndicator === 'YES' ? 1 : 0,
-      hasKeys : this.hasKeys === 'YES' ? 1 : 0,
-      vehicleEquipmentTypeName : this.vehicleEquipmentTypeName,
+      hasKeys: this.hasKeys === 'YES' ? 1 : 0,
+      vehicleEquipmentTypeName: this.vehicleEquipmentTypeName,
 
-      vehicleEquipmentCategory : this.vehicleEquipmentCategory,
+      vehicleEquipmentCategory: this.vehicleEquipmentCategory,
 
-      cardNo : this.cardNo,
+      cardNo: this.cardNo,
 
-      billintType : this.billingType,
+      billintType: this.billingType,
 
-      parkingZoneName : this.parkingZoneName
+      parkingZoneName: this.parkingZoneName
     }
 
     console.log(parking)
 
-    if(parking.id === null){
+    if (parking.id === null) {
       /**Create new parking */
-      await this.http.post<IParking>(API_URL+'/parkings/create', parking, options)
-      .toPromise()
-      .then(
-        data => {
-          this.showParkingData(data!)
+      await this.http.post<IParking>(API_URL + '/parkings/create', parking, options)
+        .toPromise()
+        .then(
+          data => {
+            this.showParkingData(data!)
 
-          console.log(data)
+            console.log(data)
 
-          this.getAllClearedParkings()
+            this.getAllClearedParkings()
 
-          this.msg.showSuccessMessage('Parking created successifully')
-        }
+            this.msg.showSuccessMessage('Parking created successifully')
+          }
 
-      )
-      .catch(
-        error => {
-          console.log(error)
-          this.msg.showErrorMessage(error, 'Error')
-        }
-      )
-    }else{
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+          }
+        )
+    } else {
       /**Update an exiisting parking */
-      await this.http.post<IParking>(API_URL+'/parkings/update', parking, options)
-      .toPromise()
-      .then(
-        data => {
-          this.showParkingData(data!)
+      await this.http.post<IParking>(API_URL + '/parkings/update', parking, options)
+        .toPromise()
+        .then(
+          data => {
+            this.showParkingData(data!)
 
-          console.log(data)
+            console.log(data)
 
-          this.getAllClearedParkings()
+            this.getAllClearedParkings()
 
-          this.msg.showSuccessMessage('Parking updated successifully')
+            this.msg.showSuccessMessage('Parking updated successifully')
 
-        }
+          }
 
-      )
-      .catch(
-        error => {
-          console.log(error)
-          this.msg.showErrorMessage(error, 'Error')
-        }
-      )
+        )
+        .catch(
+          error => {
+            console.log(error)
+            this.msg.showErrorMessage(error, 'Error')
+          }
+        )
     }
   }
 
-  
 
-  async activate(id : any){
+
+  async activate(id: any) {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var parking = {
-      id : id
+      id: id
     }
 
-    await this.http.post<String>(API_URL+'/parkings/activate', parking, options)
+    await this.http.post<String>(API_URL + '/parkings/activate', parking, options)
       .toPromise()
       .then(
         data => {
@@ -401,20 +401,20 @@ export class ReleaseVehicleEquipmentComponent {
       )
   }
 
-  async checkIn(){
+  async checkIn() {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var parking = {
-      id : this.id,
-      cardNo : this.cardNo,
-      hasKeys : this.hasKeys === 'YES' ? 1 : 0,
-      parkingZoneName : this.parkingZoneName,
-      startBillingAt : this.startBillingAt
+      id: this.id,
+      cardNo: this.cardNo,
+      hasKeys: this.hasKeys === 'YES' ? 1 : 0,
+      parkingZoneName: this.parkingZoneName,
+      startBillingAt: this.startBillingAt
     }
 
-    await this.http.post<IParking>(API_URL+'/parkings/check_in', parking, options)
+    await this.http.post<IParking>(API_URL + '/parkings/check_in', parking, options)
       .toPromise()
       .then(
         data => {
@@ -436,14 +436,14 @@ export class ReleaseVehicleEquipmentComponent {
       )
   }
 
-  lastBillingDate : string = ''
-  async getLastBillingDate(parkingId : any){
+  lastBillingDate: string = ''
+  async getLastBillingDate(parkingId: any) {
     // this.lastBillingDate = ''
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
-    await this.http.get<IModel>(API_URL+'/parkings/get_last_parking_bill_date?id=' + parkingId, options)
+    await this.http.get<IModel>(API_URL + '/parkings/get_last_parking_bill_date?id=' + parkingId, options)
       .toPromise()
       .then(
         data => {
@@ -462,29 +462,29 @@ export class ReleaseVehicleEquipmentComponent {
       )
   }
 
-/**
- * Check out the vehicle/equipment
- * @returns {Promise<void>}
- */
-  async checkOut(): Promise<void>{
+  /**
+   * Check out the vehicle/equipment
+   * @returns {Promise<void>}
+   */
+  async checkOut(): Promise<void> {
 
 
-    if(await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to check out?', 'question', 'Yes', 'No') == false){
+    if (await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to check out?', 'question', 'Yes', 'No') == false) {
       return
     }
 
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var parking = {
-      id : this.id,
-      cardNo : this.cardNo,
-      parkingZoneName : this.parkingZoneName,
-      startBillingAt : this.startBillingAt
+      id: this.id,
+      cardNo: this.cardNo,
+      parkingZoneName: this.parkingZoneName,
+      startBillingAt: this.startBillingAt
     }
 
-    await this.http.post<IParking>(API_URL+'/parkings/check_out', parking, options)
+    await this.http.post<IParking>(API_URL + '/parkings/check_out', parking, options)
       .toPromise()
       .then(
         data => {
@@ -493,7 +493,7 @@ export class ReleaseVehicleEquipmentComponent {
 
           this.getAllClearedParkings()
           this.msg.showSuccessMessage('Checked out Successifully')
-          
+
           this.printGatePassRcpt(data!.serviceBillItems, '', 0);
         }
       )
@@ -505,16 +505,16 @@ export class ReleaseVehicleEquipmentComponent {
       )
   }
 
-  async deactivate(id : any){
+  async deactivate(id: any) {
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
     var parking = {
-      id : id
+      id: id
     }
 
-    await this.http.post<String>(API_URL+'/parkings/deactivate', parking, options)
+    await this.http.post<String>(API_URL + '/parkings/deactivate', parking, options)
       .toPromise()
       .then(
         data => {
@@ -536,7 +536,7 @@ export class ReleaseVehicleEquipmentComponent {
       )
   }
 
-  showParkingData(data : IParking){
+  showParkingData(data: IParking) {
     this.id = data?.id;
     this.no = data!.no;
     this.ownerFirstName = data?.ownerFirstName;
@@ -582,24 +582,24 @@ export class ReleaseVehicleEquipmentComponent {
     this.hasKeys = data?.hasKeys == true ? 'YES' : 'NO'
     this.vehicleEquipmentTypeName = data!.vehicleEquipmentTypeName,
 
-    this.vehicleEquipmentCategory = data!.vehicleEquipmentCategory
+      this.vehicleEquipmentCategory = data!.vehicleEquipmentCategory
 
     this.parkingZoneName = data!.parkingZoneName,
-     this.cardNo = data!.cardNo
+      this.cardNo = data!.cardNo
 
-     this.billingType = data!.billingType
+    this.billingType = data!.billingType
 
-     this.status = data!.status
+    this.status = data!.status
 
-     this.color = data!.vehicleEquipmentColor
+    this.color = data!.vehicleEquipmentColor
 
-     this.validUntilDate = null
+    this.validUntilDate = null
 
-     this.comments = '' // check this
+    this.comments = '' // check this
 
   }
 
-  clearParkingData(){
+  clearParkingData() {
     this.id = null;
     this.no = ''
     this.ownerFirstName = ''
@@ -655,24 +655,24 @@ export class ReleaseVehicleEquipmentComponent {
     this.color = ''
   }
 
-  printGatePassRcpt = async (billItems : IServiceBillItem[], receiptNo :string, cash : number) => {
-  
-      await this.get(this.parkingId)
-      await this.getLastBillingDate(this.parkingId)
-  
-      var companyName = localStorage.getItem('company-name')!
-  
-      var header = ''
-      var footer = ''
-      var title  = 'Gate Pass(Reprinted)'
-      var total : number = 0
-      var discount : number = 0
-      var tax : number = 0
-  
-      // var address : any = await this.data.getReceiptHeader(receiptNo)
-      var address : any = await this.data.getBranchReceiptHeaderWithNoTinAndVrn(receiptNo)
+  printGatePassRcpt = async (billItems: IServiceBillItem[], receiptNo: string, cash: number) => {
 
-      // Set up VFS for pdfMake - try different approaches
+    await this.get(this.parkingId)
+    await this.getLastBillingDate(this.parkingId)
+
+    var companyName = localStorage.getItem('company-name')!
+
+    var header = ''
+    var footer = ''
+    var title = 'Gate Pass(Reprinted)'
+    var total: number = 0
+    var discount: number = 0
+    var tax: number = 0
+
+    // var address : any = await this.data.getReceiptHeader(receiptNo)
+    var address: any = await this.data.getBranchReceiptHeaderWithNoTinAndVrn(receiptNo)
+
+    // Set up VFS for pdfMake - try different approaches
     try {
       const vfsFonts = require('pdfmake/build/vfs_fonts.js');
       // Try different possible structures
@@ -686,124 +686,124 @@ export class ReleaseVehicleEquipmentComponent {
     } catch (error) {
       console.log('VFS setup failed, continuing without custom fonts:', error);
     }
-     
-      var receipt = [
-        [
-          {text : 'SN', fontSize : 8, bold : true}, 
-          {text : 'Item', fontSize : 8, bold : true},
-          {text : 'Qty', fontSize : 8, bold : true},
-          {text : 'Amount', fontSize : 8, bold : true},
-        ]
-      ] 
-      
-      var sn = 0
-  
-      billItems.forEach((element) => {
-        total = total + (+element.amount)
-        sn = sn + 1
-        var item = [
-          {text : sn.toString(), fontSize : 8, bold : false}, 
-          {text : element.item, fontSize : 8, bold : false},
-          {text : element.qty.toString(), fontSize : 8, bold : false},
-          {text : (element.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 8, alignment : 'right', bold : false},
-        ]
-        receipt.push(item)
-      })
-      var detailSummary = [
-        {text : ' ', fontSize : 8, bold : false},
-        {text : 'Total', fontSize : 9, bold : true},
-        {text : ' ', fontSize : 8, bold : false},
-        {text : total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', bold : true},
+
+    var receipt = [
+      [
+        { text: 'SN', fontSize: 8, bold: true },
+        { text: 'Item', fontSize: 8, bold: true },
+        { text: 'Qty', fontSize: 8, bold: true },
+        { text: 'Amount', fontSize: 8, bold: true },
       ]
-      receipt.push(detailSummary)
-      
-  
-      const docDefinition = {
-        header: '',
-        
-        //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
-          content : [
-            {
-              layout : 'noBorders',
-              table : address
-            }, 
-            
-            
-            
-            {
-              layout : 'noBorders',
-              table : {
-                headerRows : 0,
-                widths : [210],
-                body : [
-                  [{text : '=============================='}],
-                ]
-              }
-            },          
-            {
-              layout : 'noBorders',
-              table : {
-                headerRows : 0,
-                widths : [200],
-                body : [
-                  [{text : title, alignment : 'center', fontSize : 9, bold : true}],
-                  [{text : 'Vehicle Name: ' + this.vehicleEquipmentTypeName, alignment : 'left', fontSize : 9, bold : false}],
-                  [{text : 'Vehicle Color: ' + this.color, alignment : 'left', fontSize : 9, bold : false}],
-                  [{text : 'Chassis No: ' + this.chasisNo, alignment : 'left', fontSize : 9, bold : false}],
-                  [{text : '________________________________'}],
-                  [{text : 'Payment Details', alignment : 'center', fontSize : 9, bold : true}],
-                  [{text : ' ', alignment : 'center', fontSize : 9, bold : true}],
-                ]
-              }
-            },   
-            {
-              layout : 'noBorders',
-              table : {
-                  headerRows : 1,
-                  widths : [15, 100, 15, 50],
-                  body : receipt
-              }
-            },
-            {
-              layout : 'noBorders',
-              table : {
-                headerRows : 0,
-                widths : [200],
-                body : [
-                  [{text : ' '}],
-                  [{text : 'Cashier Comments', alignment : 'left', fontSize : 9, bold : true}],
-                  [{text : this.comments, alignment : 'left', fontSize : 9, bold : false}],
-                  [{text : ' '}],
-                  [{text : ' '}],
-                  [{text : 'Issued At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
-                  [{text : 'Checkout At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
-                  [{text : 'Valid Until: ' + this.lastBillingDate, alignment : 'left', fontSize : 9, bold : true}],
-                  [{text : ' '}],
-                  [{text : 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment : 'left', fontSize : 9, bold : true}],
-                  [{text : ' '}],
-                  [{text : 'Signature: ......................'}],
-                ]
-              }
-            },   
-            {
-              layout : 'noBorders',
-              table : {
-                headerRows : 0,
-                widths : [210],
-                body : [
-                  [{text : '=============================='}],
-                  [{text : 'Developed By @Davaghana', fontSize : 10, bold : true, alignment : 'center'}],
-                  [{text : '***End of Document***', fontSize : 9, alignment : 'center'}]
-                ]
-              }
-            },
-          ],
-          pageMargins: 10,
-        }
-        const win = window.open('', "tempWinForPdf")
-        pdfMake.createPdf(docDefinition).print({}, win)
-        //win!.onfocus = function () { setTimeout(function () { win!.close(); }, 10000); } //set to 10 seconds
+    ]
+
+    var sn = 0
+
+    billItems.forEach((element) => {
+      total = total + (+element.amount)
+      sn = sn + 1
+      var item = [
+        { text: sn.toString(), fontSize: 8, bold: false },
+        { text: element.item, fontSize: 8, bold: false },
+        { text: element.qty.toString(), fontSize: 8, bold: false },
+        { text: (element.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 8, alignment: 'right', bold: false },
+      ]
+      receipt.push(item)
+    })
+    var detailSummary = [
+      { text: ' ', fontSize: 8, bold: false },
+      { text: 'Total', fontSize: 9, bold: true },
+      { text: ' ', fontSize: 8, bold: false },
+      { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+    ]
+    receipt.push(detailSummary)
+
+
+    const docDefinition = {
+      header: '',
+
+      //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
+      content: [
+        {
+          layout: 'noBorders',
+          table: address
+        },
+
+
+
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: [210],
+            body: [
+              [{ text: '==============================' }],
+            ]
+          }
+        },
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: [200],
+            body: [
+              [{ text: title, alignment: 'center', fontSize: 9, bold: true }],
+              [{ text: 'Vehicle Name: ' + this.vehicleEquipmentTypeName, alignment: 'left', fontSize: 9, bold: false }],
+              [{ text: 'Vehicle Color: ' + this.color, alignment: 'left', fontSize: 9, bold: false }],
+              [{ text: 'Chassis No: ' + this.chasisNo, alignment: 'left', fontSize: 9, bold: false }],
+              [{ text: '________________________________' }],
+              [{ text: 'Payment Details', alignment: 'center', fontSize: 9, bold: true }],
+              [{ text: ' ', alignment: 'center', fontSize: 9, bold: true }],
+            ]
+          }
+        },
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 1,
+            widths: [15, 100, 15, 50],
+            body: receipt
+          }
+        },
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: [200],
+            body: [
+              [{ text: ' ' }],
+              [{ text: 'Cashier Comments', alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: this.comments, alignment: 'left', fontSize: 9, bold: false }],
+              [{ text: ' ' }],
+              [{ text: ' ' }],
+              [{ text: 'Issued At: ' + new Date().toString(), alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: 'Checkout At: ' + new Date().toString(), alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: 'Valid Until: ' + this.lastBillingDate, alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: ' ' }],
+              [{ text: 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: ' ' }],
+              [{ text: 'Signature: ......................' }],
+            ]
+          }
+        },
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: [210],
+            body: [
+              [{ text: '==============================' }],
+              [{ text: 'Developed By @Davaghana', fontSize: 10, bold: true, alignment: 'center' }],
+              [{ text: '***End of Document***', fontSize: 9, alignment: 'center' }]
+            ]
+          }
+        },
+      ],
+      pageMargins: 10,
     }
+    const win = window.open('', "tempWinForPdf")
+    pdfMake.createPdf(docDefinition).print({}, win)
+    //win!.onfocus = function () { setTimeout(function () { win!.close(); }, 10000); } //set to 10 seconds
+  }
 
 
   printGatePass1() {
@@ -828,140 +828,140 @@ export class ReleaseVehicleEquipmentComponent {
     pdfMake.createPdf(documentDefinition).open();
   }
 
-  printGatePassRcpt111 = async (billItems : IServiceBillItem[], receiptNo :string, cash : number) => {
+  printGatePassRcpt111 = async (billItems: IServiceBillItem[], receiptNo: string, cash: number) => {
 
     var companyName = localStorage.getItem('company-name')!
 
     var header = ''
     var footer = ''
-    var title  = 'Gate Pass'
-    var total : number = 0
-    var discount : number = 0
-    var tax : number = 0
+    var title = 'Gate Pass'
+    var total: number = 0
+    var discount: number = 0
+    var tax: number = 0
 
-    var address : any = await this.data.getReceiptHeader(receiptNo)
-   
+    var address: any = await this.data.getReceiptHeader(receiptNo)
+
     var receipt = [
       [
-        {text : 'SN', fontSize : 8, bold : true}, 
-        {text : 'Item', fontSize : 8, bold : true},
-        {text : 'Qty', fontSize : 8, bold : true},
-        {text : 'Amount', fontSize : 8, bold : true},
+        { text: 'SN', fontSize: 8, bold: true },
+        { text: 'Item', fontSize: 8, bold: true },
+        { text: 'Qty', fontSize: 8, bold: true },
+        { text: 'Amount', fontSize: 8, bold: true },
       ]
-    ] 
-    
+    ]
+
     var sn = 0
 
     billItems.forEach((element) => {
       total = total + (+element.amount)
       sn = sn + 1
       var item = [
-        {text : sn.toString(), fontSize : 8, bold : false}, 
-        {text : element.item, fontSize : 8, bold : false},
-        {text : element.qty.toString(), fontSize : 8, bold : false},
-        {text : (element.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 8, alignment : 'right', bold : false},
+        { text: sn.toString(), fontSize: 8, bold: false },
+        { text: element.item, fontSize: 8, bold: false },
+        { text: element.qty.toString(), fontSize: 8, bold: false },
+        { text: (element.amount).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 8, alignment: 'right', bold: false },
       ]
       receipt.push(item)
     })
     var detailSummary = [
-      {text : ' ', fontSize : 8, bold : false},
-      {text : 'Total', fontSize : 9, bold : true},
-      {text : ' ', fontSize : 8, bold : false},
-      {text : total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize : 9, alignment : 'right', bold : true},
+      { text: ' ', fontSize: 8, bold: false },
+      { text: 'Total', fontSize: 9, bold: true },
+      { text: ' ', fontSize: 8, bold: false },
+      { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
     ]
     receipt.push(detailSummary)
-    
+
 
     const docDefinition = {
       header: '',
-      
+
       //watermark : { text : '', color: 'blue', opacity: 0.1, bold: true, italics: false },
-        content : [
-          {
-            layout : 'noBorders',
-            table : address
-          }, 
-          
-          
-          
-          {
-            layout : 'noBorders',
-            table : {
-              headerRows : 0,
-              widths : [210],
-              body : [
-                [{text : '=============================='}],
-              ]
-            }
-          },          
-          {
-            layout : 'noBorders',
-            table : {
-              headerRows : 0,
-              widths : [200],
-              body : [
-                [{text : 'Gate Pass', alignment : 'center', fontSize : 9, bold : true}],
-                [{text : 'Vehicle Name: ' + this.vehicleEquipmentTypeName, alignment : 'left', fontSize : 9, bold : false}],
-                [{text : 'Vehicle Color: ' + this.color, alignment : 'left', fontSize : 9, bold : false}],
-                [{text : 'Chassis No: ' + this.chasisNo, alignment : 'left', fontSize : 9, bold : false}],
-                [{text : '________________________________'}],
-                [{text : 'Payment Details', alignment : 'center', fontSize : 9, bold : true}],
-                [{text : ' ', alignment : 'center', fontSize : 9, bold : true}],
-              ]
-            }
-          },   
-          {
-            layout : 'noBorders',
-            table : {
-                headerRows : 1,
-                widths : [15, 100, 15, 50],
-                body : receipt
-            }
-          },
-          {
-            layout : 'noBorders',
-            table : {
-              headerRows : 0,
-              widths : [200],
-              body : [
-                [{text : ' '}],
-                [{text : 'Cashier Comments', alignment : 'left', fontSize : 9, bold : true}],
-                [{text : this.comments, alignment : 'left', fontSize : 9, bold : false}],
-                [{text : ' '}],
-                [{text : ' '}],
-                [{text : 'Issued At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
-                [{text : 'Checkout At: ' + new Date().toString(), alignment : 'left', fontSize : 9, bold : true}],
-                [{text : 'Valid Until: ' + this.lastBillingDate, alignment : 'left', fontSize : 9, bold : true}],
-                [{text : ' '}],
-                [{text : 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment : 'left', fontSize : 9, bold : true}],
-                [{text : ' '}],
-                [{text : 'Signature: ......................'}],
-              ]
-            }
-          },   
-          {
-            layout : 'noBorders',
-            table : {
-              headerRows : 0,
-              widths : [210],
-              body : [
-                [{text : '=============================='}],
-                [{text : 'Developed By @Davaghana', fontSize : 10, bold : true, alignment : 'center'}],
-                [{text : '***End of Document***', fontSize : 9, alignment : 'center'}]
-              ]
-            }
-          },
-        ],
-        pageMargins: 10,
-      }
-      const win = window.open('', "tempWinForPdf")
-      pdfMake.createPdf(docDefinition).print({}, win)
-      //win!.onfocus = function () { setTimeout(function () { win!.close(); }, 10000); } //set to 10 seconds
+      content: [
+        {
+          layout: 'noBorders',
+          table: address
+        },
+
+
+
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: [210],
+            body: [
+              [{ text: '==============================' }],
+            ]
+          }
+        },
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: [200],
+            body: [
+              [{ text: 'Gate Pass', alignment: 'center', fontSize: 9, bold: true }],
+              [{ text: 'Vehicle Name: ' + this.vehicleEquipmentTypeName, alignment: 'left', fontSize: 9, bold: false }],
+              [{ text: 'Vehicle Color: ' + this.color, alignment: 'left', fontSize: 9, bold: false }],
+              [{ text: 'Chassis No: ' + this.chasisNo, alignment: 'left', fontSize: 9, bold: false }],
+              [{ text: '________________________________' }],
+              [{ text: 'Payment Details', alignment: 'center', fontSize: 9, bold: true }],
+              [{ text: ' ', alignment: 'center', fontSize: 9, bold: true }],
+            ]
+          }
+        },
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 1,
+            widths: [15, 100, 15, 50],
+            body: receipt
+          }
+        },
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: [200],
+            body: [
+              [{ text: ' ' }],
+              [{ text: 'Cashier Comments', alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: this.comments, alignment: 'left', fontSize: 9, bold: false }],
+              [{ text: ' ' }],
+              [{ text: ' ' }],
+              [{ text: 'Issued At: ' + new Date().toString(), alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: 'Checkout At: ' + new Date().toString(), alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: 'Valid Until: ' + this.lastBillingDate, alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: ' ' }],
+              [{ text: 'Gate Pass issued By: ' + localStorage.getItem('user-name'), alignment: 'left', fontSize: 9, bold: true }],
+              [{ text: ' ' }],
+              [{ text: 'Signature: ......................' }],
+            ]
+          }
+        },
+        {
+          layout: 'noBorders',
+          table: {
+            headerRows: 0,
+            widths: [210],
+            body: [
+              [{ text: '==============================' }],
+              [{ text: 'Developed By @Davaghana', fontSize: 10, bold: true, alignment: 'center' }],
+              [{ text: '***End of Document***', fontSize: 9, alignment: 'center' }]
+            ]
+          }
+        },
+      ],
+      pageMargins: 10,
+    }
+    const win = window.open('', "tempWinForPdf")
+    pdfMake.createPdf(docDefinition).print({}, win)
+    //win!.onfocus = function () { setTimeout(function () { win!.close(); }, 10000); } //set to 10 seconds
   }
 
 }
 
 
-interface IModel{
-  stringData : string
+interface IModel {
+  stringData: string
 }

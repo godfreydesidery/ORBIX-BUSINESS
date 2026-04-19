@@ -29,10 +29,10 @@
                                             <td>Description</td>
                                             <td>Price&#64; TZS/USD</td> 
                                             <td>Days</td>
-                                            <!-- <td>Discount Status</td> -->
+                                            <td>Discount Status</td>
                                             <td>TZS</td>
                                             <td>Status</td>
-                                            <!-- <td>Action</td> -->
+                                            <td>Action</td>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -41,20 +41,20 @@
                                             <td>Bond Item From {{p.startedAt}} To {{p.endedAt}} </td>
                                             <td style="text-align: right;">{{p.price | currency:'':''}}</td>
                                             <td>{{p.noOfDays}}</td>
-                                            <!-- <td>
+                                            <td>
                                                 <span class="badge badge-warning" *ngIf="p.discountStatus === 'Requested'">{{p.discountStatus}}</span> 
                                                 <span class="badge badge-success" *ngIf="p.discountStatus === 'Approved'">{{p.discountStatus}}</span> 
                                                 <span class="badge badge-danger" *ngIf="p.discountStatus === 'Rejected'">{{p.discountStatus}}</span> 
-                                            </td> -->
-                                            <!-- <td style="text-align: right;">{{p.discount | currency:'':''}}</td> -->
+                                            </td>
+                                            <td style="text-align: right;">{{p.discount | currency:'':''}}</td>
                                             <td style="text-align: right;">{{p.amount | currency:'':''}}</td>
                                             <td>{{p.payStatus}}</td>
-                                            <!-- <td>
+                                            <td>
                                                 <tr>
                                                 <td><button class="btn btn-success btn-sm btn-round-custom text-nowrap" *ngIf="p.payStatus === 'UNPAID' && (!(p.discountStatus == 'Requested' || p.discountStatus == 'Approved'))" (click)="getBondItemBill(p.id)" data-toggle="modal" data-target="#discount-request-modal">Request</button></td>
                                                 <td><button class="btn btn-primary btn-sm btn-round-custom text-nowrap" *ngIf="p.payStatus === 'UNPAID'" (click)="getBondItemBill(p.id)" data-toggle="modal" data-target="#discount-view-modal">View</button></td>
                                                 </tr>
-                                            </td> -->
+                                            </td>
                                         </tr>
                                     </tbody>
                                 </table>

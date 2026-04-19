@@ -36,7 +36,10 @@
                         <div class="row">
                             <div class="col-sm-4"><button class="btn btn-success btn-round-custom"
                                     (click)="loadCollectionReport()"><i class="fa fa-money"></i> Collection
-                                    Report</button></div>
+                                    Report</button>
+                                <button class="btn btn-success btn-round-custom" (click)="loadCheckoutList()"><i
+                                        class="fa fa-money"></i> Checkout List</button>
+                            </div>
                             <div class="col-sm-4"></div>
                             <div class="col-sm-4">
                                 <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords"
@@ -354,22 +357,67 @@
                                 <p><b>Check List</b></p>
                             </thead>
                             <tbody>
-                                <tr><td><b>Front Lamps</b></td><td><span>L: {{leftFrontLamp}}</span><span> R: {{rightFrontLamp}}</span></td></tr>
-                                <tr><td><b>Rear Lamps</b></td><td><span>L: {{leftRearLamp}}</span><span> R: {{rightRearLamp}}</span></td></tr>
-                                <tr><td><b>Front Indicators</b></td><td><span>L: {{leftFrontLamp}}</span><span> R: {{rightFrontLamp}}</span></td></tr>
-                                <tr><td><b>Rear Indicators</b></td><td><span>L: {{leftRearLamp}}</span><span> R: {{rightRearLamp}}</span></td></tr>
-                                <tr><td><b>Side Mirrors</b></td><td><span>L: {{leftSideMirror}}</span><span> R: {{rightSideMirror}}</span></td></tr>
-                                <tr><td><b>Wipers</b></td><td><span>L: {{leftWiper}}</span><span> R: {{rightWiper}}</span></td></tr> 
-                                <tr><td><b>Back Wipers</b></td><td>{{backWiper}}</td></tr> 
-                                <tr><td><b>Fuel Cap</b></td><td>{{fuelCap}}</td></tr> 
-                                <tr><td><b>Spare Tyre</b></td><td>{{spareTire}}</td></tr>  
-                                <tr><td><b>Battery</b></td><td>{{battery}}</td></tr> 
-                                <tr><td><b>Starter</b></td><td>{{starter}}</td></tr>  
-                                <tr><td><b>Aerial</b></td><td>{{aerial}}</td></tr> 
-                                <tr><td><b>Wheel Cap</b></td><td>{{wheelCap}}</td></tr> 
-                                <tr><td><b>Round Mirror</b></td><td>{{roundMirror}}</td></tr> 
-                                <tr><td><b>Tire Indicator</b></td><td>{{tireIndicator}}</td></tr> 
-                                
+                                <tr>
+                                    <td><b>Front Lamps</b></td>
+                                    <td><span>L: {{leftFrontLamp}}</span><span> R: {{rightFrontLamp}}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Rear Lamps</b></td>
+                                    <td><span>L: {{leftRearLamp}}</span><span> R: {{rightRearLamp}}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Front Indicators</b></td>
+                                    <td><span>L: {{leftFrontLamp}}</span><span> R: {{rightFrontLamp}}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Rear Indicators</b></td>
+                                    <td><span>L: {{leftRearLamp}}</span><span> R: {{rightRearLamp}}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Side Mirrors</b></td>
+                                    <td><span>L: {{leftSideMirror}}</span><span> R: {{rightSideMirror}}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Wipers</b></td>
+                                    <td><span>L: {{leftWiper}}</span><span> R: {{rightWiper}}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Back Wipers</b></td>
+                                    <td>{{backWiper}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Fuel Cap</b></td>
+                                    <td>{{fuelCap}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Spare Tyre</b></td>
+                                    <td>{{spareTire}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Battery</b></td>
+                                    <td>{{battery}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Starter</b></td>
+                                    <td>{{starter}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Aerial</b></td>
+                                    <td>{{aerial}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Wheel Cap</b></td>
+                                    <td>{{wheelCap}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Round Mirror</b></td>
+                                    <td>{{roundMirror}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Tire Indicator</b></td>
+                                    <td>{{tireIndicator}}</td>
+                                </tr>
+
                             </tbody>
                         </table>
                     </div>
