@@ -52,9 +52,10 @@
                                     <td><b>Name</b></td>
                                     <td><b>Phone</b></td>
                                     <td><b>Date Registered</b></td>
-                                    <td><b>Days</b></td>
+                                    <!-- <td><b>Days</b></td> -->
                                     <td><b>Amount</b></td>
                                     <td><b>Discount</b></td>
+                                    <td><b>Discount approved by</b></td>
                                     <td><b>Payment Date</b></td>
                                     <td><b>Bond Name</b></td>
                                     <td><b>Cashier Name</b></td>
@@ -66,13 +67,14 @@
                                         <td>{{p.chasisNo}}</td>
                                         <td>{{p.ownerFirstName}} {{p.ownerLastName}}</td>
                                         <td>{{p.ownerPhoneNo}}</td>
-                                        <td>{{p.createdDateTime}}</td>
-                                        <td>{{p.days}}</td>
+                                        <td>{{p.checkedInDate}}</td>
+                                        <!-- <td>{{p.days}}</td> -->
                                         <td style="text-align: right;">{{p.amount | currency:'':''}}
                                         </td>
                                         <td style="text-align: right;">{{p.discount |
                                             currency:'':''}}</td>
-                                        <td>{{p.dateTime}}</td>
+                                        <td>{{p.discountApprovedBy}}</td>
+                                        <td>{{p.checkedOutDate}}</td>
                                         <td>{{p.bondZoneName}}</td>
                                         <td>{{p.cashierName}}</td>
                                     </tr>
@@ -82,12 +84,13 @@
                                         <td></td>
                                         <td></td>
                                         <td></td>
-                                        <td></td>
+                                        <!-- <td></td> -->
                                         <td>Total</td>
                                         <td style="text-align: right;">{{totalBondItemCashCollections | currency:'':''}}
                                         </td>
                                         <td style="text-align: right;">{{0 |
                                             currency:'':''}}</td>
+                                        <td></td>
                                         <td></td>
                                         <td></td>
                                         <td></td>

@@ -402,7 +402,7 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
 		            "WHERE c.collection_date_time BETWEEN :startDate AND :endDate AND (:bond_zone_id IS NULL OR bz.id = :bond_zone_id)",
 		    nativeQuery = true
 		)
-		List<IBondItemCollection> findBondItemCollectionsBetweenDates(
+		List<IBondItemCollection> findBondItemCollectionsBetweenDates_(
 		    @Param("startDate") LocalDateTime startDate,
 		    @Param("endDate") LocalDateTime endDate,
 		    @Param("bond_zone_id") Long bondZoneId
@@ -505,6 +505,46 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
 		    @Param("endDate") LocalDateTime endDate,
 		    @Param("nickname") String nickname
 		);
+	
+	@Query(value = "SELECT " +
+	        "p.chasis_no AS chasisNo, " +
+	        "p.owner_first_name AS ownerFirstName, " +
+	        "p.owner_last_name AS ownerLastName, " +
+	        "p.owner_phone_no AS ownerPhoneNo, " +
+	        "DATE(p.checked_in_date_time) AS checkedInDate, " +
+	        "TIME(p.checked_in_date_time) AS checkedInTime, " +
+	        "DATE(p.checked_out_date_time) AS checkedOutDate, " +
+	        "TIME(p.checked_out_date_time) AS checkedOutTime, " +
+	        "p.checked_in_date_time AS checkedInDateTime, " +
+	        "p.checked_out_date_time AS checkedOutDateTime, " +
+	        "vt.name AS bondItemName, " +
+	        "br.qty AS qty, " +
+	        "pbr.discount AS discount, " +
+	        "z.name AS bondZoneName, " +
+	        "brc.amount AS amount, " +
+	        "c.pay_code AS payCode, " +
+	        "u.nickname AS cashierName, " +
+	        "ua.nickname AS discountApprovedBy, " +
+	        "pbr.discount_approved_date_time AS discountApprovedDateTime, " +
+	        "DATE(pbr.discount_approved_date_time) AS discountApprovedDate, " +
+	        "TIME(pbr.discount_approved_date_time) AS discountApprovedTime " +
+	        "FROM bill_receivable_collections brc " +
+	        "JOIN bill_receivables br ON brc.bill_receivable_id = br.id " +
+	        "JOIN collections c ON brc.collection_id = c.id " +
+	        "JOIN users u ON c.collected_by_user_id = u.id " +
+	        "JOIN bond_item_bill_receivables pbr ON pbr.bill_receivable_id = br.id " +
+	        "JOIN bond_items p ON pbr.bond_item_id = p.id " +
+	        "JOIN bond_zones z ON p.bond_zone_id = z.id " +
+	        "JOIN bond_item_types vt ON p.bond_item_type_id = vt.id " +
+	        "LEFT JOIN users ua ON pbr.discount_approved_by_user_id = ua.id " +
+	        "WHERE (:bondZoneId IS NULL OR p.bond_zone_id = :bondZoneId) " +
+	        "AND c.collection_date_time BETWEEN :startDate AND :endDate",
+	        nativeQuery = true)
+	List<IBondItemCollection> findBondItemCollectionsBetweenDates(
+	        @Param("startDate") LocalDateTime startDate,
+	        @Param("endDate") LocalDateTime endDate,
+	        @Param("bondZoneId") Long bondZoneId
+	);
 
 }
 
@@ -590,7 +630,7 @@ interface IStorageCollection {
 }
 
 interface IBondItemCollection {
-    String getAmount();
+    double getAmount();
     String getPayCode();
     String getDateTime();
     String getReason();
@@ -600,8 +640,11 @@ interface IBondItemCollection {
     String getOwnerLastName();
     String getOwnerPhoneNo();
     String getCreatedDateTime();
-    double getDays();
+    String getCheckedInDate();
+    String getCheckedOutDate();
+    Double getDays();
     double getDiscount();
+    String getDiscountApprovedBy();
     String getCashierName();
     Long getBondZoneId();
     String getBondZoneName();

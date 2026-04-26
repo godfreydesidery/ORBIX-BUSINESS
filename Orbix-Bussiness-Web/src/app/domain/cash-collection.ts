@@ -109,11 +109,13 @@ export interface IBondItemCashCollection {
   ownerPhoneNo: string
   dateTime: string
   createdDateTime: string
+  checkedInDate: string
+  checkedOutDate: string
   days: number
   discount: number
   bondZoneName : string
   chasisNo : string
-
+  discountApprovedBy : string
   sn: number
 }
 

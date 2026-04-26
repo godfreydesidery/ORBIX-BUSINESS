@@ -994,9 +994,9 @@ export class BondCashCollectionComponent {
           { text: 'Owner Name', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
           { text: 'Phone No', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
           { text: 'Date Registered', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
-          { text: 'Days', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
           { text: 'Amount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
           { text: 'Discount', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
+          { text: 'Discount Approved By', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
           { text: 'Payment Date', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
           { text: 'Cashier', fontSize: 8, alignment: 'left', fillColor: '#ffffff', bold: true },
         ]);
@@ -1012,11 +1012,11 @@ export class BondCashCollectionComponent {
             { text: element.chasisNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
             { text: `${element.ownerFirstName || ''} ${element.ownerLastName || ''}`, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
             { text: element.ownerPhoneNo || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-            { text: element.createdDateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
-            { text: element.days || '', fontSize: 9, alignment: 'center', fillColor: '#ffffff', bold: false },
+            { text: element.checkedInDate, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
             { text: (Number(element.amount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
             { text: (Number(element.discount) || 0).toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', fillColor: '#ffffff', bold: false },
-            { text: element.dateTime.substring(0, 10), fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+            { text: element.discountApprovedBy || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
+            { text: element.checkedOutDate, fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
             { text: element.cashierName || '', fontSize: 9, alignment: 'left', fillColor: '#ffffff', bold: false },
           ]);
         });
@@ -1028,10 +1028,10 @@ export class BondCashCollectionComponent {
           {},
           {},
           {},
-          {},
           { text: 'Total', fontSize: 9, alignment: 'right', bold: true },
           { text: total.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
           { text: discount.toLocaleString('en-US', { minimumFractionDigits: 2 }), fontSize: 9, alignment: 'right', bold: true },
+          {},
           {},
           {},
         ]);
@@ -1057,7 +1057,7 @@ export class BondCashCollectionComponent {
             {text: fromTo , fontSize: 10, bold: true, alignment: 'left', margin: [0, 10, 0, 10] },
             {
               table: {
-                widths: [25, 80, 50, 100, 60, 60, 30, 60, 50, 60, 80],
+                widths: [25, 80, 50, 100, 60, 60, 60, 50, 60, 80, 80],
                 body: report,
               },
             },
