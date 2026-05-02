@@ -17,6 +17,12 @@ import org.springframework.stereotype.Service;
 
 import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.api.commons.WorkFlowStatus;
+import com.orbix.api.api.vehicleandequipmentparking.Parking;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingBillReceivable;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingRequestDTO;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingZone;
+import com.orbix.api.api.vehicleandequipmentparking.VehicleEquipmentType;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
@@ -397,6 +403,7 @@ public class BondItemServiceController implements BondItemService {
 //		
 
 		bondItem.setBillingType("MONTHLY");
+		
 
 		String dateString = bondItemRequest.getStartBillingAt() + " 00:00:00";
 		DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -493,6 +500,8 @@ public class BondItemServiceController implements BondItemService {
 		bondItem.setOwnerPhoneNo(bondItemRequest.getOwnerPhoneNo());
 		bondItem.setOwnerEmail(bondItemRequest.getOwnerEmail());
 		bondItem.setOwnerAddress(bondItemRequest.getOwnerAddress());
+		
+		bondItem.setBondItemColor(bondItemRequest.getBondItemColor());
 
 		bondItem.setBondItemType(bondItemType_.get());
 
@@ -588,6 +597,7 @@ public class BondItemServiceController implements BondItemService {
 		bondItemResponse.setOwnerPhoneNo(bondItem.getOwnerPhoneNo());
 		bondItemResponse.setOwnerEmail(bondItem.getOwnerEmail());
 		bondItemResponse.setOwnerAddress(bondItem.getOwnerAddress());
+		
 
 		bondItemResponse.setWidth(String.valueOf(bondItem.getWidth()));
 		bondItemResponse.setLength(String.valueOf(bondItem.getLength()));
@@ -689,6 +699,132 @@ public class BondItemServiceController implements BondItemService {
 			throw new InvalidEntryException("Invalid billing amount");
 		}
 		return true;
+	}
+	
+	@Override
+	public BondItemResponseDTO modifyBondItem(BondItemRequestDTO bondItemRequest, HttpServletRequest request) {
+		
+		Optional<BondItem> bondItem_ = bondItemRepository.findById(bondItemRequest.getId());
+		if(bondItem_.isEmpty()) throw new NotFoundException("Bond Item not found in database");
+			
+		if(!bondItem_.get().getStatus().equals("CHECKED-IN")) throw new NotFoundException("Can not modify only checked-in parking can be modified");
+			
+		if(!validateBondItemData(bondItemRequest)) throw new InvalidEntryException("Could not validate data");
+			
+		Optional<Company> company_ = companyRepository.findById(userService.getUserCompany(request).getId());
+		if(company_.isEmpty()) throw new NotFoundException("Company not found");
+			
+		Optional<Branch> branch_ = branchRepository.findById(userService.getUserBranch(request).getId());
+		if(branch_.isEmpty()) throw new NotFoundException("Branch not found");
+			
+		Optional<BondItemType> bondItemType_ = bondItemTypeRepository.findByNameAndCompany(bondItemRequest.getBondItemTypeName(), company_.get());
+		if(bondItemType_.isEmpty()) throw new NotFoundException("Vehicle or equipment type not found");
+			
+		
+		if(bondItemType_.get().getCompany().getId() != company_.get().getId()) 
+			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
+		
+//		Optional<BondZone> bondZone_ = bondZoneRepository.findByNameAndBranch(bondItemRequest.getBondZoneName(), branch_.get());
+//		if(bondZone_.isEmpty())throw new NotFoundException("Bond Zone not found");
+		
+		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItem(bondItem_.get());
+		
+		if(!bondItemBillReceivables.isEmpty()) {
+			throw new InvalidOperationException("Cannot proceed with modification as there are already existing bills.");
+		}
+		
+		BondItem bondItem = bondItem_.get();
+		
+		bondItem.setOwnerFirstName(bondItemRequest.getOwnerFirstName());
+		bondItem.setOwnerMiddleName(bondItemRequest.getOwnerMiddleName());
+		bondItem.setOwnerLastName(bondItemRequest.getOwnerLastName());
+		bondItem.setOwnerCompanyName(bondItemRequest.getOwnerCompanyName());
+		bondItem.setOwnerIdNo(bondItemRequest.getOwnerIdNo());
+		bondItem.setOwnerIdType(bondItemRequest.getOwnerIdType());
+		bondItem.setOwnerPhoneNo(bondItemRequest.getOwnerPhoneNo());
+		bondItem.setOwnerEmail(bondItemRequest.getOwnerEmail());
+		bondItem.setOwnerAddress(bondItemRequest.getOwnerAddress());
+		
+		bondItem.setBondItemColor(bondItemRequest.getBondItemColor());
+
+		bondItem.setBondItemType(bondItemType_.get());
+
+		bondItem.setBondItemName(bondItemRequest.getBondItemName()); // Look here later
+		bondItem.setBondItemDescription(bondItemRequest.getBondItemDescription());
+
+		bondItem.setComments(bondItemRequest.getComments());
+
+		bondItem.setWidth(bondItemRequest.getWidth());
+		bondItem.setLength(bondItemRequest.getLength());
+		bondItem.setHeight(bondItemRequest.getHeight());
+		bondItem.setWeight(bondItemRequest.getWeight());
+
+		////////////////////
+		bondItem.setOwnerFirstName(bondItemRequest.getOwnerFirstName());
+		bondItem.setOwnerMiddleName(bondItemRequest.getOwnerMiddleName());
+		bondItem.setOwnerLastName(bondItemRequest.getOwnerLastName());
+		bondItem.setOwnerCompanyName(bondItemRequest.getOwnerCompanyName());
+		bondItem.setOwnerIdNo(bondItemRequest.getOwnerIdNo());
+		bondItem.setOwnerIdType(bondItemRequest.getOwnerIdType());
+		bondItem.setOwnerPhoneNo(bondItemRequest.getOwnerPhoneNo());
+		bondItem.setOwnerEmail(bondItemRequest.getOwnerEmail());
+		bondItem.setOwnerAddress(bondItemRequest.getOwnerAddress());
+		bondItem.setAgentName(bondItemRequest.getAgentName());
+		bondItem.setAgentAddress(bondItemRequest.getAgentAddress());
+		bondItem.setAgentPhoneNo(bondItemRequest.getAgentPhoneNo());
+		bondItem.setAgentEmail(bondItemRequest.getAgentEmail());
+		bondItem.setTformNumber(bondItemRequest.getTformNumber());
+		bondItem.setRegistrationNo(bondItemRequest.getRegistrationNo());
+		bondItem.setChasisNo(bondItemRequest.getChasisNo());
+		bondItem.setCardNo(bondItemRequest.getCardNo());
+		bondItem.setLeftFrontLamp(bondItemRequest.isLeftFrontLamp());
+		bondItem.setRightFrontLamp(bondItemRequest.isRightFrontLamp());
+		bondItem.setLeftRearLamp(bondItemRequest.isLeftRearLamp());
+		bondItem.setRightRearLamp(bondItemRequest.isRightRearLamp());
+		bondItem.setLeftSideMirror(bondItemRequest.isLeftSideMirror());
+		bondItem.setRightSideMirror(bondItemRequest.isRightSideMirror());
+		bondItem.setLeftWiper(bondItemRequest.isLeftWiper());
+		bondItem.setRightWiper(bondItemRequest.isRightWiper());
+		bondItem.setBackWiper(bondItemRequest.isBackWiper());
+		bondItem.setFuelCap(bondItemRequest.isFuelCap());
+		bondItem.setSpareTire(bondItemRequest.isSpareTire());
+		bondItem.setBattery(bondItemRequest.isBattery());
+		bondItem.setStarter(bondItemRequest.isStarter());
+		bondItem.setAerial(bondItemRequest.isAerial());
+		bondItem.setWheelCap(bondItemRequest.isWheelCap());
+		bondItem.setRoundMirror(bondItemRequest.isRoundMirror());
+		bondItem.setTireIndicator(bondItemRequest.isTireIndicator());
+		bondItem.setHasKeys(true);
+		bondItem.setDeviceStatus(bondItemRequest.isDeviceStatus());
+
+		bondItem.setComments(bondItemRequest.getComments());
+		////////////////////
+
+//		bondItem.setBondZone(bondZone_.get());
+
+		bondItem.setBillingType(bondItemRequest.getBillingType());
+		bondItem.setBillingAmount(bondItemType_.get().getDailyPrice());
+
+		if (bondItemRequest.startBillingAt != null && bondItem.getStatus().equals("CHECKED-IN")) {
+			LocalDateTime dateTime;
+			String raw = bondItemRequest.getStartBillingAt();
+			if (raw.contains("T")) {
+				dateTime = LocalDateTime.parse(raw);
+			} else {
+				String dateString = raw + " 00:00:00";
+				DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+				dateTime = LocalDateTime.parse(dateString, formatter);
+			}
+			if (dateTime.isAfter(dayService.getTimeStamp())) {
+				throw new InvalidOperationException(
+						"The selected date cannot be in the future. Please choose today or an earlier date.");
+			}
+			bondItem.setStartBillingAt(dateTime);
+		}
+
+		bondItem = bondItemRepository.save(bondItem);
+
+		return bondItemResponseDTOMapper(bondItem);		
 	}
 
 	@Override

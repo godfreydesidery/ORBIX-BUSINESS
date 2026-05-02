@@ -95,6 +95,7 @@ export interface IBondItem {
         parkingZoneName : string
     
         cardNo : string
+
     
 
     //////////////////

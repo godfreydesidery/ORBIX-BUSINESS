@@ -3,7 +3,9 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { MsgBoxService } from '@services/custom/msg-box.service';
+import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from 'src/app/auth.service';
+import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { IBondItemType } from 'src/app/domain/bond-item-type';
 
 import { Byte } from 'src/custom-packages/util';
@@ -16,7 +18,9 @@ const API_URL = environment.apiUrl;
   standalone: true,
   imports: [
     FormsModule,
-    CommonModule
+    CommonModule,
+    SearchFilterPipe,
+    NgxPaginationModule
   ],
   templateUrl: './bond-item-type.component.html',
   styleUrl: './bond-item-type.component.scss'
@@ -32,6 +36,10 @@ export class BondItemTypeComponent {
   dailyPrice : number = 0;
 
   currency : string = ''
+
+  page: number = 1; // Initialize the current page to 1
+
+  filterRecords : string = ''
 
   /**Collections */
   bondItemTypes : IBondItemType[] = []

@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponseDTO;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingRequestDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
 
 import lombok.Data;
@@ -208,6 +209,15 @@ public class BondItemResource {
 			@RequestParam(name = "year") int year,
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(bondItemService.getMonthlyStats(year, request));
+	}
+	
+	@PostMapping("/bond_items/modify")
+	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	public ResponseEntity<BondItemResponseDTO>modify(
+			@RequestBody BondItemRequestDTO bondItemRequest,
+			HttpServletRequest request){		
+		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/bond_items/modify").toUriString());
+		return ResponseEntity.created(uri).body(bondItemService.modifyBondItem(bondItemRequest, request));
 	}
 	
 	

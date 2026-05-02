@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponseDTO;
+import com.orbix.api.api.vehicleandequipmentparking.ParkingRequestDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
 
 
@@ -24,6 +25,7 @@ public interface BondItemService {
 	List<BondItemBillReceivableResponseDTO> getBondItemBillReceivables(Long id, HttpServletRequest request);
 	BondItemResponseDTO createBondItem(BondItemRequestDTO bondItemRequest, HttpServletRequest request);
 	BondItemResponseDTO updateBondItem(BondItemRequestDTO bondItemRequest, HttpServletRequest request);
+	BondItemResponseDTO modifyBondItem(BondItemRequestDTO bondItemRequest, HttpServletRequest request);
 	
 	BondItemResponseDTO checkIn(BondItemRequestDTO bondItemRequest, HttpServletRequest request);
 	BondItemResponseDTO checkOut(BondItemRequestDTO bondItemRequest, HttpServletRequest request);

@@ -9,11 +9,16 @@
             <div class="card-body widget-body"> 
 
                 <div class="row">
-                    <div class="col-sm-12">
+                    <div class="col-sm-4">
                         <button type="button" class="btn btn-outline-success btn-round-custom" (click)="clearBondItemTypeData()" data-toggle="modal" data-target="#parkingZone-modal">New Vehicle Type</button>
-                    <br><br>
+                    </div>
+                    <div class="col-sm-4"></div>
+                    <div class="col-sm-4">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
                     </div>
                 </div>
+
+                <br>
 
                 <div class="table-responsive">
                     <table class="table">
@@ -29,8 +34,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            @for (v of bondItemTypes; track v.id) {
-                                <tr>
+                                <tr  *ngFor="let v of bondItemTypes | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
                                     <td>{{v.sn}}</td>
                                     <td>{{v.code}}</td>
                                     <td>{{v.name}}</td>
@@ -43,7 +47,6 @@
                                     </td>
                                     <td><button type="button" class="btn btn-primary btn-round-custom" (click)="get(v.id)" data-toggle="modal" data-target="#parkingZone-modal" style="cursor: pointer;">Edit</button></td>
                                 </tr>
-                            }
                         </tbody>
                     </table>
                 </div>

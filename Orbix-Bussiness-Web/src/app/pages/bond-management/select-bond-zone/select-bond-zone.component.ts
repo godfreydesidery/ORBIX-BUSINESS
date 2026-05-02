@@ -147,7 +147,7 @@ export class SelectBondZoneComponent {
 
   deviceStatus: string = 'ATTACHED'
 
-  vehicleEquipmentColor: string = ''
+  bondItemColor: string = ''
 
   cardNo: string = ''
 
@@ -386,7 +386,7 @@ export class SelectBondZoneComponent {
       deviceStatus: this.deviceStatus === 'ATTACHED' ? 1 : 0,
 
 
-      bondItemColor: this.vehicleEquipmentColor,
+      bondItemColor: this.bondItemColor,
 
       cardNo: this.cardNo,
 
@@ -508,6 +508,7 @@ export class SelectBondZoneComponent {
     this.status = data!.status
     this.currentQty = data!.currentQty
 
+
     ////////////////////////
 
 
@@ -558,7 +559,7 @@ export class SelectBondZoneComponent {
 
 
 
-    this.vehicleEquipmentColor = data!.vehicleEquipmentColor
+    this.bondItemColor = data!.bondItemColor
 
     this.cardNo = data!.cardNo
 
@@ -645,7 +646,7 @@ export class SelectBondZoneComponent {
 
     this.deviceStatus = 'ATTACHED'
 
-    this.vehicleEquipmentColor = ''
+    this.bondItemColor = ''
 
 
 
@@ -1057,6 +1058,121 @@ export class SelectBondZoneComponent {
         console.log(error)
       })
   }
+
+  public async modify(){
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+      }
+  
+      var startBillingAt = this.startBillingAt ? new Date(this.startBillingAt).toISOString().split('T')[0] : '';
+    
+    
+  
+      var bondItem = {
+      id: this.id,
+      no: this.no,
+      ownerFirstName: this.ownerFirstName,
+      ownerMiddleName: this.ownerMiddleName,
+      ownerLastName: this.ownerLastName,
+      ownerCompanyName: this.ownerCompanyName,
+      ownerIdNo: this.ownerIdNo,
+      ownerIdType: this.ownerIdType,
+      ownerPhoneNo: this.ownerPhoneNo,
+      ownerEmail: this.ownerEmail,
+      ownerAddress: this.ownerAddress,
+      bondZoneId: this.bondZoneId,
+      billingType: this.billingType,
+      billingAmount: this.billingAmount,
+      comments: this.comments,
+      bondItemName: this.bondItemTypeName,
+      bondItemDescription: this.bondItemDescription,
+      bondItemTypeName: this.bondItemTypeName,
+      length: this.length,
+      width: this.width,
+      height: this.height,
+      weight: this.weight,
+      initialQty: this.initialQty,
+      startBillingAt: this.startBillingAt,
+
+
+
+      ////////////////////////////
+
+
+
+      // Agent Information
+      agentName: this.agentName,
+      agentAddress: this.agentAddress,
+      agentPhoneNo: this.agentPhoneNo,
+      agentEmail: this.agentEmail,
+      tformNumber: this.tformNumber,
+
+
+
+      // Vehicle or Equipment Information
+      registrationNo: this.registrationNo,
+      transardNo: this.transardNo,
+      chasisNo: this.chasisNo,
+
+      leftFrontLamp: this.leftFrontLamp === 'YES' ? 1 : 0,
+      rightFrontLamp: this.rightFrontLamp === 'YES' ? 1 : 0,
+      leftRearLamp: this.leftRearLamp === 'YES' ? 1 : 0,
+      rightRearLamp: this.rightRearLamp === 'YES' ? 1 : 0,
+      leftSideMirror: this.leftSideMirror === 'YES' ? 1 : 0,
+      rightSideMirror: this.rightSideMirror === 'YES' ? 1 : 0,
+      leftWiper: this.leftWiper === 'YES' ? 1 : 0,
+      rightWiper: this.rightWiper === 'YES' ? 1 : 0,
+      backWiper: this.backWiper === 'YES' ? 1 : 0,
+      fuelCap: this.fuelCap === 'YES' ? 1 : 0,
+      spareTire: this.spareTire === 'YES' ? 1 : 0,
+      battery: this.battery === 'YES' ? 1 : 0,
+      starter: this.starter === 'YES' ? 1 : 0,
+      aerial: this.aerial === 'YES' ? 1 : 0,
+      wheelCap: this.wheelCap === 'YES' ? 1 : 0,
+      roundMirror: this.roundMirror === 'YES' ? 1 : 0,
+      tireIndicator: this.tireIndicator === 'YES' ? 1 : 0,
+      hasKeys: this.hasKeys === 'YES' ? 1 : 0,
+
+      deviceStatus: this.deviceStatus === 'ATTACHED' ? 1 : 0,
+
+
+      bondItemColor: this.bondItemColor,
+
+      cardNo: this.cardNo,
+
+      billintType: this.billingType,
+
+
+
+      //////////////////////////////
+    }
+  
+  
+      /**Modify an exiisting parking */
+      await this.http.post<IBondItem>(API_URL+'/bond_items/modify', bondItem, options)
+      .toPromise()
+      .then(
+        data => {
+          this.showBondItemData(data!)
+  
+          console.log(data)
+  
+          this.getAllCheckedInAndPendingBondItems()
+  
+          this.msg.showSuccessMessage('Bond modified successifully')
+  
+        }
+  
+      )
+      .catch(
+        error => {
+          console.log(error)
+          this.msg.showErrorMessage(error, 'Error')
+        }
+      )
+  
+      
+    }
 
   async printBondItemGoodReleaseNote(id: any) {
     await this.getBondItemGoodRelease(id)

@@ -36,7 +36,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './storage-discounts.component.scss'
 })
 export class StorageDiscountsComponent {
-page: number = 1; // Initialize the current page to 1
+  page: number = 1; // Initialize the current page to 1
 
   filterRecords: string = ''
 
@@ -188,7 +188,7 @@ page: number = 1; // Initialize the current page to 1
       )
   }
 
-  async discounts(serviceId: any, serviceName : string) {
+  async discounts(serviceId: any, serviceName: string) {
 
     localStorage.setItem('service-id', '');
     localStorage.setItem('service-id', serviceId);
@@ -536,7 +536,7 @@ page: number = 1; // Initialize the current page to 1
           this.msg.showErrorMessage(error, 'Error')
         }
       )
-      this.getAllCheckedInStorages()
+    this.getAllCheckedInStorages()
   }
 
   lastBillingDate: string = ''

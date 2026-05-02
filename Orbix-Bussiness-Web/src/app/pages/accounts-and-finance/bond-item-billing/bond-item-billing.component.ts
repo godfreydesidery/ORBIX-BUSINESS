@@ -131,12 +131,12 @@ export class BondItemBillingComponent {
     private msg: MsgBoxService
   ) { } //{(window as any).pdfMake.vfs = pdfFonts.pdfMake.vfs;}
 
-  ngOnInit() {
+  async ngOnInit() {
     this.route.queryParams.subscribe(params => {
       this.bondItemId = params['bond_item_id']
     })
-    this.getBondItemBillReceivables(this.bondItemId)
-    this.getBondItemServiceBillReceivables(this.bondItemId)
+    await this.getBondItemBillReceivables(this.bondItemId)
+    await this.getBondItemServiceBillReceivables(this.bondItemId)
   }
 
 
@@ -673,6 +673,8 @@ export class BondItemBillingComponent {
           this.msg.showSuccessMessage('Checked out Successifully')
 
           this.printGatePassRcpt(data!.serviceBillItems, '', 0);
+
+          this.router.navigate(['/app/accounts-and-finance/bond-billing']);
         }
       )
       .catch(
@@ -709,7 +711,7 @@ export class BondItemBillingComponent {
     })
 
     var customer: ICustomer = {
-      name: this.bondItemGoodReleaseClientName,
+      name: this.ownerFirstName + ' ' + this.ownerLastName!,
       address: this.ownerAddress,
       phone: this.ownerPhoneNo
     }

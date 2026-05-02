@@ -391,6 +391,17 @@ public class DiscountRequestServiceController implements DiscountRequestService 
 			discountRequest.setRejectedDateTime(dayService.getTimeStamp());
 			discountRequest.setComments(discountRequestDTO.getComments());
 			discountRequestRepository.save(discountRequest);
+		}else if(discountRequest.getServiceBillName().equals("Bond")) {
+			BondItemBillReceivable bondItemBillReceivable = bondItemBillReceivableRepository
+				    .findById(discountRequest.getServiceBillId())
+				    .orElseThrow(() -> new NotFoundException("Bill not found"));
+			bondItemBillReceivable.setDiscountStatus("Rejected");
+			bondItemBillReceivableRepository.save(bondItemBillReceivable);
+			discountRequest.setStatus(WorkFlowStatus.REJECTED);
+			discountRequest.setRejectedByUser(userService.getUser(request));
+			discountRequest.setRejectedDateTime(dayService.getTimeStamp());
+			discountRequest.setComments(discountRequestDTO.getComments());
+			discountRequestRepository.save(discountRequest);
 		}
 		return true;
 	}
