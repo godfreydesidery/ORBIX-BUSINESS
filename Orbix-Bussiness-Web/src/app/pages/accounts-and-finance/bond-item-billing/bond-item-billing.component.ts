@@ -687,6 +687,48 @@ export class BondItemBillingComponent {
 
 
 
+  async archive(): Promise<void> {
+
+
+    if (await this.msg.showConfirmMessageDialog('Confirm', 'Are you sure you want to archive?', 'question', 'Yes', 'No') == false) {
+      return
+    }
+
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+
+    var bondItem = {
+      id: this.bondItemId
+      // cardNo : this.cardNo,
+      // bondItemZoneName : this.bondItemZoneName,
+      // startBillingAt : this.startBillingAt
+    }
+
+    await this.http.post<IBondItem>(API_URL + '/bond_items/archive', bondItem, options)
+      .toPromise()
+      .then(
+        data => {
+
+          console.log(data)
+
+          this.msg.showSuccessMessage('Archived Successifully')
+
+          //this.printGatePassRcpt(data!.serviceBillItems, '', 0);
+
+          this.router.navigate(['/app/accounts-and-finance/bond-billing']);
+        }
+      )
+      .catch(
+        error => {
+          console.log(error)
+          this.msg.showErrorMessage(error, 'Error')
+        }
+      )
+  }
+
+
+
   printReceipt() {
 
     if (this.toPrintReceipt == false) {
@@ -1668,9 +1710,9 @@ export class BondItemBillingComponent {
     }).format(value);
   }
 
-
-
-
+  grant(privileges: string[]): boolean {
+    return this.auth.grant(privileges); // Adjust return value based on logic
+  }
 }
 
 export interface IBillSummary {

@@ -518,11 +518,12 @@ public interface CollectionRepository extends JpaRepository<Collection, Long> {
 	        "p.checked_in_date_time AS checkedInDateTime, " +
 	        "p.checked_out_date_time AS checkedOutDateTime, " +
 	        "vt.name AS bondItemName, " +
-	        "br.qty AS qty, " +
+	        "br.qty * 30 AS days, " +
 	        "pbr.discount AS discount, " +
 	        "z.name AS bondZoneName, " +
 	        "brc.amount AS amount, " +
 	        "c.pay_code AS payCode, " +
+	        "c.collection_date_time AS dateTime, " +
 	        "u.nickname AS cashierName, " +
 	        "ua.nickname AS discountApprovedBy, " +
 	        "pbr.discount_approved_date_time AS discountApprovedDateTime, " +

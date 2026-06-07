@@ -7,6 +7,9 @@ import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
+import com.orbix.api.modules.identityandaccess.UserService;
+
+import lombok.RequiredArgsConstructor;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,13 +18,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 @Service
+@RequiredArgsConstructor
 public class CurrencyConversionServiceController implements CurrencyConversionService {
     private final CurrencyConversionRepository currencyConversionRepository;
     
-    // Constructor
-    public CurrencyConversionServiceController(CurrencyConversionRepository currencyConversionRepository) {
-        this.currencyConversionRepository = currencyConversionRepository;
-    }
+    private final UserService userService;
+    
+    private final DayService dayService;
+    
 
     @Override
     public List<CurrencyConversionResponseDTO> getAllCurrencyConversions(HttpServletRequest request) {
@@ -53,6 +57,9 @@ public class CurrencyConversionServiceController implements CurrencyConversionSe
         conversion.setSourceCurrencyValue(conversionRequest.getSourceCurrencyValue());
         conversion.setFinalCurrencyValue(conversionRequest.getFinalCurrencyValue());
         conversion.setActive(conversionRequest.isActive());
+        
+        conversion.setCreatedByUser(userService.getUser(request));
+        conversion.setCreatedDateTime(dayService.getTimeStamp());
         
         // Save conversion
         conversion = currencyConversionRepository.save(conversion);

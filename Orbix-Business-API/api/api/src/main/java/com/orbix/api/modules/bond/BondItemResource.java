@@ -139,6 +139,13 @@ public class BondItemResource {
 		return ResponseEntity.ok().body(bondItemService.checkOut(bondItemRequest, request));		
 	}
 	
+	@PostMapping("/bond_items/archive")
+	public ResponseEntity<BondItemResponseDTO>archive(
+			@RequestBody BondItemRequestDTO bondItemRequest,
+			HttpServletRequest request){		
+		return ResponseEntity.ok().body(bondItemService.archive(bondItemRequest, request));		
+	}
+	
 	
 	@GetMapping("/bond_items/get_last_bond_item_bill_date")
 	public Model getLastBondItemBillDate(

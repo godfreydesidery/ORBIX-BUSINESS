@@ -29,6 +29,7 @@ public interface BondItemService {
 	
 	BondItemResponseDTO checkIn(BondItemRequestDTO bondItemRequest, HttpServletRequest request);
 	BondItemResponseDTO checkOut(BondItemRequestDTO bondItemRequest, HttpServletRequest request);
+	BondItemResponseDTO archive(BondItemRequestDTO bondItemRequest, HttpServletRequest request);
 
 	BondItemBillReceivableResponseDTO createBondItemBillReceivable(Long bondItemId, LocalDateTime startedAt, LocalDateTime endedAt, String billingType, double qty, double price, double discount, int autoBilling, HttpServletRequest request);
 

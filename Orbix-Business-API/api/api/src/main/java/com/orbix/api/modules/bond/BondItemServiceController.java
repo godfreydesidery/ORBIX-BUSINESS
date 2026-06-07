@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -65,6 +66,8 @@ public class BondItemServiceController implements BondItemService {
 
 	private final InvoiceReceivableRepository invoiceReceivableRepository;
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
+	
+	final int CHECKOUT_GRACE_DAYS = 2;
 
 	@Override
 	public List<BondItemResponseDTO> getAllBondItems(HttpServletRequest request) {
@@ -884,8 +887,6 @@ public class BondItemServiceController implements BondItemService {
 		if (!bondItem_.get().getStatus().equals("CHECKED-IN"))
 			throw new NotFoundException("Can not check out, only checked in bondItem can be checked out");
 
-//		if(!validateBondItemData(bondItemRequest)) throw new InvalidEntryException("Could not validate data");
-
 		Optional<Company> company_ = companyRepository.findById(userService.getUserCompany(request).getId());
 		if (company_.isEmpty())
 			throw new NotFoundException("Company not found");
@@ -898,8 +899,14 @@ public class BondItemServiceController implements BondItemService {
 				.findAllByBondItem(bondItem_.get());
 
 		
-		LocalDateTime startOfTomorrow = LocalDate.now().plusDays(1).atStartOfDay();
 		LocalDateTime lastBillDate = null;
+		LocalDate today = LocalDate.now();
+		
+		// Sort by endedAt ascending so the last element is the furthest coverage.
+		// Nulls first, so a malformed (null endedAt) row surfaces at index 0.
+		bondItemBillReceivables.sort(
+		    Comparator.comparing(BondItemBillReceivable::getEndedAt,
+		                         Comparator.nullsFirst(Comparator.naturalOrder())));
 
 		for (BondItemBillReceivable item : bondItemBillReceivables) {
 
@@ -913,12 +920,76 @@ public class BondItemServiceController implements BondItemService {
 		        lastBillDate = endedAt;
 		    }
 		}
+		
+		final int CHECKOUT_GRACE_DAYS = 2;
+		LocalDate coverageFloor = today.minusDays(CHECKOUT_GRACE_DAYS);
 
-		// Core validation (only date-based)
-		if (lastBillDate == null || lastBillDate.isBefore(startOfTomorrow)) {
+		if (lastBillDate == null || lastBillDate.toLocalDate().isBefore(coverageFloor)) {
 		    throw new InvalidOperationException(
 		        "Cannot checkout. Billing is not up to date.");
 		}
+
+		BondItem bondItem = bondItem_.get();
+		bondItem.setStatus("CHECKED-OUT");
+		bondItem.setCheckedOutByUser(userService.getUser(request));
+		bondItem.setCheckedOutDateTime(dayService.getTimeStamp());
+
+		bondItem = bondItemRepository.save(bondItem);
+
+		return bondItemResponseDTOMapper(bondItem);
+	}
+	
+	@Override
+	public BondItemResponseDTO archive(BondItemRequestDTO bondItemRequest, HttpServletRequest request) {
+
+		Optional<BondItem> bondItem_ = bondItemRepository.findById(bondItemRequest.getId());
+		if (bondItem_.isEmpty())
+			throw new NotFoundException("BondItem not found in database");
+
+		if (!bondItem_.get().getStatus().equals("CHECKED-IN"))
+			throw new NotFoundException("Can not check out, only checked in bondItem can be checked out");
+
+		Optional<Company> company_ = companyRepository.findById(userService.getUserCompany(request).getId());
+		if (company_.isEmpty())
+			throw new NotFoundException("Company not found");
+
+		Optional<Branch> branch_ = branchRepository.findById(userService.getUserBranch(request).getId());
+		if (branch_.isEmpty())
+			throw new NotFoundException("Branch not found");
+
+		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository
+				.findAllByBondItem(bondItem_.get());
+
+		
+		LocalDateTime lastBillDate = null;
+		LocalDate today = LocalDate.now();
+		
+		// Sort by endedAt ascending so the last element is the furthest coverage.
+		// Nulls first, so a malformed (null endedAt) row surfaces at index 0.
+		bondItemBillReceivables.sort(
+		    Comparator.comparing(BondItemBillReceivable::getEndedAt,
+		                         Comparator.nullsFirst(Comparator.naturalOrder())));
+
+		for (BondItemBillReceivable item : bondItemBillReceivables) {
+
+//		    if (item.getBillReceivable().getPayStatus().equals(PayStatus.UNPAID)) {
+//		        throw new InvalidOperationException("Cannot check out, bills not cleared");
+//		    }
+//
+//		    LocalDateTime endedAt = item.getEndedAt();
+//
+//		    if (endedAt != null && (lastBillDate == null || endedAt.isAfter(lastBillDate))) {
+//		        lastBillDate = endedAt;
+//		    }
+		}
+		
+//		final int CHECKOUT_GRACE_DAYS = 2;
+//		LocalDate coverageFloor = today.minusDays(CHECKOUT_GRACE_DAYS);
+//
+//		if (lastBillDate == null || lastBillDate.toLocalDate().isBefore(coverageFloor)) {
+//		    throw new InvalidOperationException(
+//		        "Cannot checkout. Billing is not up to date.");
+//		}
 
 		BondItem bondItem = bondItem_.get();
 		bondItem.setStatus("CHECKED-OUT");

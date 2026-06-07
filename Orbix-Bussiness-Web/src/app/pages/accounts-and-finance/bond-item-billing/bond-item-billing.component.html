@@ -161,6 +161,7 @@
                                 <button class="btn btn-outline-success btn-round-custom" *ngIf="billReceivables.length > 0" (click)="confirmBillsPayment()">Confirm Payment</button>
                                 <button class="btn btn-outline-primary btn-round-custom" (click)="printReceipt()">Print Receipt</button>
                                 <button class="btn btn-outline-danger btn-round-custom" (click)="checkOut()">Checkout</button>
+                                <button class="btn btn-outline-danger btn-round-custom" *ngIf="grant(['BND-ARCHIVE'])" (click)="archive()">Archive</button>
                             </div>
                         </div>
                     </div>
