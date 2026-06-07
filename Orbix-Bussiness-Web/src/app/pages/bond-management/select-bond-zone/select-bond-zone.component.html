@@ -1,0 +1,1949 @@
+<div class="col">
+    <div widget class="card">
+        <div class="card-header">
+            <span>Bond Zone: {{ selectedBondZone?.name || '' }}</span>
+        </div>
+        <div class="card-body widget-body">
+            <div class="row" *ngIf="bondZoneLoaded == false">
+                <div class="col-md-3"></div>
+                <div class="col-md-6">
+
+                    <br><br>
+
+                    <div class="form-group">
+                        <select class="form-control" [(ngModel)]="selectedBondZoneId"
+                            (change)="onBondZoneChange($event)">
+                            <option value=''></option>
+                            <option *ngFor="let bondZone of availableBondZones" [value]="bondZone.id"
+                                style="font-size: larger;"><b>{{bondZone.name}}</b></option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <button type="button" class="btn btn-outline-danger btn-round-custom pull-right"
+                            (click)="clearSelectedBondZone()">Cancel</button>
+                        <button type="button" class="btn btn-outline-success btn-round-custom pull-right"
+                            (click)="selectBondZone()">Select</button>
+                    </div>
+                </div>
+                <div class="col-md-3"></div>
+            </div>
+            <div class="row" *ngIf="bondZoneLoaded == true">
+                <div class="col-lg-12">
+                    <button class="btn btn-outline-primary btn-round-custom" (click)="setNew()"><i
+                            class="fa fa-pencil-square-o"></i> New Vehicle</button>
+                    <button class="btn btn-outline-primary btn-round-custom" (click)="setExisting()"
+                        (click)="getAllCheckedInAndPendingBondItems()"><i class="fa fa-list"></i> Vehicle List</button>
+                    <!-- <button class="btn btn-success btn-round-custom" (click)="setExisting()"
+                        (click)="getAllRecentCheckedOutBondItems()">Checked Out</button> -->
+                    <!-- <button class="btn btn-outline-primary btn-round-custom" (click)="setReleased()"
+                        (click)="getAllCheckedInBondItems()"><i class="fa fa-sign-out"></i> Released List</button> -->
+                    <button class="btn btn-outline-danger btn-round-custom" (click)="setReleased()"
+                        (click)="getAllRecentCheckedOutBondItems()"><i class="fa fa-sign-out"></i> Checked Out
+                        List</button>
+                </div>
+                <div class="col-lg-12" *ngIf="mode === 'new'">
+                    <div class="row" *ngIf="id == null">
+                        <div class="col-sm-12">
+                            <br>
+                            <p><b class="text-primary" style="font-size: large;">Owner Information</b></p>
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>First Name*</label>
+                                        <input class="form-control" type="text" [(ngModel)]="ownerFirstName"
+                                            autocomplete="nope">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Middle Name</label>
+                                        <input class="form-control" type="text" [(ngModel)]="ownerMiddleName"
+                                            autocomplete="nope">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Last Name*</label>
+                                        <input class="form-control" type="text" [(ngModel)]="ownerLastName"
+                                            autocomplete="nope">
+                                    </div>
+                                </div>
+                                <!-- <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Company Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
+                                </div>
+                            </div> -->
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>ID Type*</label>
+                                        <select class="form-control" [(ngModel)]="ownerIdType">
+                                            <option></option>
+                                            <option>NATIONAL ID</option>
+                                            <option>VOTER ID</option>
+                                            <option>PASSPORT</option>
+                                            <option>DRIVING LICENCE</option>
+                                            <option>LETTER</option>
+                                            <option>VISA</option>
+                                            <option>NONE</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>ID No*</label>
+                                        <input class="form-control" type="text" [(ngModel)]="ownerIdNo"
+                                            autocomplete="nope">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Phone No*</label>
+                                        <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo"
+                                            autocomplete="nope">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Address</label>
+                                        <input class="form-control" type="text" [(ngModel)]="ownerAddress"
+                                            autocomplete="nope">
+                                    </div>
+                                </div>
+                            </div>
+
+                            <p><b class="text-primary" style="font-size: large;">Agent Information</b></p>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Agent Name</label>
+                                        <input class="form-control" type="text" [(ngModel)]="agentName"
+                                            autocomplete="nope">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Agent Phone</label>
+                                        <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo"
+                                            autocomplete="nope">
+                                    </div>
+                                </div>
+
+
+                            </div>
+
+                            <p><b class="text-primary" style="font-size: large;">Vehicle Information</b></p>
+                            <div class="row">
+                                <!-- <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Vehicle Name</label>
+                                        <input class="form-control" type="text" [(ngModel)]="bondItemName"
+                                            autocomplete="nope">
+                                    </div>
+                                </div> -->
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Select Vehicle Type</label>
+                                        <ng-select [items]="bondItemTypes" bindLabel="name" bindValue="name"
+                                            [(ngModel)]="bondItemTypeName"
+                                            class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                                        </ng-select>
+                                    </div>
+                                </div>
+
+                                <!-- <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Billing Rate</label>
+                                        <input class="form-control" type="number" [(ngModel)]="billingAmount"
+                                            autocomplete="nope" min="0" style="text-align: center; font-weight: bold;"
+                                            readonly>
+                                    </div>
+                                </div> -->
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Select Billing Type</label>
+                                        <select class="form-control" [(ngModel)]="billingType">
+                                            <option>MONTHLY</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Select Vehicle Color</label>
+                                        <select class="form-control" [(ngModel)]="bondItemColor">
+                                            <option></option>
+                                            <option value="black">Black</option>
+                                            <option value="white">White</option>
+                                            <option value="red">Red</option>
+                                            <option value="dark-blue">Dark Blue</option>
+                                            <option value="silver">Silver</option>
+                                            <option value="yellow">Yellow</option>
+                                            <option value="brown">Brown</option>
+                                            <option value="blue">Blue</option>
+                                            <option value="green">Green</option>
+                                            <option value="gray">Gray</option>
+                                            <option value="purple">Purple</option>
+                                            <option value="pink">Pink</option>
+                                            <option value="snow">Snow</option>
+                                            <option value="gold">Gold</option>
+                                            <option value="orange">Orange</option>
+                                            <option value="azul">Azul</option>
+                                            <option value="tomato">Tomato</option>
+                                            <option value="multicolour">Multicolour</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Start Billing At</label>
+                                        <input class="form-control" type="date" [(ngModel)]="startBillingAt"
+                                            autocomplete="nope" min="0" style="text-align: center; font-weight: bold;">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Chasis No/ Reg No*</label>
+                                        <input class="form-control" type="text" [(ngModel)]="chasisNo"
+                                            autocomplete="nope">
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Transard No</label>
+                                        <input class="form-control" type="text" [(ngModel)]="tformNumber"
+                                            autocomplete="nope">
+                                    </div>
+                                </div>
+
+
+
+                                <!-- <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Height(cm)</label>
+                                    <input class="form-control" type="number" [(ngModel)]="height" autocomplete="nope"
+                                        min="0">
+                                </div>
+                            </div> -->
+                                <!-- <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Weight(kg)</label>
+                                    <input class="form-control" type="number" [(ngModel)]="weight" autocomplete="nope"
+                                        min="0">
+                                </div>
+                            </div> -->
+                                <!-- <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Qty</label>
+                                    <input class="form-control" type="number" (input)="calculateBillingAmount()"
+                                        [(ngModel)]="initialQty" autocomplete="nope" min="0">
+                                </div>
+                            </div> -->
+                                <!-- <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Total Price</label>
+                                    <input class="form-control" type="number" (input)="calculateBillingAmount()"
+                                        [(ngModel)]="totalPrice" autocomplete="nope" min="0"
+                                        style="text-align: center; font-weight: bold;">
+                                </div>
+                            </div> -->
+
+
+
+
+
+
+
+
+
+                                <!-- <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Registration No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="registrationNo" autocomplete="nope">
+                                </div>
+                            </div> -->
+
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Transard No</label>
+                                        <input class="form-control" type="text" [(ngModel)]="tformNumber"
+                                            autocomplete="nope">
+                                    </div>
+                                </div>
+
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Device Status*</label>
+                                        <select class="form-control" [(ngModel)]="deviceStatus">
+                                            <option>ATTACHED</option>
+                                            <option>NOT-ATTACHED</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+
+
+                                <!-- <div class="col-lg-3"> -->
+                                <!-- <div class="form-group"> -->
+                                <!-- <label>Select Vehicle Type</label> -->
+                                <!-- <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
+                                        <option></option>
+                                        <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
+                                    </select> -->
+
+                                <!-- <input class="form-control" type="text" list="venamesaa"
+                                        [(ngModel)]="vehicleEquipmentTypeName" autocomplete="nope" />
+                                    <datalist id="venamesaa">
+                                        <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
+                                    </datalist> -->
+
+                                <!-- <ng-select [items]="vehicleEquipmentTypes"
+                                            bindLabel="name"
+                                            bindValue="name"
+                                            [(ngModel)]="vehicleEquipmentTypeName"
+                                            class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                                    </ng-select> -->
+
+
+                                <!-- </div> -->
+                                <!-- </div> -->
+
+
+                                <!-- <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Bill No*</label>
+                                        <input class="form-control" type="text" [(ngModel)]="cardNo"
+                                            autocomplete="nope">
+                                    </div>
+                                </div> -->
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Keys Status</label>
+                                        <select class="form-control" [(ngModel)]="hasKeys">
+                                            <option>YES</option>
+                                            <option>NO</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Vehicle Comment</label>
+                                        <textarea class="form-control" [(ngModel)]="comments"
+                                            autocomplete="nope"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row" *ngIf="id != null">
+                        <div class="col-sm-12">
+                            <p><b class="text-primary" style="font-size: large;">Vehicle Information</b></p>
+                            <hr>
+                            <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Front Lamp</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>Left</td>
+                                                <td>Right</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="leftFrontLamp">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="rightFrontLamp">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Rear Lamp</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>Left</td>
+                                                <td>Right</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="leftRearLamp">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="rightRearLamp">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Side Mirror</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>Left</td>
+                                                <td>Right</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="leftSideMirror">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="rightSideMirror">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Wipers</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>Left</td>
+                                                <td>Right</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="leftWiper">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="rightWiper">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Back Wipers</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="backWiper">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Fuel Cap</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="fuelCap">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Spare Tires</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="spareTire">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Battery</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="battery">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Starter</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="starter">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Aerial</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="aerial">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Wheel Cap</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="wheelCap">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Round Mirror</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="roundMirror">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Tire Indicator</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="tireIndicator">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Device Status</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="deviceStatus">
+                                                        <option>ATTACHED</option>
+                                                        <option>NOT-ATTACHED</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-lg-12" style="text-align: right;">
+                            <button class="btn btn-success btn-round-custom" *ngIf="id != null"
+                                (click)="saveBondItem()">Update</button>
+                            <button class="btn btn-success btn-round-custom" *ngIf="id == null"
+                                (click)="saveBondItem()">Save</button>
+                            <button class="btn btn-primary btn-round-custom" *ngIf="id != null"
+                                (click)="checkIn(id, no, bondItemName)">Carry In</button>
+                        </div>
+                    </div>
+
+                </div>
+                <div class="col-lg-12" *ngIf="mode === 'existing'">
+                    <div class="row">
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords"
+                                placeholder="Search..." style="max-width: 8cm;">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="table-responsive table-striped table-sm table-bordered">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>SN</th>
+                                    <th>No</th>
+                                    <th>Vehicle Name</th>
+                                    <th>Owner Name</th>
+                                    <th>Chasis No</th>
+                                    <th>Owner Address</th>
+                                    <th>Owner Contact</th>
+                                    <th>Agent Name</th>
+                                    <th>Agent Phone</th>
+                                    <th>Billing Type</th>
+                                    <th>Currency</th>
+                                    <th>Price &#64;</th>
+                                    <th>Check Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    *ngFor="let bondItem of bondItems | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index">
+                                    <td>{{bondItem.sn}}</td>
+                                    <td>{{bondItem.no}}</td>
+                                    <td>{{bondItem.bondItemName}}</td>
+
+                                    <td>{{bondItem.ownerFirstName}} {{bondItem.ownerMiddleName}}
+                                        {{bondItem.ownerLastName}}
+                                    </td>
+                                    <td>{{bondItem.chasisNo}}</td>
+                                    <td>{{bondItem.ownerAddress}}</td>
+                                    <td>{{bondItem.ownerPhoneNo}}</td>
+                                    <td>{{bondItem.agentName}}</td>
+                                    <td>{{bondItem.agentPhoneNo}}</td>
+                                    <td><span class="badge badge-primary">{{bondItem.billingType}}</span></td>
+                                    <td>{{bondItem.currency}}</td>
+                                    <td class="text-danger" style="text-align: right;"><b>{{bondItem.billingAmount |
+                                            currency:'':''}}</b></td>
+                                    <td>
+                                        <span class="badge badge-success"
+                                            *ngIf="bondItem.status === 'PROCESSING'">{{bondItem.status}}</span>
+                                        <span class="badge badge-warning"
+                                            *ngIf="bondItem.status === 'PENDING'">{{bondItem.status}}</span>
+                                        <span class="badge badge-primary"
+                                            *ngIf="bondItem.status === 'APPROVED'">{{bondItem.status}}</span>
+                                        <span class="badge badge-danger"
+                                            *ngIf="bondItem.status === 'CANCELED'">{{bondItem.status}}</span>
+                                        <span class="badge badge-success"
+                                            *ngIf="bondItem.status === 'CHECKED-IN'">{{bondItem.status}}</span>
+                                        <span class="badge badge-danger"
+                                            *ngIf="bondItem.status === 'CHECKED-OUT'">{{bondItem.status}}</span>
+
+                                    <td class="d-flex flex-wrap gap-2">
+                                        <div class="d-flex flex-row flex-wrap align-items-center gap-2">
+                                            <button class="btn btn-warning btn-round-custom btn-sm"
+                                                *ngIf="(bondItem.status === 'PENDING') && grant(['STRG-UPDATE'])"
+                                                (click)="getBondItem(bondItem.id)" data-toggle="modal"
+                                                data-target="#edit-modal"><i class="fa fa-cogs"></i> Edit</button>
+                                            <button class="btn btn-primary btn-round-custom btn-sm"
+                                                (click)="get(bondItem.id)" data-toggle="modal"
+                                                data-target="#view-modal"><i class="fa fa-eye"></i> View</button>
+                                            <button class="btn btn-success btn-round-custom btn-sm"
+                                                *ngIf="(bondItem.status === 'CHECKED-IN' && grant(['BND-MODIFY']))" (click)="get(bondItem.id)"
+                                                data-toggle="modal" data-target="#modify-modal"><i
+                                                    class="fa fa-pencil-square-o"></i>
+                                                Modify</button>
+                                            <!-- <td *ngIf="p.status === 'CHECKED-IN' && grant(['PKNG-MODIFY'])"><button type="button" class="btn btn-warning btn-round-custom btn-sm text-nowrap" (click)="get(p.id)" data-toggle="modal" data-target="#modify-modal" style="cursor: pointer;"><i class="fa fa-wrench"></i> Modify</button></td> -->
+
+                                            <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="bondItem.status === 'CHECKED-IN'" (click)="getBondItemGoodReleaseDetail(bondItem.id)" data-toggle="modal" data-target="#bondItem-good-release-modal">Release</button> -->
+                                            <button class="btn btn-success btn-round-custom btn-sm"
+                                                *ngIf="(bondItem.status === 'PENDING')"
+                                                (click)="checkIn(bondItem.id, bondItem.no, bondItem.bondItemName)"><i
+                                                    class="fa fa-sign-in"></i> Carry-In</button>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <pagination-controls class="pull-right"
+                                    (pageChange)="page = $event"></pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <div class="col-lg-12" *ngIf="mode === 'released'">
+                    <div class="row">
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-4"></div>
+                        <div class="col-sm-4">
+                            <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords"
+                                placeholder="Search..." style="max-width: 8cm;">
+                        </div>
+                    </div>
+                    <br>
+                    <div class="table-responsive table-striped table-sm table-bordered">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>SN</th>
+                                    <th>No</th>
+                                    <th>Vehicle Name</th>
+                                    <th>Owner Name</th>
+                                    <th>Chasis No</th>
+                                    <th>Vehicle Type</th>
+                                    <th>Owner Contact</th>
+                                    <th>Billing Type</th>
+                                    <th>Currency</th>
+                                    <th>Price &#64;</th>
+                                    <th>Check Status</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr
+                                    *ngFor="let bondItem of bondItems | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index">
+                                    <td>{{bondItem.sn}}</td>
+                                    <td>{{bondItem.no}}</td>
+                                    <td>{{bondItem.bondItemName}}</td>
+
+                                    <td>{{bondItem.ownerFirstName}} {{bondItem.ownerMiddleName}}
+                                        {{bondItem.ownerLastName}}
+                                    </td>
+                                    <td>{{bondItem.chasisNo}}</td>
+                                    <td>{{bondItem.ownerAddress}}</td>
+                                    <td>{{bondItem.ownerIdType}}</td>
+                                    <td><span class="badge badge-primary">{{bondItem.billingType}}</span></td>
+                                    <td>{{bondItem.currency}}</td>
+                                    <td class="text-danger" style="text-align: right;"><b>{{bondItem.billingAmount |
+                                            currency:'':''}}</b></td>
+                                    <td>
+                                        <span class="badge badge-success"
+                                            *ngIf="bondItem.status === 'PROCESSING'">{{bondItem.status}}</span>
+                                        <span class="badge badge-warning"
+                                            *ngIf="bondItem.status === 'PENDING'">{{bondItem.status}}</span>
+                                        <span class="badge badge-primary"
+                                            *ngIf="bondItem.status === 'APPROVED'">{{bondItem.status}}</span>
+                                        <span class="badge badge-danger"
+                                            *ngIf="bondItem.status === 'CANCELED'">{{bondItem.status}}</span>
+                                        <span class="badge badge-success"
+                                            *ngIf="bondItem.status === 'CHECKED-IN'">{{bondItem.status}}</span>
+                                        <span class="badge badge-danger"
+                                            *ngIf="bondItem.status === 'CHECKED-OUT'">{{bondItem.status}}</span>
+
+                                    <td class="d-flex flex-wrap gap-2">
+                                        <div class="d-flex flex-row flex-wrap align-items-center gap-2">
+                                            <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="bondItem.status === 'PENDING'" (click)="getBondItem(bondItem.id)" data-toggle="modal" data-target="#edit-modal">Edit</button> -->
+                                            <button class="btn btn-primary btn-round-custom btn-sm"
+                                                (click)="get(bondItem.id)" data-toggle="modal"
+                                                data-target="#view-modal"><i class="fa fa-eye"></i> View</button>
+
+                                            <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="bondItem.status === 'CHECKED-IN'" (click)="getBondItemGoodReleaseDetail(bondItem.id)" data-toggle="modal" data-target="#bondItem-good-release-modal">Release</button> -->
+                                            <button class="btn btn-danger btn-round-custom btn-sm"
+                                                *ngIf="bondItem.status === 'CHECKED-IN'"
+                                                (click)="getBondItemGoodReleases(bondItem.id)" data-toggle="modal"
+                                                data-target="#bondItem-good-releases-modal"><i
+                                                    class="fa fa-sign-out"></i> Releases</button>
+                                            <!-- <td *ngIf="p.status === 'CHECKED-IN' && grant(['PKNG-MODIFY'])"><button type="button" class="btn btn-warning btn-round-custom btn-sm text-nowrap" (click)="get(p.id)" data-toggle="modal" data-target="#modify-modal" style="cursor: pointer;"><i class="fa fa-wrench"></i> Modify</button></td> -->
+                                            <!-- <button class="btn btn-primary btn-round-custom btn-sm" *ngIf="bondItem.status === 'PENDING'" (click)="checkIn(bondItem.id, bondItem.no, bondItem.bondItemName)" >Check-In</button>
+                                            <button class="btn btn-warning btn-round-custom btn-sm" *ngIf="bondItem.status === 'CHECKED-IN'" (click)="checkOut(bondItem.id, bondItem.no, bondItem.bondItemName)" >Check-Out</button> -->
+                                        </div>
+                                    </td>
+
+
+                                </tr>
+                            </tbody>
+                        </table>
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <pagination-controls class="pull-right"
+                                    (pageChange)="page = $event"></pagination-controls>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="edit-modal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">
+                <h4 class="modal-title" id="modal-large-label">Edit BondItem</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <br>
+                        <p><b class="text-primary" style="font-size: large;">Owner Information</b></p>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>First Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerFirstName"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Middle Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerMiddleName"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Last Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerLastName"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                            <!-- <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Company Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
+                                </div>
+                            </div> -->
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>ID Type*</label>
+                                    <select class="form-control" [(ngModel)]="ownerIdType">
+                                        <option></option>
+                                        <option>NATIONAL ID</option>
+                                        <option>VOTER ID</option>
+                                        <option>PASSPORT</option>
+                                        <option>DRIVING LICENCE</option>
+                                        <option>LETTER</option>
+                                        <option>VISA</option>
+                                        <option>NONE</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>ID No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Phone No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Address</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerAddress"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                        </div>
+
+                        <p><b class="text-primary" style="font-size: large;">Vehicle Information</b></p>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Vehicle Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="bondItemName"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Select Vehicle Type</label>
+                                    <input type="text" class="form-control" [(ngModel)]="bondItemTypeName"
+                                        list="vehicleTypes" placeholder="Select Vehicle Type">
+
+                                    <datalist id="vehicleTypes">
+                                        <option *ngFor="let option of bondItemTypes" [value]="option.name"></option>
+                                    </datalist>
+                                    <!-- <select class="form-control" [(ngModel)]="bondItemTypeName">
+                                        <option></option>
+                                        <option *ngFor="let option of bondItemTypes" [value]="option.name">{{
+                                            option.name }}
+                                        </option>
+                                    </select> -->
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Billing Rate</label>
+                                    <input class="form-control" type="number" [(ngModel)]="billingAmount"
+                                        autocomplete="nope" min="0">
+                                </div>
+                            </div>
+                            <div class="col-lg-3" *ngIf="status === 'PENDING'">
+                                <div class="form-group">
+                                    <label>Start Billing At</label>
+                                    <input class="form-control" type="date" [(ngModel)]="startBillingAt"
+                                        autocomplete="nope" min="0" style="text-align: center; font-weight: bold;">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" (click)="saveBondItem()"
+                    data-dismiss="modal">Update</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="check-in-modal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">
+                <h4 class="modal-title" id="modal-large-label">Carry In bondItem</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <br>
+                        <p><b class="text-primary" style="font-size: large;">Owner Information</b></p>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>First Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerFirstName"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Middle Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerMiddleName"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Last Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerLastName"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                            <!-- <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Company Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerCompanyName" autocomplete="nope">
+                                </div>
+                            </div> -->
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>ID Type*</label>
+                                    <select class="form-control" [(ngModel)]="ownerIdType">
+                                        <option></option>
+                                        <option>NATIONAL ID</option>
+                                        <option>VOTER ID</option>
+                                        <option>PASSPORT</option>
+                                        <option>DRIVING LICENCE</option>
+                                        <option>LETTER</option>
+                                        <option>VISA</option>
+                                        <option>NONE</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>ID No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Phone No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Address</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerAddress"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                        </div>
+
+                        <p><b class="text-primary" style="font-size: large;">Good Information</b></p>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Vehicle Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="bondItemName"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Select Good Type</label>
+                                    <select class="form-control" [(ngModel)]="bondItemTypeName">
+                                        <option></option>
+                                        <option *ngFor="let option of bondItemTypes" [value]="option.name">{{
+                                            option.name }}
+                                        </option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Good Description</label>
+                                    <textarea class="form-control" [(ngModel)]="bondItemDescription"
+                                        autocomplete="nope"></textarea>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Billing Rate</label>
+                                    <input class="form-control" type="text" [(ngModel)]="billingAmount"
+                                        autocomplete="nope" min="0" readonly>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Start Billing At</label><!--To do this later-->
+                                    <input class="form-control" type="number" [(ngModel)]="billingAmount"
+                                        autocomplete="nope" min="0">
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" data-dismiss="modal">Carry In</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="view-modal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">
+                <h4 class="modal-title" id="modal-large-label">View</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+            </div>
+
+
+            <div class="modal-body">
+                <hr>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm table-bordered">
+                            <thead>
+                                <p><b>Owner Information</b></p>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><b>First Name</b></td>
+                                    <td>{{ownerFirstName}}</td>
+                                </tr>
+                                <!-- <tr><td><b>Middle Name</b></td><td>{{ownerMiddleName}}</td></tr> -->
+                                <tr>
+                                    <td><b>Last Name</b></td>
+                                    <td>{{ownerLastName}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>ID Type</b></td>
+                                    <td>{{ownerIdType}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>ID No</b></td>
+                                    <td>{{ownerIdNo}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Phone No</b></td>
+                                    <td>{{ownerPhoneNo}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Email</b></td>
+                                    <td>{{ownerEmail}}</td>
+                                </tr>
+                            </tbody>
+
+
+                        </table>
+                    </div>
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm table-bordered">
+                            <thead>
+                                <p><b>BondItem Information</b></p>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><b>Bond Item No</b></td>
+                                    <td>{{no}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Vehicle Name</b></td>
+                                    <td>{{bondItemName}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Vehicle Type</b></td>
+                                    <td>{{bondItemTypeName}}</td>
+                                </tr>
+                                <!-- <tr><td><b>Initial Qty</b></td><td>{{initialQty}}</td></tr> -->
+                                <tr>
+                                    <td><b>Billing Type</b></td>
+                                    <td>{{billingType}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Billing Start Date</b></td>
+                                    <td>{{startBillingAt}}</td>
+                                </tr>
+                                <!-- <tr><td><b>Billing Amount</b></td><td style="text-align: right;">{{billingAmount}}</td></tr>  -->
+                                <tr>
+                                    <td><b>BondZone</b></td>
+                                    <td>{{bondZoneName}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>BondItem No</b></td>
+                                    <td>{{no}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Status</b></td>
+                                    <td>{{status}}</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm">
+                            <thead>
+                                <p><b>Check List</b></p>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><b>Front Lamps</b></td>
+                                    <td><span>L: {{leftFrontLamp}}</span><span> R: {{rightFrontLamp}}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Rear Lamps</b></td>
+                                    <td><span>L: {{leftRearLamp}}</span><span> R: {{rightRearLamp}}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Front Indicators</b></td>
+                                    <td><span>L: {{leftFrontLamp}}</span><span> R: {{rightFrontLamp}}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Rear Indicators</b></td>
+                                    <td><span>L: {{leftRearLamp}}</span><span> R: {{rightRearLamp}}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Side Mirrors</b></td>
+                                    <td><span>L: {{leftSideMirror}}</span><span> R: {{rightSideMirror}}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Wipers</b></td>
+                                    <td><span>L: {{leftWiper}}</span><span> R: {{rightWiper}}</span></td>
+                                </tr>
+                                <tr>
+                                    <td><b>Back Wipers</b></td>
+                                    <td>{{backWiper}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Fuel Cap</b></td>
+                                    <td>{{fuelCap}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Spare Tyre</b></td>
+                                    <td>{{spareTire}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Battery</b></td>
+                                    <td>{{battery}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Starter</b></td>
+                                    <td>{{starter}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Aerial</b></td>
+                                    <td>{{aerial}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Wheel Cap</b></td>
+                                    <td>{{wheelCap}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Round Mirror</b></td>
+                                    <td>{{roundMirror}}</td>
+                                </tr>
+                                <tr>
+                                    <td><b>Tire Indicator</b></td>
+                                    <td>{{tireIndicator}}</td>
+                                </tr>
+
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- <div class="col-lg-12">
+                        <p><b>Gate Pass Valid Until</b></p>
+                        <input type="date" class="form-control" [(ngModel)]="validUntilDate">
+                        
+                    </div> -->
+                    <div class="col-lg-12">
+                        <p><b>Comments</b></p>
+                        <textarea class="form-control" placeholder="Comments" [(ngModel)]="comments" readonly
+                            style="background-color: white;"></textarea>
+
+                        <!-- <input type="text" class="form-control" placeholder="Comments" [(ngModel)]="comments" readonly> -->
+
+                    </div>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <!-- <button type="button" class="btn btn-primary" (click)="checkOut()">Check Out</button> -->
+                <!-- <button type="button" class="btn btn-primary">Print Gate Pass</button> -->
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="bondItem-good-release-modal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-md" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">
+                <h4 class="modal-title" id="modal-large-label">Release Goods</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+
+                <table class="table table-striped table-sm table-bordered">
+                    <tbody>
+                        <tr>
+                            <td>Initial Qty</td>
+                            <td>{{originalQty}}</td>
+                        </tr>
+                        <tr>
+                            <td>Current Qty</td>
+                            <td>{{availableQty}}</td>
+                        </tr>
+                        <tr>
+                            <td>Released Qty</td>
+                            <td>{{releasedQty}}</td>
+                        </tr>
+                        <tr>
+                            <td>Available for Release</td>
+                            <td>{{availableForRelease}}</td>
+                        </tr>
+                        <tr>
+                            <td>Enter Qty to be release</td>
+                            <td><input class="form-control" [(ngModel)]="qtyToRelease" style="text-align: center;"></td>
+                        </tr>
+                    </tbody>
+                </table>
+
+                <div class="row">
+                    <div class="col-lg-12">
+                        <button type="button" class="btn btn-primary btn-round-custom"
+                            (click)="createBondItemGoodRelease()" data-dismiss="modal">Confirm Release</button>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="bondItem-good-releases-modal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-lg" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">
+                <h4 class="modal-title text-primary" id="modal-large-label" style="font-weight: bold;">View Releases
+                </h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+
+                <table class="table table-striped table-sm table-bordered">
+                    <thead>
+                        <tr>
+                            <th>Release No</th>
+                            <th>Released Date</th>
+                            <th>Released Qty</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let release of releases">
+                            <td>{{release.no}}</td>
+                            <td>{{release.releaseDate | date: 'dd-MM-yyyy'}}</td>
+                            <td>{{release.qty}}</td>
+                            <td><button class="btn btn-outline-success btn-round-custom btn-sm"
+                                    (click)="printReleaseNote(release.id)"><i class="fa fa-print"></i> Release
+                                    Note</button></td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="remove-modal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-md" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">
+                <h4 class="modal-title" id="modal-large-label">Archive</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+
+                    <div class="col-sm-12">
+
+                        <div class="form-group">
+                            <label>Vehicle No</label>
+                            <input class="form-control" type="text" [(ngModel)]="no" autocomplete="nope" readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Vehicle Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="bondItemName" autocomplete="nope"
+                                readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Available Qty</label>
+                            <input class="form-control" type="text" [(ngModel)]="currentQty" autocomplete="nope"
+                                readonly>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Qty to Archive</label>
+                            <input class="form-control" type="number" [(ngModel)]="qtyToRemove" autocomplete="nope">
+                        </div>
+
+                        <div class="form-group">
+                            <label>Reason</label>
+                            <input class="form-control" type="text" [(ngModel)]="reasonToRemove" autocomplete="nope">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" (click)="remove()" data-dismiss="modal">Archive</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<div class="modal fade" id="modify-modal" data-backdrop="static" tabindex="-1" role="dialog"
+    aria-labelledby="modal-large-label" style="top: 0;">
+    <div class="modal-dialog modal-xl" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">
+                <h4 class="modal-title" id="modal-large-label">Modify Existing Bond</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                        aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <br>
+                        <p><b class="text-primary" style="font-size: large;">Owner Information</b></p>
+                        <div class="row">
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>First Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerFirstName"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Middle Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerMiddleName"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Last Name*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerLastName"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                            
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>ID Type*</label>
+                                    <select class="form-control" [(ngModel)]="ownerIdType">
+                                        <option></option>
+                                        <option>NATIONAL ID</option>
+                                        <option>VOTER ID</option>
+                                        <option>PASSPORT</option>
+                                        <option>DRIVING LICENCE</option>
+                                        <option>LETTER</option>
+                                        <option>VISA</option>
+                                        <option>NONE</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>ID No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Phone No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerPhoneNo"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Address</label>
+                                    <input class="form-control" type="text" [(ngModel)]="ownerAddress"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+                        </div>
+
+                        <p><b class="text-primary" style="font-size: large;">Agent Information</b></p>
+                        <div class="row">
+                            <div class="col-lg-6">
+                                <div class="form-group">
+                                    <label>Agent Name</label>
+                                    <input class="form-control" type="text" [(ngModel)]="agentName" autocomplete="nope">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Agent Phone</label>
+                                    <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <p><b class="text-primary" style="font-size: large;">Vehicle Information</b></p>
+                        <div class="row">
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Select Vehicle Type</label>
+                                    <!-- <ng-select [items]="bondItemTypes" bindLabel="name" bindValue="name"
+                                        [(ngModel)]="bondItemTypeName"
+                                        class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
+                                    </ng-select> -->
+                                    <input type="text" class="form-control" [(ngModel)]="bondItemTypeName"
+                                        list="bondItemTypes" placeholder="Select Vehicle Type">
+
+                                    <datalist id="bondItemTypes">
+                                        <option *ngFor="let option of bondItemTypes" [value]="option.name"></option>
+                                    </datalist>
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Select Billing Type</label>
+                                    <select class="form-control" [(ngModel)]="billingType">
+                                        <option>MONTHLY</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Select Vehicle Color</label>
+                                    <select class="form-control" [(ngModel)]="bondItemColor">
+                                        <option></option>
+                                        <option value="black">Black</option>
+                                        <option value="white">White</option>
+                                        <option value="red">Red</option>
+                                        <option value="dark-blue">Dark Blue</option>
+                                        <option value="silver">Silver</option>
+                                        <option value="yellow">Yellow</option>
+                                        <option value="brown">Brown</option>
+                                        <option value="blue">Blue</option>
+                                        <option value="green">Green</option>
+                                        <option value="gray">Gray</option>
+                                        <option value="purple">Purple</option>
+                                        <option value="pink">Pink</option>
+                                        <option value="snow">Snow</option>
+                                        <option value="gold">Gold</option>
+                                        <option value="orange">Orange</option>
+                                        <option value="azul">Azul</option>
+                                        <option value="tomato">Tomato</option>
+                                        <option value="multicolour">Multicolour</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Start Billing At: {{startBillingAt}}</label>
+                                    <input class="form-control" type="date" [(ngModel)]="startBillingAt"
+                                        autocomplete="nope" min="0" style="text-align: center; font-weight: bold;">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Chasis No/ Reg No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Sub T1 Number</label>
+                                    <input class="form-control" type="text" [(ngModel)]="tformNumber"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Transard No</label>
+                                    <input class="form-control" type="text" [(ngModel)]="tformNumber"
+                                        autocomplete="nope">
+                                </div>
+                            </div>
+
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Device Status*</label>
+                                    <select class="form-control" [(ngModel)]="deviceStatus">
+                                        <option>ATTACHED</option>
+                                        <option>NOT-ATTACHED</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Bill No*</label>
+                                    <input class="form-control" type="text" [(ngModel)]="cardNo" autocomplete="nope">
+                                </div>
+                            </div> -->
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Keys Status</label>
+                                    <select class="form-control" [(ngModel)]="hasKeys">
+                                        <option>YES</option>
+                                        <option>NO</option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="col-lg-3">
+                                <div class="form-group">
+                                    <label>Vehicle Comment</label>
+                                    <textarea class="form-control" [(ngModel)]="comments"
+                                        autocomplete="nope"></textarea>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Front Lamp</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>Left</td>
+                                                <td>Right</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="leftFrontLamp">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="rightFrontLamp">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Rear Lamp</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>Left</td>
+                                                <td>Right</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="leftRearLamp">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="rightRearLamp">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Side Mirror</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>Left</td>
+                                                <td>Right</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="leftSideMirror">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="rightSideMirror">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Wipers</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>Left</td>
+                                                <td>Right</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="leftWiper">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="rightWiper">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Back Wipers</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="backWiper">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Fuel Cap</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="fuelCap">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Spare Tires</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="spareTire">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Battery</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="battery">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Starter</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="starter">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Aerial</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="aerial">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Wheel Cap</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="wheelCap">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Round Mirror</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="roundMirror">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Tire Indicator</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="tireIndicator">
+                                                        <option>YES</option>
+                                                        <option>NO</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3">
+                                    <div class="form-group">
+                                        <label>Device Status</label>
+                                        <table class="table table-sm table-bordered">
+                                            <thead>
+                                                <td>|</td>
+                                            </thead>
+                                            <tbody>
+                                                <td>
+                                                    <select class="form-control" [(ngModel)]="deviceStatus">
+                                                        <option>ATTACHED</option>
+                                                        <option>NOT-ATTACHED</option>
+                                                    </select>
+                                                </td>
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </div>
+                            </div>
+
+
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" (click)="modify()" data-dismiss="modal">Modify</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>

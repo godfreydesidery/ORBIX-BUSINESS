@@ -15,6 +15,7 @@ import { ProductComponent } from './inventory/product/product.component';
 import { RestaurantComponent } from './administration-units/restaurant/restaurant.component';
 import { WorkshopComponent } from './administration-units/workshop/workshop.component';
 import { version } from 'moment';
+import { CurrencyConversionComponent } from './administration-units/currency-conversion/currency-conversion.component';
 
 export const routes: Routes = [
   {
@@ -90,6 +91,12 @@ export const routes: Routes = [
         path : 'admin-unit/shop',
         loadComponent : () => import('./administration-units/administration-units.routes').then(c => ShopComponent),
         data : { breadcrumb : 'Admin Unit/Shop'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'admin-unit/currency-conversion',
+        loadComponent : () => import('./administration-units/administration-units.routes').then(c => CurrencyConversionComponent),
+        data : { breadcrumb : 'Admin Unit/Currency Conversion'},
         canActivate : [AuthGuard]
       },
       {
@@ -445,6 +452,57 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
 
+      /**Bond Management */
+      {
+        path : 'bond-management/bond-zone',
+        loadComponent: () => import('./bond-management/bond-zone/bond-zone.component').then(c => c.BondZoneComponent),
+        data : { breadcrumb : 'Bond Management/Bond Zone'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'bond-management/bond-item-type',
+        loadComponent: () => import('./bond-management/bond-item-type/bond-item-type.component').then(c => c.BondItemTypeComponent),
+        data : { breadcrumb : 'Bond Management/Vehicle Types'},
+        canActivate : [AuthGuard]
+      },
+
+      {
+        path : 'bond-management/select-bond-zone',
+        loadComponent: () => import('./bond-management/select-bond-zone/select-bond-zone.component').then(c => c.SelectBondZoneComponent),
+        data : { breadcrumb : 'Bond/Select Bond Zone'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'bond-management/bond-checkout-list',
+        loadComponent: () => import('./bond-management/bond-checkout-list/bond-checkout-list.component').then(c => c.BondCheckoutListComponent),
+        data : { breadcrumb : 'Bond/Checkout List'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'bond-management/cash-collections',
+        loadComponent: () => import('./bond-management/bond-cash-collection/bond-cash-collection.component').then(c => c.BondCashCollectionComponent),
+        data : { breadcrumb : 'Bond/Cash Collections'},
+        canActivate : [AuthGuard]
+      },
+      // {
+      //   path : 'storage-management/cash-collections',
+      //   loadComponent: () => import('./storage-management/storage-cash-collection/storage-cash-collection.component').then(c => c.StorageCashCollectionComponent),
+      //   data : { breadcrumb : 'Warehouse/Cash Collections'},
+      //   canActivate : [AuthGuard]
+      // },
+      // {
+      //   path : 'storage-management/storage-report',
+      //   loadComponent: () => import('./storage-management/reports/storage-report/storage-report.component').then(c => c.StorageReportComponent),
+      //   data : { breadcrumb : 'Warehouse/Reports/Storage Report'},
+      //   canActivate : [AuthGuard]
+      // },
+      // {
+      //   path : 'storage-management/goods-removed-report',
+      //   loadComponent: () => import('./storage-management/reports/goods-removed-report/goods-removed-report.component').then(c => c.GoodsRemovedReportComponent),
+      //   data : { breadcrumb : 'Warehouse/Reports/Goods Removed Report'},
+      //   canActivate : [AuthGuard]
+      // },
+
 
 
       /**End Storage Management */
@@ -519,6 +577,12 @@ export const routes: Routes = [
         canActivate : [AuthGuard]
       },
       {
+        path : 'accounts-and-finance/bond-discounts',
+        loadComponent: () => import('./accounts-and-finance/bond-discounts/bond-discounts.component').then(c => c.BondDiscountsComponent),
+        data : { breadcrumb : 'Accounts & Finance | Bond Discounts'},
+        canActivate : [AuthGuard]
+      },
+      {
         path : 'accounts-and-finance/vehicle-equipment-billing',
         loadComponent: () => import('./accounts-and-finance/vehicle-equipment-billing/vehicle-equipment-billing.component').then(c => c.VehicleEquipmentBillingComponent),
         data : { breadcrumb : 'Accounts & Finance | Vehicle & Equipment Billing'},
@@ -528,6 +592,18 @@ export const routes: Routes = [
         path : 'accounts-and-finance/good-billing',
         loadComponent: () => import('./accounts-and-finance/good-billing/good-billing.component').then(c => c.GoodBillingComponent),
         data : { breadcrumb : 'Accounts & Finance | Good Storage Billing'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'accounts-and-finance/bond-billing',
+        loadComponent: () => import('./accounts-and-finance/bond-billing/bond-billing.component').then(c => c.BondBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Bond Billing'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'accounts-and-finance/bond-item-billing',
+        loadComponent: () => import('./accounts-and-finance/bond-item-billing/bond-item-billing.component').then(c => c.BondItemBillingComponent),
+        data : { breadcrumb : 'Accounts & Finance | Bond Item Billing'},
         canActivate : [AuthGuard]
       },
       {

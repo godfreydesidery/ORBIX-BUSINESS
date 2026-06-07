@@ -97,6 +97,28 @@ export interface IStorageCashCollection {
   sn: number
 }
 
+export interface IBondItemCashCollection {
+
+  amount: number
+  paymentType: string
+  cashierName: string
+  reason: string
+  bondItemName: string
+  ownerFirstName: string
+  ownerLastName: string
+  ownerPhoneNo: string
+  dateTime: string
+  createdDateTime: string
+  checkedInDate: string
+  checkedOutDate: string
+  days: number
+  discount: number
+  bondZoneName : string
+  chasisNo : string
+  discountApprovedBy : string
+  sn: number
+}
+
 export interface IMaintenanceCashCollection {
 
   issueName: string

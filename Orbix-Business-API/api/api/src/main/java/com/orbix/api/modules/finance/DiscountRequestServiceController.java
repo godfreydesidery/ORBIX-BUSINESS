@@ -19,6 +19,10 @@ import com.orbix.api.api.vehicleandequipmentparking.ParkingRepository;
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.DayService;
+import com.orbix.api.modules.bond.BondItem;
+import com.orbix.api.modules.bond.BondItemBillReceivable;
+import com.orbix.api.modules.bond.BondItemBillReceivableRepository;
+import com.orbix.api.modules.bond.BondItemRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.warehouse.Storage;
 import com.orbix.api.modules.warehouse.StorageBillReceivable;
@@ -40,8 +44,10 @@ public class DiscountRequestServiceController implements DiscountRequestService 
 	private final DayService dayService;	
 	private final ParkingBillReceivableRepository parkingBillReceivableRepository;
 	private final StorageBillReceivableRepository storageBillReceivableRepository;	
+	private final BondItemBillReceivableRepository bondItemBillReceivableRepository;
 	private final ParkingRepository parkingRepository;
 	private final StorageRepository storageRepository;
+	private final BondItemRepository bondItemRepository;
 	private final BillReceivableRepository billReceivableRepository;
 	
 	@Override
@@ -58,6 +64,13 @@ public class DiscountRequestServiceController implements DiscountRequestService 
 			Optional<Storage> storage_ = storageRepository.findById(serviceId);
 			List<StorageBillReceivable> sbrs = storageBillReceivableRepository.findByStorage(storage_.get());
 			for(StorageBillReceivable sbr : sbrs) {
+				ids.add(sbr.getId());
+			}
+		}
+		if(serviceName.equals("Bond")) {
+			Optional<BondItem> bondItem_ = bondItemRepository.findById(serviceId);
+			List<BondItemBillReceivable> sbrs = bondItemBillReceivableRepository.findByBondItem(bondItem_.get());
+			for(BondItemBillReceivable sbr : sbrs) {
 				ids.add(sbr.getId());
 			}
 		}
@@ -212,6 +225,54 @@ public class DiscountRequestServiceController implements DiscountRequestService 
 				s.setDiscountStatus("Requested");
 				storageBillReceivableRepository.save(s);
 			}
+		}else if(dRequest.getServiceBillName().equals("Bond")) {
+			Optional<BondItemBillReceivable> bondItemBillReceivable_ = bondItemBillReceivableRepository.findById(serviceBillId);
+			if(bondItemBillReceivable_.isEmpty()) {
+				throw new NotFoundException("Bill not found");
+			}
+			Optional<DiscountRequest> discountRequest_ = discountRequestRepository.findByServiceBillIdAndServiceBillName(serviceBillId, dRequest.getServiceBillName());
+			if(!discountRequest_.isEmpty()) {
+				discountRequest = discountRequest_.get();
+				if(discountRequest.getStatus().toString().equals("REJECTED")) {
+					discountRequest.setDiscountAmount(dRequest.getDiscountAmount());
+					discountRequest.setReason(dRequest.getReason());
+					discountRequest.setStatus(WorkFlowStatus.PENDING);
+					discountRequest.setCreatedByUser(userService.getUser(request));
+					discountRequest.setCreatedDateTime(dayService.getTimeStamp());
+					discountRequest.setRejectedByUser(null);
+					discountRequest.setRejectedDateTime(null);
+					discountRequest = discountRequestRepository.save(discountRequest);
+					
+					BondItemBillReceivable s = bondItemBillReceivable_.get();
+					s.setDiscountStatus("Requested");
+					bondItemBillReceivableRepository.save(s);
+					
+				}else if(discountRequest.getStatus().toString().equals("PENDING")) {
+					discountRequest.setDiscountAmount(dRequest.getDiscountAmount());
+					discountRequest.setReason(dRequest.getReason());
+					discountRequest = discountRequestRepository.save(discountRequest);
+				}else {
+					throw new InvalidOperationException("Must be pending or Rejected");
+				}
+				
+			}else {
+				discountRequest = new DiscountRequest();
+				discountRequest.setServiceBillId(serviceBillId);
+				discountRequest.setBillAmount(dRequest.getBillAmount());
+				discountRequest.setDiscountAmount(dRequest.getDiscountAmount());
+				discountRequest.setReason(dRequest.getReason());
+				discountRequest.setServiceBillName(dRequest.getServiceBillName());
+				discountRequest.setDescription("Bond Bill " + bondItemBillReceivable_.get().getStartedAt() + " " + bondItemBillReceivable_.get().getEndedAt());
+				discountRequest.setStatus(WorkFlowStatus.PENDING);
+				discountRequest.setCreatedByUser(userService.getUser(request));
+				discountRequest.setCreatedDateTime(dayService.getTimeStamp());
+				discountRequest.setBranch(userService.getUserBranch(request));
+				discountRequest = discountRequestRepository.save(discountRequest);
+				
+				BondItemBillReceivable s = bondItemBillReceivable_.get();
+				s.setDiscountStatus("Requested");
+				bondItemBillReceivableRepository.save(s);
+			}
 		}else {
 			throw new InvalidOperationException("Invalid Service selected");
 		}
@@ -272,6 +333,28 @@ public class DiscountRequestServiceController implements DiscountRequestService 
 			billReceivable.setAmount(storageBillReceivable.getPrice() * storageBillReceivable.getQty() * storageBillReceivable.getNoOfDays() - discountRequest.getDiscountAmount());
 			billReceivable.setDue(storageBillReceivable.getPrice() * storageBillReceivable.getQty() * storageBillReceivable.getNoOfDays() - discountRequest.getDiscountAmount());
 			billReceivable = billReceivableRepository.save(billReceivable);
+		}else if(discountRequest.getServiceBillName().equals("Bond")) {
+			BondItemBillReceivable bondItemBillReceivable = bondItemBillReceivableRepository
+				    .findById(discountRequest.getServiceBillId())
+				    .orElseThrow(() -> new NotFoundException("Bill not found"));
+			bondItemBillReceivable.setDiscount(discountRequest.getDiscountAmount());
+			bondItemBillReceivable.setDiscountApprovedByUser(userService.getUser(request));
+			bondItemBillReceivable.setDiscountApprovedDateTime(dayService.getTimeStamp());
+			bondItemBillReceivable.setDiscountStatus("Approved");
+			bondItemBillReceivable = bondItemBillReceivableRepository.save(bondItemBillReceivable);
+			discountRequest.setStatus(WorkFlowStatus.APPROVED);
+			discountRequest.setApprovedByUser(userService.getUser(request));
+			discountRequest.setApprovedDateTime(dayService.getTimeStamp());
+			discountRequest.setComments(discountRequestDTO.getComments());
+			discountRequestRepository.save(discountRequest);
+			
+			BillReceivable billReceivable = bondItemBillReceivable.getBillReceivable();
+			
+			if(!billReceivable.getPayStatus().equals(PayStatus.UNPAID)) throw new InvalidOperationException("Only unpaid bill can be edited");
+			double billAmount = bondItemBillReceivable.getBillReceivable().getAmount();
+			billReceivable.setAmount(billAmount - discountRequest.getDiscountAmount());
+			billReceivable.setDue(billAmount - discountRequest.getDiscountAmount());
+			billReceivable = billReceivableRepository.save(billReceivable);
 		}
 		
 		return true;
@@ -303,6 +386,17 @@ public class DiscountRequestServiceController implements DiscountRequestService 
 				    .orElseThrow(() -> new NotFoundException("Bill not found"));
 			storageBillReceivable.setDiscountStatus("Rejected");
 			storageBillReceivableRepository.save(storageBillReceivable);
+			discountRequest.setStatus(WorkFlowStatus.REJECTED);
+			discountRequest.setRejectedByUser(userService.getUser(request));
+			discountRequest.setRejectedDateTime(dayService.getTimeStamp());
+			discountRequest.setComments(discountRequestDTO.getComments());
+			discountRequestRepository.save(discountRequest);
+		}else if(discountRequest.getServiceBillName().equals("Bond")) {
+			BondItemBillReceivable bondItemBillReceivable = bondItemBillReceivableRepository
+				    .findById(discountRequest.getServiceBillId())
+				    .orElseThrow(() -> new NotFoundException("Bill not found"));
+			bondItemBillReceivable.setDiscountStatus("Rejected");
+			bondItemBillReceivableRepository.save(bondItemBillReceivable);
 			discountRequest.setStatus(WorkFlowStatus.REJECTED);
 			discountRequest.setRejectedByUser(userService.getUser(request));
 			discountRequest.setRejectedDateTime(dayService.getTimeStamp());

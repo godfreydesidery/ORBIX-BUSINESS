@@ -397,9 +397,19 @@ export const menuItems = [
                 routerLink: '/app/accounts-and-finance/storage-billing'
             },
             {
+                title: 'Bond Billing',
+                show: grant(['FINCBND-ACCESS']),
+                routerLink: '/app/accounts-and-finance/bond-billing'
+            },
+            {
                 title: 'Storage Discounts',
                 show: grant(['FINCDISC-ACCESS', 'STRGDISC-ACCESS']),
                 routerLink: '/app/accounts-and-finance/storage-discounts'
+            },
+            {
+                title: 'Bond Discounts',
+                show: grant(['BNDDISC-ACCESS']),
+                routerLink: '/app/accounts-and-finance/bond-discounts'
             },
             {
                 title: 'Maintenance Billing',
@@ -419,7 +429,7 @@ export const menuItems = [
             {
                 title: 'Reports',
                 url: '#',
-                show: true,
+                show: grant(['FINCRPRT-ACCESS']),
                 subMenu: [
                     {
                         title: 'Parking Collections',
@@ -537,6 +547,36 @@ export const menuItems = [
                     }
                 ]
             },
+        ]
+    },
+    {
+        title: 'Bond Parking',
+        icon: 'fa-cogs',
+        selected: false,
+        expanded: false,
+        show: grant(['BNDZN-ACCESS']),
+        order: 700,
+        subMenu: [
+            {
+                title: 'Select Bond Zone',
+                show: true,
+                routerLink: '/app/bond-management/select-bond-zone'
+            },
+            // {
+            //     title: 'Reports',
+            //     url: '#',
+            //     show: true,
+            //     subMenu: [
+            //         {
+            //             title: 'Collection Report',
+            //             routerLink: '/app/storage-management/cash-collections'
+            //         },
+            //         {
+            //             title: 'Bond Report',
+            //             routerLink: '/app/storage-management/storage-report'
+            //         }
+            //     ]
+            // },
         ]
     },
     {
@@ -859,6 +899,10 @@ export const menuItems = [
                         routerLink: '/app/admin-unit/shop'
                     },
                     {
+                        title: 'Currency Conv',
+                        routerLink: '/app/admin-unit/currency-conversion'
+                    },
+                    {
                         title: 'Workshop',
                         routerLink: '/app/admin-unit/workshop'
                     },
@@ -916,11 +960,22 @@ export const menuItems = [
                     {
                         title: 'Good Types',
                         routerLink: '/app/storage-management/good-type'
+                    },                
+                ]
+            },
+            {
+                title: 'Bond Management',
+                url: '#',
+                show: true,
+                subMenu: [
+                    {
+                        title: 'Bond Zone',
+                        routerLink: '/app/bond-management/bond-zone'
                     },
-                    // {
-                    //     title: 'Vehicle Type',
-                    //     routerLink: '/app/parking-management/vehicle-and-equipment-type'
-                    // },                  
+                    {
+                        title: 'Bond Item Types',
+                        routerLink: '/app/bond-management/bond-item-type'
+                    },                
                 ]
             },
             {

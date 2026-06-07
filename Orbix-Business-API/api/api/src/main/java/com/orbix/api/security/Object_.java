@@ -22,26 +22,30 @@ public class Object_ {
 	
 	public static String RCPTN = "RCPTN-ACCESS";
 	public static String PKNG = "PKNG-ACCESS MODIFY ARCHIVE";
+	public static String BND = "BND-MODIFY ARCHIVE";
 	public static String MTNC = "MTNC-ACCESS";
 	public static String TCHN = "TCHN-ACCESS";
 	public static String FINC = "FINC-ACCESS";
 	public static String SERVBAY = "SERVBAY-ACCESS";
 	public static String FINCPKNG = "FINCPKNG-ACCESS";
 	public static String FINCDISC = "FINCDISC-ACCESS";
+	public static String BNDDISC = "BNDDISC-ACCESS";
 	public static String PKNGDISC = "PKNGDISC-ACCESS";
 	public static String STRGDISC = "STRGDISC-ACCESS";
 	public static String FINCSTRG = "FINCSTRG-ACCESS";
+	public static String FINCBND = "FINCBND-ACCESS";
 	public static String FINCWEGH = "FINCWEGH-ACCESS";
 	public static String FINCMTNC = "FINCMTNC-ACCESS";
+	public static String FINCRPRT = "FINCRPRT-ACCESS";
 	public static String FINCSERVBAY = "FINCSERVBAY-ACCESS";
 	public static String SHOP = "SHOP-ACCESS";
 	public static String RESTAURANT = "RESTAURANT-ACCESS SALE ADMIN"; 
 	public static String WRHOUSE = "WRHOUSE-ACCESS";
+	public static String BNDZN = "BNDZN-ACCESS";
 	public static String WEGH = "WEGH-ACCESS";
 	public static String STRG = "STRG-UPDATE ARCHIVE";
 	public static String PRCMT = "PRCMT-ACCESS";
 	public static String MNGNT = "MNGNT-ACCESS"; 
-	
 	public static String SHPSTK = "SHPSTK-ALL UPDATE";
 	public static String SHPPRDCT = "SHPPRDCT-ALL CREATE UPDATE DELETE";
 	

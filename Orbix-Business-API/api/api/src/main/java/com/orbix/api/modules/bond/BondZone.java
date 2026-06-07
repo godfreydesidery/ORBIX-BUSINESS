@@ -1,0 +1,64 @@
+package com.orbix.api.modules.bond;
+
+import java.time.LocalDateTime;
+
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
+import javax.persistence.Table;
+import javax.persistence.UniqueConstraint;
+
+import org.hibernate.annotations.OnDelete;
+import org.hibernate.annotations.OnDeleteAction;
+
+import com.orbix.api.api.vehicleandequipmentparking.ParkingZone;
+import com.orbix.api.modules.adminunits.Branch;
+import com.orbix.api.modules.identityandaccess.User;
+
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.NoArgsConstructor;
+import lombok.ToString;
+
+@Entity
+@Data 
+@NoArgsConstructor 
+@AllArgsConstructor
+@Table(name = "bond_zones", uniqueConstraints = { @UniqueConstraint(columnNames = {"code", "branch_id"}), @UniqueConstraint(columnNames = {"name", "branch_id"})})
+public class BondZone {
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
+	
+	@Column(unique = true, nullable = false)
+	private String code;
+	
+	@Column(nullable = false)
+	private String name;
+	
+	@Column(nullable = true)
+	private String location;
+	
+	private int noOfSections = 0;
+	private boolean active = false;
+	
+	@ManyToOne(targetEntity = Branch.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "branch_id", nullable = false , updatable = true)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+    private Branch branch;
+		
+	@ManyToOne(targetEntity = User.class, fetch = FetchType.EAGER,  optional = false)
+    @JoinColumn(name = "created_by_user_id", nullable = false , updatable = false)
+    @OnDelete(action = OnDeleteAction.NO_ACTION)
+	@ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private User createdByUser;
+		
+	private LocalDateTime createdDateTime = LocalDateTime.now();
+}
