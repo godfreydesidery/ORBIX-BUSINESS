@@ -905,7 +905,7 @@ public class BondItemServiceController implements BondItemService {
 		// Sort by endedAt ascending so the last element is the furthest coverage.
 		// Nulls first, so a malformed (null endedAt) row surfaces at index 0.
 		bondItemBillReceivables.sort(
-		    Comparator.comparing(BondItemBillReceivable::getEndedAt,
+		    Comparator.comparing(BondItemBillReceivable::getId,
 		                         Comparator.nullsFirst(Comparator.naturalOrder())));
 
 		for (BondItemBillReceivable item : bondItemBillReceivables) {

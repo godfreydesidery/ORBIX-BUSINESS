@@ -197,12 +197,12 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 	    }
 
 	    // 4. Resolve reference date (endedAt or now)
-	    LocalDateTime referenceDate;
-	    if (request.getEndedAt() != null && !request.getEndedAt().isEmpty()) {
-	        referenceDate = LocalDate.parse(request.getEndedAt(), dateFormatter).atStartOfDay();
-	    } else {
-	        referenceDate = LocalDateTime.now();
-	    }
+	    LocalDateTime referenceDate = LocalDateTime.now();
+//	    if (request.getEndedAt() != null && !request.getEndedAt().isEmpty()) {
+//	        referenceDate = LocalDate.parse(request.getEndedAt(), dateFormatter).atStartOfDay();
+//	    } else {
+//	        referenceDate = LocalDateTime.now();
+//	    }
 
 	    // 5. Calculate elapsed days
 //	    long elapsedDays = ChronoUnit.DAYS.between(fromDate, referenceDate);
