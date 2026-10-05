@@ -37,7 +37,6 @@ import org.hibernate.Hibernate;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.beans.factory.ObjectProvider;
-import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
@@ -53,12 +52,13 @@ import lombok.extern.slf4j.Slf4j;
  * The method's result and exceptions pass through unchanged; building the entry never fails the action
  * (a value that cannot be read is left empty).
  *
- * Runs around the action's transaction (first in order), so the record is read before the transaction starts and
- * the method returns here only once it has committed.
+ * Runs around the action's transaction (ordered before it, but after Spring's own ExposeInvocationInterceptor, which
+ * binding the annotation needs), so the record is read before the transaction starts and the method returns here
+ * only once it has committed.
  */
 @Aspect
 @Component
-@Order(Ordered.HIGHEST_PRECEDENCE)
+@Order(0)
 @RequiredArgsConstructor
 @Slf4j
 public class AuditAspect {

@@ -119,7 +119,7 @@ public ResponseEntity<...> confirmBillPayment(...) { ... }
 ```
 
 `AuditAspect` (Spring AOP, already on the classpath) records the entry **after the method returns successfully**:
-- The aspect runs **around the action's transaction** (it is ordered first), so the method returns to it only once the transaction has committed. A rolled back action leaves no entry.
+- The aspect runs **around the action's transaction** (it is ordered before the transaction), so the method returns to it only once the transaction has committed. A rolled back action leaves no entry.
 - The entry is then **written by the audit thread** (`auditExecutor`), in a transaction of its own. The request never waits on it, and never holds a second database connection for it: with open-in-view the request keeps its connection until it ends, so a write on the request itself would take another, and many audited changes at once could use up the pool.
 - A failure to write the entry is logged and never fails the action, so the audit log cannot break business operations. The only gap: an entry is lost if the server stops between the action's commit and the entry's write. If ever more than 1000 entries are waiting, the next one is written on the request itself instead of being dropped.
 - **Record id and reference** come from the returned DTO (`getId()`, `getNo()`) or from a named argument (`@Audited(entityId = "discountRequest.id")`).
