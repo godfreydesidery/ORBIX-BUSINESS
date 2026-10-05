@@ -217,7 +217,7 @@
                         <div class="col-sm-4"></div>
                         <div class="col-sm-4"></div>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords"
+                            <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchList()"
                                 placeholder="Search..." style="max-width: 8cm;">
                         </div>
                     </div>
@@ -243,7 +243,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let storage of storages | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index; trackBy: trackById">
+                                    *ngFor="let storage of $any(storages) | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalStorages }; let i = index; trackBy: trackById">
                                     <td>{{storage.sn}}</td>
                                     <td>{{storage.no}}</td>
                                     <td>{{storage.goodName}}</td>
@@ -299,7 +299,7 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <pagination-controls class="pull-right"
-                                    (pageChange)="page = $event"></pagination-controls>
+                                    (pageChange)="pageChanged($event)"></pagination-controls>
                             </div>
                         </div>
                     </div>
@@ -311,7 +311,7 @@
                         <div class="col-sm-4"></div>
                         <div class="col-sm-4"></div>
                         <div class="col-sm-4">
-                            <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords"
+                            <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchList()"
                                 placeholder="Search..." style="max-width: 8cm;">
                         </div>
                     </div>
@@ -335,7 +335,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let storage of storages | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index; trackBy: trackById">
+                                    *ngFor="let storage of $any(storages) | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalStorages }; let i = index; trackBy: trackById">
                                     <td>{{storage.sn}}</td>
                                     <td>{{storage.no}}</td>
                                     <td>{{storage.goodName}}</td>
@@ -385,7 +385,7 @@
                         <div class="row">
                             <div class="col-sm-12">
                                 <pagination-controls class="pull-right"
-                                    (pageChange)="page = $event"></pagination-controls>
+                                    (pageChange)="pageChanged($event)"></pagination-controls>
                             </div>
                         </div>
                     </div>
