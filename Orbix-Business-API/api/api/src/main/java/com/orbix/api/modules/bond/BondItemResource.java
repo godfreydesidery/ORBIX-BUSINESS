@@ -23,6 +23,7 @@ import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponse
 import com.orbix.api.api.vehicleandequipmentparking.ParkingRequestDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -222,6 +223,7 @@ public class BondItemResource {
 	}
 	
 	@PostMapping("/bond_items/create_bond_item_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_CREATED", entityType = "BondItemBillReceivable", entityRef = "result.bondItemId", summary = "Created bond item bill {result.id} for bond item {result.bondItemId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.bondItemId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BondItemBillReceivableResponseDTO>createBondItemBillReceivable(
 			@RequestBody BondItemBillReceivableRequestDTO bondItemBillReceivableRequest,
@@ -239,6 +241,7 @@ public class BondItemResource {
 	}
 	
 	@PostMapping("/bond_items/create_bond_item_custom_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_CREATED", entityType = "BondItemBillReceivable", entityRef = "result.bondItemId", summary = "Created custom bond item bill {result.id} for bond item {result.bondItemId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.bondItemId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BondItemBillReceivableResponseDTO>createBondItemCustomBillReceivable(
 			@RequestBody BondItemBillReceivableRequestDTO bondItemBillReceivableRequest,

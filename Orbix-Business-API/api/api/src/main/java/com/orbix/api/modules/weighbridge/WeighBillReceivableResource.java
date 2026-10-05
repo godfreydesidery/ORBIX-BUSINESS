@@ -28,6 +28,7 @@ import com.orbix.api.modules.finance.BillReceivableRepository;
 import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.warehouse.StorageBillReceivableResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -79,6 +80,7 @@ public class WeighBillReceivableResource {
 	
 	
 	@PostMapping("/weigh_bills/add_bill")
+	@Audited(category = "FINANCE", action = "BILL_CREATED", entityType = "WeighBillReceivable", entityId = "", entityRef = "b.weighId", summary = "Added a bill to weigh {b.weighId}: {b.description}, {b.amount}", details = {"weighId=b.weighId", "description=b.description", "amount=b.amount", "weighStatus=b.weighStatus"})
 	public void addBill(@RequestBody Bill b, HttpServletRequest request) {
 		
 		Optional<Weigh> weigh_ = weighRepository.findById(b.getWeighId());
@@ -127,6 +129,7 @@ public class WeighBillReceivableResource {
 	}
 	
 	@PostMapping("/weigh_bills/remove")
+	@Audited(category = "FINANCE", action = "BILL_DELETED", entityType = "WeighBillReceivable", entityId = "removeBill.billId", entityRef = "removeBill.weighNo", summary = "Removed bill {removeBill.billId} from weigh {removeBill.weighNo}", details = {"weighId=removeBill.weighId", "weighNo=removeBill.weighNo"})
 	public void addBill(@RequestBody RemoveBill removeBill, HttpServletRequest request) {
 		
 		Optional<Weigh> weigh_ = weighRepository.findById(removeBill.getWeighId());

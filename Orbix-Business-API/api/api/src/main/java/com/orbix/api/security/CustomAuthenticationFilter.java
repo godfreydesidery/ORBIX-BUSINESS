@@ -29,6 +29,9 @@ import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orbix.api.exceptions.InvalidOperationException;
+import com.orbix.api.modules.audit.AuditLogService;
+import com.orbix.api.modules.audit.AuditLogServiceController;
+import com.orbix.api.modules.audit.AuditRequests;
 import com.orbix.api.modules.identityandaccess.UserRepository;
 import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -44,10 +47,13 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 	private final UserRepository userRepository;
 
 	private final AuthenticationManager authenticationManager;
+
+	private final AuditLogService auditLogService;
 	
-	public CustomAuthenticationFilter(AuthenticationManager authenticationManager, UserRepository userRepository) {
+	public CustomAuthenticationFilter(AuthenticationManager authenticationManager, UserRepository userRepository, AuditLogService auditLogService) {
 		this.authenticationManager = authenticationManager;
 		this.userRepository = userRepository;
+		this.auditLogService = auditLogService;
 	}
 	
 	@Override
@@ -69,7 +75,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 			Authentication authentication) throws IOException, ServletException {	
 		User user = (User)authentication.getPrincipal();
 		
-		Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
+		Algorithm algorithm = JwtKey.ALGORITHM;
 		String access_token = JWT.create()
 				.withSubject(user.getUsername())
 				.withExpiresAt(new Date(System.currentTimeMillis()+8*60*60*1000))
@@ -92,9 +98,26 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 		//_user.setAuthorizationToken(access_token.substring(access_token.length() - 20));
 		//userRepository.save(_user);
 		
-		//can use this segment to register login activity
+		// Sign-in recorded in the audit log, in the background
+		auditLogService.recordAuth("LOGIN_SUCCESS", AuditLogServiceController.SUCCESS, user.getUsername(), null,
+				AuditRequests.ipAddress(request), AuditRequests.userAgent(request));
 		
 		new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+	}
+	
+	@Override
+	protected void unsuccessfulAuthentication(
+			HttpServletRequest request, 
+			HttpServletResponse response,
+			AuthenticationException failed) throws IOException, ServletException {
+		// Failed sign-in recorded in the audit log, in the background; the response is unchanged
+		try {
+			auditLogService.recordAuth("LOGIN_FAILED", AuditLogServiceController.FAILURE, request.getParameter("username"), failed.getMessage(),
+					AuditRequests.ipAddress(request), AuditRequests.userAgent(request));
+		}catch(Exception e) {
+			// Recording must never change the response
+		}
+		super.unsuccessfulAuthentication(request, response, failed);
 	}
 
 	

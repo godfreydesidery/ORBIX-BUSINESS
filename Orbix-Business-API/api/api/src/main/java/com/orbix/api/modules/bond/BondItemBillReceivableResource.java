@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
+import com.orbix.api.modules.audit.Audited;
 
 @RestController
 @RequestMapping("/orbix-business-api")
@@ -45,6 +46,7 @@ public class BondItemBillReceivableResource {
 	}
 	
 	@PostMapping("/bond_item_bill_receivables/create_bond_item_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_CREATED", entityType = "BondItemBillReceivable", entityRef = "result.bondItemId", summary = "Created bond item bill {result.id} for bond item {result.bondItemId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.bondItemId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BondItemBillReceivableResponseDTO>createBondItemBill(
 			@RequestBody BondItemBillReceivableRequestDTO bondItemBillReceivableRequest,
@@ -54,6 +56,7 @@ public class BondItemBillReceivableResource {
 	}
 	
 	@PostMapping("/bond_item_bill_receivables/update_bond_item_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_UPDATED", entityType = "BondItemBillReceivable", entityRef = "result.bondItemId", summary = "Updated bond item bill {result.id} for bond item {result.bondItemId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.bondItemId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BondItemBillReceivableResponseDTO>updateBondItemBill(
 			@RequestBody BondItemBillReceivableRequestDTO bondItemBillReceivableRequest,

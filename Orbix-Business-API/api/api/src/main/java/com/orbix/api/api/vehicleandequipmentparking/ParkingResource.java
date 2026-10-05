@@ -21,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -217,6 +218,7 @@ public class ParkingResource {
 	}
 	
 	@PostMapping("/parkings/create_parking_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_CREATED", entityType = "ParkingBillReceivable", entityRef = "result.parkingId", summary = "Created parking bill {result.id} for parking {result.parkingId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.parkingId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ParkingBillReceivableResponseDTO>createParkingBillReceivable(
 			@RequestBody ParkingBillReceivableRequestDTO parkingBillReceivableRequest,

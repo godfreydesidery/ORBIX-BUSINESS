@@ -64,6 +64,11 @@ import com.orbix.api.modules.utilities.Shortcut;
 import com.orbix.api.security.Object_;
 import com.orbix.api.security.Operation;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
+import com.orbix.api.modules.audit.AuditLogService;
+import com.orbix.api.modules.audit.AuditLogServiceController;
+import com.orbix.api.modules.audit.AuditRequests;
+import com.orbix.api.security.JwtKey;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -81,6 +86,7 @@ import lombok.RequiredArgsConstructor;
 public class UserResource {
 	
 	private final UserService userService;
+	private final AuditLogService auditLogService;
 	//private UserResponseDTO userResponse;
 	//private UserRequestDTO userRequest;
 	
@@ -173,6 +179,7 @@ public class UserResource {
 	
 	
 	@PostMapping("/users/create")
+	@Audited(category = "SECURITY", action = "USER_CREATED", entityType = "User", entityRef = "result.username", summary = "Created user {result.username}", details = {"type=user.type", "companyName=user.companyName", "branchName=user.branchName"})
 	@PreAuthorize("hasAnyAuthority('USER-ALL','ADMIN-ACCESS')")
 	public ResponseEntity<User>createUser(
 			@RequestBody UserRequestDTO user,
@@ -185,6 +192,7 @@ public class UserResource {
 	}
 		
 	@PutMapping("/users/update")
+	@Audited(category = "SECURITY", action = "USER_UPDATED", entityType = "User", entityRef = "result.username", summary = "Updated user {result.username}", details = {"type=user.type", "companyName=user.companyName", "branchName=user.branchName", "passwordChanged=present:user.password"})
 	@PreAuthorize("hasAnyAuthority('USER-ALL','ADMIN-ACCESS')")
 	public ResponseEntity<User>updateUser(
 			@RequestBody UserRequestDTO user, 
@@ -220,6 +228,7 @@ public class UserResource {
 	}
 	
 	@DeleteMapping("/users/delete")
+	@Audited(category = "SECURITY", action = "USER_DELETED", entityType = "User", entityId = "id", summary = "Deleted user with id {id}")
 	@PreAuthorize("hasAnyAuthority('USER-ALL','ADMIN-ACCESS')")
 	public ResponseEntity<Boolean> deleteUser(
 			@RequestParam(name = "id") Long id,
@@ -247,6 +256,7 @@ public class UserResource {
 	}
 	
 	@PostMapping("/roles/create")
+	@Audited(category = "SECURITY", action = "ROLE_CREATED", entityType = "Role", entityRef = "result.name", summary = "Created role {result.name}")
 	//@PreAuthorize("hasAnyAuthority('ROLE-ALL','ADMIN-ACCESS')")
 	public ResponseEntity<Role>saveRole(
 			@RequestBody Role role,
@@ -271,6 +281,7 @@ public class UserResource {
 	}
 	
 	@PutMapping("/roles/update")
+	@Audited(category = "SECURITY", action = "ROLE_UPDATED", entityType = "Role", entityRef = "result.name", summary = "Updated role {result.name}")
 	//@PreAuthorize("hasAnyAuthority('ROLE-ALL','ADMIN-ACCESS')")
 	public ResponseEntity<Role>updateRole(
 			@RequestBody Role role,
@@ -325,6 +336,7 @@ public class UserResource {
 	}
 	
 	@DeleteMapping("/roles/delete")
+	@Audited(category = "SECURITY", action = "ROLE_DELETED", entityType = "Role", entityId = "id", summary = "Deleted role with id {id}")
 	@PreAuthorize("hasAnyAuthority('ROLE-ALL','ADMIN-ACCESS')")
 	public ResponseEntity<Boolean> deleteRole(
 			@RequestParam(name = "id") Long id,
@@ -338,6 +350,7 @@ public class UserResource {
 	}
 
 	@PostMapping("/roles/addtouser")
+	@Audited(category = "SECURITY", action = "ROLE_ASSIGNED", entityType = "User", entityId = "", entityRef = "form.username", summary = "Gave role {form.roleName} to user {form.username}", details = {"roleName=form.roleName"})
 	@PreAuthorize("hasAnyAuthority('USER-ALL','USER-UPDATE','ROLE-ALL','ADMIN-ACCESS')")
 	public ResponseEntity<Role>addRoleToUser(
 			@RequestBody RoleToUserForm form,
@@ -347,6 +360,18 @@ public class UserResource {
 	}
 		
 	
+	@PostMapping("/logout")
+	public ResponseEntity<Boolean> logout(
+			HttpServletRequest request){
+		// Sign-out recorded in the audit log, in the background; the token itself simply expires
+		String username = request.getUserPrincipal() == null ? null : request.getUserPrincipal().getName();
+		if(username != null) {
+			auditLogService.recordAuth("LOGOUT", AuditLogServiceController.SUCCESS, username, null,
+					AuditRequests.ipAddress(request), AuditRequests.userAgent(request));
+		}
+		return ResponseEntity.ok().body(true);
+	}
+
 	@GetMapping("/token/refresh")
 	public void refreshToken(
 			HttpServletRequest request, HttpServletResponse response) throws JsonGenerationException, JsonMappingException, IOException{
@@ -354,9 +379,8 @@ public class UserResource {
 		if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
 			try {
 				String refresh_token = authorizationHeader.substring("Bearer ".length());
-				Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-				JWTVerifier verifier = JWT.require(algorithm).build();
-				DecodedJWT decodedJWT = verifier.verify(refresh_token);
+				Algorithm algorithm = JwtKey.ALGORITHM;
+				DecodedJWT decodedJWT = JwtKey.VERIFIER.verify(refresh_token);
 				String username =decodedJWT.getSubject();
 				User user = userService.getUser(username);
 				Collection<Role> roles = user.getRoles();
@@ -382,6 +406,10 @@ public class UserResource {
 				response.setContentType(MediaType.APPLICATION_JSON_VALUE);
 				
 				new ObjectMapper().writeValue(response.getOutputStream(), tokens);
+
+				// Session renewal recorded in the audit log, in the background
+				auditLogService.recordAuth("TOKEN_REFRESHED", AuditLogServiceController.SUCCESS, username, null,
+						AuditRequests.ipAddress(request), AuditRequests.userAgent(request));
 			}catch(Exception exception) {
 				response.setHeader("error", exception.getMessage());
 				response.setStatus(HttpStatus.FORBIDDEN.value());
@@ -453,6 +481,7 @@ public class UserResource {
 	}
 	
 	@PostMapping("/privileges/addtorole")
+	@Audited(category = "SECURITY", action = "PRIVILEGES_CHANGED", entityType = "Role", entityId = "", entityRef = "form.role", summary = "Set the privileges of role {form.role}", details = {"privileges=form.privileges"})
 	//@PreAuthorize("hasAnyAuthority('ROLE-U')")
 	public boolean addPrivilegeToRole(
 			@RequestBody AccessModel form,
@@ -524,9 +553,7 @@ public class UserResource {
 	
 	private String getUsernameFromAuthorizationHeader(String authorizationHeader) {
 		String token = authorizationHeader.substring("Bearer ".length());
-		Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-		JWTVerifier verifier = JWT.require(algorithm).build();
-		DecodedJWT decodedJWT = verifier.verify(token);
+		DecodedJWT decodedJWT = JwtKey.VERIFIER.verify(token);
 		String username = decodedJWT.getSubject();
 		return username;
 	}
@@ -601,6 +628,7 @@ public class UserResource {
 	}
 	
 	@PostMapping("/users/activate")
+	@Audited(category = "SECURITY", action = "USER_ACTIVATED", entityType = "User", entityId = "userRequest.id", entityRef = "userRequest.username", summary = "Activated user {userRequest.username} (id {userRequest.id})")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody UserRequestDTO userRequest,
@@ -610,6 +638,7 @@ public class UserResource {
 	}
 	
 	@PostMapping("/users/deactivate")
+	@Audited(category = "SECURITY", action = "USER_DEACTIVATED", entityType = "User", entityId = "userRequest.id", entityRef = "userRequest.username", summary = "Deactivated user {userRequest.username} (id {userRequest.id})")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody UserRequestDTO userRequest,

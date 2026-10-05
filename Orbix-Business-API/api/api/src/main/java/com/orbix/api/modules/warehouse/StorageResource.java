@@ -22,6 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponseDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -233,6 +234,7 @@ public class StorageResource {
 	}
 	
 	@PostMapping("/storages/create_storage_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_CREATED", entityType = "StorageBillReceivable", entityRef = "result.storageId", summary = "Created storage bill {result.id} for storage {result.storageId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.storageId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<StorageBillReceivableResponseDTO>createStorageBillReceivable(
 			@RequestBody StorageBillReceivableRequestDTO storageBillReceivableRequest,
@@ -250,6 +252,7 @@ public class StorageResource {
 	}
 	
 	@PostMapping("/storages/create_storage_custom_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_CREATED", entityType = "StorageBillReceivable", entityRef = "result.storageId", summary = "Created custom storage bill {result.id} for storage {result.storageId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.storageId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<StorageBillReceivableResponseDTO>createStorageCustomBillReceivable(
 			@RequestBody StorageBillReceivableRequestDTO storageBillReceivableRequest,
