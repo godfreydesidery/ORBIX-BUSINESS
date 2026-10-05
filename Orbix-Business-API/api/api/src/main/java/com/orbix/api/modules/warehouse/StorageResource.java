@@ -188,6 +188,7 @@ public class StorageResource {
 	}
 	
 	@PostMapping("/storages/remove")
+	@Audited(category = "OPERATIONS", action = "GOODS_REMOVED", entityType = "Storage", entityId = "storageId", summary = "Removed {qty} from storage {ref}: {reason}", details = {"qty", "reason"}, changeOf = Storage.class, changeId = "storageId")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public void remove(
 			@RequestParam(name = "storage_id") Long storageId,
@@ -199,6 +200,7 @@ public class StorageResource {
 	}
 	
 	@PostMapping("/storages/check_in")
+	@Audited(category = "OPERATIONS", action = "CHECKED_IN", entityType = "Storage", entityRef = "result.no", summary = "Checked in storage {result.no} ({result.goodName})", details = {"result.goodName"})
 	public ResponseEntity<StorageResponseDTO>checkIn(
 			@RequestBody StorageRequestDTO storageRequest,
 			HttpServletRequest request){		
@@ -206,6 +208,7 @@ public class StorageResource {
 	}
 	
 	@PostMapping("/storages/check_out")
+	@Audited(category = "OPERATIONS", action = "CHECKED_OUT", entityType = "Storage", entityRef = "result.no", summary = "Checked out storage {result.no} ({result.goodName})", details = {"result.goodName"})
 	public ResponseEntity<StorageResponseDTO>checkOut(
 			@RequestBody StorageRequestDTO storageRequest,
 			HttpServletRequest request){		

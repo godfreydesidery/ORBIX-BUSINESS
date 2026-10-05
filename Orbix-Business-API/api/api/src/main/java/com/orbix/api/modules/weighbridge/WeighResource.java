@@ -23,6 +23,7 @@ import com.orbix.api.modules.vehicleandequipmentmaintenance.ServiceSpecialistRes
 import com.orbix.api.modules.vehicleandequipmentmaintenance.ServiceSpecialistService;
 import com.orbix.api.modules.warehouse.StorageResponseDTO;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -77,6 +78,7 @@ public class WeighResource {
 	}
 	
 	@PostMapping("/weighs/recheck")
+	@Audited(category = "OPERATIONS", action = "WEIGH_RECHECKED", entityType = "Weigh", entityId = "id", summary = "Rechecked weigh {ref}", changeOf = Weigh.class, changeId = "id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public boolean recheck(
 			@RequestParam Long id,

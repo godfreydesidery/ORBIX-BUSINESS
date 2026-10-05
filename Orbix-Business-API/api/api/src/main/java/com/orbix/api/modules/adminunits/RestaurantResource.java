@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +42,7 @@ public class RestaurantResource {
 	}
 	
 	@PostMapping("/restaurants/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "Restaurant", summary = "Created restaurant {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantResponseDTO>create(
 			@RequestBody RestaurantRequestDTO restaurantRequest,
@@ -50,6 +52,7 @@ public class RestaurantResource {
 	}
 	
 	@PostMapping("/restaurants/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Restaurant", summary = "Updated restaurant {ref}", changeOf = Restaurant.class, changeId = "restaurantRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantResponseDTO>update(
 			@RequestBody RestaurantRequestDTO restaurantRequest,
@@ -59,6 +62,7 @@ public class RestaurantResource {
 	}
 	
 	@PostMapping("/restaurants/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "Restaurant", entityId = "restaurantRequest.id", summary = "Activated restaurant {ref}", changeOf = Restaurant.class, changeId = "restaurantRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody RestaurantRequestDTO restaurantRequest,
@@ -68,6 +72,7 @@ public class RestaurantResource {
 	}
 	
 	@PostMapping("/restaurants/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "Restaurant", entityId = "restaurantRequest.id", summary = "Deactivated restaurant {ref}", changeOf = Restaurant.class, changeId = "restaurantRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody RestaurantRequestDTO restaurantRequest,

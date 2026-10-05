@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -62,6 +63,7 @@ private final SupplierProductRepository supplierProductRepository;
 	}
 	
 	@PostMapping("/supplier_products/create")
+	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "SupplierProduct", summary = "Created supplier product {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<SupplierProductResponseDTO>create(
 			@RequestBody SupplierProductRequestDTO supplierProductRequest,
@@ -71,6 +73,7 @@ private final SupplierProductRepository supplierProductRepository;
 	}
 	
 	@PostMapping("/supplier_products/update")
+	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "SupplierProduct", summary = "Updated supplier product {ref}", changeOf = SupplierProduct.class, changeId = "supplierProductRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<SupplierProductResponseDTO>update(
 			@RequestBody SupplierProductRequestDTO supplierProductRequest,
@@ -80,6 +83,7 @@ private final SupplierProductRepository supplierProductRepository;
 	}
 	
 	@PostMapping("/supplier_products/adjust_stock")
+	@Audited(category = "INVENTORY", action = "STOCK_ADJUSTED", entityType = "SupplierProduct", entityRef = "result.productCode", summary = "Adjusted supplier product {result.productCode} {result.productName}", changeOf = SupplierProduct.class, changeId = "supplierProductRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<SupplierProductResponseDTO>adjustStock(
 			@RequestBody SupplierProductRequestDTO supplierProductRequest,
@@ -89,6 +93,7 @@ private final SupplierProductRepository supplierProductRepository;
 	}
 	
 	@PostMapping("/supplier_products/activate")
+	@Audited(category = "INVENTORY", action = "RECORD_ACTIVATED", entityType = "SupplierProduct", entityId = "supplierProductRequest.id", summary = "Activated supplier product {ref}", changeOf = SupplierProduct.class, changeId = "supplierProductRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody SupplierProductRequestDTO supplierProductRequest,
@@ -98,6 +103,7 @@ private final SupplierProductRepository supplierProductRepository;
 	}
 	
 	@PostMapping("/supplier_products/deactivate")
+	@Audited(category = "INVENTORY", action = "RECORD_DEACTIVATED", entityType = "SupplierProduct", entityId = "supplierProductRequest.id", summary = "Deactivated supplier product {ref}", changeOf = SupplierProduct.class, changeId = "supplierProductRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody SupplierProductRequestDTO supplierProductRequest,

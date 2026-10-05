@@ -46,6 +46,7 @@ public class RoleResource {
 	}
 	
 	@PostMapping("/companies/update_role")
+	@Audited(category = "SECURITY", action = "ROLE_UPDATED", entityType = "Role", summary = "Updated role {ref}", changeOf = Role.class, changeId = "roleRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RoleResponseDTO>updateRole(
 			@RequestBody RoleRequestDTO roleRequest,

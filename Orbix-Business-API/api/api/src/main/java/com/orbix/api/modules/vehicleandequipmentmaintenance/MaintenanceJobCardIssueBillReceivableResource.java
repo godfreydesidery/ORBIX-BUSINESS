@@ -55,7 +55,7 @@ public class MaintenanceJobCardIssueBillReceivableResource {
 //	}
 	
 	@PostMapping("/maintenance_bill_receivables/update_maintenance_bill_receivable")
-	@Audited(category = "FINANCE", action = "BILL_UPDATED", entityType = "MaintenanceJobCardIssueBillReceivable", entityRef = "result.maintenanceId", summary = "Updated maintenance bill {result.id} for maintenance {result.maintenanceId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.maintenanceId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
+	@Audited(category = "FINANCE", action = "BILL_UPDATED", entityType = "MaintenanceJobCardIssueBillReceivable", entityRef = "result.maintenanceId", summary = "Updated maintenance bill {result.id} for maintenance {result.maintenanceId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.maintenanceId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"}, changeOf = MaintenanceJobCardIssueBillReceivable.class, changeId = "maintenanceJobCardIssueBillReceivableRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<MaintenanceJobCardIssueBillReceivableResponseDTO>updateMaintenanceJobCardIssueBill(
 			@RequestBody MaintenanceJobCardIssueBillReceivableRequestDTO maintenanceJobCardIssueBillReceivableRequest,

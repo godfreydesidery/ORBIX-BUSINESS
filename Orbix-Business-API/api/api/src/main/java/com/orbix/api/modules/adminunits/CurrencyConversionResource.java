@@ -40,13 +40,14 @@ public class CurrencyConversionResource {
     }
 
     @PostMapping("/currency_conversions/update")
-    @Audited(category = "FINANCE", action = "CURRENCY_RATES_CHANGED", entityType = "CurrencyConversion", summary = "Updated currency rate {result.sourceCurrencyCode} {result.sourceCurrencyValue} = {result.finalCurrencyCode} {result.finalCurrencyValue}", details = {"result.sourceCurrencyCode", "result.sourceCurrencyValue", "result.finalCurrencyCode", "result.finalCurrencyValue", "result.active"})
+    @Audited(category = "FINANCE", action = "CURRENCY_RATES_CHANGED", entityType = "CurrencyConversion", summary = "Updated currency rate {result.sourceCurrencyCode} {result.sourceCurrencyValue} = {result.finalCurrencyCode} {result.finalCurrencyValue}", details = {"result.sourceCurrencyCode", "result.sourceCurrencyValue", "result.finalCurrencyCode", "result.finalCurrencyValue", "result.active"}, changeOf = CurrencyConversion.class, changeId = "conversionRequest.id")
     public ResponseEntity<CurrencyConversionResponseDTO> updateCurrencyConversion(@RequestBody CurrencyConversionRequestDTO conversionRequest, HttpServletRequest request) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/currency-conversions/update").toUriString());
         return ResponseEntity.created(uri).body(currencyConversionService.updateCurrencyConversion(conversionRequest, request));
     }
     
     @PostMapping("/currency_conversions/activate")
+    @Audited(category = "FINANCE", action = "CURRENCY_RATES_CHANGED", entityType = "CurrencyConversion", entityId = "currencyConversionRequest.id", summary = "Activated currency rate {currencyConversionRequest.id}", changeOf = CurrencyConversion.class, changeId = "currencyConversionRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody CurrencyConversionRequestDTO currencyConversionRequest,
@@ -56,6 +57,7 @@ public class CurrencyConversionResource {
 	}
     
     @PostMapping("/currency_conversions/deactivate")
+    @Audited(category = "FINANCE", action = "CURRENCY_RATES_CHANGED", entityType = "CurrencyConversion", entityId = "currencyConversionRequest.id", summary = "Deactivated currency rate {currencyConversionRequest.id}", changeOf = CurrencyConversion.class, changeId = "currencyConversionRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody CurrencyConversionRequestDTO currencyConversionRequest,

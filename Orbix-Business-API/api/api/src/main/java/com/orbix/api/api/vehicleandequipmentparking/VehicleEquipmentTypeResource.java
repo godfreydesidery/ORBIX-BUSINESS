@@ -19,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.modules.adminunits.Company;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -52,6 +53,7 @@ public class VehicleEquipmentTypeResource {
 	}
 	
 	@PostMapping("/vehicle_equipment_types/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "VehicleEquipmentType", summary = "Created vehicle/equipment type {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<VehicleEquipmentTypeResponseDTO>create(
 			@RequestBody VehicleEquipmentTypeRequestDTO vehicleEquipmentTypeRequest,
@@ -61,6 +63,7 @@ public class VehicleEquipmentTypeResource {
 	}
 	
 	@PostMapping("/vehicle_equipment_types/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "VehicleEquipmentType", summary = "Updated vehicle/equipment type {ref}", changeOf = VehicleEquipmentType.class, changeId = "vehicleEquipmentTypeRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<VehicleEquipmentTypeResponseDTO>update(
 			@RequestBody VehicleEquipmentTypeRequestDTO vehicleEquipmentTypeRequest,
@@ -70,6 +73,7 @@ public class VehicleEquipmentTypeResource {
 	}
 	
 	@PostMapping("/vehicle_equipment_types/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "VehicleEquipmentType", entityId = "vehicleEquipmentTypeRequest.id", summary = "Activated vehicle/equipment type {ref}", changeOf = VehicleEquipmentType.class, changeId = "vehicleEquipmentTypeRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody VehicleEquipmentTypeRequestDTO vehicleEquipmentTypeRequest,
@@ -80,6 +84,7 @@ public class VehicleEquipmentTypeResource {
 	
 	
 	@PostMapping("/vehicle_equipment_types/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "VehicleEquipmentType", entityId = "vehicleEquipmentTypeRequest.id", summary = "Deactivated vehicle/equipment type {ref}", changeOf = VehicleEquipmentType.class, changeId = "vehicleEquipmentTypeRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody VehicleEquipmentTypeRequestDTO vehicleEquipmentTypeRequest,

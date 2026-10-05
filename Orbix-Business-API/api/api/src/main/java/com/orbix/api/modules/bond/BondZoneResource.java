@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.modules.adminunits.ShopResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -49,6 +50,7 @@ public class BondZoneResource {
 	}
 	
 	@PostMapping("/bond_zones/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "BondZone", summary = "Created bond zone {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BondZoneResponseDTO>create(
 			@RequestBody BondZoneRequestDTO bondZoneRequest,
@@ -58,6 +60,7 @@ public class BondZoneResource {
 	}
 	
 	@PostMapping("/bond_zones/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "BondZone", summary = "Updated bond zone {ref}", changeOf = BondZone.class, changeId = "bondZoneRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BondZoneResponseDTO>update(
 			@RequestBody BondZoneRequestDTO bondZoneRequest,
@@ -67,6 +70,7 @@ public class BondZoneResource {
 	}
 	
 	@PostMapping("/bond_zones/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "BondZone", entityId = "bondZoneRequest.id", summary = "Activated bond zone {ref}", changeOf = BondZone.class, changeId = "bondZoneRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody BondZoneRequestDTO bondZoneRequest,
@@ -77,6 +81,7 @@ public class BondZoneResource {
 	
 	
 	@PostMapping("/bond_zones/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "BondZone", entityId = "bondZoneRequest.id", summary = "Deactivated bond zone {ref}", changeOf = BondZone.class, changeId = "bondZoneRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody BondZoneRequestDTO bondZoneRequest,

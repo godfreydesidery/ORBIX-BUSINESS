@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 
 import lombok.RequiredArgsConstructor;
@@ -60,6 +61,7 @@ public class ProductResource {
 	}
 	
 	@PostMapping("/products/create")
+	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "Product", summary = "Created product {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ProductResponseDTO>create(
 			@RequestBody ProductRequestDTO productRequest,
@@ -69,6 +71,7 @@ public class ProductResource {
 	}
 	
 	@PostMapping("/products/update")
+	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "Product", summary = "Updated product {ref}", changeOf = Product.class, changeId = "productRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ProductResponseDTO>update(
 			@RequestBody ProductRequestDTO productRequest,
@@ -78,6 +81,7 @@ public class ProductResource {
 	}
 	
 	@PostMapping("/products/activate")
+	@Audited(category = "INVENTORY", action = "RECORD_ACTIVATED", entityType = "Product", entityId = "productRequest.id", summary = "Activated product {ref}", changeOf = Product.class, changeId = "productRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody ProductRequestDTO productRequest,
@@ -87,6 +91,7 @@ public class ProductResource {
 	}
 	
 	@PostMapping("/products/deactivate")
+	@Audited(category = "INVENTORY", action = "RECORD_DEACTIVATED", entityType = "Product", entityId = "productRequest.id", summary = "Deactivated product {ref}", changeOf = Product.class, changeId = "productRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody ProductRequestDTO productRequest,

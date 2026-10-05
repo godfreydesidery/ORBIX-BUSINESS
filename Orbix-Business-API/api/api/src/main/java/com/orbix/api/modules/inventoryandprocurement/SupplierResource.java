@@ -19,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.api.commons.PageResponseDTO;
 import com.orbix.api.modules.adminunits.ShopResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -58,6 +59,7 @@ private final SupplierService supplierService;
 	}
 	
 	@PostMapping("/suppliers/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "Supplier", summary = "Created supplier {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<SupplierResponseDTO>create(
 			@RequestBody SupplierRequestDTO supplierRequest,
@@ -67,6 +69,7 @@ private final SupplierService supplierService;
 	}
 	
 	@PostMapping("/suppliers/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Supplier", summary = "Updated supplier {ref}", changeOf = Supplier.class, changeId = "supplierRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<SupplierResponseDTO>update(
 			@RequestBody SupplierRequestDTO supplierRequest,
@@ -76,6 +79,7 @@ private final SupplierService supplierService;
 	}
 	
 	@PostMapping("/suppliers/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "Supplier", entityId = "supplierRequest.id", summary = "Activated supplier {ref}", changeOf = Supplier.class, changeId = "supplierRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody SupplierRequestDTO supplierRequest,
@@ -85,6 +89,7 @@ private final SupplierService supplierService;
 	}
 	
 	@PostMapping("/suppliers/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "Supplier", entityId = "supplierRequest.id", summary = "Deactivated supplier {ref}", changeOf = Supplier.class, changeId = "supplierRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody SupplierRequestDTO supplierRequest,

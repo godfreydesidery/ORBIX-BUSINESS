@@ -19,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -61,6 +62,7 @@ public class CompanyResource {
 	 * @return
 	 */
 	@PostMapping("/companies/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "Company", summary = "Created company {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<CompanyResponseDTO>create(
 			@RequestBody CompanyRequestDTO companyRequest,
@@ -75,6 +77,7 @@ public class CompanyResource {
 	 * @return
 	 */
 	@PostMapping("/companies/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Company", summary = "Updated company {ref}", changeOf = Company.class, changeId = "companyRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<CompanyResponseDTO>update(
 			@RequestBody CompanyRequestDTO companyRequest,
@@ -89,6 +92,7 @@ public class CompanyResource {
 	 * @return
 	 */
 	@PostMapping("/companies/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "Company", entityId = "companyRequest.id", summary = "Activated company {ref}", changeOf = Company.class, changeId = "companyRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody CompanyRequestDTO companyRequest,
@@ -104,6 +108,7 @@ public class CompanyResource {
 	 * @return
 	 */
 	@PostMapping("/companies/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "Company", entityId = "companyRequest.id", summary = "Deactivated company {ref}", changeOf = Company.class, changeId = "companyRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody CompanyRequestDTO companyRequest,

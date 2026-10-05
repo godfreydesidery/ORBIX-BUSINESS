@@ -41,4 +41,20 @@ public @interface Audited {
 
 	/** Values copied into the entry's details, as "expression" or "name=expression"; "present:expression" gives true when the value is not empty */
 	String[] details() default {};
+
+	/**
+	 * For a change to an existing record: the record's entity class. Its columns are read before and after the action,
+	 * and those that changed are written to the details as "before" and "after" (all of them as "before" when the record
+	 * was deleted). Passwords, tokens, secrets and binary data such as logos are never read.
+	 */
+	Class<?> changeOf() default void.class;
+
+	/** Expression giving the id of that record, read before the action, e.g. "productRequest.id" */
+	String changeId() default "";
+
+	/** When a column whose name matches this pattern changed, the entry is recorded as changedAction instead of action */
+	String changedFieldPattern() default "";
+
+	/** e.g. PRICE_CHANGED */
+	String changedAction() default "";
 }

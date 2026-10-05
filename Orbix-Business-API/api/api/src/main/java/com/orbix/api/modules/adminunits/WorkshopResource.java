@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,6 +40,7 @@ public class WorkshopResource {
 	}
 
 	@PostMapping("/workshops/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "Workshop", summary = "Created workshop {ref}")
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<WorkshopResponseDTO> create(@RequestBody WorkshopRequestDTO workshopRequest, HttpServletRequest request) {
 		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -47,6 +49,7 @@ public class WorkshopResource {
 	}
 
 	@PostMapping("/workshops/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Workshop", summary = "Updated workshop {ref}", changeOf = Workshop.class, changeId = "workshopRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<WorkshopResponseDTO> update(@RequestBody WorkshopRequestDTO workshopRequest, HttpServletRequest request) {
 		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath()
@@ -55,6 +58,7 @@ public class WorkshopResource {
 	}
 
 	@PostMapping("/workshops/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "Workshop", entityId = "workshopRequest.id", summary = "Activated workshop {ref}", changeOf = Workshop.class, changeId = "workshopRequest.id")
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse> activate(@RequestBody WorkshopRequestDTO workshopRequest,
 			HttpServletRequest request) {
@@ -64,6 +68,7 @@ public class WorkshopResource {
 	}
 
 	@PostMapping("/workshops/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "Workshop", entityId = "workshopRequest.id", summary = "Deactivated workshop {ref}", changeOf = Workshop.class, changeId = "workshopRequest.id")
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse> deactivate(@RequestBody WorkshopRequestDTO workshopRequest,
 			HttpServletRequest request) {

@@ -72,7 +72,7 @@ public class DiscountRequestResource {
 	}
 	
 	@PostMapping("/discount_requests/approve")
-	@Audited(category = "FINANCE", action = "DISCOUNT_APPROVED", entityType = "DiscountRequest", entityId = "discountRequest.id", summary = "Approved discount request {discountRequest.id}", details = {"comments=discountRequest.comments"})
+	@Audited(category = "FINANCE", action = "DISCOUNT_APPROVED", entityType = "DiscountRequest", entityId = "discountRequest.id", summary = "Approved discount request {discountRequest.id}", details = {"comments=discountRequest.comments"}, changeOf = DiscountRequest.class, changeId = "discountRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<Boolean>approve(
 			@RequestBody DiscountRequestRequestDTO discountRequest,
@@ -82,7 +82,7 @@ public class DiscountRequestResource {
 	}
 	
 	@PostMapping("/discount_requests/reject")
-	@Audited(category = "FINANCE", action = "DISCOUNT_REJECTED", entityType = "DiscountRequest", entityId = "discountRequest.id", summary = "Rejected discount request {discountRequest.id}", details = {"comments=discountRequest.comments"})
+	@Audited(category = "FINANCE", action = "DISCOUNT_REJECTED", entityType = "DiscountRequest", entityId = "discountRequest.id", summary = "Rejected discount request {discountRequest.id}", details = {"comments=discountRequest.comments"}, changeOf = DiscountRequest.class, changeId = "discountRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<Boolean>reject(
 			@RequestBody DiscountRequestRequestDTO discountRequest,

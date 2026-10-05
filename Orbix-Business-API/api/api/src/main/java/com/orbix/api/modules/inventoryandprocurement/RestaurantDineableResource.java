@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -55,6 +56,7 @@ public class RestaurantDineableResource {
 	}
 	
 	@PostMapping("/restaurant_dineables/create")
+	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "RestaurantDineable", summary = "Created restaurant dineable {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantDineableResponseDTO>create(
 			@RequestBody RestaurantDineableRequestDTO restaurantDineableRequest,
@@ -64,6 +66,7 @@ public class RestaurantDineableResource {
 	}
 	
 	@PostMapping("/restaurant_dineables/update")
+	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "RestaurantDineable", summary = "Updated restaurant dineable {ref}", changeOf = RestaurantDineable.class, changeId = "restaurantDineableRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantDineableResponseDTO>update(
 			@RequestBody RestaurantDineableRequestDTO restaurantDineableRequest,
@@ -73,6 +76,7 @@ public class RestaurantDineableResource {
 	}
 	
 	@PostMapping("/restaurant_dineables/adjust_stock")
+	@Audited(category = "INVENTORY", action = "STOCK_ADJUSTED", entityType = "RestaurantDineable", entityRef = "result.dineableCode", summary = "Adjusted the stock of {result.dineableCode} {result.dineableName} to {result.currentStock}", changeOf = RestaurantDineable.class, changeId = "restaurantDineableRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantDineableResponseDTO>adjustStock(
 			@RequestBody RestaurantDineableRequestDTO restaurantDineableRequest,
@@ -82,6 +86,7 @@ public class RestaurantDineableResource {
 	}
 	
 	@PostMapping("/restaurant_dineables/activate")
+	@Audited(category = "INVENTORY", action = "RECORD_ACTIVATED", entityType = "RestaurantDineable", entityId = "restaurantDineableRequest.id", summary = "Activated restaurant dineable {ref}", changeOf = RestaurantDineable.class, changeId = "restaurantDineableRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody RestaurantDineableRequestDTO restaurantDineableRequest,
@@ -91,6 +96,7 @@ public class RestaurantDineableResource {
 	}
 	
 	@PostMapping("/restaurant_dineables/deactivate")
+	@Audited(category = "INVENTORY", action = "RECORD_DEACTIVATED", entityType = "RestaurantDineable", entityId = "restaurantDineableRequest.id", summary = "Deactivated restaurant dineable {ref}", changeOf = RestaurantDineable.class, changeId = "restaurantDineableRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody RestaurantDineableRequestDTO restaurantDineableRequest,

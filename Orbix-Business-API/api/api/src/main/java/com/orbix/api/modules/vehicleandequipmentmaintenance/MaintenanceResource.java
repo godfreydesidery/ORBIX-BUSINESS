@@ -22,6 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 @RestController
 @RequestMapping("/orbix-business-api")
@@ -170,6 +171,7 @@ public class MaintenanceResource {
 	}
 	
 	@PostMapping("/maintenances/check_in")
+	@Audited(category = "OPERATIONS", action = "CHECKED_IN", entityType = "Maintenance", entityRef = "result.no", summary = "Checked in maintenance {result.no} ({result.chasisNo})", details = {"result.chasisNo"})
 	public ResponseEntity<MaintenanceResponseDTO>checkIn(
 			@RequestBody MaintenanceRequestDTO maintenanceRequest,
 			HttpServletRequest request){		
@@ -177,6 +179,7 @@ public class MaintenanceResource {
 	}
 	
 	@PostMapping("/maintenances/check_out")
+	@Audited(category = "OPERATIONS", action = "CHECKED_OUT", entityType = "Maintenance", entityRef = "result.no", summary = "Checked out maintenance {result.no} ({result.chasisNo})", details = {"result.chasisNo"})
 	public ResponseEntity<MaintenanceResponseDTO>checkOut(
 			@RequestBody MaintenanceRequestDTO maintenanceRequest,
 			HttpServletRequest request){		

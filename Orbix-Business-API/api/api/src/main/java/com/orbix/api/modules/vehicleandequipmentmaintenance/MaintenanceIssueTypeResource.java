@@ -17,6 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -49,6 +50,7 @@ public class MaintenanceIssueTypeResource {
 	}
 	
 	@PostMapping("/maintenance_issue_types/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "MaintenanceIssueType", summary = "Created maintenance issue type {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<MaintenanceIssueTypeResponseDTO>create(
 			@RequestBody MaintenanceIssueTypeRequestDTO maintenanceIssueTypeRequest,
@@ -58,6 +60,7 @@ public class MaintenanceIssueTypeResource {
 	}
 	
 	@PostMapping("/maintenance_issue_types/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "MaintenanceIssueType", summary = "Updated maintenance issue type {ref}", changeOf = MaintenanceIssueType.class, changeId = "maintenanceIssueTypeRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<MaintenanceIssueTypeResponseDTO>update(
 			@RequestBody MaintenanceIssueTypeRequestDTO maintenanceIssueTypeRequest,
@@ -67,6 +70,7 @@ public class MaintenanceIssueTypeResource {
 	}
 	
 	@PostMapping("/maintenance_issue_types/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "MaintenanceIssueType", entityId = "maintenanceIssueTypeRequest.id", summary = "Activated maintenance issue type {ref}", changeOf = MaintenanceIssueType.class, changeId = "maintenanceIssueTypeRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody MaintenanceIssueTypeRequestDTO maintenanceIssueTypeRequest,
@@ -77,6 +81,7 @@ public class MaintenanceIssueTypeResource {
 	
 	
 	@PostMapping("/maintenance_issue_types/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "MaintenanceIssueType", entityId = "maintenanceIssueTypeRequest.id", summary = "Deactivated maintenance issue type {ref}", changeOf = MaintenanceIssueType.class, changeId = "maintenanceIssueTypeRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody MaintenanceIssueTypeRequestDTO maintenanceIssueTypeRequest,

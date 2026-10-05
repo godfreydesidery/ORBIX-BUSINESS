@@ -56,7 +56,7 @@ public class BondItemBillReceivableResource {
 	}
 	
 	@PostMapping("/bond_item_bill_receivables/update_bond_item_bill_receivable")
-	@Audited(category = "FINANCE", action = "BILL_UPDATED", entityType = "BondItemBillReceivable", entityRef = "result.bondItemId", summary = "Updated bond item bill {result.id} for bond item {result.bondItemId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.bondItemId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
+	@Audited(category = "FINANCE", action = "BILL_UPDATED", entityType = "BondItemBillReceivable", entityRef = "result.bondItemId", summary = "Updated bond item bill {result.id} for bond item {result.bondItemId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.bondItemId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"}, changeOf = BondItemBillReceivable.class, changeId = "bondItemBillReceivableRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BondItemBillReceivableResponseDTO>updateBondItemBill(
 			@RequestBody BondItemBillReceivableRequestDTO bondItemBillReceivableRequest,

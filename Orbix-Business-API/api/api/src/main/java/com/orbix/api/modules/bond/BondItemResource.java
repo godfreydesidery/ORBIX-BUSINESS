@@ -181,6 +181,7 @@ public class BondItemResource {
 	}
 	
 	@PostMapping("/bond_items/check_in")
+	@Audited(category = "OPERATIONS", action = "CHECKED_IN", entityType = "BondItem", entityRef = "result.no", summary = "Checked in bond item {result.no} ({result.bondItemName})", details = {"result.bondItemName"})
 	public ResponseEntity<BondItemResponseDTO>checkIn(
 			@RequestBody BondItemRequestDTO bondItemRequest,
 			HttpServletRequest request){		
@@ -188,6 +189,7 @@ public class BondItemResource {
 	}
 	
 	@PostMapping("/bond_items/check_out")
+	@Audited(category = "OPERATIONS", action = "CHECKED_OUT", entityType = "BondItem", entityRef = "result.no", summary = "Checked out bond item {result.no} ({result.bondItemName})", details = {"result.bondItemName"})
 	public ResponseEntity<BondItemResponseDTO>checkOut(
 			@RequestBody BondItemRequestDTO bondItemRequest,
 			HttpServletRequest request){		
@@ -195,6 +197,7 @@ public class BondItemResource {
 	}
 	
 	@PostMapping("/bond_items/archive")
+	@Audited(category = "OPERATIONS", action = "BOND_ITEM_ARCHIVED", entityType = "BondItem", entityRef = "result.no", summary = "Archived bond item {ref}", changeOf = BondItem.class, changeId = "bondItemRequest.id")
 	public ResponseEntity<BondItemResponseDTO>archive(
 			@RequestBody BondItemRequestDTO bondItemRequest,
 			HttpServletRequest request){		
@@ -278,6 +281,7 @@ public class BondItemResource {
 	}
 	
 	@PostMapping("/bond_items/modify")
+	@Audited(category = "OPERATIONS", action = "RECORD_MODIFIED", entityType = "BondItem", entityRef = "result.no", summary = "Modified bond item {ref}", changeOf = BondItem.class, changeId = "bondItemRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BondItemResponseDTO>modify(
 			@RequestBody BondItemRequestDTO bondItemRequest,

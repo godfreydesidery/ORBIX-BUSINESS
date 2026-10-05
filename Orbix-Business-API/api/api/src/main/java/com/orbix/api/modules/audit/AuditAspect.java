@@ -1,20 +1,35 @@
 package com.orbix.api.modules.audit;
 
+import java.lang.reflect.Field;
+import java.lang.reflect.Member;
+import java.lang.reflect.Method;
 import java.math.BigDecimal;
+import java.sql.Blob;
+import java.sql.Clob;
 import java.time.temporal.Temporal;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.aspectj.lang.JoinPoint;
-import org.aspectj.lang.annotation.AfterReturning;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import javax.persistence.metamodel.Attribute;
+import javax.persistence.metamodel.EntityType;
+import javax.persistence.metamodel.SingularAttribute;
+
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
 import org.aspectj.lang.reflect.MethodSignature;
+import org.hibernate.Hibernate;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.beans.factory.ObjectProvider;
@@ -28,7 +43,8 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Writes an audit log entry for each method marked @Audited that returns normally.
- * Building the entry never fails the action: a value that cannot be read is left empty.
+ * The method's result and exceptions pass through unchanged; building the entry never fails the action
+ * (a value that cannot be read is left empty).
  */
 @Aspect
 @Component
@@ -38,34 +54,171 @@ public class AuditAspect {
 
 	private static final Pattern PLACEHOLDER = Pattern.compile("\\{([^}]+)\\}");
 	private static final String PRESENT = "present:";
+	// Never read into the audit log
+	private static final Pattern SENSITIVE = Pattern.compile("(?i).*(password|token|secret|logo).*");
+	// Columns used as the readable reference of a changed record when the annotation names none
+	private static final String[] REFERENCE_COLUMNS = {"no", "code", "username", "name", "chasisNo"};
 
 	// Looked up when first needed, so creating this aspect does not create the services early
 	private final ObjectProvider<AuditLogService> auditLogService;
 	private final ObjectProvider<ObjectMapper> objectMapper;
 
-	@AfterReturning(pointcut = "@annotation(audited)", returning = "result", argNames = "audited,result")
-	public void recordAction(JoinPoint joinPoint, Audited audited, Object result) {
+	@PersistenceContext
+	private EntityManager entityManager;
+
+	@Around(value = "@annotation(audited)", argNames = "audited")
+	public Object recordAction(ProceedingJoinPoint joinPoint, Audited audited) throws Throwable {
+		Map<String, Object> values = new HashMap<>();
+		Map<String, Object> before = null;
 		try {
-			Map<String, Object> values = new HashMap<>();
 			String[] names = ((MethodSignature) joinPoint.getSignature()).getParameterNames();
 			Object[] args = joinPoint.getArgs();
 			for(int i = 0; names != null && i < names.length && i < args.length; i++) {
 				values.put(names[i], args[i]);
 			}
+			before = columns(audited.changeOf(), resolve(values, audited.changeId()));
+		}catch(Exception e) {
+			log.error("Could not read the record before audited action {}: {}", audited.action(), e.getMessage());
+		}
+
+		Object result = joinPoint.proceed();
+
+		try {
 			values.put("result", result instanceof ResponseEntity ? ((ResponseEntity<?>) result).getBody() : result);
+			Map<String, Object> details = details(values, audited.details());
+			String action = audited.action();
+			String reference = text(resolve(values, audited.entityRef()));
+
+			if(audited.changeOf() != void.class && before != null) {
+				Map<String, Object> after = columns(audited.changeOf(), resolve(values, audited.changeId()));
+				if(after == null) {
+					// The record was deleted: keep everything it held
+					details.put("before", before);
+				}else {
+					Map<String, Object> changedBefore = new LinkedHashMap<>();
+					Map<String, Object> changedAfter = new LinkedHashMap<>();
+					Set<String> columns = new LinkedHashSet<>(before.keySet());
+					columns.addAll(after.keySet());
+					for(String column : columns) {
+						if(!Objects.equals(before.get(column), after.get(column))) {
+							changedBefore.put(column, before.get(column));
+							changedAfter.put(column, after.get(column));
+						}
+					}
+					details.put("before", changedBefore);
+					details.put("after", changedAfter);
+					if(!audited.changedFieldPattern().isEmpty() && !audited.changedAction().isEmpty()
+							&& changedAfter.keySet().stream().anyMatch(column -> column.matches(audited.changedFieldPattern()))) {
+						action = audited.changedAction();
+					}
+				}
+				if(reference == null) {
+					reference = reference(before);
+				}
+			}
+
+			if(reference == null) {
+				Object resultValue = values.get("result");
+				for(int i = 0; i < REFERENCE_COLUMNS.length && reference == null && resultValue != null; i++) {
+					reference = text(property(resultValue, REFERENCE_COLUMNS[i]));
+					if(reference != null && reference.isEmpty()) {
+						reference = null;
+					}
+				}
+			}
+			// {ref} in a summary names the record
+			values.put("ref", reference);
 
 			AuditLog auditLog = new AuditLog();
 			auditLog.setCategory(audited.category());
-			auditLog.setAction(audited.action());
+			auditLog.setAction(action);
 			auditLog.setEntityType(audited.entityType().isEmpty() ? null : audited.entityType());
-			auditLog.setEntityId(AuditRequests.truncate(text(resolve(values, audited.entityId())), 40));
-			auditLog.setEntityRef(AuditRequests.truncate(text(resolve(values, audited.entityRef())), 100));
+			String entityId = text(resolve(values, audited.entityId()));
+			if(entityId == null && audited.changeOf() != void.class) {
+				entityId = text(resolve(values, audited.changeId()));
+			}
+			auditLog.setEntityId(AuditRequests.truncate(entityId, 40));
+			auditLog.setEntityRef(AuditRequests.truncate(reference, 100));
 			auditLog.setSummary(AuditRequests.truncate(fill(values, audited.summary()), 255));
-			auditLog.setDetails(details(values, audited.details()));
+			auditLog.setDetails(details.isEmpty() ? null : json(details));
 			auditLogService.getObject().recordAction(auditLog);
 		}catch(Exception e) {
 			log.error("Could not record audit log entry {}: {}", audited.action(), e.getMessage());
 		}
+		return result;
+	}
+
+	// The record's own columns (and the ids of the records it points to), or null when there is no such record
+	private Map<String, Object> columns(Class<?> entityClass, Object id) throws Exception {
+		if(entityClass == void.class || id == null) {
+			return null;
+		}
+		EntityType<?> entityType = entityManager.getMetamodel().entity(entityClass);
+		Object entity = entityManager.find(entityClass, idOfType(id, entityType.getIdType().getJavaType()));
+		if(entity == null) {
+			return null;
+		}
+		// A lazy reference already in the persistence context is replaced by the record itself
+		entity = Hibernate.unproxy(entity);
+		Map<String, Object> columns = new LinkedHashMap<>();
+		for(Attribute<?, ?> attribute : entityType.getAttributes()) {
+			if(!(attribute instanceof SingularAttribute) || ((SingularAttribute<?, ?>) attribute).isId()
+					|| ((SingularAttribute<?, ?>) attribute).isVersion() || SENSITIVE.matcher(attribute.getName()).matches()) {
+				continue;
+			}
+			Class<?> type = attribute.getJavaType();
+			if(type == byte[].class || type == Byte[].class || Blob.class.isAssignableFrom(type) || Clob.class.isAssignableFrom(type)) {
+				continue;
+			}
+			switch(attribute.getPersistentAttributeType()) {
+				case BASIC:
+					columns.put(attribute.getName(), simple(read(entity, attribute.getJavaMember())));
+					break;
+				case MANY_TO_ONE:
+				case ONE_TO_ONE:
+					Object related = read(entity, attribute.getJavaMember());
+					columns.put(attribute.getName() + "Id", related == null ? null
+							: simple(entityManager.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(related)));
+					break;
+				default:
+					break;
+			}
+		}
+		return columns;
+	}
+
+	private Object read(Object entity, Member member) throws Exception {
+		if(member instanceof Field) {
+			Field field = (Field) member;
+			field.setAccessible(true);
+			return field.get(entity);
+		}
+		if(member instanceof Method) {
+			Method method = (Method) member;
+			method.setAccessible(true);
+			return method.invoke(entity);
+		}
+		return null;
+	}
+
+	private Object idOfType(Object id, Class<?> idType) {
+		if(idType == Long.class || idType == long.class) {
+			return id instanceof Number ? ((Number) id).longValue() : Long.valueOf(id.toString());
+		}
+		if(idType == Integer.class || idType == int.class) {
+			return id instanceof Number ? ((Number) id).intValue() : Integer.valueOf(id.toString());
+		}
+		return id;
+	}
+
+	private String reference(Map<String, Object> columns) {
+		for(String column : REFERENCE_COLUMNS) {
+			Object value = columns.get(column);
+			if(value != null && !value.toString().isEmpty()) {
+				return value.toString();
+			}
+		}
+		return null;
 	}
 
 	// Replaces each {expression} in the summary with its value
@@ -80,10 +233,7 @@ public class AuditAspect {
 		return summary.toString();
 	}
 
-	private String details(Map<String, Object> values, String[] expressions) {
-		if(expressions.length == 0) {
-			return null;
-		}
+	private Map<String, Object> details(Map<String, Object> values, String[] expressions) {
 		Map<String, Object> details = new LinkedHashMap<>();
 		for(String expression : expressions) {
 			String name = expression;
@@ -105,6 +255,10 @@ public class AuditAspect {
 			}
 			details.put(name, value);
 		}
+		return details;
+	}
+
+	private String json(Map<String, Object> details) {
 		try {
 			return objectMapper.getObject().writeValueAsString(details);
 		}catch(Exception e) {

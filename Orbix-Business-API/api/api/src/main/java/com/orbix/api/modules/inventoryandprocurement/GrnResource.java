@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 @RestController
 @RequestMapping("/orbix-business-api")
@@ -124,6 +125,7 @@ public class GrnResource {
 	}
 	
 	@PostMapping("/grns/approve")
+	@Audited(category = "PROCUREMENT", action = "GRN_APPROVED", entityType = "Grn", entityId = "grnId", summary = "Approved GRN {ref}", changeOf = Grn.class, changeId = "grnId")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public boolean approve(
 			@RequestParam(name = "grn_id") Long grnId,
@@ -132,6 +134,7 @@ public class GrnResource {
 	}
 	
 	@PostMapping("/grns/cancel")
+	@Audited(category = "PROCUREMENT", action = "GRN_CANCELLED", entityType = "Grn", entityId = "grnId", summary = "Cancelled GRN {ref}", changeOf = Grn.class, changeId = "grnId")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public boolean cancel(
 			@RequestParam(name = "grn_id") Long grnId,
@@ -140,6 +143,7 @@ public class GrnResource {
 	}
 	
 	@PostMapping("/grns/archive")
+	@Audited(category = "PROCUREMENT", action = "GRN_ARCHIVED", entityType = "Grn", entityId = "grnId", summary = "Archived GRN {ref}", changeOf = Grn.class, changeId = "grnId")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public boolean archive(
 			@RequestParam(name = "grn_id") Long grnId,

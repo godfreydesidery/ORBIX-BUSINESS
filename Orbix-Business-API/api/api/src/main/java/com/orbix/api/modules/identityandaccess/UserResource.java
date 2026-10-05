@@ -192,7 +192,7 @@ public class UserResource {
 	}
 		
 	@PutMapping("/users/update")
-	@Audited(category = "SECURITY", action = "USER_UPDATED", entityType = "User", entityRef = "result.username", summary = "Updated user {result.username}", details = {"type=user.type", "companyName=user.companyName", "branchName=user.branchName", "passwordChanged=present:user.password"})
+	@Audited(category = "SECURITY", action = "USER_UPDATED", entityType = "User", entityRef = "result.username", summary = "Updated user {result.username}", details = {"type=user.type", "companyName=user.companyName", "branchName=user.branchName", "passwordChanged=present:user.password"}, changeOf = User.class, changeId = "user.id")
 	@PreAuthorize("hasAnyAuthority('USER-ALL','ADMIN-ACCESS')")
 	public ResponseEntity<User>updateUser(
 			@RequestBody UserRequestDTO user, 
@@ -281,7 +281,7 @@ public class UserResource {
 	}
 	
 	@PutMapping("/roles/update")
-	@Audited(category = "SECURITY", action = "ROLE_UPDATED", entityType = "Role", entityRef = "result.name", summary = "Updated role {result.name}")
+	@Audited(category = "SECURITY", action = "ROLE_UPDATED", entityType = "Role", entityRef = "result.name", summary = "Updated role {result.name}", changeOf = Role.class, changeId = "role.id")
 	//@PreAuthorize("hasAnyAuthority('ROLE-ALL','ADMIN-ACCESS')")
 	public ResponseEntity<Role>updateRole(
 			@RequestBody Role role,
@@ -628,7 +628,7 @@ public class UserResource {
 	}
 	
 	@PostMapping("/users/activate")
-	@Audited(category = "SECURITY", action = "USER_ACTIVATED", entityType = "User", entityId = "userRequest.id", entityRef = "userRequest.username", summary = "Activated user {userRequest.username} (id {userRequest.id})")
+	@Audited(category = "SECURITY", action = "USER_ACTIVATED", entityType = "User", entityId = "userRequest.id", summary = "Activated user {ref}", changeOf = User.class, changeId = "userRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody UserRequestDTO userRequest,
@@ -638,7 +638,7 @@ public class UserResource {
 	}
 	
 	@PostMapping("/users/deactivate")
-	@Audited(category = "SECURITY", action = "USER_DEACTIVATED", entityType = "User", entityId = "userRequest.id", entityRef = "userRequest.username", summary = "Deactivated user {userRequest.username} (id {userRequest.id})")
+	@Audited(category = "SECURITY", action = "USER_DEACTIVATED", entityType = "User", entityId = "userRequest.id", summary = "Deactivated user {ref}", changeOf = User.class, changeId = "userRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody UserRequestDTO userRequest,

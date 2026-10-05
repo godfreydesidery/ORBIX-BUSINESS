@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.PayCode;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -80,6 +81,7 @@ public class RestaurantSalesOrderResource {
 	}
 
 	@PostMapping("/restaurant_sales_orders/confirm")
+	@Audited(category = "SALES", action = "SALES_ORDER_CONFIRMED", entityType = "RestaurantSalesOrder", entityId = "restaurantOrderId", summary = "Confirmed restaurant sales order {ref} ({payCode}, ref {payRefNo})", details = {"payCode", "payRefNo"}, changeOf = RestaurantSalesOrder.class, changeId = "restaurantOrderId")
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public boolean confirm(@RequestParam(name = "restaurant_sales_order_id") Long restaurantOrderId,
 			@RequestParam(name = "pay_code") PayCode payCode, @RequestParam(name = "pay_ref_no") String payRefNo,
@@ -88,6 +90,7 @@ public class RestaurantSalesOrderResource {
 	}
 
 	@PostMapping("/restaurant_sales_orders/cancel")
+	@Audited(category = "SALES", action = "SALES_ORDER_CANCELLED", entityType = "RestaurantSalesOrder", entityId = "restaurantOrderId", summary = "Cancelled restaurant sales order {ref}", changeOf = RestaurantSalesOrder.class, changeId = "restaurantOrderId")
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public boolean cancel(@RequestParam(name = "restaurant_sales_order_id") Long restaurantOrderId,
 			HttpServletRequest request) {

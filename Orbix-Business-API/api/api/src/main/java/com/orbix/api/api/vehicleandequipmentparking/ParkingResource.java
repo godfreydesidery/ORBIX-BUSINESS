@@ -122,6 +122,7 @@ public class ParkingResource {
 	}
 	
 	@PostMapping("/parkings/remove")
+	@Audited(category = "OPERATIONS", action = "VEHICLE_REMOVED", entityType = "Parking", entityId = "parkingId", summary = "Removed the vehicle of parking {ref}: {reason}", details = {"reason"}, changeOf = Parking.class, changeId = "parkingId")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public void remove(
 			@RequestParam(name = "parking_id") Long parkingId,
@@ -174,6 +175,7 @@ public class ParkingResource {
 	}
 	
 	@PostMapping("/parkings/modify")
+	@Audited(category = "OPERATIONS", action = "RECORD_MODIFIED", entityType = "Parking", entityRef = "result.no", summary = "Modified parking {ref}", changeOf = Parking.class, changeId = "parkingRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ParkingResponseDTO>modify(
 			@RequestBody ParkingRequestDTO parkingRequest,
@@ -183,6 +185,7 @@ public class ParkingResource {
 	}
 	
 	@PostMapping("/parkings/check_in")
+	@Audited(category = "OPERATIONS", action = "CHECKED_IN", entityType = "Parking", entityRef = "result.no", summary = "Checked in parking {result.no} ({result.chasisNo})", details = {"result.chasisNo"})
 	public ResponseEntity<ParkingResponseDTO>checkIn(
 			@RequestBody ParkingRequestDTO parkingRequest,
 			HttpServletRequest request){		
@@ -190,6 +193,7 @@ public class ParkingResource {
 	}
 	
 	@PostMapping("/parkings/check_out")
+	@Audited(category = "OPERATIONS", action = "CHECKED_OUT", entityType = "Parking", entityRef = "result.no", summary = "Checked out parking {result.no} ({result.chasisNo})", details = {"result.chasisNo"})
 	public ResponseEntity<ParkingResponseDTO>checkOut(
 			@RequestBody ParkingRequestDTO parkingRequest,
 			HttpServletRequest request){		
