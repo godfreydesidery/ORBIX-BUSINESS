@@ -14,9 +14,9 @@ import { environment } from 'src/environments/environment';
 import { HttpHeaders } from '@angular/common/http';
 import { IShopProduct } from 'src/app/domain/shop-product';
 import { IProduct } from 'src/app/domain/product';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
 const API_URL = environment.apiUrl;
 @Component({
@@ -33,6 +33,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './import-product.component.scss'
 })
 export class ImportProductComponent {
+  trackById = trackById
   
     shopId: number;
   

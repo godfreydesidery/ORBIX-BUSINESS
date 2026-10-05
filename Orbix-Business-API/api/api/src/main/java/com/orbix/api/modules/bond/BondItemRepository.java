@@ -81,4 +81,40 @@ public interface BondItemRepository extends JpaRepository<BondItem, Long> {
 	int countByStatus(String string);
 
 	List<BondItem> findAllByStatusInAndBondZone(List<String> statuses, BondZone bondZone);
+
+	// Report rows read only the columns the report shows, instead of loading whole entities with their eager relations
+	@Query("SELECT p.createdDateTime AS createdDateTime, u.nickname AS createdByNickname FROM BondItem p LEFT JOIN p.createdByUser u WHERE p.createdDateTime BETWEEN :from AND :to AND p.status IN :statuses")
+	List<IBondItemRegistration> getRegistrationReport(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("statuses") List<String> statuses);
+
+	@Query("SELECT p.createdDateTime AS createdDateTime, u.nickname AS createdByNickname FROM BondItem p LEFT JOIN p.createdByUser u WHERE p.createdByUser = :user AND p.createdDateTime BETWEEN :from AND :to AND p.status IN :statuses")
+	List<IBondItemRegistration> getRegistrationReportByCreatedByUser(@Param("user") User user, @Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("statuses") List<String> statuses);
+
+	@Query("SELECT p.no AS no, p.bondItemName AS bondItemName, p.ownerFirstName AS ownerFirstName, p.ownerLastName AS ownerLastName, p.ownerPhoneNo AS ownerPhoneNo, "
+			+ "p.billingAmount AS billingAmount, p.initialQty AS initialQty, p.billingType AS billingType, p.checkedInDateTime AS checkedInDateTime, p.checkedOutDateTime AS checkedOutDateTime, "
+			+ "p.status AS status, u.nickname AS createdByNickname, ciu.nickname AS checkedInByNickname, cou.nickname AS checkedOutByNickname "
+			+ "FROM BondItem p LEFT JOIN p.createdByUser u LEFT JOIN p.checkedInByUser ciu LEFT JOIN p.checkedOutByUser cou "
+			+ "WHERE p.checkedInDateTime BETWEEN :from AND :to AND p.status IN :statuses")
+	List<IBondItemReportRow> getBondItemReport(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("statuses") List<String> statuses);
+}
+
+interface IBondItemRegistration {
+	LocalDateTime getCreatedDateTime();
+	String getCreatedByNickname();
+}
+
+interface IBondItemReportRow {
+	String getNo();
+	String getBondItemName();
+	String getOwnerFirstName();
+	String getOwnerLastName();
+	String getOwnerPhoneNo();
+	double getBillingAmount();
+	double getInitialQty();
+	String getBillingType();
+	LocalDateTime getCheckedInDateTime();
+	LocalDateTime getCheckedOutDateTime();
+	String getStatus();
+	String getCreatedByNickname();
+	String getCheckedInByNickname();
+	String getCheckedOutByNickname();
 }

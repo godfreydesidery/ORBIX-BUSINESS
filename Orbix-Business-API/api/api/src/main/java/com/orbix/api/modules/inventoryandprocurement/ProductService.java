@@ -5,9 +5,11 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface ProductService {
 	List<ProductResponseDTO> getAllProductes(HttpServletRequest request);
+	PageResponseDTO<ProductResponseDTO> getProductPage(int page, int size, HttpServletRequest request);
 	ProductResponseDTO get(Long id, HttpServletRequest request);
 	ProductResponseDTO getCompanyProduct(Long productId, HttpServletRequest request);
 	ProductResponseDTO createProduct(ProductRequestDTO product, HttpServletRequest request);

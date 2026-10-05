@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.api.commons.PageResponseDTO;
 import com.orbix.api.modules.adminunits.ShopResponseDTO;
 
 import lombok.RequiredArgsConstructor;
@@ -32,6 +33,15 @@ private final SupplierService supplierService;
 	@GetMapping("/suppliers")
 	public ResponseEntity<List<SupplierResponseDTO>>getAll(HttpServletRequest request){
 		return ResponseEntity.ok().body(supplierService.getAllSuppliers(request));
+	}
+	
+	@GetMapping("/suppliers/get_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<SupplierResponseDTO>>getPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(supplierService.getSupplierPage(page, size, request));
 	}
 	
 	@GetMapping("/suppliers/get_all_by_company")

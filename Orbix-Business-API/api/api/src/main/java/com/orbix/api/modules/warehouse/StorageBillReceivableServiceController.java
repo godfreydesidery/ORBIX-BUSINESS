@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,7 +47,8 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		Storage storage = storageRepository.findById(storageId)
                 .orElseThrow(() -> new NotFoundException("Storage with ID " + storageId + " not found."));
 		
-		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage));
 		
 		List<StorageBillReceivableResponseDTO> storageBillReceivableResponses = new ArrayList<>();
 		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
@@ -76,7 +78,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		
 		// Check if is first bill
 		
-		List<StorageBillReceivable> rcvs = storageBillReceivableRepository.findAllByStorage(storage);
+		Optional<StorageBillReceivable> lastStorageBillReceivable_ = storageBillReceivableRepository.findFirstByStorageOrderByIdDesc(storage);
 		
 		LocalDateTime fromDate = null;
 		LocalDateTime toDate = null;
@@ -88,7 +90,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 			toDate = LocalDateTime.parse(dateString, formatter).plusDays(1).toLocalDate().atStartOfDay();
 		}
 		
-		if(rcvs.isEmpty()) {			
+		if(lastStorageBillReceivable_.isEmpty()) {			
 			// Check for first billing date		
 			fromDate = storage.getStartBillingAt().toLocalDate().atStartOfDay();
 			
@@ -102,7 +104,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 			
 		}else {
 			// Take the last bill
-			fromDate = rcvs.get(rcvs.size() - 1).getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
+			fromDate = lastStorageBillReceivable_.get().getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
 			
 			if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
 			
@@ -210,7 +212,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 			noOfDays = 1;
 		}
 				
-		List<StorageBillReceivable> rcvs = storageBillReceivableRepository.findAllByStorage(storage);
+		List<StorageBillReceivable> rcvs = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage));
 		
 		double billedQty = 0;
 		
@@ -297,7 +299,8 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		double totalGenerated = 0;
 		double totalUngenerated = 0;
 		
-		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage_.get());
+		// One load (bill receivables fetched with it), shared with getUngeneratedBill
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage_.get()));
 		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
 			if(storageBillReceivable.getBillReceivable().getPayStatus().toString().equals("PAID")) {
 				totalPaid = totalPaid + storageBillReceivable.getBillReceivable().getAmount();
@@ -305,8 +308,8 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 				totalGenerated = totalGenerated + storageBillReceivable.getBillReceivable().getAmount();
 			}
 		}
-		
-		totalUngenerated = this.getUngeneratedBill(storage_.get());
+
+		totalUngenerated = this.getUngeneratedBill(storage_.get(), storageBillReceivables);
 		
 		
 		billResponse.setBillPaid(String.valueOf(totalPaid));
@@ -318,12 +321,10 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		return billResponse;
 	}
 	
-	private double getUngeneratedBill(Storage storage) {
-		
+	private double getUngeneratedBill(Storage storage, List<StorageBillReceivable> rcvs) {
+
 		double bill = 0;
-		
-		List<StorageBillReceivable> rcvs = storageBillReceivableRepository.findAllByStorage(storage);
-		
+
 		LocalDateTime fromDate = null;
 		LocalDateTime toDate = null;
 		double qty = 0;

@@ -9,8 +9,12 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.orbix.api.api.commons.PageResponseDTO;
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
@@ -42,7 +46,7 @@ public class SupplierServiceController implements SupplierService {
 
 	@Override
 	public List<SupplierResponseDTO> getAllSuppliers(HttpServletRequest request) {
-		List<Supplier> suppliers = supplierRepository.findAll();
+		List<Supplier> suppliers = supplierRepository.findAll(Sort.by("id")); // same order as the paged list
 		List<SupplierResponseDTO> supplierResponses = new ArrayList<>();
 
 		for(Supplier supplier : suppliers) {
@@ -50,6 +54,22 @@ public class SupplierServiceController implements SupplierService {
 		}		
 		return supplierResponses;
 	}
+
+	@Override
+	public PageResponseDTO<SupplierResponseDTO> getSupplierPage(int page, int size, HttpServletRequest request) {
+		// One page of the list, in the same order as the full list (by id)
+		int pageSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+		PageRequest pageRequest = PageRequest.of(Math.min(Math.max(page, 0), Integer.MAX_VALUE / pageSize), pageSize, Sort.by("id"));
+		Page<Supplier> suppliers = supplierRepository.findAll(pageRequest);
+		List<SupplierResponseDTO> supplierResponses = new ArrayList<>();
+
+		for(Supplier supplier : suppliers) {
+			supplierResponses.add(supplierResponseDTOMapper(supplier));
+		}
+		return new PageResponseDTO<>(supplierResponses, suppliers.getTotalElements());
+	}
+	
+	private static final int MAX_PAGE_SIZE = 100;
 	
 	@Override
 	public List<SupplierResponseDTO> getAllCompanySuppliers(HttpServletRequest request) {

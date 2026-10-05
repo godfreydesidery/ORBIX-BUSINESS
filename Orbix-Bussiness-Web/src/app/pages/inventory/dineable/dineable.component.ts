@@ -9,8 +9,10 @@ import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 
 import { ICompany } from 'src/app/domain/company';
 import { IDineable } from 'src/app/domain/dineable';
+import { IPage } from 'src/app/domain/page';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 
@@ -27,6 +29,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './dineable.component.scss'
 })
 export class DineableComponent {
+  trackById = trackById
 /**Data */
   id: any = null
   code: string = ''
@@ -46,6 +49,11 @@ export class DineableComponent {
 
 
   page: number = 1; // Initialize the current page to 1
+  pageSize: number = 15
+  totalDineables: number = 0
+  // The list is loaded a page at a time; the whole list is loaded only when searching, so the search still covers every dineable
+  allDineablesLoaded: boolean = false
+  requestedPage: number = 1
   filterRecords: string = ''
   selectedOption: string = '';
 
@@ -56,7 +64,7 @@ export class DineableComponent {
   ) { }
 
   ngOnInit() {
-    this.getAllDineables()
+    this.getDineablePage(1)
   }
 
   async getAllDineables() {
@@ -69,15 +77,69 @@ export class DineableComponent {
       .toPromise()
       .then(
         data => {
+          // Built apart and assigned at the end, so two overlapping loads cannot mix their rows
+          var dineables : IDineable[] = []
           var sn = 1
           data?.forEach(element => {
             element.sn = sn
-            this.dineables.push(element)
+            dineables.push(element)
             sn = sn + 1
           })
+          this.dineables = dineables
+          this.allDineablesLoaded = true
           console.log(data)
         }
       )
+  }
+
+  async getDineablePage(page: number) {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    this.requestedPage = page
+
+    await this.http.get<IPage<IDineable>>(API_URL + '/dineables/get_page?page=' + (page - 1) + '&size=' + this.pageSize, options)
+      .toPromise()
+      .then(
+        data => {
+          // Ignore a page that arrives after another page or the whole list was requested
+          if (this.allDineablesLoaded || page != this.requestedPage) {
+            return
+          }
+          var sn = (page - 1) * this.pageSize + 1
+          data!.content.forEach(element => {
+            element.sn = sn
+            sn = sn + 1
+          })
+          this.dineables = data!.content
+          this.totalDineables = data!.totalElements
+          this.page = page
+        }
+      )
+  }
+
+  pageChanged(page: number) {
+    if (this.allDineablesLoaded) {
+      this.page = page
+    } else {
+      this.getDineablePage(page)
+    }
+  }
+
+  searchDineables(filter: string) {
+    if (filter != '' && !this.allDineablesLoaded) {
+      // Set before loading, so a page that arrives meanwhile is ignored
+      this.allDineablesLoaded = true
+      this.getAllDineables()
+    }
+  }
+
+  refreshDineables() {
+    if (this.allDineablesLoaded) {
+      this.getAllDineables()
+    } else {
+      this.getDineablePage(this.page)
+    }
   }
 
 
@@ -121,7 +183,7 @@ export class DineableComponent {
 
             console.log(data)
 
-            this.getAllDineables()
+            this.refreshDineables()
 
             this.msg.showSuccessMessage('Dineable created successifully')
 
@@ -144,7 +206,7 @@ export class DineableComponent {
 
             console.log(data)
 
-            this.getAllDineables()
+            this.refreshDineables()
 
             this.msg.showSuccessMessage('Dineable updated successifully')
           }
@@ -175,7 +237,7 @@ export class DineableComponent {
 
           console.log(data)
 
-          this.getAllDineables()
+          this.refreshDineables()
 
           this.msg.showSuccessMessage('Dineable activated successifully')
 
@@ -206,7 +268,7 @@ export class DineableComponent {
 
           console.log(data)
 
-          this.getAllDineables()
+          this.refreshDineables()
           this.msg.showSuccessMessage('Dineable deactivated successifully')
 
 

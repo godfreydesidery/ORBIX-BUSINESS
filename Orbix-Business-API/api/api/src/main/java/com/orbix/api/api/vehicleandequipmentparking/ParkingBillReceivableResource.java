@@ -26,6 +26,7 @@ public class ParkingBillReceivableResource {
 	private final ParkingBillReceivableService parkingBillReceivableService;
 	
 	@GetMapping("/parking_bill_receivables/get_all_by_parking")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ParkingBillReceivableResponseDTO>> getAllByParking(
 			@RequestParam(name = "parking_id") Long parkingId,
 			HttpServletRequest request)
@@ -50,6 +51,7 @@ public class ParkingBillReceivableResource {
 	}
 	
 	@GetMapping("/service_bill_receivables/get_all_by_parking")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ParkingServiceBillReceivableResponseDTO>> getAllServiceByParking(
 			@RequestParam(name = "parking_id") Long parkingId,
 			HttpServletRequest request)
@@ -104,6 +106,7 @@ public class ParkingBillReceivableResource {
 	
 	
 	@GetMapping("/parking_bill_receivables/get_bill_view")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<BillViewResponseDTO> getBillView(
 			@RequestParam(name = "parking_id") Long parkingId,
 			HttpServletRequest request)

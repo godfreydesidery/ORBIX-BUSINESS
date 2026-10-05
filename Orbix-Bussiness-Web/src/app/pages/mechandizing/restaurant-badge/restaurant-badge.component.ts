@@ -15,9 +15,9 @@ import { HttpHeaders } from '@angular/common/http';
 import { IRestaurantDineable } from 'src/app/domain/restaurant-dineable';
 import { IDineable } from 'src/app/domain/dineable';
 import { IRestaurantBadge } from 'src/app/domain/restaurant-badge';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 
@@ -35,6 +35,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './restaurant-badge.component.scss'
 })
 export class RestaurantBadgeComponent {
+  trackById = trackById
   restaurantId: any
   restaurantBadges: IRestaurantBadge[] = []
   searchKey: string = ''

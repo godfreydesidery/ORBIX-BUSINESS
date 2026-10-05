@@ -2,9 +2,13 @@ package com.orbix.api.modules.finance;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.function.Function;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
@@ -83,6 +87,25 @@ public class BillReceivableServiceController implements BillReceivableService {
 	
 	private final DayService dayService;
 	
+	// Groups the records linked to bills by bill id
+	private <T> Map<Long, List<T>> groupByBillReceivable(List<T> records, Function<T, BillReceivable> getBillReceivable) {
+		Map<Long, List<T>> recordsByBillReceivable = new HashMap<>();
+		for(T record : records) {
+			recordsByBillReceivable.computeIfAbsent(getBillReceivable.apply(record).getId(), k -> new ArrayList<>()).add(record);
+		}
+		return recordsByBillReceivable;
+	}
+	
+	// Same result as the repository findByBillReceivable, taken from the preloaded records
+	private <T> Optional<T> getPreloadedByBillReceivable(Map<Long, List<T>> recordsByBillReceivable, BillReceivable billReceivable, Function<BillReceivable, Optional<T>> repositoryFindByBillReceivable) {
+		List<T> records = recordsByBillReceivable.getOrDefault(billReceivable.getId(), Collections.emptyList());
+		if(records.size() > 1) {
+			// More than one linked record is not expected; let the repository handle it exactly as before
+			return repositoryFindByBillReceivable.apply(billReceivable);
+		}
+		return records.isEmpty() ? Optional.empty() : Optional.of(records.get(0));
+	}
+	
 	@Override
 	public List<BillReceivableResponseDTO> confirmBillPayment(
 			List<BillReceivableRequestDTO> billReceivableRequests, 
@@ -102,7 +125,32 @@ public class BillReceivableServiceController implements BillReceivableService {
 		collection = collectionRepository.save(collection);
 		
 		double total = 0;
-		
+
+		// Load the bills and the service records linked to them once for the whole payment, instead of eight look-ups per bill
+		List<Long> billReceivableIds = new ArrayList<>();
+		for(BillReceivableRequestDTO bl : billReceivableRequests) {
+			billReceivableIds.add(bl.getId());
+		}
+		List<BillReceivable> billReceivables = billReceivableRepository.findAllById(billReceivableIds);
+		Map<Long, List<ParkingBillReceivable>> parkingBillReceivables = new HashMap<>();
+		Map<Long, List<ParkingServiceBillReceivable>> parkingServiceBillReceivables = new HashMap<>();
+		Map<Long, List<StorageBillReceivable>> storageBillReceivables = new HashMap<>();
+		Map<Long, List<BondItemBillReceivable>> bondItemBillReceivables = new HashMap<>();
+		Map<Long, List<MaintenanceJobCardIssueBillReceivable>> maintenanceJobCardIssueBillReceivables = new HashMap<>();
+		Map<Long, List<WeighBillReceivable>> weighBillReceivables = new HashMap<>();
+		Map<Long, List<RestaurantSaleDetailBillReceivable>> restaurantSaleDetailBillReceivables = new HashMap<>();
+		Map<Long, List<MachineServiceBillReceivable>> machineServiceBillReceivables = new HashMap<>();
+		if(!billReceivables.isEmpty()) {
+			parkingBillReceivables = groupByBillReceivable(parkingBillReceivableRepository.findAllByBillReceivableIn(billReceivables), ParkingBillReceivable::getBillReceivable);
+			parkingServiceBillReceivables = groupByBillReceivable(parkingServiceBillReceivableRepository.findAllByBillReceivableIn(billReceivables), ParkingServiceBillReceivable::getBillReceivable);
+			storageBillReceivables = groupByBillReceivable(storageBillReceivableRepository.findAllByBillReceivableIn(billReceivables), StorageBillReceivable::getBillReceivable);
+			bondItemBillReceivables = groupByBillReceivable(bondItemBillReceivableRepository.findAllByBillReceivableIn(billReceivables), BondItemBillReceivable::getBillReceivable);
+			maintenanceJobCardIssueBillReceivables = groupByBillReceivable(maintenanceJobCardIssueBillReceivableRepository.findAllByBillReceivableIn(billReceivables), MaintenanceJobCardIssueBillReceivable::getBillReceivable);
+			weighBillReceivables = groupByBillReceivable(weighBillReceivableRepository.findAllByBillReceivableIn(billReceivables), WeighBillReceivable::getBillReceivable);
+			restaurantSaleDetailBillReceivables = groupByBillReceivable(restaurantSaleDetailBillReceivableRepository.findAllByBillReceivableIn(billReceivables), RestaurantSaleDetailBillReceivable::getBillReceivable);
+			machineServiceBillReceivables = groupByBillReceivable(machineServiceBillReceivableRepository.findAllByBillReceivableIn(billReceivables), MachineServiceBillReceivable::getBillReceivable);
+		}
+
 		for(BillReceivableRequestDTO bl : billReceivableRequests) {
 			BillReceivable billReceivable = billReceivableRepository.findById(bl.getId()).get();
 			total = total + billReceivable.getDue();
@@ -126,48 +174,48 @@ public class BillReceivableServiceController implements BillReceivableService {
 			
 			
 
-			Optional<ParkingBillReceivable> parkingBillReceivable = parkingBillReceivableRepository.findByBillReceivable(billReceivable);
+			Optional<ParkingBillReceivable> parkingBillReceivable = getPreloadedByBillReceivable(parkingBillReceivables, billReceivable, parkingBillReceivableRepository::findByBillReceivable);
 			if(parkingBillReceivable.isPresent()) {
 				billReceivableCollection.setReason("Vehicle and Equipment/Parking");
 				qty = parkingBillReceivable.get().getQty();
 			} 
-			Optional<ParkingServiceBillReceivable> parkingServiceBillReceivable = parkingServiceBillReceivableRepository.findByBillReceivable(billReceivable);
+			Optional<ParkingServiceBillReceivable> parkingServiceBillReceivable = getPreloadedByBillReceivable(parkingServiceBillReceivables, billReceivable, parkingServiceBillReceivableRepository::findByBillReceivable);
 			if(parkingServiceBillReceivable.isPresent()) {
 				billReceivableCollection.setReason("Vehicle and Equipment/Service");
 				qty = parkingServiceBillReceivable.get().getQty();
 			} 
 			
-			Optional<StorageBillReceivable> storageBillReceivable = storageBillReceivableRepository.findByBillReceivable(billReceivable);
+			Optional<StorageBillReceivable> storageBillReceivable = getPreloadedByBillReceivable(storageBillReceivables, billReceivable, storageBillReceivableRepository::findByBillReceivable);
 			if(storageBillReceivable.isPresent()) {
 				billReceivableCollection.setReason("Goods Storage");
 				qty = storageBillReceivable.get().getQty();
 			}
 			
-			Optional<BondItemBillReceivable> bondItemBillReceivable = bondItemBillReceivableRepository.findByBillReceivable(billReceivable);
+			Optional<BondItemBillReceivable> bondItemBillReceivable = getPreloadedByBillReceivable(bondItemBillReceivables, billReceivable, bondItemBillReceivableRepository::findByBillReceivable);
 			if(bondItemBillReceivable.isPresent()) {
 				billReceivableCollection.setReason("Bond");
 				qty = bondItemBillReceivable.get().getQty();
 			}
 			
-			Optional<MaintenanceJobCardIssueBillReceivable> maintenanceJobCardIssueBillReceivable = maintenanceJobCardIssueBillReceivableRepository.findByBillReceivable(billReceivable);
+			Optional<MaintenanceJobCardIssueBillReceivable> maintenanceJobCardIssueBillReceivable = getPreloadedByBillReceivable(maintenanceJobCardIssueBillReceivables, billReceivable, maintenanceJobCardIssueBillReceivableRepository::findByBillReceivable);
 			if(maintenanceJobCardIssueBillReceivable.isPresent()) {
 				billReceivableCollection.setReason("V/Eq Maintenance");
 				qty = 1; //maintenanceJobCardIssueBillReceivable.get().getQty();
 			}
 			
-			Optional<WeighBillReceivable> weighBillReceivable = weighBillReceivableRepository.findByBillReceivable(billReceivable);
+			Optional<WeighBillReceivable> weighBillReceivable = getPreloadedByBillReceivable(weighBillReceivables, billReceivable, weighBillReceivableRepository::findByBillReceivable);
 			if(weighBillReceivable.isPresent()) {
 				billReceivableCollection.setReason("Weigh Bridge");
 				qty = 1;
 			}
 			
-			Optional<RestaurantSaleDetailBillReceivable> restaurantSaleDetailBillReceivable = restaurantSaleDetailBillReceivableRepository.findByBillReceivable(billReceivable);
+			Optional<RestaurantSaleDetailBillReceivable> restaurantSaleDetailBillReceivable = getPreloadedByBillReceivable(restaurantSaleDetailBillReceivables, billReceivable, restaurantSaleDetailBillReceivableRepository::findByBillReceivable);
 			if(restaurantSaleDetailBillReceivable.isPresent()) {
 				billReceivableCollection.setReason("Restaurant Sales");
 				qty = restaurantSaleDetailBillReceivable.get().getQty();
 			}
 			
-			Optional<MachineServiceBillReceivable> machineServiceBillReceivable = machineServiceBillReceivableRepository.findByBillReceivable(billReceivable);
+			Optional<MachineServiceBillReceivable> machineServiceBillReceivable = getPreloadedByBillReceivable(machineServiceBillReceivables, billReceivable, machineServiceBillReceivableRepository::findByBillReceivable);
 			if(machineServiceBillReceivable.isPresent()) {
 				billReceivableCollection.setReason("Machine/Vehicle Service");
 				qty = machineServiceBillReceivable.get().getQty();
@@ -192,8 +240,9 @@ public class BillReceivableServiceController implements BillReceivableService {
 		Parking parking = parkingRepository.findById(parkingId)
 			    .orElseThrow(() -> new NotFoundException("Parking with ID " + parkingId + " not found"));
 		
-		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
-		List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking));
+		List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking));
 		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
 		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
 			billReceivableResponses.add(billReceivableResponseDTOMapper(parkingBillReceivable.getBillReceivable()));
@@ -209,7 +258,8 @@ public class BillReceivableServiceController implements BillReceivableService {
 		Storage storage = storageRepository.findById(storageId)
 			    .orElseThrow(() -> new NotFoundException("Storage with ID " + storageId + " not found"));
 		
-		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage));
 		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
 		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
 			billReceivableResponses.add(billReceivableResponseDTOMapper(storageBillReceivable.getBillReceivable()));
@@ -222,7 +272,8 @@ public class BillReceivableServiceController implements BillReceivableService {
 		BondItem bondItem = bondItemRepository.findById(bondItemId)
 			    .orElseThrow(() -> new NotFoundException("Bond Item with ID " + bondItemId + " not found"));
 		
-		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItemIn(Collections.singletonList(bondItem));
 		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
 		for(BondItemBillReceivable bondItemBillReceivable : bondItemBillReceivables) {
 			billReceivableResponses.add(billReceivableResponseDTOMapper(bondItemBillReceivable.getBillReceivable()));
@@ -235,7 +286,8 @@ public class BillReceivableServiceController implements BillReceivableService {
 		Weigh weigh = weighRepository.findById(weighId)
 			    .orElseThrow(() -> new NotFoundException("Weigh with ID " + weighId + " not found"));
 		
-		List<WeighBillReceivable> weighBillReceivables = weighBillReceivableRepository.findAllByWeigh(weigh);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<WeighBillReceivable> weighBillReceivables = weighBillReceivableRepository.findAllByWeighIn(Collections.singletonList(weigh));
 		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
 		for(WeighBillReceivable weighBillReceivable : weighBillReceivables) {
 			billReceivableResponses.add(billReceivableResponseDTOMapper(weighBillReceivable.getBillReceivable()));

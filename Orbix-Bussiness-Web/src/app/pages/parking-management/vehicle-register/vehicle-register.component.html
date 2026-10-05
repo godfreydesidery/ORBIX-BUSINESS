@@ -42,7 +42,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                                <tr *ngFor="let p of parkings | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                <tr *ngFor="let p of parkings | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                     <td>{{p.sn}}</td>
                                     <td>{{p.no}}</td>
                                     <td>{{p.ownerFirstName}} {{p.ownerLastName}}</td>
@@ -433,7 +433,7 @@
                             </select> -->
                             <input class="form-control" type="text" list="venames" [(ngModel)]="vehicleEquipmentTypeName"/>
                                     <datalist id="venames">
-                                        <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
+                                        <option *ngFor="let option of vehicleEquipmentTypes; trackBy: trackById" [value]="option.name">
                                     </datalist>
                         </div>
                     </div>
@@ -453,7 +453,7 @@
                             <label>Parking Zone</label>
                             <select class="form-control" [(ngModel)]="parkingZoneName">
                                 <option></option>
-                                <option *ngFor="let option of parkingZones" [value]="option.name">{{ option.name }}</option>
+                                <option *ngFor="let option of parkingZones; trackBy: trackById" [value]="option.name">{{ option.name }}</option>
                             </select>
                         </div>
                     </div> 
@@ -1209,7 +1209,7 @@
                             </select> -->
                             <input class="form-control" type="text" list="venames" [(ngModel)]="vehicleEquipmentTypeName"/>
                                     <datalist id="venames">
-                                        <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
+                                        <option *ngFor="let option of vehicleEquipmentTypes; trackBy: trackById" [value]="option.name">
                                     </datalist>
                         </div>
                     </div>
@@ -1229,7 +1229,7 @@
                             <label>Parking Zone</label>
                             <select class="form-control" [(ngModel)]="parkingZoneName">
                                 <option></option>
-                                <option *ngFor="let option of parkingZones" [value]="option.name">{{ option.name }}</option>
+                                <option *ngFor="let option of parkingZones; trackBy: trackById" [value]="option.name">{{ option.name }}</option>
                             </select>
                         </div>
                     </div> 

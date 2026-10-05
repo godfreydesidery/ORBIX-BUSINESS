@@ -42,7 +42,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                        <tr *ngFor="let p of maintenances | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                        <tr *ngFor="let p of maintenances | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                             <td>{{p.sn}}</td>
                                             <td>{{p.no}}</td>
                                             <td>{{p.ownerFirstName}} {{p.ownerLastName}}</td>
@@ -191,7 +191,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                                <tr *ngFor="let m of maintenanceJobCard.maintenanceJobCardIssues">
+                                                <tr *ngFor="let m of maintenanceJobCard.maintenanceJobCardIssues; trackBy: trackById">
                                                     <td>{{m.no}}</td>
                                                     <td>{{m.name}}</td>
                                                     <td>{{m.description}}</td>

@@ -9,7 +9,8 @@ import { AuthService } from 'src/app/auth.service';
 import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { HttpHeaders } from '@angular/common/http';
 
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 
 import { environment } from 'src/environments/environment';
 import { ICashCollection, IParkingCashCollection, IParkingServiceCashCollection } from 'src/app/domain/cash-collection';
@@ -19,9 +20,9 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { IRestaurantProduct } from 'src/app/domain/restaurant-product';
 import { IRestaurant } from 'src/app/domain/restaurant';
 import { IProduct } from 'src/app/domain/product';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 @Component({
@@ -38,6 +39,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './restaurant-product-stock-log.component.scss'
 })
 export class RestaurantProductStockLogComponent {
+  trackById = trackById
   documentHeader!: any
 
   from: Date | string | null = null
@@ -187,6 +189,8 @@ export class RestaurantProductStockLogComponent {
   dinableName: string = ''
 
 
+  searchTimer: any = null
+
   searchProducts(): void {
       const options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
@@ -194,13 +198,17 @@ export class RestaurantProductStockLogComponent {
       }
       this.filteredProducts = [];
       this.selectedProduct = null
+      clearTimeout(this.searchTimer)
       if (this.searchTerm.trim().length >= 2) {
-        this.http
-          .get<IProduct[]>(API_URL + '/restaurant_products/get_products_by_restaurant_containing?product_name_like=' + this.searchTerm + '&restaurant_id=' + this.restaurantId, options)
-          .subscribe(
-            (data) => (this.filteredProducts = data),
-            (error) => console.error('Error fetching dineables:', error)
-          );
+        // Wait for a short pause in typing before asking the server (each keystroke restarts the wait)
+        this.searchTimer = setTimeout(() => {
+          this.http
+            .get<IProduct[]>(API_URL + '/restaurant_products/get_products_by_restaurant_containing?product_name_like=' + this.searchTerm + '&restaurant_id=' + this.restaurantId, options)
+            .subscribe(
+              (data) => (this.filteredProducts = data),
+              (error) => console.error('Error fetching dineables:', error)
+            );
+        }, 300)
       } else {
         this.filteredProducts = [];
       }
@@ -209,6 +217,7 @@ export class RestaurantProductStockLogComponent {
     productId : any = null
   
     selectProduct(product: any): void {
+      clearTimeout(this.searchTimer) // a search still waiting would refill the list after the selection
       this.selectedProduct = product
       this.productId = product.id
       this.searchTerm = product.name
@@ -228,20 +237,6 @@ export class RestaurantProductStockLogComponent {
 
   printReport = async () => {
 
-    // Set up VFS for pdfMake - try different approaches
-    try {
-      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
-      // Try different possible structures
-      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
-      } else if (vfsFonts.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.vfs;
-      } else {
-        (window as any).pdfMake.vfs = vfsFonts;
-      }
-    } catch (error) {
-      console.log('VFS setup failed, continuing without custom fonts:', error);
-    }
 
     this.documentHeader = await this.data.getDocumentHeader()
     var header = ''

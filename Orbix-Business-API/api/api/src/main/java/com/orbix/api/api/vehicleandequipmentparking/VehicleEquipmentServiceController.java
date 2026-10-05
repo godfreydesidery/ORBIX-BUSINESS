@@ -3,11 +3,11 @@ package com.orbix.api.api.vehicleandequipmentparking;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.orbix.api.exceptions.InvalidEntryException;
@@ -109,9 +109,10 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		
 		ParkingResponseDTO parkingResponse = new ParkingResponseDTO();
 		
-		List<Parking> parkings = parkingRepository.findAllByVehicleEquipmentAndStatusIn(vehicleEquipment_.get(), statuses);
-		for(Parking p : parkings) {
-			parkingResponse.setId(p.getId().toString());
+		// Only the id of the open parking is needed, so read ids instead of whole parkings
+		List<Long> parkingIds = parkingRepository.getIdsByVehicleEquipmentAndStatusIn(vehicleEquipment_.get(), statuses);
+		for(Long parkingId : parkingIds) {
+			parkingResponse.setId(parkingId.toString());
 		}
 		
 		return vehicleEquipmentResponseDTOMapper(vehicleEquipment_.get(), parkingResponse, null);
@@ -130,9 +131,10 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		
 		MaintenanceResponseDTO maintenanceResponse = new MaintenanceResponseDTO();
 		
-		List<Maintenance> maintenances = maintenanceRepository.findAllByVehicleEquipmentAndStatusIn(vehicleEquipment_.get(), statuses);
-		for(Maintenance m : maintenances) {
-			maintenanceResponse.setId(m.getId().toString());
+		// Only the id of the open maintenance is needed, so read ids instead of whole maintenances
+		List<Long> maintenanceIds = maintenanceRepository.getIdsByVehicleEquipmentAndStatusIn(vehicleEquipment_.get(), statuses);
+		for(Long maintenanceId : maintenanceIds) {
+			maintenanceResponse.setId(maintenanceId.toString());
 		}
 		
 		return vehicleEquipmentResponseDTOMapper(vehicleEquipment_.get(), null, maintenanceResponse);
@@ -141,12 +143,8 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 	
 	@Override	
 	public List<String> getChasisNos(HttpServletRequest request) {
-		List<String> chasisNos = vehicleEquipmentRepository.findTop2000ByActiveTrue()
-			    .stream()
-			    .map(VehicleEquipment::getChasisNo)
-			    .collect(Collectors.toList());
-		
-			return chasisNos;		
+		// Read only the chassis numbers instead of loading 2000 full records with their related data
+		return vehicleEquipmentRepository.getActiveChasisNos(PageRequest.of(0, 2000));
 	}
 	
 	

@@ -24,7 +24,7 @@
                             <label class="form-control">Cashier Name</label>
                             <select class="form-control" [(ngModel)]="nickname">
                                 <option></option>
-                                <option *ngFor="let cashier of userNames">{{cashier}}</option>
+                                <option *ngFor="let cashier of userNames; trackBy: trackById">{{cashier}}</option>
                             </select>
                         </div>
                     </div>
@@ -33,7 +33,7 @@
                             <label class="form-control">Agent Name</label>
                             <select class="form-control" [(ngModel)]="agentName">
                                 <option></option>
-                                <option *ngFor="let agentName of agentNames">{{agentName}}</option>
+                                <option *ngFor="let agentName of agentNames; trackBy: trackById">{{agentName}}</option>
                             </select>
                         </div>
                     </div>
@@ -63,7 +63,7 @@
                                     <td><b>Agent Name</b></td>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let s of salesListings">
+                                    <tr *ngFor="let s of salesListings; trackBy: trackById">
                                         <td>{{s.sn}}</td>
                                         <td>{{s.dineableName}}</td>
                                         <td class="text-danger" style="font-weight: bold;">{{s.qty}}</td>

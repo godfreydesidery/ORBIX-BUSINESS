@@ -27,6 +27,7 @@ import { error } from 'src/custom-packages/util';
 import { IProduct } from 'src/app/domain/product';
 import { IRestaurantProduct } from 'src/app/domain/restaurant-product';
 import { IRestaurantDinableProduct } from 'src/app/domain/restaurant-dineable-product';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 
@@ -44,6 +45,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './restaurant-dineable-product.component.scss'
 })
 export class RestaurantDineableProductComponent {
+  trackById = trackById
 
   // ============================
   // Restaurant & Product Context
@@ -143,25 +145,32 @@ export class RestaurantDineableProductComponent {
     await this.loadRestaurantDineableStockStatus()
   }
 
+  searchTimer: any = null
+
   searchProducts(): void {
     const options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
 
     }
     this.filteredProducts = [];
+    clearTimeout(this.searchTimer)
     if (this.searchTerm.trim().length >= 2) {
-      this.http
-        .get<IProduct[]>(API_URL + '/restaurant_products/get_products_by_restaurant_containing?product_name_like=' + this.searchTerm + '&restaurant_id=' + this.restaurantId, options)
-        .subscribe(
-          (data) => (this.filteredProducts = data),
-          (error) => console.error('Error fetching dineables:', error)
-        );
+      // Wait for a short pause in typing before asking the server (each keystroke restarts the wait)
+      this.searchTimer = setTimeout(() => {
+        this.http
+          .get<IProduct[]>(API_URL + '/restaurant_products/get_products_by_restaurant_containing?product_name_like=' + this.searchTerm + '&restaurant_id=' + this.restaurantId, options)
+          .subscribe(
+            (data) => (this.filteredProducts = data),
+            (error) => console.error('Error fetching dineables:', error)
+          );
+      }, 300)
     } else {
       this.filteredProducts = [];
     }
   }
 
   selectProduct(product: any): void {
+    clearTimeout(this.searchTimer) // a search still waiting would refill the list after the selection
     this.selectedProduct = product
     this.searchTerm = product.name
     this.isDropdownOpen = false

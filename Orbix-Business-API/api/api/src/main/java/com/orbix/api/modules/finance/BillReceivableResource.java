@@ -40,6 +40,7 @@ public class BillReceivableResource {
 	
 	
 	@GetMapping("/bill_receivables/get_all_by_parking")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BillReceivableResponseDTO>>getAllByParking(
 			@RequestParam(name = "parking_id") Long parkingId,
 			HttpServletRequest request){
@@ -47,6 +48,7 @@ public class BillReceivableResource {
 	}
 	
 	@GetMapping("/bill_receivables/get_all_by_maintenance")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BillReceivableResponseDTO>>getAllByMaintenance(
 			@RequestParam(name = "maintenance_id") Long maintenanceId,
 			HttpServletRequest request){
@@ -54,6 +56,7 @@ public class BillReceivableResource {
 	}
 	
 	@GetMapping("/bill_receivables/get_all_by_storage")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BillReceivableResponseDTO>>getAllByStorage(
 			@RequestParam(name = "storage_id") Long storageId,
 			HttpServletRequest request){
@@ -61,6 +64,7 @@ public class BillReceivableResource {
 	}
 	
 	@GetMapping("/bill_receivables/get_all_by_bond_item")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BillReceivableResponseDTO>>getAllByBondItem(
 			@RequestParam(name = "bond_item_id") Long bondItemId,
 			HttpServletRequest request){
@@ -68,6 +72,7 @@ public class BillReceivableResource {
 	}
 	
 	@GetMapping("/bill_receivables/get_all_by_weigh")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BillReceivableResponseDTO>>getAllByWeigh(
 			@RequestParam(name = "weigh_id") Long weighId,
 			HttpServletRequest request){
@@ -75,6 +80,7 @@ public class BillReceivableResource {
 	}
 	
 	@GetMapping("/bill_receivables/get_all_by_machine")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BillReceivableResponseDTO>>getAllByMachine(
 			@RequestParam(name = "machine_id") Long machineId,
 			HttpServletRequest request){

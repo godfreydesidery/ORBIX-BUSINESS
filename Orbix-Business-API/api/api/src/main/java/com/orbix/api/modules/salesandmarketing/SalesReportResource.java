@@ -37,6 +37,7 @@ public class SalesReportResource {
 	
 	
 	@PostMapping("/sales_reports/get_sales_listing_report_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ISalesListing>> getSalesListingReportByDates(
 	        @RequestBody DateRange dateRange,
 	        HttpServletRequest request) {
@@ -48,6 +49,7 @@ public class SalesReportResource {
 	}
 	
 	@PostMapping("/sales_reports/get_fast_moving_products_report_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<IFastMovingProducts>> getFastMovingProductsReportByDates(
 	        @RequestBody DateRange dateRange,
 	        HttpServletRequest request) {

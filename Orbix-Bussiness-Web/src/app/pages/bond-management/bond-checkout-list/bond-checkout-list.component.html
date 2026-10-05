@@ -48,7 +48,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let bondItem of bondItems | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index">
+                                    *ngFor="let bondItem of bondItems | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index; trackBy: trackById">
                                     <td>{{bondItem.sn}}</td>
                                     <td>{{bondItem.no}}</td>
                                     <td>{{bondItem.bondItemName}}</td>

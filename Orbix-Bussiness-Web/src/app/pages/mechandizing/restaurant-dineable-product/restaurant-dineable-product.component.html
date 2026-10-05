@@ -34,7 +34,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let restaurantDineable of restaurantDineables | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }">
+                                    *ngFor="let restaurantDineable of restaurantDineables | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }; trackBy: trackById">
                                     <td>{{restaurantDineable.sn}}</td>
                                     <td>{{restaurantDineable.dineableCode}}</td>
                                     <td>{{restaurantDineable.dineableName}}</td>
@@ -72,7 +72,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let rdp of restaurantDinableProducts">
+                                <tr *ngFor="let rdp of restaurantDinableProducts; trackBy: trackById">
                                     <td>{{rdp.sn}}</td>
                                     <td>{{rdp.productCode}}</td>
                                     <td>{{rdp.productName}}</td>
@@ -114,7 +114,7 @@
                     <div class="dropdown-menu show mt-1" *ngIf="isDropdownOpen && filteredProducts.length > 0"
                         style="max-height: 200px; overflow-y: auto; width: 100%;">
                         <button class="dropdown-item form-control" style="font-weight: bold;"
-                            *ngFor="let product of filteredProducts" (click)="selectProduct(product)">
+                            *ngFor="let product of filteredProducts; trackBy: trackById" (click)="selectProduct(product)">
                             {{ product.name }}
                         </button>
                     </div>

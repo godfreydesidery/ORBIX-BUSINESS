@@ -23,6 +23,12 @@ public interface LpoRepository extends JpaRepository<Lpo, Long> {
 	Optional<Lpo> findByNo(String lpoNo);
 
 	List<Lpo> findAllByStatusInAndBranchAndShop(List<WorkFlowStatus> statuses, Branch userBranch, Shop shop);
+
+	@Query("SELECT l FROM Lpo l WHERE (l.branch = :branch OR (:branch IS NULL AND l.branch IS NULL)) AND (l.status IN :openStatuses OR (l.status IN :approvedStatuses AND l.approvedDateTime > :cutoffTime)) ORDER BY l.id")
+	List<Lpo> getVisibleLposByBranch(@Param("branch") Branch branch, @Param("openStatuses") List<WorkFlowStatus> openStatuses, @Param("approvedStatuses") List<WorkFlowStatus> approvedStatuses, @Param("cutoffTime") LocalDateTime cutoffTime);
+
+	@Query("SELECT l FROM Lpo l WHERE (l.branch = :branch OR (:branch IS NULL AND l.branch IS NULL)) AND l.shop = :shop AND (l.status IN :openStatuses OR (l.status IN :approvedStatuses AND l.approvedDateTime > :cutoffTime)) ORDER BY l.id")
+	List<Lpo> getVisibleLposByBranchAndShop(@Param("branch") Branch branch, @Param("shop") Shop shop, @Param("openStatuses") List<WorkFlowStatus> openStatuses, @Param("approvedStatuses") List<WorkFlowStatus> approvedStatuses, @Param("cutoffTime") LocalDateTime cutoffTime);
 	
 	
 	@Query(value = 

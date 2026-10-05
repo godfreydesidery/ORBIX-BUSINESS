@@ -31,6 +31,7 @@ public class DiscountRequestResource {
 	private final DiscountRequestService discountRequestService;
 
 	@GetMapping("/discount_requests")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<DiscountRequestResponseDTO>>getAll(
 			@RequestParam(name = "service_id") Long serviceId,
 			@RequestParam(name = "service_name") String serviceName,

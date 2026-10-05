@@ -16,6 +16,8 @@ public interface ParkingBillReceivableRepository extends JpaRepository<ParkingBi
 	List<ParkingBillReceivable> findAllByParking(Parking parking);
 
 	List<ParkingBillReceivable> findByParking(Parking parking);
+
+	Optional<ParkingBillReceivable> findFirstByParkingOrderByIdDesc(Parking parking);
 	
 	
 	@Query("SELECT COUNT(p) FROM ParkingBillReceivable p WHERE p.billReceivable.payStatus IN ('PAID', 'VERIFIED') AND p.billReceivable.paidDateTime BETWEEN :startDate AND :endDate")
@@ -23,7 +25,18 @@ public interface ParkingBillReceivableRepository extends JpaRepository<ParkingBi
 
 	Optional<ParkingBillReceivable> findByBillReceivable(BillReceivable billReceivable);
 
+	List<ParkingBillReceivable> findAllByBillReceivableIn(List<BillReceivable> billReceivables);
+
 	List<ParkingBillReceivable> findByParkingAndDiscountStatus(Parking parking, String string);
 
-	
+	@Query("SELECT b FROM ParkingBillReceivable b JOIN b.parking p WHERE b.discountStatus = :discountStatus AND p.status IN :statuses ORDER BY p.id, b.id")
+	List<ParkingBillReceivable> findAllByDiscountStatusAndParking_StatusIn(@Param("discountStatus") String discountStatus, @Param("statuses") List<String> statuses);
+
+	@Query("SELECT b.id FROM ParkingBillReceivable b WHERE b.parking = :parking ORDER BY b.id")
+	List<Long> getIdsByParking(@Param("parking") Parking parking);
+
+	@Query("SELECT b FROM ParkingBillReceivable b LEFT JOIN FETCH b.billReceivable WHERE b.parking IN :parkings ORDER BY b.id")
+	List<ParkingBillReceivable> findAllByParkingIn(@Param("parkings") List<Parking> parkings);
+
+
 }

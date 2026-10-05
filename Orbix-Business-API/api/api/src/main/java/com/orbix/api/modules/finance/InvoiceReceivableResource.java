@@ -24,11 +24,13 @@ public class InvoiceReceivableResource {
 	private final InvoiceReceivableService invoiceReceivableService;
 	
 	@GetMapping("/invoice_receivables")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<InvoiceReceivableResponseDTO>>getAll(HttpServletRequest request){
 		return ResponseEntity.ok().body(invoiceReceivableService.getAllInvoiceReceivables(request));
 	}
 	
 	@GetMapping("/invoice_receivables/get_pending_parking_invoice_receivables")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<InvoiceReceivableResponseDTO>>getAllParkingInvoiceReceivables(HttpServletRequest request){
 		return ResponseEntity.ok().body(invoiceReceivableService.getPendingParkingInvoiceReceivables(request));
 	}

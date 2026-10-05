@@ -41,6 +41,7 @@ public class StorageReportResource {
 	
 	
 	@PostMapping("/storage_reports/get_totals_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<StorageTotalsResponseDTO>getTotalsByDates(
 			@RequestBody DateRange dateRange,
 			HttpServletRequest request){
@@ -52,6 +53,7 @@ public class StorageReportResource {
 	}
 	
 	@PostMapping("/storage_reports/get_registration_report")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<RegistrationResponseDTO>>getRegistrationReportByDateAndReceptionist(
 			@RequestBody DateRange dateRange,
 			@RequestParam(name = "nickname") String cashierName,
@@ -67,13 +69,13 @@ public class StorageReportResource {
 			}
 		}
 		
-		List<Storage> storages = new ArrayList<>();
+		List<IStorageRegistration> storages = new ArrayList<>();
 		List<String> statuses = new ArrayList<>();
 		statuses.add("CHECKED-IN");
 		statuses.add("CHECKED-OUT");
 		if(user != null) {
 			
-			storages = storageRepository.findAllByCreatedByUserAndCreatedDateTimeBetweenAndStatusIn(
+			storages = storageRepository.getRegistrationReportByCreatedByUser(
 			        user, 
 			        dateRange.getFrom().atStartOfDay(),
 			        dateRange.getTo().atTime(LocalTime.MAX),
@@ -81,7 +83,7 @@ public class StorageReportResource {
 			    );		
 					
 		}else {
-			storages = storageRepository.findAllByCreatedDateTimeBetweenAndStatusIn(
+			storages = storageRepository.getRegistrationReport(
 			        dateRange.getFrom().atStartOfDay(),
 			        dateRange.getTo().atTime(LocalTime.MAX),
 			        statuses
@@ -90,10 +92,10 @@ public class StorageReportResource {
 		
 		List<RegistrationResponseDTO> registrationResponses = new ArrayList<>();
 		int sn = 1;
-		for(Storage storage : storages) {
+		for(IStorageRegistration storage : storages) {
 			RegistrationResponseDTO registrationResponse = new RegistrationResponseDTO();
 			registrationResponse.setRegisteredDate(storage.getCreatedDateTime().toString());
-			registrationResponse.setRegisteredBy(storage.getCreatedByUser().getNickname());
+			registrationResponse.setRegisteredBy(storage.getCreatedByNickname());
 			registrationResponse.setSn(String.valueOf(sn));
 			registrationResponses.add(registrationResponse);
 			sn++;
@@ -103,13 +105,14 @@ public class StorageReportResource {
 	}
 	
 	@PostMapping("/storage_reports/get_storage_report")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StorageResponseDTO>>getStorageReportByDateAndReceptionist(
 			@RequestBody DateRange dateRange,
 			@RequestParam(name = "status") String status,
 			HttpServletRequest request){
 		
 		
-		List<Storage> storages = new ArrayList<>();
+		List<IStorageReportRow> storages = new ArrayList<>();
 		List<String> statuses = new ArrayList<>();
 		if(status.equals("") || status.equals("--All--")) {
 			statuses.add("CHECKED-IN");
@@ -122,7 +125,7 @@ public class StorageReportResource {
 			throw new InvalidOperationException("Invalid Option selected");
 		}
 		
-		storages = storageRepository.findAllByCheckedInDateTimeBetweenAndStatusIn(
+		storages = storageRepository.getStorageReport(
 		        dateRange.getFrom().atStartOfDay(),
 		        dateRange.getTo().atTime(LocalTime.MAX),
 		        statuses
@@ -130,7 +133,7 @@ public class StorageReportResource {
 		
 		List<StorageResponseDTO> storageResponses = new ArrayList<>();
 		int sn = 1;
-		for(Storage storage : storages) {
+		for(IStorageReportRow storage : storages) {
 			StorageResponseDTO storageResponse = new StorageResponseDTO();
 			storageResponse.setNo(storage.getNo());
 			storageResponse.setGoodName(storage.getGoodName());
@@ -152,14 +155,14 @@ public class StorageReportResource {
 				);
 			storageResponse.setSn(String.valueOf(sn));
 			storageResponse.setStatus(storage.getStatus());
-			storageResponse.setCreatedBy(storage.getCreatedByUser().getNickname());
+			storageResponse.setCreatedBy(storage.getCreatedByNickname());
 			
-			if(storage.getCheckedInByUser() != null) {
-				storageResponse.setCheckedInBy(storage.getCheckedInByUser().getNickname());
+			if(storage.getCheckedInByNickname() != null) {
+				storageResponse.setCheckedInBy(storage.getCheckedInByNickname());
 			}
 			
-			if(storage.getCheckedOutByUser() != null) {
-				storageResponse.setCheckedOutBy(storage.getCheckedOutByUser().getNickname());
+			if(storage.getCheckedOutByNickname() != null) {
+				storageResponse.setCheckedOutBy(storage.getCheckedOutByNickname());
 			}
 			
 			storageResponses.add(storageResponse);
@@ -172,6 +175,7 @@ public class StorageReportResource {
 	}
 	
 	@PostMapping("/storage_reports/get_goods_removed_report")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<GoodsRemovedResponseDTO>>getGoodsRemovedReport(
 			@RequestBody DateRange dateRange,
 			HttpServletRequest request){

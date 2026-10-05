@@ -35,6 +35,7 @@ public class WeighResource {
 	private final WeighService weighService;
 	
 	@GetMapping("/weighs/recent")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<WeighResponseDTO>>getAll(HttpServletRequest request){
 		return ResponseEntity.ok().body(weighService.getAllWeighs(request));
 	}

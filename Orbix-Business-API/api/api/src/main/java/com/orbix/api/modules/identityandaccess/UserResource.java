@@ -22,6 +22,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -564,14 +566,20 @@ public class UserResource {
 			}
 		}
 		
+		// All privilege names in one query instead of one look-up per object and operation
+		// (case-insensitive and ignoring trailing spaces, as the database compares names)
+		Set<String> privilegeNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+		for(String privilegeName : privilegeRepository.getPrivilegeNames()) {
+			if(privilegeName != null) privilegeNames.add(privilegeName.stripTrailing());
+		}
+		
 		for(String object : objects) {
 			AuthorityModel m = new AuthorityModel();
 			m.setObject(object);
 			List<String> s = new ArrayList<>();
 			for(String operation : operations) {				
 				String privilege = object+"-"+operation;
-				Optional<Privilege> p =privilegeRepository.findByName(privilege);
-				if(p.isPresent()) {
+				if(privilegeNames.contains(privilege)) {
 					s.add(operation);
 				}
 			}
@@ -627,10 +635,8 @@ public class UserResource {
 			Branch branch = null;
 			branch = userService.getUser(request).getBranch();
 			
-			List<RestaurantAgent> users = restaurantAgentRepository.findAll();
-			for(RestaurantAgent user : users) {
-				nicknames.add(user.getName());
-			}	
+			// Only the names are needed, so read them instead of loading every agent with its related data
+			nicknames.addAll(restaurantAgentRepository.getNames());
 		}catch(Exception e) {
 			return nicknames;
 		}

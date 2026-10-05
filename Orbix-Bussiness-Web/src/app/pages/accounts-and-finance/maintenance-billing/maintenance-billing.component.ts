@@ -12,6 +12,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { Router, RouterModule } from '@angular/router';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { version } from 'moment';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 @Component({
@@ -28,6 +29,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './maintenance-billing.component.scss'
 })
 export class MaintenanceBillingComponent {
+  trackById = trackById
 page: number = 1; // Initialize the current page to 1
 
   filterRecords : string = ''

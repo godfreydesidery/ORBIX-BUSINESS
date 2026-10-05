@@ -11,6 +11,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -37,7 +38,14 @@ import lombok.ToString;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "bond_items")
+@Table(name = "bond_items", indexes = {
+		@Index(name = "ix_bond_items_status_checked_out", columnList = "status, checkedOutDateTime"),
+		@Index(name = "ix_bond_items_zone_status_checked_out", columnList = "bond_zone_id, status, checkedOutDateTime"),
+		@Index(name = "ix_bond_items_chasis_no", columnList = "chasisNo"),
+		@Index(name = "ix_bond_items_checked_in_status", columnList = "checkedInDateTime, status"),
+		@Index(name = "ix_bond_items_created_status", columnList = "createdDateTime, status"),
+		@Index(name = "ix_bond_items_created_by_created", columnList = "created_by_user_id, createdDateTime")
+})
 public class BondItem {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

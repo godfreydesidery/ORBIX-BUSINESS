@@ -9,14 +9,15 @@ import { AuthService } from 'src/app/auth.service';
 import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { HttpHeaders } from '@angular/common/http';
 
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 
 import { environment } from 'src/environments/environment';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
 import { IWorkshopCashCollection } from 'src/app/domain/cash-collection';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 
@@ -34,6 +35,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './service-cash-collection.component.scss'
 })
 export class ServiceCashCollectionComponent {
+  trackById = trackById
 documentHeader!: any
 
   from: Date | string | null = null
@@ -131,20 +133,6 @@ documentHeader!: any
   }
 
   printWorkshopCollectionReport = async () => {
-    // Set up VFS for pdfMake - try different approaches
-    try {
-      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
-      // Try different possible structures
-      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
-      } else if (vfsFonts.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.vfs;
-      } else {
-        (window as any).pdfMake.vfs = vfsFonts;
-      }
-    } catch (error) {
-      console.log('VFS setup failed, continuing without custom fonts:', error);
-    }
 
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
     const title = 'Workshop Collection Report';

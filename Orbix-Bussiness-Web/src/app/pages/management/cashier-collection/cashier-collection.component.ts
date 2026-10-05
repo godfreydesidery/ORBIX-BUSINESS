@@ -9,15 +9,16 @@ import { AuthService } from 'src/app/auth.service';
 import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { HttpHeaders } from '@angular/common/http';
 
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 
 import { environment } from 'src/environments/environment';
 import { ICashCollection, IParkingCashCollection, IParkingServiceCashCollection } from 'src/app/domain/cash-collection';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
 const API_URL = environment.apiUrl;
 @Component({
@@ -34,6 +35,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './cashier-collection.component.scss'
 })
 export class CashierCollectionComponent {
+  trackById = trackById
   documentHeader! : any
 
   from : Date | string | null = null
@@ -266,19 +268,6 @@ export class CashierCollectionComponent {
   printCashierCollectionReport = async () => {
     this.documentHeader = await this.data.getDocumentHeaderLandScape()
 
-    try {
-      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
-      // Try different possible structures
-      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
-      } else if (vfsFonts.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.vfs;
-      } else {
-        (window as any).pdfMake.vfs = vfsFonts;
-      }
-    } catch (error) {
-      console.log('VFS setup failed, continuing without custom fonts:', error);
-    }
 
     var header = ''
     var footer = ''
@@ -411,19 +400,6 @@ export class CashierCollectionComponent {
   printParkingCollectionReport = async () => {
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
 
-    try {
-      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
-      // Try different possible structures
-      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
-      } else if (vfsFonts.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.vfs;
-      } else {
-        (window as any).pdfMake.vfs = vfsFonts;
-      }
-    } catch (error) {
-      console.log('VFS setup failed, continuing without custom fonts:', error);
-    }
 
     
 
@@ -517,19 +493,6 @@ export class CashierCollectionComponent {
   printParkingServiceCollectionReport = async () => {
     this.documentHeader = await this.data.getDocumentHeaderLandScape();
 
-    try {
-      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
-      // Try different possible structures
-      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
-      } else if (vfsFonts.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.vfs;
-      } else {
-        (window as any).pdfMake.vfs = vfsFonts;
-      }
-    } catch (error) {
-      console.log('VFS setup failed, continuing without custom fonts:', error);
-    }
 
     const title = 'Vehicle Services Collection Report';
     const fromTo = 'From: ' +this.from?.toString() + ' To: ' + this.to?.toString();

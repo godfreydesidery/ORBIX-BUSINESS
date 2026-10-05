@@ -9,7 +9,8 @@ import { IMaintenance } from 'src/app/domain/maintenance';
 import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 
 import { DataService } from '@services/custom/data.service';
 import { MsgBoxService } from '@services/custom/msg-box.service';
@@ -17,6 +18,7 @@ import { IMaintenanceJobCard } from 'src/app/domain/maintenance-job-card';
 import { IMaintenanceIssueType } from 'src/app/domain/maintenance-issue-type';
 import { IServiceSpecialist } from 'src/app/domain/service-specialist';
 import { IMaintenanceJobCardIssue } from 'src/app/domain/maintenance-job-card-issue';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -33,6 +35,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './maintenance.component.scss'
 })
 export class MaintenanceComponent {
+  trackById = trackById
   documentHeader! : any
   
     page: number = 1; // Initialize the current page to 1

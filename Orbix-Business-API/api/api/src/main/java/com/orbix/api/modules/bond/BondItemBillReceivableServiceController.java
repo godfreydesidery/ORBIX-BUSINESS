@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -49,7 +50,8 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 		BondItem bondItem = bondItemRepository.findById(bondItemId)
                 .orElseThrow(() -> new NotFoundException("BondItem with ID " + bondItemId + " not found."));
 		
-		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItemIn(Collections.singletonList(bondItem));
 		
 		List<BondItemBillReceivableResponseDTO> bondItemBillReceivableResponses = new ArrayList<>();
 		for(BondItemBillReceivable bondItemBillReceivable : bondItemBillReceivables) {
@@ -181,15 +183,15 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 	    BondItem bondItem = bondItemRepository.findById(request.getBondItemId())
 	            .orElseThrow(() -> new NotFoundException("BondItem not found."));
 
-	    // 2. Fetch previous receivables
-	    List<BondItemBillReceivable> rcvs = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+	    // 2. Fetch the previous receivable (only the last one is needed)
+	    Optional<BondItemBillReceivable> lastBondItemBillReceivable_ = bondItemBillReceivableRepository.findFirstByBondItemOrderByIdDesc(bondItem);
 
 	    // 3. Resolve FROM date
 	    LocalDateTime fromDate;
-	    if (rcvs.isEmpty()) {
+	    if (lastBondItemBillReceivable_.isEmpty()) {
 	        fromDate = bondItem.getStartBillingAt().toLocalDate().atStartOfDay();
 	    } else {
-	        fromDate = rcvs.get(rcvs.size() - 1)
+	        fromDate = lastBondItemBillReceivable_.get()
 	                .getEndedAt()
 	                .plusDays(1)
 	                .toLocalDate()
@@ -320,14 +322,6 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 			noOfDays = 1;
 		}
 				
-		List<BondItemBillReceivable> rcvs = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
-		
-		double billedQty = 0;
-		
-		for(BondItemBillReceivable sbr : rcvs) {
-			billedQty = billedQty + sbr.getQty();
-		}
-		
 		
 		BillReceivable billReceivable = new BillReceivable();
 		billReceivable.setNo(String.valueOf(Math.random()));
@@ -390,7 +384,8 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 		double totalGenerated = 0;
 		double totalUngenerated = 0;
 		
-		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItem(bondItem_.get());
+		// One load (bill receivables fetched with it), shared with getUngeneratedBill
+		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItemIn(Collections.singletonList(bondItem_.get()));
 		for(BondItemBillReceivable bondItemBillReceivable : bondItemBillReceivables) {
 			if(bondItemBillReceivable.getBillReceivable().getPayStatus().toString().equals("PAID")) {
 				totalPaid = totalPaid + bondItemBillReceivable.getBillReceivable().getAmount();
@@ -398,8 +393,8 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 				totalGenerated = totalGenerated + bondItemBillReceivable.getBillReceivable().getAmount();
 			}
 		}
-		
-		totalUngenerated = this.getUngeneratedBill(bondItem_.get());
+
+		totalUngenerated = this.getUngeneratedBill(bondItem_.get(), bondItemBillReceivables);
 		
 		
 		billResponse.setBillPaid(String.valueOf(totalPaid));
@@ -462,9 +457,7 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 //		return bill;
 //	}
 	
-	private double getUngeneratedBill(BondItem bondItem) {
-
-	    List<BondItemBillReceivable> rcvs = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+	private double getUngeneratedBill(BondItem bondItem, List<BondItemBillReceivable> rcvs) {
 
 	    // 1. Determine start point (last billed + 1 day OR initial start)
 	    LocalDateTime fromDate;

@@ -1,15 +1,21 @@
 package com.orbix.api.modules.inventoryandprocurement;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.orbix.api.api.commons.PageResponseDTO;
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
@@ -44,7 +50,7 @@ public class DineableServiceController implements DineableService {
 	 */
 	@Override
 	public List<DineableResponseDTO> getAllDineablees(HttpServletRequest request) {
-		List<Dineable> dineables = dineableRepository.findAll();
+		List<Dineable> dineables = dineableRepository.findAll(Sort.by("id")); // same order as the paged list
 		List<DineableResponseDTO> dineableResponses = new ArrayList<>();
 
 		for(Dineable dineable : dineables) {
@@ -52,6 +58,22 @@ public class DineableServiceController implements DineableService {
 		}		
 		return dineableResponses;
 	}
+
+	@Override
+	public PageResponseDTO<DineableResponseDTO> getDineablePage(int page, int size, HttpServletRequest request) {
+		// One page of the list, in the same order as the full list (by id)
+		int pageSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+		PageRequest pageRequest = PageRequest.of(Math.min(Math.max(page, 0), Integer.MAX_VALUE / pageSize), pageSize, Sort.by("id"));
+		Page<Dineable> dineables = dineableRepository.findAll(pageRequest);
+		List<DineableResponseDTO> dineableResponses = new ArrayList<>();
+
+		for(Dineable dineable : dineables) {
+			dineableResponses.add(dineableResponseDTOMapper(dineable));
+		}
+		return new PageResponseDTO<>(dineableResponses, dineables.getTotalElements());
+	}
+	
+	private static final int MAX_PAGE_SIZE = 100;
 
 	/**
 	 * 
@@ -295,11 +317,23 @@ public class DineableServiceController implements DineableService {
 	    List<Dineable> dineables = dineableRepository.findAllByCompanyAndSellable(company, true);
 	    List<DineableResponseDTO> dineableResponses = new ArrayList<>();
 	    
+	    // How many times each dineable is already in the restaurant, loaded once instead of one look-up per dineable
+	    Map<Long, Integer> restaurantDineableCounts = new HashMap<>();
+	    for(Long dineableId : restaurantDineableRepository.getDineableIdsByRestaurant(restaurant)) {
+	    	restaurantDineableCounts.merge(dineableId, 1, Integer::sum);
+	    }
+	    
 	    for(Dineable dineable : dineables) {
 	    	boolean imported = false;
-	    	Optional<RestaurantDineable> restaurantDineable_ = restaurantDineableRepository.findByDineableAndRestaurant(dineable, restaurant);
-	    	if(restaurantDineable_.isPresent()) {
+	    	int restaurantDineableCount = restaurantDineableCounts.getOrDefault(dineable.getId(), 0);
+	    	if(restaurantDineableCount == 1) {
 	    		imported = true;
+	    	}else if(restaurantDineableCount > 1) {
+	    		// Not expected; keep the original look-up so the outcome stays the same
+	    		Optional<RestaurantDineable> restaurantDineable_ = restaurantDineableRepository.findByDineableAndRestaurant(dineable, restaurant);
+	    		if(restaurantDineable_.isPresent()) {
+	    			imported = true;
+	    		}
 	    	}	    	
 	    	dineableResponses.add(dineableResponseDTOMapperWithImportedStatus(dineable, imported));
 	    	

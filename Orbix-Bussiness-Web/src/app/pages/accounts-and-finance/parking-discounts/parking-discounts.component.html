@@ -33,7 +33,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let p of parkings | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }">
+                            <tr *ngFor="let p of parkings | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }; trackBy: trackById">
                                 <td>{{p.sn}}</td>
                                 <td><b style="color: rgb(228, 85, 8);">{{p.chasisNo}}</b></td>
                                 <!-- <td>{{p.hasKeys}}</td> -->
@@ -156,7 +156,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let p of parkingBillReceivables">
+                            <tr *ngFor="let p of parkingBillReceivables; trackBy: trackById">
                                 <td>{{p.sn}}</td>
                                 <td>{{p.startedAt}}</td>
                                 <td>{{p.endedAt}}</td>

@@ -44,7 +44,7 @@
                     <select class="form-control" [(ngModel)]="selectedSupplierId" (change)="onSupplierChange($event)">
                         <option value = ''></option>
                         <optgroup label="">  
-                            <option *ngFor="let supplier of availableSuppliers" [value]="supplier.id" style="font-size: larger;">Supplier name: <b>{{supplier.name}}</b></option>                   
+                            <option *ngFor="let supplier of availableSuppliers; trackBy: trackById" [value]="supplier.id" style="font-size: larger;">Supplier name: <b>{{supplier.name}}</b></option>                   
                         </optgroup>
                     </select>
                 </div>
@@ -82,7 +82,7 @@
                                         </tr>
                                     </thead> 
                                     <tbody>
-                                        <tr *ngFor="let product of importProducts | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                        <tr *ngFor="let product of importProducts | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                             <td>{{product.code}}</td>
                                             <td>{{product.name}}</td>
                                             <td>{{product.description}}</td>
@@ -132,7 +132,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let supplierProduct of supplierProducts | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                    <tr *ngFor="let supplierProduct of supplierProducts | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                         <td>{{supplierProduct.productCode}}</td>
                                         <td>{{supplierProduct.productName}}</td>
                                         <td>{{supplierProduct.productDescription}}</td>

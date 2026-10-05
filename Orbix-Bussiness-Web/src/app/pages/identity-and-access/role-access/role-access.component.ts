@@ -14,6 +14,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { IPrivilege } from 'src/app/domain/priviledge';
 import { MsgBoxService } from '@services/custom/msg-box.service';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 
@@ -28,6 +29,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './role-access.component.scss'
 })
 export class RoleAccessComponent {
+  trackById = trackById
 
   public object       : string
   public operation    : string
@@ -224,29 +226,21 @@ export class RoleAccessComponent {
   removePrivilege(object : string, operation : string){
     for (const [key, value] of Object.entries(this.privileges)) {
       if(key == object){
-        var i = -1
-        value.forEach(element => {
-          if(element == operation){
-            value.splice(i, 1)
-            return
-          }
-        })
+        // Remove the unticked operation itself (splice(-1, 1) used to remove the last operation instead)
+        var i = value.indexOf(operation)
+        if(i > -1){
+          value.splice(i, 1)
+        }
       }
     }
   }
 
   privilegeChecked(object_ : string, operation_ : string){
-    var present = false
-    for (const [key] of Object.entries(this.privileges)){
-      if(key === object_){
-        this.privileges[key].forEach(element => {
-          if(element === operation_){
-            present = true
-          }
-        })
-      }   
-    } 
-    return present 
+    // Direct look-up of the object's operations instead of scanning every entry (called for each checkbox on every refresh)
+    if(!Object.prototype.hasOwnProperty.call(this.privileges, object_)){
+      return false
+    }
+    return this.privileges[object_].includes(operation_)
   }
 
   async addPrivilegeToRole(role : string){

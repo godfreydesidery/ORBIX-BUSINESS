@@ -32,7 +32,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let weigh of weighs | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }">
+                                *ngFor="let weigh of weighs | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }; trackBy: trackById">
                                 <td>{{weigh.sn}}</td>
                                 <td>{{weigh.no}}</td>
                                 <td>{{weigh.ownerName}}</td>
@@ -158,7 +158,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let p of weighBillReceivables">
+                            <tr *ngFor="let p of weighBillReceivables; trackBy: trackById">
                                 <td>{{p.sn}}</td>
                                 <td>{{p.startedAt}}</td>
                                 <td>{{p.endedAt}}</td>

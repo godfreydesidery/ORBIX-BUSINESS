@@ -19,13 +19,14 @@ import { IStorage } from 'src/app/domain/storage';
 import { IGoodType } from 'src/app/domain/good-type';
 import { error } from 'src/custom-packages/util';
 
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 import { IServiceBillItem } from 'src/app/domain/maintenance';
 import { IMachine } from 'src/app/domain/machine';
 import { IMachineService } from 'src/app/domain/machine-service';
 import { IService } from 'src/app/domain/service';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 
@@ -43,6 +44,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './select-workshop.component.scss'
 })
 export class SelectWorkshopComponent {
+  trackById = trackById
 
   machineId: any = null
   machineNo: string = ''
@@ -436,24 +438,30 @@ export class SelectWorkshopComponent {
   }
 
   
+  searchTimer: any = null
+
   getServiceLike = async (searchKey: string) => {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
+    clearTimeout(this.searchTimer)
     if (searchKey.length > 2) {
-      await this.http.get<IService[]>(API_URL + '/services/get_services_by_company_containing?service_name_like=' + searchKey, options)
-        .toPromise()
-        .then(
-          data => {
-            console.log(data)
-            this.filteredServices = data!
+      // Wait for a short pause in typing before asking the server (each keystroke restarts the wait)
+      this.searchTimer = setTimeout(async () => {
+        await this.http.get<IService[]>(API_URL + '/services/get_services_by_company_containing?service_name_like=' + searchKey, options)
+          .toPromise()
+          .then(
+            data => {
+              console.log(data)
+              this.filteredServices = data!
+            }
+          )
+          .catch(error => {
+            console.log(error)
           }
-        )
-        .catch(error => {
-          console.log(error)
-        }
-        )
+          )
+      }, 300)
     } else {
       this.filteredServices = []
     }
@@ -517,6 +525,7 @@ export class SelectWorkshopComponent {
   }
 
   selectService(service: any): void {
+    clearTimeout(this.searchTimer) // a search still waiting would refill the list after the selection
     this.selectedService = service
     this.searchTerm = service.name
     this.isDropdownOpen = false

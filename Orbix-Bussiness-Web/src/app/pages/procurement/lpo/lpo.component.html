@@ -36,7 +36,7 @@
                                     <select class="form-control" [(ngModel)]="supplierId"
                                         (change)="onSupplierChange($event)">
                                         <option></option>
-                                        <option *ngFor="let supplier of suppliers" [value]="supplier.id"
+                                        <option *ngFor="let supplier of suppliers; trackBy: trackById" [value]="supplier.id"
                                             style="font-size: larger;"><b>{{supplier.name}}</b></option>
                                     </select>
 
@@ -76,7 +76,7 @@
                                     <p>Select Destination (Shop)</p>
                                     <select class="form-control" [(ngModel)]="shopId" (change)="onShopChange($event)">
                                         <option></option>
-                                        <option *ngFor="let shop of shops" [value]="shop.id" style="font-size: larger;">
+                                        <option *ngFor="let shop of shops; trackBy: trackById" [value]="shop.id" style="font-size: larger;">
                                             <b>{{shop.name}}</b></option>
                                     </select>
                                 </div>
@@ -143,7 +143,7 @@
                                                     </tr>
                                                 </thead>
                                                 <tbody>
-                                                    <tr *ngFor="let item of lpo.lpoDetails">
+                                                    <tr *ngFor="let item of lpo.lpoDetails; trackBy: trackById">
                                                         <td>{{item.sn}}</td>
                                                         <td>{{item.productCode}}</td>
                                                         <td>{{item.productName}}</td>
@@ -375,7 +375,7 @@
                         <div class="dropdown-menu show mt-1" *ngIf="isDropdownOpen && filteredProducts.length > 0"
                             style="max-height: 200px; overflow-y: auto; width: 100%; border-width: 2px;">
                             <button class="dropdown-item form-control btn-outline-primary"
-                                *ngFor="let product of filteredProducts" (click)="selectProduct(product)">
+                                *ngFor="let product of filteredProducts; trackBy: trackById" (click)="selectProduct(product)">
                                 {{ product.name }}
                             </button>
                         </div>
@@ -461,7 +461,7 @@
                     <select class="form-control" [(ngModel)]="supplierId" (change)="onSupplierChange($event)">
                         <option value=''></option>
                         <optgroup label="">
-                            <option *ngFor="let supplier of suppliers" [value]="supplier.id" style="font-size: larger;">
+                            <option *ngFor="let supplier of suppliers; trackBy: trackById" [value]="supplier.id" style="font-size: larger;">
                                 Supplier name: <b>{{supplier.name}}</b></option>
                         </optgroup>
                     </select>
@@ -472,7 +472,7 @@
                     <select class="form-control" [(ngModel)]="shopId" (change)="onShopChange($event)">
                         <option value=''></option>
                         <optgroup label="">
-                            <option *ngFor="let shop of shops" [value]="shop.id" style="font-size: larger;">Shop name:
+                            <option *ngFor="let shop of shops; trackBy: trackById" [value]="shop.id" style="font-size: larger;">Shop name:
                                 <b>{{shop.name}}</b></option>
                         </optgroup>
                     </select>
@@ -542,7 +542,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let lpo of lpos | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }">
+                                    *ngFor="let lpo of lpos | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }; trackBy: trackById">
                                     <td>{{lpo.no}}</td>
                                     <td>{{lpo.supplierName}}</td>
                                     <td>

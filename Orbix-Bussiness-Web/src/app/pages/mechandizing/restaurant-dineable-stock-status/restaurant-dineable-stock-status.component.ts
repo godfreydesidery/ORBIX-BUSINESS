@@ -15,9 +15,9 @@ import { HttpHeaders } from '@angular/common/http';
 import { IRestaurantDineable } from 'src/app/domain/restaurant-dineable';
 import { IDineable } from 'src/app/domain/dineable';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
 const API_URL = environment.apiUrl;
 @Component({
@@ -34,6 +34,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './restaurant-dineable-stock-status.component.scss'
 })
 export class RestaurantDineableStockStatusComponent {
+  trackById = trackById
 restaurantId: number;
 
   restaurantDineables : IRestaurantDineable[] = []

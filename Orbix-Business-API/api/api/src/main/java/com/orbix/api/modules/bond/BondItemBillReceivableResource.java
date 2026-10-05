@@ -28,6 +28,7 @@ public class BondItemBillReceivableResource {
 	private final BondItemBillReceivableService bondItemBillReceivableService;
 	
 	@GetMapping("/bond_item_bill_receivables/get_all_by_bond_item")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BondItemBillReceivableResponseDTO>> getAllByBondItem(
 			@RequestParam(name = "bond_item_id") Long bondItemId,
 			HttpServletRequest request)
@@ -62,6 +63,7 @@ public class BondItemBillReceivableResource {
 	}
 	
 	@GetMapping("/bond_item_bill_receivables/get_bill_view")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<BillViewResponseDTO> getBillView(
 			@RequestParam(name = "bond_item_id") Long bondItemId,
 			HttpServletRequest request)

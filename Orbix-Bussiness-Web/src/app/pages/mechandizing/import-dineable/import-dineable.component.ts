@@ -14,9 +14,9 @@ import { environment } from 'src/environments/environment';
 import { HttpHeaders } from '@angular/common/http';
 import { IRestaurantDineable } from 'src/app/domain/restaurant-dineable';
 import { IDineable } from 'src/app/domain/dineable';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
 const API_URL = environment.apiUrl;
 @Component({
@@ -33,6 +33,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './import-dineable.component.scss'
 })
 export class ImportDineableComponent {
+  trackById = trackById
 
     restaurantId: number;
   

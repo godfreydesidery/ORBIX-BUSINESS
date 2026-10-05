@@ -30,7 +30,7 @@
                         </thead>
                         <tbody>
                             <tr
-                                *ngFor="let machine of machines | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }">
+                                *ngFor="let machine of machines | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }; trackBy: trackById">
                                 <td>{{machine.sn}}</td>
                                 <td>{{machine.no}}</td>
                                 <td>{{machine.ownerName}}</td>

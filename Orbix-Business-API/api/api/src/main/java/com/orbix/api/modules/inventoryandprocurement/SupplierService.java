@@ -5,9 +5,11 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface SupplierService {
 	List<SupplierResponseDTO> getAllSuppliers(HttpServletRequest request);
+	PageResponseDTO<SupplierResponseDTO> getSupplierPage(int page, int size, HttpServletRequest request);
 	List<SupplierResponseDTO> getAllCompanySuppliers(HttpServletRequest request);
 	SupplierResponseDTO get(Long id, HttpServletRequest request);
 	SupplierResponseDTO createSupplier(SupplierRequestDTO supplier, HttpServletRequest request);

@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,7 +47,8 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		Parking parking = parkingRepository.findById(parkingId)
                 .orElseThrow(() -> new NotFoundException("Parking with ID " + parkingId + " not found."));
 		
-		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking));
 		
 		List<ParkingBillReceivableResponseDTO> parkingBillReceivableResponses = new ArrayList<>();
 		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
@@ -61,7 +63,8 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		Parking parking = parkingRepository.findById(parkingId)
                 .orElseThrow(() -> new NotFoundException("Parking with ID " + parkingId + " not found."));
 		
-		List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking));
 		
 		List<ParkingServiceBillReceivableResponseDTO> parkingServiceBillReceivableResponses = new ArrayList<>();
 		for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
@@ -99,7 +102,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		
 		// Check if is first bill
 		
-		List<ParkingBillReceivable> rcvs = parkingBillReceivableRepository.findAllByParking(parking);
+		Optional<ParkingBillReceivable> lastParkingBillReceivable_ = parkingBillReceivableRepository.findFirstByParkingOrderByIdDesc(parking);
 		
 		LocalDateTime fromDate = null;
 		LocalDateTime toDate = null;
@@ -111,7 +114,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 			toDate = LocalDateTime.parse(dateString, formatter).plusDays(1).toLocalDate().atStartOfDay();
 		}
 		
-		if(rcvs.isEmpty()) {			
+		if(lastParkingBillReceivable_.isEmpty()) {			
 			// Check for first billing date		
 			fromDate = parking.getStartBillingAt().toLocalDate().atStartOfDay();
 			// temporary solution, timezone issue, billing
@@ -125,7 +128,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 			
 		}else {
 			// Take the last bill
-			fromDate = rcvs.get(rcvs.size() - 1).getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
+			fromDate = lastParkingBillReceivable_.get().getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
 			// temporary solution, timezone issue, billing
 			if(toDate == null) toDate = (LocalDateTime.now().plusHours(3)).plusDays(1).toLocalDate().atStartOfDay();
 			
@@ -406,7 +409,8 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		double totalGenerated = 0;
 		double totalUngenerated = 0;
 		
-		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		// One load (bill receivables fetched with it), shared with getUngeneratedBill
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking_.get()));
 		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
 			if(parkingBillReceivable.getBillReceivable().getPayStatus().toString().equals("PAID")) {
 				totalPaid = totalPaid + parkingBillReceivable.getBillReceivable().getAmount();
@@ -414,8 +418,8 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 				totalGenerated = totalGenerated + parkingBillReceivable.getBillReceivable().getAmount();
 			}
 		}
-		
-		totalUngenerated = this.getUngeneratedBill(parking_.get());
+
+		totalUngenerated = this.getUngeneratedBill(parking_.get(), parkingBillReceivables);
 		
 		
 		billResponse.setBillPaid(String.valueOf(totalPaid));
@@ -427,12 +431,10 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		return billResponse;
 	}
 	
-	private double getUngeneratedBill(Parking parking) {
-		
+	private double getUngeneratedBill(Parking parking, List<ParkingBillReceivable> rcvs) {
+
 		double bill = 0;
-		
-		List<ParkingBillReceivable> rcvs = parkingBillReceivableRepository.findAllByParking(parking);
-		
+
 		LocalDateTime fromDate = null;
 		LocalDateTime toDate = null;
 		double qty = 0;

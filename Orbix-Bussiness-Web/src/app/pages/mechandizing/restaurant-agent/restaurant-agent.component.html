@@ -36,7 +36,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let agent of restaurantAgents | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                    *ngFor="let agent of restaurantAgents | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                     <td>{{agent.sn}}</td>
                                     <td style="font-weight: bold; font-size: large;">{{agent.name}}</td>
                                     <td style="font-weight: bold; font-size: large;">{{agent.phoneNo}}</td>
@@ -139,7 +139,7 @@
                         <div class="form-group">
                             <label>Select Badge</label>
                             <select class="form-control" [(ngModel)]="selectedBadgeId">
-                                <option *ngFor="let availableBadge of availableBadges" [value]="availableBadge.id">
+                                <option *ngFor="let availableBadge of availableBadges; trackBy: trackById" [value]="availableBadge.id">
                                     {{availableBadge.code}}
                                 </option>
                             </select>

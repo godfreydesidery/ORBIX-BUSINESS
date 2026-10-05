@@ -43,7 +43,7 @@
                                 </tr>
                             </thead> 
                             <tbody>
-                                <tr *ngFor="let dineable of importDineables | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                <tr *ngFor="let dineable of importDineables | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                     <td>{{dineable.code}}</td>
                                     <td>{{dineable.name}}</td>
                                     <td>{{dineable.description}}</td>

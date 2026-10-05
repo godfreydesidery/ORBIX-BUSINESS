@@ -47,7 +47,11 @@ import lombok.extern.slf4j.Slf4j;
 @RequiredArgsConstructor
 @CrossOrigin(origins = "*", allowedHeaders = "*")
 public class CustomAuthorizationFilter extends OncePerRequestFilter {
-	
+
+	// Built once and reused: the algorithm and verifier are immutable and thread-safe
+	private static final Algorithm ALGORITHM = Algorithm.HMAC256("secret".getBytes());
+	private static final JWTVerifier VERIFIER = JWT.require(ALGORITHM).build();
+
 	private final UserRepository userRepository;
 
 	@Override
@@ -64,9 +68,7 @@ public class CustomAuthorizationFilter extends OncePerRequestFilter {
 			if(authorizationHeader != null && authorizationHeader.startsWith("Bearer ")) {
 				try {
 					String token = authorizationHeader.substring("Bearer ".length());
-					Algorithm algorithm = Algorithm.HMAC256("secret".getBytes());
-					JWTVerifier verifier = JWT.require(algorithm).build();
-					DecodedJWT decodedJWT = verifier.verify(token);
+					DecodedJWT decodedJWT = VERIFIER.verify(token);
 					String username = decodedJWT.getSubject();
 					String[] roles = decodedJWT.getClaim("privileges").asArray(String.class);
 					Collection<SimpleGrantedAuthority> authorities = new ArrayList<>();

@@ -21,11 +21,10 @@ import { ILpo, ILpoDetail } from 'src/app/domain/lpo';
 import { ISupplier } from 'src/app/domain/supplier';
 import { ISupplierProduct } from 'src/app/domain/supplier-product';
 import { NgSelectModule } from '@ng-select/ng-select';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
-import * as pdfMake from 'pdfmake/build/pdfmake';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 
@@ -44,6 +43,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './weighbridge.component.scss'
 })
 export class WeighbridgeComponent {
+  trackById = trackById
 
   pageStatus : string = ''
 

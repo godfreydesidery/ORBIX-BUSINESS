@@ -9,7 +9,8 @@ import { AuthService } from 'src/app/auth.service';
 import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { HttpHeaders } from '@angular/common/http';
 
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 
 import { environment } from 'src/environments/environment';
 import { ICashCollection, IParkingCashCollection, IParkingServiceCashCollection } from 'src/app/domain/cash-collection';
@@ -17,9 +18,9 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
 import { IRestaurant } from 'src/app/domain/restaurant';
 import { IRestaurantSalesListingReport } from 'src/app/domain/restaurant-sales-listing-report';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 @Component({
@@ -36,6 +37,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './restaurant-sales-listing-report.component.scss'
 })
 export class RestaurantSalesListingReportComponent {
+  trackById = trackById
   documentHeader!: any
 
   from: Date | string | null = null

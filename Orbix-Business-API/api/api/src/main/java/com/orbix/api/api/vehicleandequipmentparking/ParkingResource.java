@@ -38,36 +38,43 @@ public class ParkingResource {
 	private final ParkingRepository parkingRepository;
 	
 	@GetMapping("/parkings")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ParkingResponseDTO>>getAll(HttpServletRequest request){
 		return ResponseEntity.ok().body(parkingService.getAllParkings(request));
 	}
 	
 	@GetMapping("/parkings/get_all_pending_or_checked_in")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ParkingResponseDTO>>getAllPendingAndCheckedIn(HttpServletRequest request){
 		return ResponseEntity.ok().body(parkingService.getAllPendingOrCheckedInParkings(request));
 	}
 	
 	@GetMapping("/parkings/get_all_checked_in")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ParkingResponseDTO>>getAllCheckedIn(HttpServletRequest request){
 		return ResponseEntity.ok().body(parkingService.getAllCheckedInParkings(request));
 	}
 	
 	@GetMapping("/parkings/get_all_with_discounts")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ParkingResponseDTO>>getAllWithDiscounts(HttpServletRequest request){
 		return ResponseEntity.ok().body(parkingService.getAllWithDiscounts(request));
 	}
 	
 	@GetMapping("/parkings/get_all_cleared")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ParkingResponseDTO>>getAllCleared(HttpServletRequest request){
 		return ResponseEntity.ok().body(parkingService.getAllCleared(request));
 	}
 	
 	@GetMapping("/parkings/get_today_checked_out")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ParkingResponseDTO>>getTodayCheckedOut(HttpServletRequest request){
 		return ResponseEntity.ok().body(parkingService.getTodayCheckedOut(request));
 	}
 	
 	@GetMapping("/parkings/get_recent_checked_out")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ParkingResponseDTO>>getRecentCheckedOut(HttpServletRequest request){
 		return ResponseEntity.ok().body(parkingService.getRecentCheckedOut(request));
 	}
@@ -83,6 +90,7 @@ public class ParkingResource {
 	}
 	
 	@GetMapping("/parkings/get_parking_summary")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MonthlyParkingStatusResponseDTO>>getParkingSummary(
 			@RequestParam(name = "year") int year,
 			HttpServletRequest request){
@@ -98,6 +106,7 @@ public class ParkingResource {
 	}
 	
 	@GetMapping("/parkings/get_parking_bill_receivables")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ParkingBillReceivableResponseDTO>>getParkingBillReceivables(
 			@RequestParam(name = "parking_id") Long id,
 			HttpServletRequest request){		
@@ -156,8 +165,9 @@ public class ParkingResource {
 		Optional<Parking> p = parkingRepository.findById(id);
 		
 		try {
-			List<ParkingBillReceivable> rcs = parkingBillReceivableRepository.findAllByParking(p.get());
-			model.setStringData((rcs.get(rcs.size() - 1).getEndedAt().minusDays(1)).toString());
+			// Only the last bill is needed
+			ParkingBillReceivable lastParkingBillReceivable = parkingBillReceivableRepository.findFirstByParkingOrderByIdDesc(p.get()).get();
+			model.setStringData((lastParkingBillReceivable.getEndedAt().minusDays(1)).toString());
 		}catch(Exception e) {
 			model.setStringData("");
 		}

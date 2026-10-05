@@ -16,9 +16,9 @@ import { IRestaurantDineable } from 'src/app/domain/restaurant-dineable';
 import { IDineable } from 'src/app/domain/dineable';
 import { IRestaurantAgent } from 'src/app/domain/restaurant-agent';
 import { IRestaurantBadge } from 'src/app/domain/restaurant-badge';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 
@@ -36,6 +36,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './restaurant-agent.component.scss'
 })
 export class RestaurantAgentComponent {
+  trackById = trackById
   restaurantId: any
   restaurantAgents: IRestaurantAgent[] = []
   searchKey: string = ''

@@ -1,5 +1,6 @@
 import { AsyncPipe, NgClass } from '@angular/common';
 import { Component, OnInit, ViewEncapsulation } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, NavigationEnd, Params, Router, RouterModule } from '@angular/router';
 import { Mail } from '@models/mail';
@@ -32,7 +33,8 @@ export class MailListComponent implements OnInit {
               public router: Router,
               private state: AppState) {
 
-    this.router.events.subscribe((event) => {
+    // Ends with this screen, instead of adding another listener each time it is opened
+    this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.unSelectAll();
         this.searchText = '';

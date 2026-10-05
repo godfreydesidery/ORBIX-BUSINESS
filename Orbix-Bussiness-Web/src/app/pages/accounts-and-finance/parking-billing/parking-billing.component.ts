@@ -15,6 +15,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { Router, RouterModule } from '@angular/router';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { IBillView } from 'src/app/domain/bill-view';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 
@@ -33,6 +34,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './parking-billing.component.scss'
 })
 export class ParkingBillingComponent {
+  trackById = trackById
 
   page: number = 1; // Initialize the current page to 1
 

@@ -23,7 +23,7 @@
                             <label class="form-control">Cashier Name</label>
                             <select class="form-control" [(ngModel)]="nickname">
                                 <option></option>
-                                <option *ngFor="let cashier of userNames">{{cashier}}</option>
+                                <option *ngFor="let cashier of userNames; trackBy: trackById">{{cashier}}</option>
                             </select>
                         </div>
                     </div>
@@ -61,7 +61,7 @@
                                     <td><b>Cashier Name</b></td>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let p of workshopCashCollections">
+                                    <tr *ngFor="let p of workshopCashCollections; trackBy: trackById">
                                         <td>{{p.sn}}</td>
                                         <td>{{p.ownerName}}</td>
                                         <td>{{p.ownerPhoneNo}}</td>

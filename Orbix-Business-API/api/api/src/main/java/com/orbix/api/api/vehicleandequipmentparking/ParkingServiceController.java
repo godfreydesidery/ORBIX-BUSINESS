@@ -4,7 +4,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -70,14 +74,70 @@ public class ParkingServiceController implements ParkingService {
 		
 	
 
+	private static final int IN_CLAUSE_CHUNK_SIZE = 1000;
+
+	// Bills of all the given parkings in a few batched queries, grouped by parking id (same id order as findAllByParking)
+	private Map<Long, List<ParkingBillReceivable>> getParkingBillReceivablesByParking(List<Parking> parkings) {
+		Map<Long, List<ParkingBillReceivable>> parkingBillReceivablesByParking = new HashMap<>();
+		for(int i = 0; i < parkings.size(); i += IN_CLAUSE_CHUNK_SIZE) {
+			List<Parking> chunk = parkings.subList(i, Math.min(i + IN_CLAUSE_CHUNK_SIZE, parkings.size()));
+			for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivableRepository.findAllByParkingIn(chunk)) {
+				parkingBillReceivablesByParking.computeIfAbsent(parkingBillReceivable.getParking().getId(), k -> new ArrayList<>()).add(parkingBillReceivable);
+			}
+		}
+		return parkingBillReceivablesByParking;
+	}
+
+	// Service bills of all the given parkings in a few batched queries, grouped by parking id (same id order as findAllByParking)
+	private Map<Long, List<ParkingServiceBillReceivable>> getParkingServiceBillReceivablesByParking(List<Parking> parkings) {
+		Map<Long, List<ParkingServiceBillReceivable>> parkingServiceBillReceivablesByParking = new HashMap<>();
+		for(int i = 0; i < parkings.size(); i += IN_CLAUSE_CHUNK_SIZE) {
+			List<Parking> chunk = parkings.subList(i, Math.min(i + IN_CLAUSE_CHUNK_SIZE, parkings.size()));
+			for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivableRepository.findAllByParkingIn(chunk)) {
+				parkingServiceBillReceivablesByParking.computeIfAbsent(parkingServiceBillReceivable.getParking().getId(), k -> new ArrayList<>()).add(parkingServiceBillReceivable);
+			}
+		}
+		return parkingServiceBillReceivablesByParking;
+	}
+
+	// Cleared when every parking bill and service bill is PAID (a parking without bills is cleared)
+	private boolean isCleared(List<ParkingBillReceivable> parkingBillReceivables, List<ParkingServiceBillReceivable> parkingServiceBillReceivables) {
+		boolean cleared = true;
+		if(!parkingBillReceivables.isEmpty() && cleared == true) {
+			for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
+				if(!parkingBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
+					cleared = false;
+					break;
+				}
+			}
+		}
+		if(!parkingServiceBillReceivables.isEmpty() && cleared == true) {
+			for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
+				if(!parkingServiceBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
+					cleared = false;
+					break;
+				}
+			}
+		}
+		return cleared;
+	}
+
 	@Override
 	public List<ParkingResponseDTO> getAllParkings(HttpServletRequest request) {
 		List<Parking> parkings = parkingRepository.findAll();
-		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
 
+		// The mapper lists the bills of checked out parkings; load them for all such parkings at once
+		List<Parking> checkedOutParkings = new ArrayList<>();
 		for(Parking parking : parkings) {
-			parkingResponses.add(parkingResponseDTOMapper(parking));					
-		}		
+			if("CHECKED-OUT".equals(parking.getStatus())) checkedOutParkings.add(parking);
+		}
+		Map<Long, List<ParkingBillReceivable>> parkingBillReceivablesByParking = getParkingBillReceivablesByParking(checkedOutParkings);
+		Map<Long, List<ParkingServiceBillReceivable>> parkingServiceBillReceivablesByParking = getParkingServiceBillReceivablesByParking(checkedOutParkings);
+
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+		for(Parking parking : parkings) {
+			parkingResponses.add(parkingResponseDTOMapper(parking, parkingBillReceivablesByParking, parkingServiceBillReceivablesByParking));
+		}
 		return parkingResponses;
 	}
 	
@@ -104,39 +164,20 @@ public class ParkingServiceController implements ParkingService {
 		statuses.add("CHECKED-IN");
 		
 		List<Parking> parkings = parkingRepository.findAllByStatusIn(statuses);
+		Map<Long, List<ParkingBillReceivable>> parkingBillReceivablesByParking = getParkingBillReceivablesByParking(parkings);
+		Map<Long, List<ParkingServiceBillReceivable>> parkingServiceBillReceivablesByParking = getParkingServiceBillReceivablesByParking(parkings);
 		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
 
 		for(Parking parking : parkings) {
-			
-			boolean cleared = true;
-			
-			List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
-			if(!parkingBillReceivables.isEmpty() && cleared == true) {
-				for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
-					if(!parkingBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
-						cleared = false;
-						break;
-					}
-				}
-			}
-			
-			List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking);
-			if(!parkingServiceBillReceivables.isEmpty() && cleared == true) {
-				for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
-					if(!parkingServiceBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
-						cleared = false;
-						break;
-					}
-				}
-			}
-			
-			
-			if(cleared) parkingResponses.add(parkingResponseDTOMapper(parking));	
-							
-		}		
+			boolean cleared = isCleared(
+					parkingBillReceivablesByParking.getOrDefault(parking.getId(), Collections.emptyList()),
+					parkingServiceBillReceivablesByParking.getOrDefault(parking.getId(), Collections.emptyList()));
+
+			if(cleared) parkingResponses.add(parkingResponseDTOMapper(parking, parkingBillReceivablesByParking, parkingServiceBillReceivablesByParking));
+		}
 		return parkingResponses;
 	}
-	
+
 	@Override
 	public List<ParkingResponseDTO> getTodayCheckedOut(HttpServletRequest request) {
 		
@@ -148,38 +189,19 @@ public class ParkingServiceController implements ParkingService {
 		LocalDateTime endOfYesterday = LocalDateTime.now().plusDays(1).with(LocalTime.MIN);
 
 		List<Parking> parkings = parkingRepository.findAllByStatusInAndCheckedOutDateTimeBetween(statuses, startOfToday, endOfYesterday);
-		
+
 		//List<Parking> parkings = parkingRepository.findAllByStatusInAndCheckedOutBetween(statuses, LocalDateTime.now().);
+		Map<Long, List<ParkingBillReceivable>> parkingBillReceivablesByParking = getParkingBillReceivablesByParking(parkings);
+		Map<Long, List<ParkingServiceBillReceivable>> parkingServiceBillReceivablesByParking = getParkingServiceBillReceivablesByParking(parkings);
 		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
 
 		for(Parking parking : parkings) {
-			
-			boolean cleared = true;
-			
-			List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
-			if(!parkingBillReceivables.isEmpty() && cleared == true) {
-				for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
-					if(!parkingBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
-						cleared = false;
-						break;
-					}
-				}
-			}
-			
-			List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking);
-			if(!parkingServiceBillReceivables.isEmpty() && cleared == true) {
-				for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
-					if(!parkingServiceBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
-						cleared = false;
-						break;
-					}
-				}
-			}
-			
-			
-			if(cleared) parkingResponses.add(parkingResponseDTOMapper(parking));	
-							
-		}		
+			boolean cleared = isCleared(
+					parkingBillReceivablesByParking.getOrDefault(parking.getId(), Collections.emptyList()),
+					parkingServiceBillReceivablesByParking.getOrDefault(parking.getId(), Collections.emptyList()));
+
+			if(cleared) parkingResponses.add(parkingResponseDTOMapper(parking, parkingBillReceivablesByParking, parkingServiceBillReceivablesByParking));
+		}
 		return parkingResponses;
 	}
 	
@@ -195,38 +217,19 @@ public class ParkingServiceController implements ParkingService {
 
 
 		List<Parking> parkings = parkingRepository.findAllByStatusInAndCheckedOutDateTimeBetween(statuses, before, now);
-		
+
 		//List<Parking> parkings = parkingRepository.findAllByStatusInAndCheckedOutBetween(statuses, LocalDateTime.now().);
+		Map<Long, List<ParkingBillReceivable>> parkingBillReceivablesByParking = getParkingBillReceivablesByParking(parkings);
+		Map<Long, List<ParkingServiceBillReceivable>> parkingServiceBillReceivablesByParking = getParkingServiceBillReceivablesByParking(parkings);
 		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
 
 		for(Parking parking : parkings) {
-			
-			boolean cleared = true;
-			
-			List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
-			if(!parkingBillReceivables.isEmpty() && cleared == true) {
-				for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
-					if(!parkingBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
-						cleared = false;
-						break;
-					}
-				}
-			}
-			
-			List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking);
-			if(!parkingServiceBillReceivables.isEmpty() && cleared == true) {
-				for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
-					if(!parkingServiceBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
-						cleared = false;
-						break;
-					}
-				}
-			}
-			
-			
-			if(cleared) parkingResponses.add(parkingResponseDTOMapper(parking));	
-							
-		}		
+			boolean cleared = isCleared(
+					parkingBillReceivablesByParking.getOrDefault(parking.getId(), Collections.emptyList()),
+					parkingServiceBillReceivablesByParking.getOrDefault(parking.getId(), Collections.emptyList()));
+
+			if(cleared) parkingResponses.add(parkingResponseDTOMapper(parking, parkingBillReceivablesByParking, parkingServiceBillReceivablesByParking));
+		}
 		return parkingResponses;
 	}
 	
@@ -251,19 +254,19 @@ public class ParkingServiceController implements ParkingService {
 		List<String> statuses = new ArrayList<>();
 		statuses.add("CHECKED-IN");
 		
-		List<Parking> parkings = parkingRepository.findAllByStatusIn(statuses);
-		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+		// Load only the bills with a requested discount, instead of every bill of every checked-in parking
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByDiscountStatusAndParking_StatusIn("Requested", statuses);
+		Map<Long, Parking> parkings = new LinkedHashMap<>();
+		for(ParkingBillReceivable pbr : parkingBillReceivables) {
+			if(pbr.getDiscountStatus() != null && pbr.getDiscountStatus().equals("Requested")) {
+				parkings.putIfAbsent(pbr.getParking().getId(), pbr.getParking());
+			}
+		}
 
-		for(Parking parking : parkings) {
-			
-			List<ParkingBillReceivable> pbrs = parkingBillReceivableRepository.findByParking(parking);
-			for(ParkingBillReceivable pbr : pbrs) {
-				if(pbr.getDiscountStatus() != null && pbr.getDiscountStatus().equals("Requested")) {
-					parkingResponses.add(parkingResponseDTOMapper(parking));
-					break;
-				}
-			}							
-		}		
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+		for(Parking parking : parkings.values()) {
+			parkingResponses.add(parkingResponseDTOMapper(parking));
+		}
 		return parkingResponses;
 	}
 
@@ -283,7 +286,7 @@ public class ParkingServiceController implements ParkingService {
 			throw new NotFoundException("Parking not found");
 		}
 		
-		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking_.get()));
 		
 		List<ParkingBillReceivableResponseDTO> parkingBillReceivableResponses = new ArrayList<>();
 		
@@ -533,7 +536,7 @@ public class ParkingServiceController implements ParkingService {
 		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), branch_.get());
 		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
 		
-		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking_.get()));
 		
 		if(!parkingBillReceivables.isEmpty()) {
 			throw new InvalidOperationException("Cannot proceed with modification as there are already existing bills.");
@@ -609,6 +612,13 @@ public class ParkingServiceController implements ParkingService {
 	}
 
 	private ParkingResponseDTO parkingResponseDTOMapper(Parking parking) {
+		return parkingResponseDTOMapper(parking, null, null);
+	}
+
+	// Takes the bills from the preloaded maps when given, otherwise queries them for this parking
+	private ParkingResponseDTO parkingResponseDTOMapper(Parking parking,
+			Map<Long, List<ParkingBillReceivable>> parkingBillReceivablesByParking,
+			Map<Long, List<ParkingServiceBillReceivable>> parkingServiceBillReceivablesByParking) {
 		ParkingResponseDTO parkingResponse = new ParkingResponseDTO();
 		
 		parkingResponse.setId(String.valueOf(parking.getId()));
@@ -684,8 +694,12 @@ public class ParkingServiceController implements ParkingService {
 		if(parking.getStatus().equals("CHECKED-OUT")) {
 			List<ServiceBillItem> items = new ArrayList<>();
 		
-			List<ParkingBillReceivable> pbs = parkingBillReceivableRepository.findAllByParking(parking);
-			List<ParkingServiceBillReceivable> psbs = parkingServiceBillReceivableRepository.findAllByParking(parking);
+			List<ParkingBillReceivable> pbs = parkingBillReceivablesByParking != null
+					? parkingBillReceivablesByParking.getOrDefault(parking.getId(), Collections.emptyList())
+					: parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking));
+			List<ParkingServiceBillReceivable> psbs = parkingServiceBillReceivablesByParking != null
+					? parkingServiceBillReceivablesByParking.getOrDefault(parking.getId(), Collections.emptyList())
+					: parkingServiceBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking));
 			int sn = 1;
 			for(ParkingBillReceivable pbr : pbs) {
 				ServiceBillItem sbi = new ServiceBillItem();
@@ -857,7 +871,7 @@ public class ParkingServiceController implements ParkingService {
 //		if(vehicleEquipmentType_.isEmpty()) throw new NotFoundException("Vehicle or equipment type not found");
 		
 		
-		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking_.get()));
 		LocalDateTime lastDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
 		LocalDateTime lastBillDate = LocalDateTime.now().toLocalDate().atStartOfDay();
 		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
@@ -870,7 +884,7 @@ public class ParkingServiceController implements ParkingService {
 			throw new InvalidOperationException("Could not checkout. Some parking days have not been billed. Please generate and clear bills");
 		}
 		
-		List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking_.get());
+		List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking_.get()));
 		for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
 			if(parkingServiceBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.UNPAID)) {
 				throw new InvalidOperationException("Can not check out, bills  not cleared");
@@ -933,7 +947,7 @@ public class ParkingServiceController implements ParkingService {
 			 */
 			if(parking.getStartBillingAt().isBefore(startedAt)) {
 				
-				List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findByParking(parking);
+				List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking));
 				// Now check for intersection
 				for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
 					if(startedAt.isAfter(parkingBillReceivable.getStartedAt()) && startedAt.isBefore(parkingBillReceivable.getEndedAt().plusDays(1))) {
@@ -1051,7 +1065,7 @@ public class ParkingServiceController implements ParkingService {
 		Optional<Branch> branch_ = branchRepository.findById(userService.getUserBranch(request).getId());
 		if(branch_.isEmpty()) throw new NotFoundException("Branch not found");
 			
-		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking_.get()));
 		
 		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
 			if(parkingBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {

@@ -2,6 +2,7 @@ package com.orbix.api.modules.weighbridge;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -47,6 +48,7 @@ public class WeighBillReceivableResource {
 	private final WeighBillReceivableService weighBillReceivableService;
 	
 	@GetMapping("/weigh_bill_receivables/get_all_by_weigh")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<WeighBillReceivableResponseDTO>> getAllByWeigh(
 			@RequestParam(name = "weigh_id") Long weighId,
 			HttpServletRequest request)
@@ -55,6 +57,7 @@ public class WeighBillReceivableResource {
 	}
 	
 	@GetMapping("/weigh_bills/get_by_weigh_id")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<WeighBillReceivableResponseDTO>>getAllByWeighId(@RequestParam(name = "weigh_id") Long weighId, HttpServletRequest request){
 		
 		Optional<Weigh> weigh_ = weighRepository.findById(weighId);
@@ -62,7 +65,7 @@ public class WeighBillReceivableResource {
 			throw new NotFoundException("Weigh not found");
 		}
 		
-		List<WeighBillReceivable> bills = weighBillReceivableRepository.findByWeigh(weigh_.get());
+		List<WeighBillReceivable> bills = weighBillReceivableRepository.findAllByWeighIn(Collections.singletonList(weigh_.get()));
 		
 		List<WeighBillReceivableResponseDTO> list = new ArrayList<>();
 		

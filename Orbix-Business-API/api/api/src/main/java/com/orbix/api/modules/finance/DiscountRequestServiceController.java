@@ -52,27 +52,19 @@ public class DiscountRequestServiceController implements DiscountRequestService 
 	
 	@Override
 	public List<DiscountRequestResponseDTO> getRequests(Long serviceId, String serviceName, HttpServletRequest request) {
+		// Only the bill ids are needed, so load the ids instead of every bill with its related records
 		List<Long> ids = new ArrayList<>();
 		if(serviceName.equals("Parking")) {
 			Optional<Parking> parking_ = parkingRepository.findById(serviceId);
-			List<ParkingBillReceivable> pbrs = parkingBillReceivableRepository.findByParking(parking_.get());
-			for(ParkingBillReceivable pbr : pbrs) {
-				ids.add(pbr.getId());
-			}
+			ids.addAll(parkingBillReceivableRepository.getIdsByParking(parking_.get()));
 		}
 		if(serviceName.equals("Storage")) {
 			Optional<Storage> storage_ = storageRepository.findById(serviceId);
-			List<StorageBillReceivable> sbrs = storageBillReceivableRepository.findByStorage(storage_.get());
-			for(StorageBillReceivable sbr : sbrs) {
-				ids.add(sbr.getId());
-			}
+			ids.addAll(storageBillReceivableRepository.getIdsByStorage(storage_.get()));
 		}
 		if(serviceName.equals("Bond")) {
 			Optional<BondItem> bondItem_ = bondItemRepository.findById(serviceId);
-			List<BondItemBillReceivable> sbrs = bondItemBillReceivableRepository.findByBondItem(bondItem_.get());
-			for(BondItemBillReceivable sbr : sbrs) {
-				ids.add(sbr.getId());
-			}
+			ids.addAll(bondItemBillReceivableRepository.getIdsByBondItem(bondItem_.get()));
 		}
 		List<DiscountRequestResponseDTO> responses = new ArrayList<>();		
 		List<DiscountRequest> requests = discountRequestRepository.findAllByServiceBillIdInAndServiceBillName(ids, serviceName);	

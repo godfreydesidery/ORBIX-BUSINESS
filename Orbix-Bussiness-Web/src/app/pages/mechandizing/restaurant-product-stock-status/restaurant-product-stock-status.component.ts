@@ -15,9 +15,9 @@ import { HttpHeaders } from '@angular/common/http';
 import { IProduct } from 'src/app/domain/product';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { IRestaurantProduct } from 'src/app/domain/restaurant-product';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
 const API_URL = environment.apiUrl;
 
@@ -35,6 +35,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './restaurant-product-stock-status.component.scss'
 })
 export class RestaurantProductStockStatusComponent {
+  trackById = trackById
 restaurantId: number;
 
   restaurantProducts : IRestaurantProduct[] = []

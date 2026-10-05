@@ -8,6 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -32,7 +33,9 @@ import lombok.ToString;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "restaurant_sales")
+@Table(name = "restaurant_sales", indexes = {
+		@Index(name = "ix_restaurant_sales_created_date_time", columnList = "createdDateTime")
+})
 public class RestaurantSale {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -47,7 +50,9 @@ public class RestaurantSale {
 	
 	private LocalDateTime createdDateTime = LocalDateTime.now();
 	
-	@OneToMany(targetEntity = RestaurantSaleDetail.class, mappedBy = "restaurantSale", fetch = FetchType.EAGER, orphanRemoval = true)
+	// Loaded only when read, so lists do not load the lines of every document
+	@OneToMany(targetEntity = RestaurantSaleDetail.class, mappedBy = "restaurantSale", fetch = FetchType.LAZY, orphanRemoval = true)
+	@ToString.Exclude
     @Valid
     @JsonIgnoreProperties("restaurantSale")
 	@Fetch(FetchMode.SUBSELECT)

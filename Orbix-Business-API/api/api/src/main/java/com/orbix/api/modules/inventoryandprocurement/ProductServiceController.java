@@ -1,15 +1,21 @@
 package com.orbix.api.modules.inventoryandprocurement;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.orbix.api.api.commons.PageResponseDTO;
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
@@ -48,7 +54,7 @@ public class ProductServiceController implements ProductService {
 	 */
 	@Override
 	public List<ProductResponseDTO> getAllProductes(HttpServletRequest request) {
-		List<Product> products = productRepository.findAll();
+		List<Product> products = productRepository.findAll(Sort.by("id")); // same order as the paged list
 		List<ProductResponseDTO> productResponses = new ArrayList<>();
 
 		for(Product product : products) {
@@ -56,6 +62,22 @@ public class ProductServiceController implements ProductService {
 		}		
 		return productResponses;
 	}
+
+	@Override
+	public PageResponseDTO<ProductResponseDTO> getProductPage(int page, int size, HttpServletRequest request) {
+		// One page of the list, in the same order as the full list (by id)
+		int pageSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+		PageRequest pageRequest = PageRequest.of(Math.min(Math.max(page, 0), Integer.MAX_VALUE / pageSize), pageSize, Sort.by("id"));
+		Page<Product> products = productRepository.findAll(pageRequest);
+		List<ProductResponseDTO> productResponses = new ArrayList<>();
+
+		for(Product product : products) {
+			productResponses.add(productResponseDTOMapper(product));
+		}
+		return new PageResponseDTO<>(productResponses, products.getTotalElements());
+	}
+	
+	private static final int MAX_PAGE_SIZE = 100;
 
 	/**
 	 * 
@@ -299,11 +321,23 @@ public class ProductServiceController implements ProductService {
 	    List<Product> products = productRepository.findAllByCompanyAndSellable(company, true);
 	    List<ProductResponseDTO> productResponses = new ArrayList<>();
 	    
+	    // How many times each product is already in the shop, loaded once instead of one look-up per product
+	    Map<Long, Integer> shopProductCounts = new HashMap<>();
+	    for(Long productId : shopProductRepository.getProductIdsByShop(shop)) {
+	    	shopProductCounts.merge(productId, 1, Integer::sum);
+	    }
+	    
 	    for(Product product : products) {
 	    	boolean imported = false;
-	    	Optional<ShopProduct> shopProduct_ = shopProductRepository.findByProductAndShop(product, shop);
-	    	if(shopProduct_.isPresent()) {
+	    	int shopProductCount = shopProductCounts.getOrDefault(product.getId(), 0);
+	    	if(shopProductCount == 1) {
 	    		imported = true;
+	    	}else if(shopProductCount > 1) {
+	    		// Not expected; keep the original look-up so the outcome stays the same
+	    		Optional<ShopProduct> shopProduct_ = shopProductRepository.findByProductAndShop(product, shop);
+	    		if(shopProduct_.isPresent()) {
+	    			imported = true;
+	    		}
 	    	}	    	
 	    	productResponses.add(productResponseDTOMapperWithImportedStatus(product, imported));
 	    	
@@ -329,11 +363,23 @@ public class ProductServiceController implements ProductService {
 	    List<Product> products = productRepository.findAllByCompanyAndSellable(company, true);
 	    List<ProductResponseDTO> productResponses = new ArrayList<>();
 	    
+	    // How many times each product is already in the restaurant, loaded once instead of one look-up per product
+	    Map<Long, Integer> restaurantProductCounts = new HashMap<>();
+	    for(Long productId : restaurantProductRepository.getProductIdsByRestaurant(restaurant)) {
+	    	restaurantProductCounts.merge(productId, 1, Integer::sum);
+	    }
+	    
 	    for(Product product : products) {
 	    	boolean imported = false;
-	    	Optional<RestaurantProduct> restaurantProduct_ = restaurantProductRepository.findByProductAndRestaurant(product, restaurant);
-	    	if(restaurantProduct_.isPresent()) {
+	    	int restaurantProductCount = restaurantProductCounts.getOrDefault(product.getId(), 0);
+	    	if(restaurantProductCount == 1) {
 	    		imported = true;
+	    	}else if(restaurantProductCount > 1) {
+	    		// Not expected; keep the original look-up so the outcome stays the same
+	    		Optional<RestaurantProduct> restaurantProduct_ = restaurantProductRepository.findByProductAndRestaurant(product, restaurant);
+	    		if(restaurantProduct_.isPresent()) {
+	    			imported = true;
+	    		}
 	    	}	    	
 	    	productResponses.add(productResponseDTOMapperWithImportedStatus(product, imported));
 	    	

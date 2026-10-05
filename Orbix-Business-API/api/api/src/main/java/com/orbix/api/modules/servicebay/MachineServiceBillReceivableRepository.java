@@ -13,4 +13,6 @@ public interface MachineServiceBillReceivableRepository extends JpaRepository<Ma
 
 	Optional<MachineServiceBillReceivable> findByBillReceivable(BillReceivable billReceivable);
 
+	List<MachineServiceBillReceivable> findAllByBillReceivableIn(List<BillReceivable> billReceivables);
+
 }

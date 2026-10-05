@@ -8,8 +8,12 @@ import java.util.stream.Collectors;
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.orbix.api.api.commons.PageResponseDTO;
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.InvalidOperationException;
@@ -42,7 +46,7 @@ public class ServiceServiceController implements ServiceService {
 	 */
 	@Override
 	public List<ServiceResponseDTO> getAllServicels(HttpServletRequest request) {
-		List<Servicel> services = serviceRepository.findAll();
+		List<Servicel> services = serviceRepository.findAll(Sort.by("id")); // same order as the paged list
 		List<ServiceResponseDTO> serviceResponses = new ArrayList<>();
 
 		for(Servicel service : services) {
@@ -50,6 +54,22 @@ public class ServiceServiceController implements ServiceService {
 		}		
 		return serviceResponses;
 	}
+
+	@Override
+	public PageResponseDTO<ServiceResponseDTO> getServicePage(int page, int size, HttpServletRequest request) {
+		// One page of the list, in the same order as the full list (by id)
+		int pageSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+		PageRequest pageRequest = PageRequest.of(Math.min(Math.max(page, 0), Integer.MAX_VALUE / pageSize), pageSize, Sort.by("id"));
+		Page<Servicel> services = serviceRepository.findAll(pageRequest);
+		List<ServiceResponseDTO> serviceResponses = new ArrayList<>();
+
+		for(Servicel service : services) {
+			serviceResponses.add(serviceResponseDTOMapper(service));
+		}
+		return new PageResponseDTO<>(serviceResponses, services.getTotalElements());
+	}
+	
+	private static final int MAX_PAGE_SIZE = 100;
 
 	/**
 	 * 

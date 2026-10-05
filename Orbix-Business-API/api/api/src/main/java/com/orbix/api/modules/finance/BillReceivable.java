@@ -10,6 +10,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -29,7 +30,9 @@ import lombok.NoArgsConstructor;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "bill_receivables")
+@Table(name = "bill_receivables", indexes = {
+		@Index(name = "ix_bill_receivables_paid_status", columnList = "paidDateTime, payStatus")
+})
 public class BillReceivable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

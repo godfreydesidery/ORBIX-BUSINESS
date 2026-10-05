@@ -20,7 +20,7 @@
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchServices($event)" placeholder="Search..." style="max-width: 8cm;">
                     </div>
                 </div>
 
@@ -38,7 +38,7 @@
                             </tr>
                         </thead>
                         <tbody>        
-                            <tr *ngFor="let service of services | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                            <tr *ngFor="let service of services | searchFilter : filterRecords | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: allServicesLoaded ? undefined : totalServices }; trackBy: trackById">
                                 <td>{{service.sn}}</td>
                                 <td>{{service.code}}</td>
                                 <td>{{service.name}}</td>
@@ -55,7 +55,7 @@
                     </table>
                     <div class="row">
                         <div class="col-sm-12" style="text-align: right;">
-                            <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                            <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
                         </div>
                     </div>
                 </div>

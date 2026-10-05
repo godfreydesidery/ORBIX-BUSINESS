@@ -4,7 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -47,6 +50,7 @@ public class ParkingReportResource {
 	
 	
 	@PostMapping("/parking_reports/get_totals_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<ParkingTotalsResponseDTO>getTotalsByDates(
 			@RequestBody DateRange dateRange,
 			HttpServletRequest request){
@@ -76,8 +80,9 @@ public class ParkingReportResource {
 		checkOutStatuses.add("CHECKED-OUT");
 		parkingTotalsResponse.setCheckedOut(String.valueOf(parkingRepository.countByDateRangeAndCheckedOut(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atTime(LocalTime.MAX), checkOutStatuses)));
 		
-		parkingTotalsResponse.setCurrentUnpaid(String.valueOf(parkingRepository.countRegistered()));
-		parkingTotalsResponse.setCurrentTotalInYards(String.valueOf(parkingRepository.countRegistered()));
+		long registered = parkingRepository.countRegistered();
+		parkingTotalsResponse.setCurrentUnpaid(String.valueOf(registered));
+		parkingTotalsResponse.setCurrentTotalInYards(String.valueOf(registered));
 		
 		
 //		public long countPaidOrVerifiedBillsWithinDateRange(LocalDateTime startDate, LocalDateTime endDate) {
@@ -88,6 +93,7 @@ public class ParkingReportResource {
 	}
 	
 	@PostMapping("/parking_reports/get_registration_report")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<RegistrationResponseDTO>>getRegistrationReportByDateAndReceptionist(
 			@RequestBody DateRange dateRange,
 			@RequestParam(name = "nickname") String cashierName,
@@ -103,13 +109,13 @@ public class ParkingReportResource {
 			}
 		}
 		
-		List<Parking> parkings = new ArrayList<>();
+		List<IParkingRegistration> parkings = new ArrayList<>();
 		List<String> statuses = new ArrayList<>();
 		statuses.add("CHECKED-IN");
 		statuses.add("CHECKED-OUT");
 		if(user != null) {
 			
-			parkings = parkingRepository.findAllByCreatedByUserAndCreatedDateTimeBetweenAndStatusIn(
+			parkings = parkingRepository.getRegistrationReportByCreatedByUser(
 			        user, 
 			        dateRange.getFrom().atStartOfDay(),
 			        dateRange.getTo().atTime(LocalTime.MAX),
@@ -117,7 +123,7 @@ public class ParkingReportResource {
 			    );		
 					
 		}else {
-			parkings = parkingRepository.findAllByCreatedDateTimeBetweenAndStatusIn(
+			parkings = parkingRepository.getRegistrationReport(
 			        dateRange.getFrom().atStartOfDay(),
 			        dateRange.getTo().atTime(LocalTime.MAX),
 			        statuses
@@ -126,13 +132,13 @@ public class ParkingReportResource {
 		
 		List<RegistrationResponseDTO> registrationResponses = new ArrayList<>();
 		int sn = 1;
-		for(Parking parking : parkings) {
+		for(IParkingRegistration parking : parkings) {
 			RegistrationResponseDTO registrationResponse = new RegistrationResponseDTO();
 			registrationResponse.setChassisNo(parking.getChasisNo());
-			registrationResponse.setVehicleType(parking.getVehicleEquipmentType().getName());
+			registrationResponse.setVehicleType(parking.getVehicleEquipmentTypeName());
 			registrationResponse.setRegisteredDate(parking.getCreatedDateTime().toString());
-			registrationResponse.setRegisteredBy(parking.getCreatedByUser().getNickname());
-			registrationResponse.setKeyStatus(parking.isHasKeys() ? "YES" : "NO");
+			registrationResponse.setRegisteredBy(parking.getCreatedByNickname());
+			registrationResponse.setKeyStatus(parking.getHasKeys() ? "YES" : "NO");
 			registrationResponse.setSn(String.valueOf(sn));
 			registrationResponses.add(registrationResponse);
 			sn++;
@@ -141,7 +147,10 @@ public class ParkingReportResource {
 		
 	}
 	
+	private static final int IN_CLAUSE_CHUNK_SIZE = 1000;
+	
 	@PostMapping("/parking_reports/get_parking_report")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ParkingResponseDTO>>getParkingReportByDateAndReceptionist(
 			@RequestBody DateRange dateRange,
 			@RequestParam(name = "nickname") String cashierName,
@@ -179,6 +188,15 @@ public class ParkingReportResource {
 			    );	
 		}
 		
+		// Bills of all the parkings in the report, loaded in a few batched queries instead of one query per parking
+		Map<Long, List<ParkingBillReceivable>> parkingBillReceivablesByParking = new HashMap<>();
+		for(int i = 0; i < parkings.size(); i += IN_CLAUSE_CHUNK_SIZE) {
+			List<Parking> chunk = parkings.subList(i, Math.min(i + IN_CLAUSE_CHUNK_SIZE, parkings.size()));
+			for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivableRepository.findAllByParkingIn(chunk)) {
+				parkingBillReceivablesByParking.computeIfAbsent(parkingBillReceivable.getParking().getId(), k -> new ArrayList<>()).add(parkingBillReceivable);
+			}
+		}
+		
 		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
 		int sn = 1;
 		for(Parking parking : parkings) {
@@ -210,7 +228,7 @@ public class ParkingReportResource {
 			
 			
 			// Get pay status
-			List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
+			List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivablesByParking.getOrDefault(parking.getId(), Collections.emptyList());
 			
 			boolean inStartLimit = false;
 			boolean inEndLimit = false;
@@ -256,6 +274,7 @@ public class ParkingReportResource {
 	
 	
 	@PostMapping("/parking_reports/get_vehicle_equipment_removed_report")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<VehicleEquipmentRemovedResponseDTO>>getVehicleEquipmentRemovedReport(
 			@RequestBody DateRange dateRange,
 			HttpServletRequest request){

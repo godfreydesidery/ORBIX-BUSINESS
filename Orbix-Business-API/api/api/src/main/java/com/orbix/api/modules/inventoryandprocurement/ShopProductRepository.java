@@ -13,6 +13,9 @@ import com.orbix.api.modules.adminunits.Shop;
 
 public interface ShopProductRepository extends JpaRepository<ShopProduct, Long> {
 
+	@Query("SELECT sp.product.id FROM ShopProduct sp WHERE sp.shop = :shop")
+	List<Long> getProductIdsByShop(@Param("shop") Shop shop);
+
 	List<ShopProduct> findAllByShop(Object object);
 
 	Optional<ShopProduct> findByIdAndShop(Long id, Shop shop);

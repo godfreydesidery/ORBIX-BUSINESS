@@ -9,7 +9,8 @@ import { AuthService } from 'src/app/auth.service';
 import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { HttpHeaders } from '@angular/common/http';
 
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 
 import { environment } from 'src/environments/environment';
 import { ICashCollection, IStorageCashCollection } from 'src/app/domain/cash-collection';
@@ -19,9 +20,9 @@ import { TimePipe } from 'src/app/custom-pipes/time.pipe';
 
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
 const API_URL = environment.apiUrl;
 @Component({
@@ -39,6 +40,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './storage-report.component.scss'
 })
 export class StorageReportComponent {
+  trackById = trackById
 documentHeader! : any
 
   from : Date | string | null = null

@@ -14,7 +14,7 @@
                         <select class="form-control" [(ngModel)]="selectedWorkshopId"
                             (change)="onWorkshopChange($event)">
                             <option value=''></option>
-                            <option *ngFor="let workshop of availableWorkshops" [value]="workshop.id"
+                            <option *ngFor="let workshop of availableWorkshops; trackBy: trackById" [value]="workshop.id"
                                 style="font-size: larger;"><b>{{workshop.name}}</b></option>
                         </select>
                     </div>
@@ -190,7 +190,7 @@
                                             *ngIf="isDropdownOpen && filteredServices.length > 0"
                                             style="max-height: 200px; overflow-y: auto; width: 100%;">
                                             <button class="dropdown-item form-control" style="font-weight: bold;"
-                                                *ngFor="let dineable of filteredServices"
+                                                *ngFor="let dineable of filteredServices; trackBy: trackById"
                                                 (click)="selectService(dineable)">
                                                 {{ dineable.name }}
                                             </button>
@@ -231,7 +231,7 @@
                             </tr>
                         </thead>
                         <thead>
-                            <tr *ngFor="let s of machineServices">
+                            <tr *ngFor="let s of machineServices; trackBy: trackById">
                                 <td>{{s.sn}}</td>
                                 <td>{{s.serviceName}}</td>
                                 <td>{{s.qty}}</td>
@@ -271,7 +271,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let machine of machines | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index">
+                                    *ngFor="let machine of machines | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index; trackBy: trackById">
                                     <td>{{machine.sn}}</td>
                                     <td>{{machine.no}}</td>
                                     <td>{{machine.ownerName}}</td>
@@ -327,7 +327,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let storage of storages | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index">
+                                    *ngFor="let storage of storages | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index; trackBy: trackById">
                                     <td>{{storage.sn}}</td>
                                     <td>{{storage.no}}</td>
                                     <td>{{storage.goodName}}</td>
@@ -485,7 +485,7 @@
                                     <label>Select Good Type</label>
                                     <select class="form-control" [(ngModel)]="goodTypeName">
                                         <option></option>
-                                        <option *ngFor="let option of goodTypes" [value]="option.name">{{
+                                        <option *ngFor="let option of goodTypes; trackBy: trackById" [value]="option.name">{{
                                             option.name }}
                                         </option>
                                     </select>
@@ -621,7 +621,7 @@
                                     <label>Select Good Type</label>
                                     <select class="form-control" [(ngModel)]="goodTypeName">
                                         <option></option>
-                                        <option *ngFor="let option of goodTypes" [value]="option.name">{{
+                                        <option *ngFor="let option of goodTypes; trackBy: trackById" [value]="option.name">{{
                                             option.name }}
                                         </option>
                                     </select>
@@ -848,7 +848,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let release of releases">
+                        <tr *ngFor="let release of releases; trackBy: trackById">
                             <td>{{release.no}}</td>
                             <td>{{release.releaseDate | date: 'dd-MM-yyyy'}}</td>
                             <td>{{release.qty}}</td>

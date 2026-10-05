@@ -15,7 +15,7 @@
                             <select class="form-control" [(ngModel)]="selectedRestaurantId"
                                 (change)="onRestaurantChange($event)">
                                 <option value=''></option>
-                                <option *ngFor="let restaurant of availableRestaurants" [value]="restaurant.id"
+                                <option *ngFor="let restaurant of availableRestaurants; trackBy: trackById" [value]="restaurant.id"
                                     style="font-size: larger;">Restaurant name: <b>{{restaurant.name}}</b> Location:
                                     {{restaurant.locationName}}</option>
                             </select>
@@ -148,7 +148,7 @@
                                 </thead>
                                 <tbody>
                                     <tr
-                                        *ngFor="let lpo of lpos | searchFilter : filterLpoRecords | paginate: { itemsPerPage: 10, currentPage: lpoPage }">
+                                        *ngFor="let lpo of lpos | searchFilter : filterLpoRecords | paginate: { itemsPerPage: 10, currentPage: lpoPage }; trackBy: trackById">
                                         <td>{{ lpo.no }}</td>
                                         <td>{{ lpo.supplierName }}</td>
                                         <td>{{ lpo.status }}</td>
@@ -210,7 +210,7 @@
                                 </thead>
                                 <tbody>
                                     <tr
-                                        *ngFor="let grn of grns | searchFilter : filterGrnRecords | paginate: { itemsPerPage: 10, currentPage: grnPage }">
+                                        *ngFor="let grn of grns | searchFilter : filterGrnRecords | paginate: { itemsPerPage: 10, currentPage: grnPage }; trackBy: trackById">
                                         <td>{{grn.no}}</td>
                                         <td>{{grn.supplierName}}</td>
                                         <td>{{grn.status}}</td>

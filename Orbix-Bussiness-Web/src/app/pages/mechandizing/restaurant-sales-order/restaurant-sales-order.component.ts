@@ -20,9 +20,9 @@ import { IDineable } from 'src/app/domain/dineable';
 import { IRestaurantSalesOrder, IRestaurantSalesOrderDetail } from 'src/app/domain/restaurant-sales-order';
 import { IRestaurantAgent } from 'src/app/domain/restaurant-agent';
 import { error } from 'src/custom-packages/util';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 @Component({
@@ -39,6 +39,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './restaurant-sales-order.component.scss'
 })
 export class RestaurantSalesOrderComponent {
+  trackById = trackById
   restaurantId: number;
 
   restaurantDineables: IRestaurantDineable[] = []
@@ -111,26 +112,33 @@ export class RestaurantSalesOrderComponent {
   filteredDineables: any[] = [];
   selectedDineable: any | null = null;
   isDropdownOpen: boolean = false;
+  searchTimer: any = null
+
   searchDineables(): void {
     const options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
 
     }
     this.filteredDineables = [];
+    clearTimeout(this.searchTimer)
     if (this.searchTerm.trim().length >= 2) {
-      this.http
-        //await this.http.get<IDineable[]>(API_URL+'/restaurant_dineables/get_dineables_by_restaurant_containing?dineable_name_like=' + searchKey + '&restaurant_id=' + this.restaurantId , options)
-        .get<IDineable[]>(API_URL + '/restaurant_dineables/get_dineables_by_restaurant_containing?dineable_name_like=' + this.searchTerm + '&restaurant_id=' + this.restaurantId, options)
-        .subscribe(
-          (data) => (this.filteredDineables = data),
-          (error) => console.error('Error fetching dineables:', error)
-        );
+      // Wait for a short pause in typing before asking the server (each keystroke restarts the wait)
+      this.searchTimer = setTimeout(() => {
+        this.http
+          //await this.http.get<IDineable[]>(API_URL+'/restaurant_dineables/get_dineables_by_restaurant_containing?dineable_name_like=' + searchKey + '&restaurant_id=' + this.restaurantId , options)
+          .get<IDineable[]>(API_URL + '/restaurant_dineables/get_dineables_by_restaurant_containing?dineable_name_like=' + this.searchTerm + '&restaurant_id=' + this.restaurantId, options)
+          .subscribe(
+            (data) => (this.filteredDineables = data),
+            (error) => console.error('Error fetching dineables:', error)
+          );
+      }, 300)
     } else {
       this.filteredDineables = [];
     }
   }
 
   selectDineable(dineable: any): void {
+    clearTimeout(this.searchTimer) // a search still waiting would refill the list after the selection
     this.selectedDineable = dineable;
     this.searchTerm = dineable.name;
     this.isDropdownOpen = false;

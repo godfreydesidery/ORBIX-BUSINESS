@@ -5,9 +5,11 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface DineableService {
 	List<DineableResponseDTO> getAllDineablees(HttpServletRequest request);
+	PageResponseDTO<DineableResponseDTO> getDineablePage(int page, int size, HttpServletRequest request);
 	DineableResponseDTO get(Long id, HttpServletRequest request);
 	DineableResponseDTO getCompanyDineable(Long dineableId, HttpServletRequest request);
 	DineableResponseDTO createDineable(DineableRequestDTO dineable, HttpServletRequest request);

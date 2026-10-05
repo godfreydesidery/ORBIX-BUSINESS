@@ -10,6 +10,7 @@ import { IBondItemType } from 'src/app/domain/bond-item-type';
 
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 
@@ -26,6 +27,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './bond-item-type.component.scss'
 })
 export class BondItemTypeComponent {
+  trackById = trackById
 
   /**Data */
   id : any = null

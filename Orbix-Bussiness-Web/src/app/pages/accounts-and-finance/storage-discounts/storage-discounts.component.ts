@@ -15,9 +15,10 @@ import { IStorageBillReceivable } from 'src/app/domain/bill-receivable';
 import { IBillView } from 'src/app/domain/bill-view';
 import { DataService } from '@services/custom/data.service';
 import { IServiceBillItem } from 'src/app/domain/maintenance';
-import * as pdfMake from 'pdfmake/build/pdfmake';
+import { trackById } from 'src/app/common/utils/track-by-id';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 
@@ -36,6 +37,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './storage-discounts.component.scss'
 })
 export class StorageDiscountsComponent {
+  trackById = trackById
   page: number = 1; // Initialize the current page to 1
 
   filterRecords: string = ''
@@ -527,6 +529,14 @@ export class StorageDiscountsComponent {
 
           this.msg.showSuccessMessage('Checked out Successifully')
 
+          // A checked out item leaves the checked-in list, so remove its row instead of reloading the whole list
+          this.storages = this.storages.filter(element => element.id != id)
+          var sn = 1
+          this.storages.forEach(element => {
+            element.sn = sn
+            sn = sn + 1
+          })
+
           this.printGatePassRcpt(data!.serviceBillItems, '', 0);
         }
       )
@@ -534,9 +544,9 @@ export class StorageDiscountsComponent {
         error => {
           console.log(error)
           this.msg.showErrorMessage(error, 'Error')
+          this.getAllCheckedInStorages()
         }
       )
-    this.getAllCheckedInStorages()
   }
 
   lastBillingDate: string = ''
@@ -568,8 +578,8 @@ export class StorageDiscountsComponent {
 
   printGatePassRcpt = async (billItems: IServiceBillItem[], receiptNo: string, cash: number) => {
 
-    await this.get(this.storageId)
-    await this.getLastBillingDate(this.storageId)
+    // The record and its last billing date are independent, so they are loaded together
+    await Promise.all([this.get(this.storageId), this.getLastBillingDate(this.storageId)])
 
     var companyName = localStorage.getItem('company-name')!
 
@@ -583,20 +593,6 @@ export class StorageDiscountsComponent {
     // var address : any = await this.data.getReceiptHeader(receiptNo)
     var address: any = await this.data.getBranchReceiptHeaderWithNoTinAndVrn(receiptNo)
 
-    // Set up VFS for pdfMake - try different approaches
-    try {
-      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
-      // Try different possible structures
-      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
-      } else if (vfsFonts.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.vfs;
-      } else {
-        (window as any).pdfMake.vfs = vfsFonts;
-      }
-    } catch (error) {
-      console.log('VFS setup failed, continuing without custom fonts:', error);
-    }
 
     var receipt = [
       [

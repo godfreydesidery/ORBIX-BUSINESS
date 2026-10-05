@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -46,7 +47,8 @@ public class WeighBillReceivableServiceController implements WeighBillReceivable
 		Weigh weigh = weighRepository.findById(weighId)
 				.orElseThrow(() -> new NotFoundException("Weigh with ID " + weighId + " not found."));
 
-		List<WeighBillReceivable> weighBillReceivables = weighBillReceivableRepository.findAllByWeigh(weigh);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<WeighBillReceivable> weighBillReceivables = weighBillReceivableRepository.findAllByWeighIn(Collections.singletonList(weigh));
 
 		List<WeighBillReceivableResponseDTO> weighBillReceivableResponses = new ArrayList<>();
 		for (WeighBillReceivable weighBillReceivable : weighBillReceivables) {

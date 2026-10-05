@@ -42,7 +42,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                        <tr *ngFor="let p of maintenances | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                        <tr *ngFor="let p of maintenances | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                             <td>{{p.sn}}</td>
                                             <td>{{p.no}}</td>
                                             <td>{{p.ownerFirstName}} {{p.ownerLastName}}</td>
@@ -131,7 +131,7 @@
                                     <label>Issue Type</label>
                                     <select class="form-control" [(ngModel)]="maintenanceJobCardIssueTypeName">
                                         <option></option>
-                                        <option *ngFor="let maintenanceIssueType of maintenanceIssueTypes">{{maintenanceIssueType.name}}</option>
+                                        <option *ngFor="let maintenanceIssueType of maintenanceIssueTypes; trackBy: trackById">{{maintenanceIssueType.name}}</option>
                                     </select>
                                 </div>                       
                             </div>
@@ -140,7 +140,7 @@
                                     <label>Technician</label>
                                     <select class="form-control" [(ngModel)]="maintenanceJobCardIssueSpecialistUser">
                                         <option></option>
-                                        <option *ngFor="let serviceSpecialist of serviceSpecialists">{{serviceSpecialist.nickname}}</option>
+                                        <option *ngFor="let serviceSpecialist of serviceSpecialists; trackBy: trackById">{{serviceSpecialist.nickname}}</option>
                                     </select>
                                 </div>                       
                             </div>
@@ -187,7 +187,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                                <tr *ngFor="let m of maintenanceJobCard.maintenanceJobCardIssues">
+                                                <tr *ngFor="let m of maintenanceJobCard.maintenanceJobCardIssues; trackBy: trackById">
                                                     <td>{{m.no}}</td>
                                                     <td>{{m.name}}</td>
                                                     <td>{{m.description}}</td>
@@ -569,7 +569,7 @@
                             </select> -->
                             <input class="form-control" type="text" list="venames" [(ngModel)]="vehicleEquipmentTypeName"/>
                                     <datalist id="venames">
-                                        <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
+                                        <option *ngFor="let option of vehicleEquipmentTypes; trackBy: trackById" [value]="option.name">
                                     </datalist>
                         </div>
                     </div>                   
