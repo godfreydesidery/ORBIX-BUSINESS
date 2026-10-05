@@ -83,18 +83,20 @@ The `AuditLog` entity is created automatically, with its indexes, by `ddl-auto=u
 
 ### 5.1 One service
 
-`AuditService`, in the new package `com.orbix.api.modules.audit`:
+`AuditLogService` (implemented by `AuditLogServiceController`), in the new package `com.orbix.api.modules.audit`:
 
 ```java
-void record(String category, String action, String entityType, Object entityId, String entityRef,
-            String summary, Map<String, Object> details);          // SUCCESS, current user
-void recordChange(String category, String action, String entityType, Object entityId, String entityRef,
-            String summary, Map<String, Object> before, Map<String, Object> after);
-void recordAuth(String action, String outcome, String username, User user, String reason);  // login events
+// A critical action of the current user, saved once the action's transaction commits;
+// afterCommit (optional) completes the entry just before it is saved, e.g. with values read after the commit
+void recordAction(AuditLog auditLog, Consumer<AuditLog> afterCommit);
+// Sign-in events and refused requests, saved in the background
+void recordAuth(String action, String outcome, String username, String reason, String ipAddress, String forwardedFor, String userAgent);
+void recordAccessDenied(String username, String path, String ipAddress, String forwardedFor, String userAgent);
 ```
 
-- **Acting user:** taken from the request-scoped memo `UserServiceController.getCurrentUser(request)`, which already exists, so recording costs no extra user query.
-- **IP address and browser:** taken from the current `HttpServletRequest`.
+- **No part in the action's transaction:** the service is deliberately not transactional at class level. Each entry is saved in a transaction of its own, and any failure there is logged and never reaches the action.
+- **Acting user:** the username is taken from the request. The user's record (id, company, branch) is looked up when the entry is saved, in the entry's own transaction, so a missing or renamed user can never affect the action.
+- **IP address and browser:** the connection's remote address, which the client cannot fake. Any `X-Forwarded-For` header is kept in the details as `forwardedFor`, not trusted as the address.
 - **Insert only:** `AuditLogRepository` has no update or delete, and no endpoint changes or removes entries.
 
 ### 5.2 Logins (`AUTH`)
@@ -124,7 +126,7 @@ public BillReceivable confirmBillPayment(...) { ... }
 
 **Sign-in events and access denials are written in the background** (`@Async`, on a small pool named `auditExecutor`), so signing in never waits on the audit log.
 
-Failed critical actions are not logged (decision D5); validation failures such as "bills not cleared" would only add noise. The one exception is `ACCESS_DENIED`: a 403 from `@PreAuthorize` is recorded by an `AccessDeniedHandler` as `SECURITY` / `FAILURE`.
+Failed critical actions are not logged (decision D5); validation failures such as "bills not cleared" would only add noise. The one exception is `ACCESS_DENIED`: a request refused by `@PreAuthorize` is recorded as `SECURITY` / `FAILURE` by the application's global exception handler, which already answers it, so the response is unchanged.
 
 ### 5.4 Before and after values
 
@@ -137,8 +139,8 @@ The same annotation handles edits, with no change to the service code:
 ```
 
 How it works:
-- **Before the action**, the aspect reads the record named by `changeOf` and `changeId`. It takes the record's own columns, plus the ids of the records it points to, from the JPA metamodel.
-- **After the action**, it reads them again and keeps only the columns that changed, as `before` and `after`. If the record was deleted, everything it held is kept as `before`.
+- **Before the action**, the aspect reads the record named by `changeOf` and `changeId`, in a short read-only transaction of its own. It takes the record's own columns, plus the ids of the records it points to, from the JPA metamodel.
+- **After the action has committed**, it reads them again, in the entry's own transaction, and keeps only the columns that changed, as `before` and `after`. If the record was deleted, everything it held is kept as `before`. Neither read takes part in the action's transaction, so neither can affect it.
 - **Price changes:** when a changed column matches `changedFieldPattern`, the entry is recorded as `changedAction` (for example `PRICE_CHANGED`) instead of `action`.
 - **Reference:** `{ref}` in a summary is the record's number, code, username or name.
 - **Safety:** reading the record before and after never throws, and the action's result and exceptions pass through unchanged.
@@ -237,7 +239,7 @@ Rules:
 
 ## 10. Performance
 
-- **Writes:** one small insert per critical action (right after it commits) or per sign-in event (in the background), with no extra user query.
+- **Writes:** per critical action, after it commits: one user look-up and one insert, plus for edits one read of the record before and one after. Per sign-in event, the same look-up and insert in the background.
 - **Reads:** only from the audit screens, which are paged and indexed.
 - **Growth:** roughly logins plus critical actions per day, small next to bills and collections, and bounded by retention.
 
