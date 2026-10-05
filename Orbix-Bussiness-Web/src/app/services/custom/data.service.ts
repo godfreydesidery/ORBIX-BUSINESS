@@ -100,7 +100,8 @@ export class DataService {
   cachedCompanyProfileToken : string = ''
 
   async getLogo() : Promise<string> {
-    if (this.cachedLogo !== '' && this.cachedLogoToken === this.auth.user?.access_token) {
+    const token = this.auth.user?.access_token
+    if (this.cachedLogo !== '' && this.cachedLogoToken === token) {
       return this.cachedLogo
     }
     var logo : any = ''
@@ -112,7 +113,7 @@ export class DataService {
         var base64Data = retrieveResponse.logo
         logo = 'data:image/png;base64,'+base64Data
         this.cachedLogo = logo
-        this.cachedLogoToken = this.auth.user?.access_token
+        this.cachedLogoToken = token
       }
     )
     .catch(error => {
@@ -160,7 +161,8 @@ export class DataService {
 
 
   async getCompanyProfile() {
-    if (this.cachedCompanyProfileToken !== '' && this.cachedCompanyProfileToken === this.auth.user?.access_token) {
+    const token = this.auth.user?.access_token
+    if (this.cachedCompanyProfileToken !== '' && this.cachedCompanyProfileToken === token) {
       return
     }
     var company! : ICompany
@@ -174,7 +176,7 @@ export class DataService {
     .then(
       data => {
 
-        this.cachedCompanyProfileToken = this.auth.user?.access_token
+        this.cachedCompanyProfileToken = token
         this.companyId        = ''
         this.companyName      = 'SIGHMAN SAFARI HAULAGE LTD'
         this.contactName      = 'STANSLAUS MTANDI'
@@ -328,7 +330,8 @@ export class DataService {
   cachedBranchReceiptHeaderToken : string = ''
 
   async getBranchReceiptHeaderData(options : { headers : HttpHeaders }) : Promise<IBranchReceiptHeader | undefined> {
-    if (this.cachedBranchReceiptHeader !== undefined && this.cachedBranchReceiptHeaderToken === this.auth.user?.access_token) {
+    const token = this.auth.user?.access_token
+    if (this.cachedBranchReceiptHeader !== undefined && this.cachedBranchReceiptHeaderToken === token) {
       return this.cachedBranchReceiptHeader
     }
     const data = await this.http
@@ -339,7 +342,7 @@ export class DataService {
       .toPromise();
     if (data) {
       this.cachedBranchReceiptHeader = data
-      this.cachedBranchReceiptHeaderToken = this.auth.user?.access_token
+      this.cachedBranchReceiptHeaderToken = token
     }
     return data
   }
