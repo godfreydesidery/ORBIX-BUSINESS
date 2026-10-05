@@ -8,6 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -34,7 +35,9 @@ import lombok.ToString;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "parking_bill_receivables")
+@Table(name = "parking_bill_receivables", indexes = {
+		@Index(name = "ix_pbr_discount_status_parking", columnList = "discountStatus, parking_id")
+})
 public class ParkingBillReceivable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

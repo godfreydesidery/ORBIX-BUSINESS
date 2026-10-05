@@ -246,7 +246,8 @@ Add `useLocalSessionState=true` to the JDBC URL (Appendix B). Without it, Connec
 })
 ```
 
-- **Use physical snake_case column names** in `columnList` (`created_date_time`, not `createdDateTime`), the same way the existing `uniqueConstraints` do. With Spring's naming strategy, Hibernate 5.4 resolves `columnList` against database column names, and a camelCase name fails at startup with "database column not found".
+- **Use logical column names** in `columnList`: the Java field name for plain columns (`createdDateTime`) and the `@JoinColumn` name for foreign keys (`parking_id`). Hibernate 5.4 resolves `columnList` by logical name and applies the naming strategy afterwards; a snake_case name for a plain field fails at startup with "database column not found" (corrected after validating every index against the entity metadata).
+- **Ship the indexes with the SQL script** `Orbix-Business-API/api/api/sql/2026-10-05_performance_indexes.sql` before deploying, so startup does not wait for index builds. The script is idempotent and builds each index online.
 - **Always set `name`.** `update` checks for an existing index by name and creates only the missing ones, so explicit names make it idempotent across restarts and environments.
 - **Keep existing `uniqueConstraints`** in the same `@Table` (e.g. `restaurant_sales_orders`, `shop_sales_orders`; see Appendix C).
 - **Startup cost.** On first boot after deployment, startup blocks while each `CREATE INDEX` runs. InnoDB builds indexes online (concurrent reads and writes continue), but the app will not serve until it finishes. Deploy P1 indexes in a low-traffic window, and allow extra time for the health check on `parkings`, `bond_items`, `storages` and `collections`.
@@ -1359,7 +1360,7 @@ The figures in this document come from static analysis. Measure before and after
 | Risk | Finding | Mitigation |
 |---|---|---|
 | Index creation lengthens the first startup on large tables | BE-04 | Deploy in a quiet window; allow a longer health-check grace period; P1 first, P2 later |
-| A camelCase `columnList` stops startup with "column not found" | BE-04 | Use physical snake_case names (Appendix C); boot once in staging |
+| A wrong `columnList` name stops startup with "column not found" | BE-04 | Use logical names (field name, or `@JoinColumn` name); all 41 were validated against the entity metadata |
 | A wrong index cannot be removed by `ddl-auto=update` | BE-04, BE-10 | Code-review index names; remove by hand with `DROP INDEX` if needed |
 | A rewritten query returns different rows or order | BE-18 to BE-26 | Equivalence tests on production-like data; explicit `order by id`; encode each Java predicate exactly (BE-20 note) |
 | A `SUM` in SQL differs from a Java sum in the last digit | BE-19, BE-25 | Keep the Java sum over a projection wherever exact equality matters |
@@ -1538,7 +1539,7 @@ target/
 
 **Rules (BE-04):**
 - Declare each index on its entity's `@Table` and let `ddl-auto=update` create it.
-- Use **physical snake_case** column names.
+- Use **logical** column names in the annotations (field name or `@JoinColumn` name). The column names shown in the tables below are the physical database names, which is what the SQL script uses.
 - Always give the index an explicit `name`.
 - Keep any existing `uniqueConstraints`.
 - Add `import javax.persistence.Index;`.

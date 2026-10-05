@@ -8,6 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -28,7 +29,9 @@ import lombok.ToString;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "bond_item_bill_receivables")
+@Table(name = "bond_item_bill_receivables", indexes = {
+		@Index(name = "ix_bibr_discount_status_bond_item", columnList = "discountStatus, bond_item_id")
+})
 public class BondItemBillReceivable {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

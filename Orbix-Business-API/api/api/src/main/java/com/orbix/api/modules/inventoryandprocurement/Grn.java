@@ -11,6 +11,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -39,7 +40,10 @@ import lombok.ToString;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "grns")
+@Table(name = "grns", indexes = {
+		@Index(name = "ix_grns_status_approved", columnList = "status, approvedDateTime"),
+		@Index(name = "ix_grns_branch_status_shop", columnList = "branch_id, status, shop_id")
+})
 public class Grn {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

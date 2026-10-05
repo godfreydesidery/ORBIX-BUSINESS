@@ -8,6 +8,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -27,7 +28,9 @@ import lombok.ToString;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "weighs")
+@Table(name = "weighs", indexes = {
+		@Index(name = "ix_weighs_created_date_time", columnList = "createdDateTime")
+})
 public class Weigh {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

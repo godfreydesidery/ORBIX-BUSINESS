@@ -11,6 +11,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
@@ -40,7 +41,10 @@ import lombok.ToString;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "restaurant_sales_orders", uniqueConstraints = { @UniqueConstraint(columnNames = {"no", "restaurant_id"})})
+@Table(name = "restaurant_sales_orders", uniqueConstraints = { @UniqueConstraint(columnNames = {"no", "restaurant_id"})}, indexes = {
+		@Index(name = "ix_rso_restaurant_status_created", columnList = "restaurant_id, status, createdDateTime"),
+		@Index(name = "ix_rso_status_confirmed", columnList = "status, confirmedDateTime")
+})
 public class RestaurantSalesOrder {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

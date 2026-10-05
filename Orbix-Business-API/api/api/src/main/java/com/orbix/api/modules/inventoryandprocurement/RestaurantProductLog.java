@@ -7,6 +7,7 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.Index;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.Table;
@@ -29,7 +30,9 @@ import lombok.ToString;
 @Data 
 @NoArgsConstructor 
 @AllArgsConstructor
-@Table(name = "restaurant_product_logs")
+@Table(name = "restaurant_product_logs", indexes = {
+		@Index(name = "ix_restaurant_product_logs_restaurant_created", columnList = "restaurant_id, createdDateTime")
+})
 public class RestaurantProductLog {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
