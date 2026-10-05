@@ -106,6 +106,10 @@ Closed records stay in the live tables forever, so every table keeps growing. An
 
 ---
 
+## Audit log (agreed, not performance)
+
+The design for login history and an audit trail of critical actions is in `AUDIT_LOG_DESIGN.md`. It includes the token signing key fix (prerequisite P1), which should ship first.
+
 ## Issues found along the way (not performance)
 
 - **Unreachable check-out code.** The check-out buttons on `bond-discounts` and `weigh-billing` are commented out. Their code calls `/bonds/check_out` and `/weighs/check_out`, which don't exist. Remove the code, or fix it before re-enabling the buttons.
