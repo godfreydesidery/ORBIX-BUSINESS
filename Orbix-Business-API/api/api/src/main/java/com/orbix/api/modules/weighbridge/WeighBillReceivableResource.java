@@ -2,6 +2,7 @@ package com.orbix.api.modules.weighbridge;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -62,7 +63,7 @@ public class WeighBillReceivableResource {
 			throw new NotFoundException("Weigh not found");
 		}
 		
-		List<WeighBillReceivable> bills = weighBillReceivableRepository.findByWeigh(weigh_.get());
+		List<WeighBillReceivable> bills = weighBillReceivableRepository.findAllByWeighIn(Collections.singletonList(weigh_.get()));
 		
 		List<WeighBillReceivableResponseDTO> list = new ArrayList<>();
 		

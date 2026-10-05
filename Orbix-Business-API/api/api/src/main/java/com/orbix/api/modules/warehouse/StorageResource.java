@@ -158,8 +158,9 @@ public class StorageResource {
 		Optional<Storage> p = storageRepository.findById(id);
 		
 		try {
-			List<StorageBillReceivable> rcs = storageBillReceivableRepository.findAllByStorage(p.get());
-			model.setStringData((rcs.get(rcs.size() - 1).getEndedAt().minusDays(1)).toString());
+			// Only the last bill is needed
+			StorageBillReceivable lastStorageBillReceivable = storageBillReceivableRepository.findFirstByStorageOrderByIdDesc(p.get()).get();
+			model.setStringData((lastStorageBillReceivable.getEndedAt().minusDays(1)).toString());
 		}catch(Exception e) {
 			model.setStringData("");
 		}

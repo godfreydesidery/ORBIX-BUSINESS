@@ -1,6 +1,7 @@
 package com.orbix.api.modules.warehouse;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
@@ -55,7 +56,7 @@ public class StorageGoodReleaseServiceController implements StorageGoodReleaseSe
 			}		
 		}
 		
-		List<StorageBillReceivable> sbrvs = storageBillReceivableRepository.findAllByStorage(storage);
+		List<StorageBillReceivable> sbrvs = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage));
 		
 		for(StorageBillReceivable sbrv : sbrvs) {
 			if(sbrv.getBillReceivable().getPayStatus().toString().equals("PAID")) {
@@ -117,7 +118,7 @@ public class StorageGoodReleaseServiceController implements StorageGoodReleaseSe
 			}		
 		}
 		
-		List<StorageBillReceivable> sbrvs = storageBillReceivableRepository.findAllByStorage(storage);
+		List<StorageBillReceivable> sbrvs = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage));
 		
 		for(StorageBillReceivable sbrv : sbrvs) {
 			if(sbrv.getBillReceivable().getPayStatus().toString().equals("PAID")) {

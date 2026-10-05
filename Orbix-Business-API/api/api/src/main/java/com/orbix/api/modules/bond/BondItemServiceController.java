@@ -697,7 +697,7 @@ public class BondItemServiceController implements BondItemService {
 
 			List<BondItemBillReceivable> pbs = bondItemBillReceivablesByBondItem != null
 					? bondItemBillReceivablesByBondItem.getOrDefault(bondItem.getId(), Collections.emptyList())
-					: bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+					: bondItemBillReceivableRepository.findAllByBondItemIn(Collections.singletonList(bondItem));
 			int sn = 1;
 			for (BondItemBillReceivable pbr : pbs) {
 				ServiceBillItem sbi = new ServiceBillItem();
@@ -754,7 +754,7 @@ public class BondItemServiceController implements BondItemService {
 //		Optional<BondZone> bondZone_ = bondZoneRepository.findByNameAndBranch(bondItemRequest.getBondZoneName(), branch_.get());
 //		if(bondZone_.isEmpty())throw new NotFoundException("Bond Zone not found");
 		
-		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItem(bondItem_.get());
+		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItemIn(Collections.singletonList(bondItem_.get()));
 		
 		if(!bondItemBillReceivables.isEmpty()) {
 			throw new InvalidOperationException("Cannot proceed with modification as there are already existing bills.");

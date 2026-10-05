@@ -50,7 +50,8 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 		BondItem bondItem = bondItemRepository.findById(bondItemId)
                 .orElseThrow(() -> new NotFoundException("BondItem with ID " + bondItemId + " not found."));
 		
-		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItemIn(Collections.singletonList(bondItem));
 		
 		List<BondItemBillReceivableResponseDTO> bondItemBillReceivableResponses = new ArrayList<>();
 		for(BondItemBillReceivable bondItemBillReceivable : bondItemBillReceivables) {
@@ -182,15 +183,15 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 	    BondItem bondItem = bondItemRepository.findById(request.getBondItemId())
 	            .orElseThrow(() -> new NotFoundException("BondItem not found."));
 
-	    // 2. Fetch previous receivables
-	    List<BondItemBillReceivable> rcvs = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+	    // 2. Fetch the previous receivable (only the last one is needed)
+	    Optional<BondItemBillReceivable> lastBondItemBillReceivable_ = bondItemBillReceivableRepository.findFirstByBondItemOrderByIdDesc(bondItem);
 
 	    // 3. Resolve FROM date
 	    LocalDateTime fromDate;
-	    if (rcvs.isEmpty()) {
+	    if (lastBondItemBillReceivable_.isEmpty()) {
 	        fromDate = bondItem.getStartBillingAt().toLocalDate().atStartOfDay();
 	    } else {
-	        fromDate = rcvs.get(rcvs.size() - 1)
+	        fromDate = lastBondItemBillReceivable_.get()
 	                .getEndedAt()
 	                .plusDays(1)
 	                .toLocalDate()
@@ -321,14 +322,6 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 			noOfDays = 1;
 		}
 				
-		List<BondItemBillReceivable> rcvs = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
-		
-		double billedQty = 0;
-		
-		for(BondItemBillReceivable sbr : rcvs) {
-			billedQty = billedQty + sbr.getQty();
-		}
-		
 		
 		BillReceivable billReceivable = new BillReceivable();
 		billReceivable.setNo(String.valueOf(Math.random()));

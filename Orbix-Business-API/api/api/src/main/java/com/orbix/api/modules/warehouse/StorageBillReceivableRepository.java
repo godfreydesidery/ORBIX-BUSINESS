@@ -15,6 +15,8 @@ public interface StorageBillReceivableRepository extends JpaRepository<StorageBi
 
 	List<StorageBillReceivable> findByStorage(Storage storage);
 
+	Optional<StorageBillReceivable> findFirstByStorageOrderByIdDesc(Storage storage);
+
 	Optional<StorageBillReceivable> findByBillReceivable(BillReceivable billReceivable);
 
 	List<StorageBillReceivable> findAllByBillReceivableIn(List<BillReceivable> billReceivables);

@@ -157,8 +157,9 @@ public class BondItemResource {
 		Optional<BondItem> p = bondItemRepository.findById(id);
 		
 		try {
-			List<BondItemBillReceivable> rcs = bondItemBillReceivableRepository.findAllByBondItem(p.get());
-			model.setStringData((rcs.get(rcs.size() - 1).getEndedAt().minusDays(1)).toString());
+			// Only the last bill is needed
+			BondItemBillReceivable lastBondItemBillReceivable = bondItemBillReceivableRepository.findFirstByBondItemOrderByIdDesc(p.get()).get();
+			model.setStringData((lastBondItemBillReceivable.getEndedAt().minusDays(1)).toString());
 		}catch(Exception e) {
 			model.setStringData("");
 		}

@@ -156,8 +156,9 @@ public class ParkingResource {
 		Optional<Parking> p = parkingRepository.findById(id);
 		
 		try {
-			List<ParkingBillReceivable> rcs = parkingBillReceivableRepository.findAllByParking(p.get());
-			model.setStringData((rcs.get(rcs.size() - 1).getEndedAt().minusDays(1)).toString());
+			// Only the last bill is needed
+			ParkingBillReceivable lastParkingBillReceivable = parkingBillReceivableRepository.findFirstByParkingOrderByIdDesc(p.get()).get();
+			model.setStringData((lastParkingBillReceivable.getEndedAt().minusDays(1)).toString());
 		}catch(Exception e) {
 			model.setStringData("");
 		}

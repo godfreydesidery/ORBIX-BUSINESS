@@ -240,8 +240,9 @@ public class BillReceivableServiceController implements BillReceivableService {
 		Parking parking = parkingRepository.findById(parkingId)
 			    .orElseThrow(() -> new NotFoundException("Parking with ID " + parkingId + " not found"));
 		
-		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
-		List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking));
+		List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking));
 		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
 		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
 			billReceivableResponses.add(billReceivableResponseDTOMapper(parkingBillReceivable.getBillReceivable()));
@@ -257,7 +258,8 @@ public class BillReceivableServiceController implements BillReceivableService {
 		Storage storage = storageRepository.findById(storageId)
 			    .orElseThrow(() -> new NotFoundException("Storage with ID " + storageId + " not found"));
 		
-		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage));
 		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
 		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
 			billReceivableResponses.add(billReceivableResponseDTOMapper(storageBillReceivable.getBillReceivable()));
@@ -270,7 +272,8 @@ public class BillReceivableServiceController implements BillReceivableService {
 		BondItem bondItem = bondItemRepository.findById(bondItemId)
 			    .orElseThrow(() -> new NotFoundException("Bond Item with ID " + bondItemId + " not found"));
 		
-		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItemIn(Collections.singletonList(bondItem));
 		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
 		for(BondItemBillReceivable bondItemBillReceivable : bondItemBillReceivables) {
 			billReceivableResponses.add(billReceivableResponseDTOMapper(bondItemBillReceivable.getBillReceivable()));
@@ -283,7 +286,8 @@ public class BillReceivableServiceController implements BillReceivableService {
 		Weigh weigh = weighRepository.findById(weighId)
 			    .orElseThrow(() -> new NotFoundException("Weigh with ID " + weighId + " not found"));
 		
-		List<WeighBillReceivable> weighBillReceivables = weighBillReceivableRepository.findAllByWeigh(weigh);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<WeighBillReceivable> weighBillReceivables = weighBillReceivableRepository.findAllByWeighIn(Collections.singletonList(weigh));
 		List<BillReceivableResponseDTO> billReceivableResponses = new ArrayList<>();
 		for(WeighBillReceivable weighBillReceivable : weighBillReceivables) {
 			billReceivableResponses.add(billReceivableResponseDTOMapper(weighBillReceivable.getBillReceivable()));

@@ -47,7 +47,8 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		Storage storage = storageRepository.findById(storageId)
                 .orElseThrow(() -> new NotFoundException("Storage with ID " + storageId + " not found."));
 		
-		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage));
 		
 		List<StorageBillReceivableResponseDTO> storageBillReceivableResponses = new ArrayList<>();
 		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
@@ -77,7 +78,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		
 		// Check if is first bill
 		
-		List<StorageBillReceivable> rcvs = storageBillReceivableRepository.findAllByStorage(storage);
+		Optional<StorageBillReceivable> lastStorageBillReceivable_ = storageBillReceivableRepository.findFirstByStorageOrderByIdDesc(storage);
 		
 		LocalDateTime fromDate = null;
 		LocalDateTime toDate = null;
@@ -89,7 +90,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 			toDate = LocalDateTime.parse(dateString, formatter).plusDays(1).toLocalDate().atStartOfDay();
 		}
 		
-		if(rcvs.isEmpty()) {			
+		if(lastStorageBillReceivable_.isEmpty()) {			
 			// Check for first billing date		
 			fromDate = storage.getStartBillingAt().toLocalDate().atStartOfDay();
 			
@@ -103,7 +104,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 			
 		}else {
 			// Take the last bill
-			fromDate = rcvs.get(rcvs.size() - 1).getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
+			fromDate = lastStorageBillReceivable_.get().getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
 			
 			if(toDate == null) toDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
 			
@@ -211,7 +212,7 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 			noOfDays = 1;
 		}
 				
-		List<StorageBillReceivable> rcvs = storageBillReceivableRepository.findAllByStorage(storage);
+		List<StorageBillReceivable> rcvs = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage));
 		
 		double billedQty = 0;
 		

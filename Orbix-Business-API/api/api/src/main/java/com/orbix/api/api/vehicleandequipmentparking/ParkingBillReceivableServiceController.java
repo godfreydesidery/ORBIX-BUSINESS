@@ -47,7 +47,8 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		Parking parking = parkingRepository.findById(parkingId)
                 .orElseThrow(() -> new NotFoundException("Parking with ID " + parkingId + " not found."));
 		
-		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking));
 		
 		List<ParkingBillReceivableResponseDTO> parkingBillReceivableResponses = new ArrayList<>();
 		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
@@ -62,7 +63,8 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		Parking parking = parkingRepository.findById(parkingId)
                 .orElseThrow(() -> new NotFoundException("Parking with ID " + parkingId + " not found."));
 		
-		List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking);
+		// Bills are loaded together with their bill receivable instead of one extra query per bill
+		List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking));
 		
 		List<ParkingServiceBillReceivableResponseDTO> parkingServiceBillReceivableResponses = new ArrayList<>();
 		for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
@@ -100,7 +102,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		
 		// Check if is first bill
 		
-		List<ParkingBillReceivable> rcvs = parkingBillReceivableRepository.findAllByParking(parking);
+		Optional<ParkingBillReceivable> lastParkingBillReceivable_ = parkingBillReceivableRepository.findFirstByParkingOrderByIdDesc(parking);
 		
 		LocalDateTime fromDate = null;
 		LocalDateTime toDate = null;
@@ -112,7 +114,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 			toDate = LocalDateTime.parse(dateString, formatter).plusDays(1).toLocalDate().atStartOfDay();
 		}
 		
-		if(rcvs.isEmpty()) {			
+		if(lastParkingBillReceivable_.isEmpty()) {			
 			// Check for first billing date		
 			fromDate = parking.getStartBillingAt().toLocalDate().atStartOfDay();
 			// temporary solution, timezone issue, billing
@@ -126,7 +128,7 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 			
 		}else {
 			// Take the last bill
-			fromDate = rcvs.get(rcvs.size() - 1).getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
+			fromDate = lastParkingBillReceivable_.get().getEndedAt().plusDays(1).toLocalDate().atStartOfDay();
 			// temporary solution, timezone issue, billing
 			if(toDate == null) toDate = (LocalDateTime.now().plusHours(3)).plusDays(1).toLocalDate().atStartOfDay();
 			

@@ -286,7 +286,7 @@ public class ParkingServiceController implements ParkingService {
 			throw new NotFoundException("Parking not found");
 		}
 		
-		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking_.get()));
 		
 		List<ParkingBillReceivableResponseDTO> parkingBillReceivableResponses = new ArrayList<>();
 		
@@ -536,7 +536,7 @@ public class ParkingServiceController implements ParkingService {
 		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), branch_.get());
 		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
 		
-		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking_.get()));
 		
 		if(!parkingBillReceivables.isEmpty()) {
 			throw new InvalidOperationException("Cannot proceed with modification as there are already existing bills.");
@@ -696,10 +696,10 @@ public class ParkingServiceController implements ParkingService {
 		
 			List<ParkingBillReceivable> pbs = parkingBillReceivablesByParking != null
 					? parkingBillReceivablesByParking.getOrDefault(parking.getId(), Collections.emptyList())
-					: parkingBillReceivableRepository.findAllByParking(parking);
+					: parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking));
 			List<ParkingServiceBillReceivable> psbs = parkingServiceBillReceivablesByParking != null
 					? parkingServiceBillReceivablesByParking.getOrDefault(parking.getId(), Collections.emptyList())
-					: parkingServiceBillReceivableRepository.findAllByParking(parking);
+					: parkingServiceBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking));
 			int sn = 1;
 			for(ParkingBillReceivable pbr : pbs) {
 				ServiceBillItem sbi = new ServiceBillItem();
@@ -871,7 +871,7 @@ public class ParkingServiceController implements ParkingService {
 //		if(vehicleEquipmentType_.isEmpty()) throw new NotFoundException("Vehicle or equipment type not found");
 		
 		
-		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking_.get()));
 		LocalDateTime lastDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
 		LocalDateTime lastBillDate = LocalDateTime.now().toLocalDate().atStartOfDay();
 		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
@@ -884,7 +884,7 @@ public class ParkingServiceController implements ParkingService {
 			throw new InvalidOperationException("Could not checkout. Some parking days have not been billed. Please generate and clear bills");
 		}
 		
-		List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParking(parking_.get());
+		List<ParkingServiceBillReceivable> parkingServiceBillReceivables = parkingServiceBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking_.get()));
 		for(ParkingServiceBillReceivable parkingServiceBillReceivable : parkingServiceBillReceivables) {
 			if(parkingServiceBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.UNPAID)) {
 				throw new InvalidOperationException("Can not check out, bills  not cleared");
@@ -947,7 +947,7 @@ public class ParkingServiceController implements ParkingService {
 			 */
 			if(parking.getStartBillingAt().isBefore(startedAt)) {
 				
-				List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findByParking(parking);
+				List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking));
 				// Now check for intersection
 				for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
 					if(startedAt.isAfter(parkingBillReceivable.getStartedAt()) && startedAt.isBefore(parkingBillReceivable.getEndedAt().plusDays(1))) {
@@ -1065,7 +1065,7 @@ public class ParkingServiceController implements ParkingService {
 		Optional<Branch> branch_ = branchRepository.findById(userService.getUserBranch(request).getId());
 		if(branch_.isEmpty()) throw new NotFoundException("Branch not found");
 			
-		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking_.get()));
 		
 		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
 			if(parkingBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {

@@ -288,7 +288,7 @@ public class StorageServiceController implements StorageService {
 			throw new NotFoundException("Storage not found");
 		}
 		
-		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage_.get());
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage_.get()));
 		
 		List<StorageBillReceivableResponseDTO> storageBillReceivableResponses = new ArrayList<>();
 		
@@ -568,7 +568,7 @@ public class StorageServiceController implements StorageService {
 		
 			List<StorageBillReceivable> pbs = storageBillReceivablesByStorage != null
 					? storageBillReceivablesByStorage.getOrDefault(storage.getId(), Collections.emptyList())
-					: storageBillReceivableRepository.findAllByStorage(storage);
+					: storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage));
 			int sn = 1;
 			for(StorageBillReceivable pbr : pbs) {
 				ServiceBillItem sbi = new ServiceBillItem();
@@ -726,7 +726,7 @@ public class StorageServiceController implements StorageService {
 //		if(goodType_.isEmpty()) throw new NotFoundException("Vehicle or equipment type not found");
 		
 		
-		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage_.get());
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage_.get()));
 		LocalDateTime lastDate = LocalDateTime.now().plusDays(1).toLocalDate().atStartOfDay();
 		LocalDateTime lastBillDate = LocalDateTime.now().toLocalDate().atStartOfDay();
 		double billedQty = 0;
@@ -803,7 +803,7 @@ public class StorageServiceController implements StorageService {
 			 */
 			if(storage.getStartBillingAt().isBefore(startedAt)) {
 				
-				List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findByStorage(storage);
+				List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage));
 				// Now check for intersection
 				for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
 					if(startedAt.isAfter(storageBillReceivable.getStartedAt()) && startedAt.isBefore(storageBillReceivable.getEndedAt().plusDays(1))) {
@@ -911,7 +911,7 @@ public class StorageServiceController implements StorageService {
 			noOfDays = 1;
 		}
 		
-		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findByStorage(storage);
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage));
 		StorageCustomBillDetail storageCustomBillDetail = new StorageCustomBillDetail();
 		
 		storageCustomBillDetail.setTotalQty(storage.getInitialQty());
@@ -954,7 +954,7 @@ public class StorageServiceController implements StorageService {
 		Optional<Branch> branch_ = branchRepository.findById(userService.getUserBranch(request).getId());
 		if(branch_.isEmpty()) throw new NotFoundException("Branch not found");
 			
-		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage_.get());
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage_.get()));
 		double billedQty = 0;
 		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
 			billedQty = billedQty + storageBillReceivable.getQty();

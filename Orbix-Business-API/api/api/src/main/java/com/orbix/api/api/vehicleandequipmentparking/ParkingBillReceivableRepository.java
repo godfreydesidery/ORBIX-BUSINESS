@@ -16,6 +16,8 @@ public interface ParkingBillReceivableRepository extends JpaRepository<ParkingBi
 	List<ParkingBillReceivable> findAllByParking(Parking parking);
 
 	List<ParkingBillReceivable> findByParking(Parking parking);
+
+	Optional<ParkingBillReceivable> findFirstByParkingOrderByIdDesc(Parking parking);
 	
 	
 	@Query("SELECT COUNT(p) FROM ParkingBillReceivable p WHERE p.billReceivable.payStatus IN ('PAID', 'VERIFIED') AND p.billReceivable.paidDateTime BETWEEN :startDate AND :endDate")

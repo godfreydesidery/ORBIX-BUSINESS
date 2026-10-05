@@ -15,6 +15,8 @@ public interface BondItemBillReceivableRepository extends JpaRepository<BondItem
 
 	List<BondItemBillReceivable> findByBondItem(BondItem bondItem);
 
+	Optional<BondItemBillReceivable> findFirstByBondItemOrderByIdDesc(BondItem bondItem);
+
 	Optional<BondItemBillReceivable> findByBillReceivable(BillReceivable billReceivable);
 
 	List<BondItemBillReceivable> findAllByBillReceivableIn(List<BillReceivable> billReceivables);
