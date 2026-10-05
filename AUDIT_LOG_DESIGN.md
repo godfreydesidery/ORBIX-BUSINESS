@@ -1,6 +1,6 @@
 # ORBIX Business: audit log design
 
-**Status:** design agreed on 5 October 2026, with the decisions in section 12. Not implemented yet; planned for the next update.
+**Status:** design agreed on 5 October 2026, with the decisions in section 12. Phases 1 and 2 are implemented on branch `performance-improvements`; phases 3 and 4 follow.
 
 ## 1. Goal
 
@@ -26,9 +26,9 @@ The log is written by the server only. It cannot be edited or deleted through th
 
 | # | Item | Why |
 |---|---|---|
-| P1 | **Token signing key.** Login tokens are signed with the hard-coded key `"secret"` in `CustomAuthenticationFilter`, `CustomAuthorizationFilter` and `UserResource` (two places); the `jwt.secret` property is not used. Move the key to an environment variable, read it in one place, and rotate it. | Anyone who knows the key can create a token for any user, and an audit trail is only as trustworthy as the identity behind it. Rotating the key signs everyone out once. |
+| P1 | **Token signing key.** Login tokens were signed with the hard-coded key `"secret"` in `CustomAuthenticationFilter`, `CustomAuthorizationFilter` and `UserResource` (two places); the `jwt.secret` property is not used. **Done:** the key is now read in one place, `security/JwtKey`, from the `ORBIX_JWT_SECRET` environment variable. While the variable is not set, the previous key still applies, so deploying changes nothing. Setting the variable rotates the key. | Anyone who knows the key can create a token for any user, and an audit trail is only as trustworthy as the identity behind it. Rotating the key signs everyone out once. |
 | P2 | **One clock.** `DayServiceController.getTimeStamp()` returns `now + 3h`, while other code uses `now()`. Store audit times in UTC (`Instant`), and convert to local business time only on screen. | Audit times must be unambiguous and comparable. |
-| P3 | **End of day becomes a POST.** `/days/end_day` is a `GET` that changes state. | Browsers and proxies may repeat or prefetch GETs, and logging the action needs a deliberate request. |
+| P3 | **End of day becomes a POST.** `/days/end_day` is a `GET` that changes state. **Done:** it now accepts POST, and still accepts GET so that nothing calling it today breaks. | Browsers and proxies may repeat or prefetch GETs, and logging the action needs a deliberate request. |
 
 ## 4. Data model
 
@@ -77,9 +77,7 @@ There is no separate table. Logins are `AUTH` rows in `audit_logs`. "Last login"
 
 ### 4.3 Creating the table
 
-The same approach as the performance indexes:
-- an `AuditLog` entity, picked up by `ddl-auto=update`;
-- a SQL script under `Orbix-Business-API/api/api/sql/` that creates the table and its indexes before deployment.
+The `AuditLog` entity is created automatically, with its indexes, by `ddl-auto=update` at start-up. It is a new table, so there is nothing to migrate and no script is needed.
 
 ## 5. How entries are written
 
@@ -120,9 +118,11 @@ public BillReceivable confirmBillPayment(...) { ... }
 ```
 
 `AuditAspect` (Spring AOP, already on the classpath) records the entry **after the method returns successfully**:
-- It writes **inside the action's own transaction**. If the action is rolled back, its log entry is rolled back too, so the log never claims an action that did not happen.
-- **Record id and reference** come from the returned DTO (`getId()`, `getNo()`) or from a named argument (`@Audited(idArg = "id")`).
-- **Summary and key values** come from a small formatter per action, e.g. amount, pay code and number of bills for a payment.
+- It is written **right after the action's transaction commits**, in a transaction of its own, on the same request. A rolled back action leaves no entry. A failure to write the entry is logged and never fails the action, so the audit log cannot break business operations. The only gap: an entry is lost if the server stops in the moment between the two writes.
+- **Record id and reference** come from the returned DTO (`getId()`, `getNo()`) or from a named argument (`@Audited(entityId = "discountRequest.id")`).
+- **Summary and key values** come from expressions in the annotation, e.g. `summary = "Confirmed payment of {totalAmount} for {billReceivableRequests.size} bill(s)"`.
+
+**Sign-in events and access denials are written in the background** (`@Async`, on a small pool named `auditExecutor`), so signing in never waits on the audit log.
 
 Failed critical actions are not logged (decision D5); validation failures such as "bills not cleared" would only add noise. The one exception is `ACCESS_DENIED`: a 403 from `@PreAuthorize` is recorded by an `AccessDeniedHandler` as `SECURITY` / `FAILURE`.
 
@@ -219,7 +219,7 @@ Rules:
 
 ## 10. Performance
 
-- **Writes:** one insert per critical action or login, inside the existing transaction, with no extra user query.
+- **Writes:** one small insert per critical action (right after it commits) or per sign-in event (in the background), with no extra user query.
 - **Reads:** only from the audit screens, which are paged and indexed.
 - **Growth:** roughly logins plus critical actions per day, small next to bills and collections, and bounded by retention.
 
