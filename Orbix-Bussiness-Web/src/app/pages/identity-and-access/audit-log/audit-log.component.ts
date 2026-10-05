@@ -185,12 +185,13 @@ export class AuditLogComponent implements OnInit {
         row.entityType, row.entityRef, row.ipAddress, row.details
       ].map(value => this.csvValue(value)).join(','))
     })
-    var blob = new Blob([lines.join('\r\n')], { type: 'text/csv;charset=utf-8' })
+    // The byte order mark tells spreadsheet programs the file is UTF-8
+    var blob = new Blob(['﻿' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' })
     var link = document.createElement('a')
     link.href = URL.createObjectURL(blob)
     link.download = (this.loginHistory ? 'login-history-' : 'audit-log-') + this.fromDate + '-to-' + this.toDate + '.csv'
     link.click()
-    URL.revokeObjectURL(link.href)
+    setTimeout(() => URL.revokeObjectURL(link.href), 1000)
   }
 
   /**The entry's UTC time shown in the local time of this computer */
@@ -204,6 +205,10 @@ export class AuditLogComponent implements OnInit {
 
   private csvValue(value : any) : string {
     var text = value == null ? '' : String(value)
+    // A value that starts like a formula (e.g. a username typed at a failed sign-in) is kept as text in spreadsheets
+    if(/^[=+\-@\t\r]/.test(text)){
+      text = "'" + text
+    }
     return '"' + text.replace(/"/g, '""') + '"'
   }
 

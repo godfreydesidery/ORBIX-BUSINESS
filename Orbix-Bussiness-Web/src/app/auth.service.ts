@@ -137,16 +137,20 @@ export class AuthService {
 
   // Tells the server about the sign-out, for the audit log. Fire and forget: it never holds up or blocks the sign-out
   recordLogout(){
-    let currentUser : {
-      access_token : string
-    } = JSON.parse(localStorage.getItem('current-user')!)
-    if(!currentUser || !currentUser.access_token){
-      return
+    try {
+      let currentUser : {
+        access_token : string
+      } = JSON.parse(localStorage.getItem('current-user')!)
+      if(!currentUser || !currentUser.access_token){
+        return
+      }
+      let options = {
+        headers: new HttpHeaders().set('Authorization', 'Bearer '+currentUser.access_token)
+      }
+      this.http.post(API_URL+'/logout', {}, options).subscribe({ error: () => {} })
+    } catch (e) {
+      // Recording must never stop the sign-out
     }
-    let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+currentUser.access_token)
-    }
-    this.http.post(API_URL+'/logout', {}, options).subscribe({ error: () => {} })
   }
 
   logout() {
