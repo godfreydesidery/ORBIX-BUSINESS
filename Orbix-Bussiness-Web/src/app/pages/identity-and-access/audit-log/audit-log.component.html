@@ -7,6 +7,24 @@
             </div>
             <div class="card-body widget-body">
 
+                <div class="row" *ngIf="auditSetting">
+                    <div class="col-sm-12">
+                        <span>Recording: </span>
+                        <span *ngIf="auditSetting.recordingEnabled" class="badge badge-success">On</span>
+                        <span *ngIf="!auditSetting.recordingEnabled" class="badge badge-danger">Off</span>
+                        <small *ngIf="auditSetting.updatedBy"> &nbsp;last changed by {{auditSetting.updatedBy}} on {{localTime(auditSetting.updatedAt)}}</small>
+                        <span class="pull-right" *ngIf="canChangeRecording">
+                            <button type="button" *ngIf="auditSetting.recordingEnabled" class="btn btn-sm btn-outline-danger btn-round-custom" (click)="changeRecording(false)">Turn off recording</button>
+                            <button type="button" *ngIf="!auditSetting.recordingEnabled" class="btn btn-sm btn-outline-success btn-round-custom" (click)="changeRecording(true)">Turn on recording</button>
+                        </span>
+                        <div class="alert alert-warning audit-log-recording-off" *ngIf="!auditSetting.recordingEnabled">
+                            Audit log recording is off: sign-ins and critical actions are not being recorded.
+                        </div>
+                    </div>
+                </div>
+
+                <br *ngIf="auditSetting">
+
                 <div class="row">
                     <div class="col-sm-2">
                         <label>From</label>

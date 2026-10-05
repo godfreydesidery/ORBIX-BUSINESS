@@ -863,7 +863,7 @@ export const menuItems = [
         icon: 'fa-history',
         selected: false,
         expanded: false,
-        show: grant(['AUDIT-ACCESS', 'AUDIT-READ']),
+        show: grant(['AUDIT-ACCESS', 'AUDIT-READ', 'AUDIT-UPDATE']),
         order: 710,
         subMenu: [
             {

@@ -7,6 +7,7 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from 'src/app/auth.service';
 import { IAuditLog } from 'src/app/domain/audit-log';
+import { IAuditSetting } from 'src/app/domain/audit-setting';
 import { IPage } from 'src/app/domain/page';
 import { pageParams } from 'src/app/common/utils/page-params';
 import { trackById } from 'src/app/common/utils/track-by-id';
@@ -50,6 +51,10 @@ export class AuditLogComponent implements OnInit {
   /**The entry opened to show its details */
   selectedAuditLog : IAuditLog | null = null
 
+  /**Whether sign-ins and critical actions are being recorded */
+  auditSetting : IAuditSetting | null = null
+  canChangeRecording : boolean = false
+
   constructor(
     private http : HttpClient,
     private auth : AuthService,
@@ -65,7 +70,50 @@ export class AuditLogComponent implements OnInit {
     weekAgo.setDate(today.getDate() - 7)
     this.fromDate = this.dateValue(weekAgo)
     this.toDate = this.dateValue(today)
+    this.canChangeRecording = this.auth.grant(['AUDIT-UPDATE'])
+    this.getAuditSetting()
     this.getAuditLogs()
+  }
+
+  async getAuditSetting(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    await this.http.get<IAuditSetting>(API_URL+'/audit_logs/get_setting', options)
+    .toPromise()
+    .then(
+      data => {
+        this.auditSetting = data!
+      }
+    )
+    .catch(error => {
+      this.msg.showErrorMessage(error, 'Could not load the audit log setting')
+    })
+  }
+
+  /**Turn recording of sign-ins and critical actions on or off; turning it on or off is itself recorded */
+  async changeRecording(enabled : boolean){
+    if(!enabled && await this.msg.showConfirmMessageDialog('Turn off audit log recording?',
+        'Sign-ins and critical actions will not be recorded until recording is turned on again. Existing entries are kept.',
+        'warning', 'Turn off', 'Cancel') == false){
+      return
+    }
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    await this.http.post<IAuditSetting>(API_URL+'/audit_logs/' + (enabled ? 'enable_recording' : 'disable_recording'), {}, options)
+    .toPromise()
+    .then(
+      data => {
+        this.auditSetting = data!
+        this.msg.showSuccessMessage(enabled ? 'Audit log recording turned on' : 'Audit log recording turned off')
+        // The change is written to the log in the background
+        setTimeout(() => this.getAuditLogs(), 1000)
+      }
+    )
+    .catch(error => {
+      this.msg.showErrorMessage(error, 'Could not change audit log recording')
+    })
   }
 
   async getAuditLogs(){
