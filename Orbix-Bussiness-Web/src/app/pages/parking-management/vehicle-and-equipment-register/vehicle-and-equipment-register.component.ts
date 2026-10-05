@@ -1163,20 +1163,26 @@ export class VehicleEquipmentRegisterComponent {
     filteredVehicleEquipments: IVehicleEquipment[] = [];
     selectedVehicleEquipment: IVehicleEquipment | null = null;
     isDropdownOpen: boolean = false;
+    searchTimer: any = null
+
     searchProducts(): void {
       const options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
       
       }
       this.filteredVehicleEquipments = [];
+      clearTimeout(this.searchTimer)
       if (this.searchTerm.trim().length >= 4) {
-        this.http
-        //await this.http.get<IProduct[]>(API_URL+'/shop_products/get_products_by_shop_containing?product_name_like=' + searchKey + '&shop_id=' + this.shopId , options)
-          .get<IVehicleEquipment[]>(API_URL+'/vehicle_equipments/get_vehicle_equipments_chasis_no_containing?chasis_no_like=' + this.searchTerm, options)
-          .subscribe(
-            (data) => (this.filteredVehicleEquipments = data),
-            (error) => console.error('Error fetching products:', error)
-          );
+        // Wait for a short pause in typing before asking the server (each keystroke restarts the wait)
+        this.searchTimer = setTimeout(() => {
+          this.http
+          //await this.http.get<IProduct[]>(API_URL+'/shop_products/get_products_by_shop_containing?product_name_like=' + searchKey + '&shop_id=' + this.shopId , options)
+            .get<IVehicleEquipment[]>(API_URL+'/vehicle_equipments/get_vehicle_equipments_chasis_no_containing?chasis_no_like=' + this.searchTerm, options)
+            .subscribe(
+              (data) => (this.filteredVehicleEquipments = data),
+              (error) => console.error('Error fetching products:', error)
+            );
+        }, 300)
       } else {
         this.filteredVehicleEquipments = [];
       }

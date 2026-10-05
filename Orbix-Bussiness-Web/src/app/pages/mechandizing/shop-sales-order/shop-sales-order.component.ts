@@ -102,20 +102,26 @@ export class ShopSalesOrderComponent {
   filteredProducts: any[] = [];
   selectedProduct: any | null = null;
   isDropdownOpen: boolean = false;
+  searchTimer: any = null
+
   searchProducts(): void {
     const options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     
     }
     this.filteredProducts = [];
+    clearTimeout(this.searchTimer)
     if (this.searchTerm.trim().length >= 2) {
-      this.http
-      //await this.http.get<IProduct[]>(API_URL+'/shop_products/get_products_by_shop_containing?product_name_like=' + searchKey + '&shop_id=' + this.shopId , options)
-        .get<IProduct[]>(API_URL+'/shop_products/get_products_by_shop_containing?product_name_like=' + this.searchTerm + '&shop_id=' + this.shopId , options)
-        .subscribe(
-          (data) => (this.filteredProducts = data),
-          (error) => console.error('Error fetching products:', error)
-        );
+      // Wait for a short pause in typing before asking the server (each keystroke restarts the wait)
+      this.searchTimer = setTimeout(() => {
+        this.http
+        //await this.http.get<IProduct[]>(API_URL+'/shop_products/get_products_by_shop_containing?product_name_like=' + searchKey + '&shop_id=' + this.shopId , options)
+          .get<IProduct[]>(API_URL+'/shop_products/get_products_by_shop_containing?product_name_like=' + this.searchTerm + '&shop_id=' + this.shopId , options)
+          .subscribe(
+            (data) => (this.filteredProducts = data),
+            (error) => console.error('Error fetching products:', error)
+          );
+      }, 300)
     } else {
       this.filteredProducts = [];
     }

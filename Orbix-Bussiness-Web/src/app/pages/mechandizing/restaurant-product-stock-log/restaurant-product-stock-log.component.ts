@@ -187,6 +187,8 @@ export class RestaurantProductStockLogComponent {
   dinableName: string = ''
 
 
+  searchTimer: any = null
+
   searchProducts(): void {
       const options = {
         headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
@@ -194,13 +196,17 @@ export class RestaurantProductStockLogComponent {
       }
       this.filteredProducts = [];
       this.selectedProduct = null
+      clearTimeout(this.searchTimer)
       if (this.searchTerm.trim().length >= 2) {
-        this.http
-          .get<IProduct[]>(API_URL + '/restaurant_products/get_products_by_restaurant_containing?product_name_like=' + this.searchTerm + '&restaurant_id=' + this.restaurantId, options)
-          .subscribe(
-            (data) => (this.filteredProducts = data),
-            (error) => console.error('Error fetching dineables:', error)
-          );
+        // Wait for a short pause in typing before asking the server (each keystroke restarts the wait)
+        this.searchTimer = setTimeout(() => {
+          this.http
+            .get<IProduct[]>(API_URL + '/restaurant_products/get_products_by_restaurant_containing?product_name_like=' + this.searchTerm + '&restaurant_id=' + this.restaurantId, options)
+            .subscribe(
+              (data) => (this.filteredProducts = data),
+              (error) => console.error('Error fetching dineables:', error)
+            );
+        }, 300)
       } else {
         this.filteredProducts = [];
       }

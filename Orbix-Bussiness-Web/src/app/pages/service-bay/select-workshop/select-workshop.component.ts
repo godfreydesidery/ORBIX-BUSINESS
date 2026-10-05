@@ -436,24 +436,30 @@ export class SelectWorkshopComponent {
   }
 
   
+  searchTimer: any = null
+
   getServiceLike = async (searchKey: string) => {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
 
+    clearTimeout(this.searchTimer)
     if (searchKey.length > 2) {
-      await this.http.get<IService[]>(API_URL + '/services/get_services_by_company_containing?service_name_like=' + searchKey, options)
-        .toPromise()
-        .then(
-          data => {
-            console.log(data)
-            this.filteredServices = data!
+      // Wait for a short pause in typing before asking the server (each keystroke restarts the wait)
+      this.searchTimer = setTimeout(async () => {
+        await this.http.get<IService[]>(API_URL + '/services/get_services_by_company_containing?service_name_like=' + searchKey, options)
+          .toPromise()
+          .then(
+            data => {
+              console.log(data)
+              this.filteredServices = data!
+            }
+          )
+          .catch(error => {
+            console.log(error)
           }
-        )
-        .catch(error => {
-          console.log(error)
-        }
-        )
+          )
+      }, 300)
     } else {
       this.filteredServices = []
     }
