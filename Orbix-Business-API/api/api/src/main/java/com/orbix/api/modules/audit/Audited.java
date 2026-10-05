@@ -52,6 +52,17 @@ public @interface Audited {
 	/** Expression giving the id of that record, read before the action, e.g. "productRequest.id" */
 	String changeId() default "";
 
+	/**
+	 * For a record the request names by other keys than its id: a JPQL query giving the ids of the matching records,
+	 * with ?1, ?2 ... set from changeKeys. Used when changeId gives no id. When several records match (e.g. the same
+	 * product in several branches), the one whose id the action returns is used.
+	 * e.g. "select p.id from ShopProduct p where p.shop.id = ?1 and p.product.id = ?2"
+	 */
+	String changeQuery() default "";
+
+	/** Expressions giving the values of changeQuery's parameters, in order, e.g. {"shopProductRequest.shopId", "shopProductRequest.productId"} */
+	String[] changeKeys() default {};
+
 	/** When a column whose name matches this pattern changed, the entry is recorded as changedAction instead of action */
 	String changedFieldPattern() default "";
 

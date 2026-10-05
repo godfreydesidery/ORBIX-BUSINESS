@@ -16,11 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
+import javax.persistence.Query;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
 import javax.persistence.metamodel.SingularAttribute;
@@ -60,7 +62,9 @@ public class AuditAspect {
 	// Never read into the audit log
 	private static final Pattern SENSITIVE = Pattern.compile("(?i).*(password|token|secret|logo).*");
 	// Columns used as the readable reference of a changed record when the annotation names none
-	private static final String[] REFERENCE_COLUMNS = {"no", "code", "username", "name", "chasisNo"};
+	private static final String[] REFERENCE_COLUMNS = {"no", "username", "code", "name", "chasisNo"};
+	// Records read at most when a change's keys match several (e.g. the same product in several branches)
+	private static final int MAX_MATCHING_RECORDS = 20;
 
 	// Looked up when first needed, so creating this aspect does not create the services early
 	private final ObjectProvider<AuditLogService> auditLogService;
@@ -73,14 +77,15 @@ public class AuditAspect {
 	@Around(value = "@annotation(audited)", argNames = "audited")
 	public Object recordAction(ProceedingJoinPoint joinPoint, Audited audited) throws Throwable {
 		Map<String, Object> values = new HashMap<>();
-		Map<String, Object> before = null;
+		// The changed record's columns before the action, by its id (more than one only when its keys match several records)
+		Map<String, Map<String, Object>> recordsBefore = null;
 		try {
 			String[] names = ((MethodSignature) joinPoint.getSignature()).getParameterNames();
 			Object[] args = joinPoint.getArgs();
 			for(int i = 0; names != null && i < names.length && i < args.length; i++) {
 				values.put(names[i], args[i]);
 			}
-			before = readColumns(audited.changeOf(), resolve(values, audited.changeId()));
+			recordsBefore = readRecordsBefore(audited, values);
 		}catch(Exception e) {
 			log.error("Could not read the record before audited action {}: {}", audited.action(), e.getMessage());
 		}
@@ -90,6 +95,19 @@ public class AuditAspect {
 		try {
 			values.put("result", result instanceof ResponseEntity ? ((ResponseEntity<?>) result).getBody() : result);
 			Map<String, Object> details = details(values, audited.details());
+
+			String entityId = text(resolve(values, audited.entityId()));
+			// The changed record: the only one read, or the one whose id the action returned
+			String changeId = null;
+			if(recordsBefore != null && recordsBefore.size() == 1) {
+				changeId = recordsBefore.keySet().iterator().next();
+			}else if(recordsBefore != null && entityId != null && recordsBefore.containsKey(entityId)) {
+				changeId = entityId;
+			}
+			Map<String, Object> before = changeId == null ? null : recordsBefore.get(changeId);
+			if(entityId == null) {
+				entityId = changeId;
+			}
 
 			String reference = text(resolve(values, audited.entityRef()));
 			if(reference == null && before != null) {
@@ -104,26 +122,25 @@ public class AuditAspect {
 					}
 				}
 			}
-			// {ref} in a summary names the record
-			values.put("ref", reference);
+			// {ref} in a summary names the record; by its id when it has no readable reference
+			if(reference != null) {
+				values.put("ref", reference);
+			}else if(entityId != null) {
+				values.put("ref", "#" + entityId);
+			}
 
 			AuditLog auditLog = new AuditLog();
 			auditLog.setCategory(audited.category());
 			auditLog.setAction(audited.action());
 			auditLog.setEntityType(audited.entityType().isEmpty() ? null : audited.entityType());
-			Object changeId = resolve(values, audited.changeId());
-			String entityId = text(resolve(values, audited.entityId()));
-			if(entityId == null && audited.changeOf() != void.class) {
-				entityId = text(changeId);
-			}
 			auditLog.setEntityId(AuditRequests.truncate(entityId, 40));
 			auditLog.setEntityRef(AuditRequests.truncate(reference, 100));
 			auditLog.setSummary(AuditRequests.truncate(fill(values, audited.summary()), 255));
 
-			if(audited.changeOf() != void.class && before != null) {
+			if(before != null) {
 				// The values after the action are read once it has committed, so they are the stored ones
-				Map<String, Object> recordBefore = before;
-				auditLogService.getObject().recordAction(auditLog, entry -> completeChange(entry, audited, details, recordBefore, changeId));
+				String recordId = changeId;
+				auditLogService.getObject().recordAction(auditLog, entry -> completeChange(entry, audited, details, before, recordId));
 			}else {
 				auditLog.setDetails(details.isEmpty() ? null : json(details));
 				auditLogService.getObject().recordAction(auditLog, null);
@@ -134,33 +151,62 @@ public class AuditAspect {
 		return result;
 	}
 
-	// Reads the record in a short read-only transaction of its own, so that nothing here can affect the action's transaction
-	private Map<String, Object> readColumns(Class<?> entityClass, Object id) {
-		if(entityClass == void.class || id == null) {
+	// Reads the changed record (by changeId, or else the records matching changeQuery) before the action
+	private Map<String, Map<String, Object>> readRecordsBefore(Audited audited, Map<String, Object> values) {
+		Object id = resolve(values, audited.changeId());
+		if(audited.changeOf() == void.class || (id == null && audited.changeQuery().isEmpty())) {
 			return null;
 		}
+		return readOnly(() -> {
+			List<?> ids = id != null ? List.of(id) : changeIds(audited, values);
+			Map<String, Map<String, Object>> records = new LinkedHashMap<>();
+			for(Object recordId : ids) {
+				Map<String, Object> columns = columns(audited.changeOf(), recordId);
+				if(columns != null) {
+					records.put(text(recordId), columns);
+				}
+			}
+			return records;
+		});
+	}
+
+	private List<?> changeIds(Audited audited, Map<String, Object> values) {
+		Query query = entityManager.createQuery(audited.changeQuery());
+		for(int i = 0; i < audited.changeKeys().length; i++) {
+			query.setParameter(i + 1, resolve(values, audited.changeKeys()[i]));
+		}
+		return query.setMaxResults(MAX_MATCHING_RECORDS).getResultList();
+	}
+
+	// Reads in a short read-only transaction of its own, so that nothing here can affect the action's transaction or the entry's
+	private <T> T readOnly(Reading<T> reading) {
 		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager.getObject());
 		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
 		transactionTemplate.setReadOnly(true);
 		return transactionTemplate.execute(status -> {
 			try {
-				return columns(entityClass, id);
+				return reading.read();
 			}catch(Exception e) {
 				throw new IllegalStateException(e.getMessage(), e);
 			}
 		});
 	}
 
+	private interface Reading<T> {
+		T read() throws Exception;
+	}
+
 	// Adds what the change did to the entry. Runs after the action has committed, inside the entry's own transaction
-	private void completeChange(AuditLog auditLog, Audited audited, Map<String, Object> details, Map<String, Object> before, Object id) {
+	private void completeChange(AuditLog auditLog, Audited audited, Map<String, Object> details, Map<String, Object> before, String id) {
 		try {
-			Map<String, Object> after = columns(audited.changeOf(), id);
+			Map<String, Object> after = readOnly(() -> columns(audited.changeOf(), id));
 			if(after == null) {
 				// The record was deleted: keep everything it held
-				details.put("before", before);
+				details.put("before", new TreeMap<>(before));
 			}else {
-				Map<String, Object> changedBefore = new LinkedHashMap<>();
-				Map<String, Object> changedAfter = new LinkedHashMap<>();
+				// By column name, so entries always list them in the same order
+				Map<String, Object> changedBefore = new TreeMap<>();
+				Map<String, Object> changedAfter = new TreeMap<>();
 				Set<String> columns = new LinkedHashSet<>(before.keySet());
 				columns.addAll(after.keySet());
 				for(String column : columns) {

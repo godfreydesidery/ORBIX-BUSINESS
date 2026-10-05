@@ -56,7 +56,7 @@ public class RestaurantDineableResource {
 	}
 	
 	@PostMapping("/restaurant_dineables/create")
-	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "RestaurantDineable", summary = "Created restaurant dineable {ref}")
+	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "RestaurantDineable", entityRef = "result.dineableCode", summary = "Created restaurant dineable {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantDineableResponseDTO>create(
 			@RequestBody RestaurantDineableRequestDTO restaurantDineableRequest,
@@ -66,7 +66,7 @@ public class RestaurantDineableResource {
 	}
 	
 	@PostMapping("/restaurant_dineables/update")
-	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "RestaurantDineable", summary = "Updated restaurant dineable {ref}", changeOf = RestaurantDineable.class, changeId = "restaurantDineableRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "RestaurantDineable", entityRef = "result.dineableCode", summary = "Updated restaurant dineable {ref}", changeOf = RestaurantDineable.class, changeId = "restaurantDineableRequest.id", changeQuery = "select d.id from RestaurantDineable d where d.restaurant.id = ?1 and d.dineable.id = ?2", changeKeys = {"restaurantDineableRequest.restaurantId", "restaurantDineableRequest.dineableId"}, changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantDineableResponseDTO>update(
 			@RequestBody RestaurantDineableRequestDTO restaurantDineableRequest,
@@ -76,7 +76,7 @@ public class RestaurantDineableResource {
 	}
 	
 	@PostMapping("/restaurant_dineables/adjust_stock")
-	@Audited(category = "INVENTORY", action = "STOCK_ADJUSTED", entityType = "RestaurantDineable", entityRef = "result.dineableCode", summary = "Adjusted the stock of {result.dineableCode} {result.dineableName} to {result.currentStock}", changeOf = RestaurantDineable.class, changeId = "restaurantDineableRequest.id")
+	@Audited(category = "INVENTORY", action = "STOCK_ADJUSTED", entityType = "RestaurantDineable", entityRef = "result.dineableCode", summary = "Adjusted the stock of {result.dineableCode} {result.dineableName} to {result.currentStock}", changeOf = RestaurantDineable.class, changeId = "restaurantDineableRequest.id", changeQuery = "select d.id from RestaurantDineable d where d.restaurant.id = ?1 and d.dineable.id = ?2", changeKeys = {"restaurantDineableRequest.restaurantId", "restaurantDineableRequest.dineableId"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantDineableResponseDTO>adjustStock(
 			@RequestBody RestaurantDineableRequestDTO restaurantDineableRequest,

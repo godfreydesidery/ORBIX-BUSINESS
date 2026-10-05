@@ -56,7 +56,7 @@ public class ShopProductResource {
 	}
 	
 	@PostMapping("/shop_products/create")
-	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "ShopProduct", summary = "Created shop product {ref}")
+	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "ShopProduct", entityRef = "result.productCode", summary = "Created shop product {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ShopProductResponseDTO>create(
 			@RequestBody ShopProductRequestDTO shopProductRequest,
@@ -66,7 +66,7 @@ public class ShopProductResource {
 	}
 	
 	@PostMapping("/shop_products/update")
-	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "ShopProduct", summary = "Updated shop product {ref}", changeOf = ShopProduct.class, changeId = "shopProductRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "ShopProduct", entityRef = "result.productCode", summary = "Updated shop product {ref}", changeOf = ShopProduct.class, changeId = "shopProductRequest.id", changeQuery = "select p.id from ShopProduct p where p.shop.id = ?1 and p.product.id = ?2", changeKeys = {"shopProductRequest.shopId", "shopProductRequest.productId"}, changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ShopProductResponseDTO>update(
 			@RequestBody ShopProductRequestDTO shopProductRequest,
@@ -76,7 +76,7 @@ public class ShopProductResource {
 	}
 	
 	@PostMapping("/shop_products/adjust_stock")
-	@Audited(category = "INVENTORY", action = "STOCK_ADJUSTED", entityType = "ShopProduct", entityRef = "result.productCode", summary = "Adjusted the stock of {result.productCode} {result.productName} to {result.currentStock}", changeOf = ShopProduct.class, changeId = "shopProductRequest.id")
+	@Audited(category = "INVENTORY", action = "STOCK_ADJUSTED", entityType = "ShopProduct", entityRef = "result.productCode", summary = "Adjusted the stock of {result.productCode} {result.productName} to {result.currentStock}", changeOf = ShopProduct.class, changeId = "shopProductRequest.id", changeQuery = "select p.id from ShopProduct p where p.shop.id = ?1 and p.product.id = ?2", changeKeys = {"shopProductRequest.shopId", "shopProductRequest.productId"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ShopProductResponseDTO>adjustStock(
 			@RequestBody ShopProductRequestDTO shopProductRequest,

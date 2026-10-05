@@ -63,7 +63,7 @@ private final SupplierProductRepository supplierProductRepository;
 	}
 	
 	@PostMapping("/supplier_products/create")
-	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "SupplierProduct", summary = "Created supplier product {ref}")
+	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "SupplierProduct", entityRef = "result.productCode", summary = "Created supplier product {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<SupplierProductResponseDTO>create(
 			@RequestBody SupplierProductRequestDTO supplierProductRequest,
@@ -73,7 +73,7 @@ private final SupplierProductRepository supplierProductRepository;
 	}
 	
 	@PostMapping("/supplier_products/update")
-	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "SupplierProduct", summary = "Updated supplier product {ref}", changeOf = SupplierProduct.class, changeId = "supplierProductRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "SupplierProduct", entityRef = "result.productCode", summary = "Updated supplier product {ref}", changeOf = SupplierProduct.class, changeId = "supplierProductRequest.id", changeQuery = "select p.id from SupplierProduct p where p.supplier.id = ?1 and p.product.id = ?2", changeKeys = {"supplierProductRequest.supplierId", "supplierProductRequest.productId"}, changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<SupplierProductResponseDTO>update(
 			@RequestBody SupplierProductRequestDTO supplierProductRequest,
@@ -83,7 +83,6 @@ private final SupplierProductRepository supplierProductRepository;
 	}
 	
 	@PostMapping("/supplier_products/adjust_stock")
-	@Audited(category = "INVENTORY", action = "STOCK_ADJUSTED", entityType = "SupplierProduct", entityRef = "result.productCode", summary = "Adjusted supplier product {result.productCode} {result.productName}", changeOf = SupplierProduct.class, changeId = "supplierProductRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<SupplierProductResponseDTO>adjustStock(
 			@RequestBody SupplierProductRequestDTO supplierProductRequest,
