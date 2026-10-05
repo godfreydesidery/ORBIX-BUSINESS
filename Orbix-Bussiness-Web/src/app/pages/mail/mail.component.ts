@@ -1,4 +1,5 @@
 import { Component, ViewEncapsulation } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, NavigationEnd, Router, RouterModule } from '@angular/router';
 import { Mail } from '@models/mail';
 import { AppState } from '@services/app.state';
@@ -29,7 +30,8 @@ export class MailComponent {
               public router: Router,
               private state: AppState) {
 
-    this.router.events.subscribe((event) => {
+    // Ends with this screen, instead of adding another listener each time it is opened
+    this.router.events.pipe(takeUntilDestroyed()).subscribe((event) => {
       if (event instanceof NavigationEnd) {
         this.id = this.route.snapshot.firstChild!.params['id'];
         this.type = this.route.snapshot.firstChild!.params['type'];
