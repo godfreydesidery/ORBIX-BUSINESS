@@ -28,7 +28,7 @@ public class AuditAccessDeniedHandler implements AccessDeniedHandler {
 		try {
 			String username = request.getUserPrincipal() == null ? null : request.getUserPrincipal().getName();
 			auditLogService.recordAccessDenied(username, request.getMethod() + " " + request.getRequestURI(),
-					AuditRequests.ipAddress(request), AuditRequests.userAgent(request));
+					AuditRequests.ipAddress(request), AuditRequests.forwardedFor(request), AuditRequests.userAgent(request));
 		}catch(Exception e) {
 			// Recording must never change the response
 		}

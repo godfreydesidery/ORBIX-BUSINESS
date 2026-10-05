@@ -5,10 +5,10 @@ import java.time.LocalDateTime;
 import java.time.ZoneOffset;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.transaction.Transactional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
@@ -23,19 +23,22 @@ import org.springframework.web.context.request.RequestAttributes;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orbix.api.api.commons.PageRequests;
 import com.orbix.api.api.commons.PageResponseDTO;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserRepository;
-import com.orbix.api.modules.identityandaccess.UserService;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
+/**
+ * Deliberately not transactional at class level: recording never takes part in the action's transaction,
+ * so nothing it does can roll the action back. Entries are written in transactions of their own.
+ */
 @Service
 @RequiredArgsConstructor
-@Transactional
 @Slf4j
 public class AuditLogServiceController implements AuditLogService {
 
@@ -43,23 +46,19 @@ public class AuditLogServiceController implements AuditLogService {
 	public static final String FAILURE = "FAILURE";
 
 	private final AuditLogRepository auditLogRepository;
-	private final UserService userService;
 	private final UserRepository userRepository;
 	private final PlatformTransactionManager transactionManager;
+	private final ObjectMapper objectMapper;
 
 	@Override
-	public void recordAction(AuditLog auditLog) {
-		// Who and where are read now, while the request is still being handled
+	public void recordAction(AuditLog auditLog, Consumer<AuditLog> afterCommit) {
+		// Who and where are read now, while the request is still being handled; the user's record is looked up when saving
 		HttpServletRequest request = currentRequest();
-		if(request != null && request.getUserPrincipal() != null) {
-			try {
-				setUser(auditLog, userService.getUser(request));
-			}catch(Exception e) {
-				auditLog.setUsername(AuditRequests.truncate(request.getUserPrincipal().getName(), 100));
-			}
-		}
+		String username = (request != null && request.getUserPrincipal() != null) ? request.getUserPrincipal().getName() : null;
+		auditLog.setUsername(AuditRequests.truncate(username, 100));
 		auditLog.setIpAddress(AuditRequests.ipAddress(request));
 		auditLog.setUserAgent(AuditRequests.userAgent(request));
+		String forwardedFor = AuditRequests.forwardedFor(request);
 		auditLog.setOccurredAt(LocalDateTime.now(ZoneOffset.UTC));
 		if(auditLog.getOutcome() == null) {
 			auditLog.setOutcome(SUCCESS);
@@ -70,55 +69,49 @@ public class AuditLogServiceController implements AuditLogService {
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 				@Override
 				public void afterCommit() {
-					save(auditLog);
+					finishAndSave(auditLog, username, forwardedFor, afterCommit);
 				}
 			});
 		}else {
-			save(auditLog);
+			finishAndSave(auditLog, username, forwardedFor, afterCommit);
 		}
 	}
 
 	@Override
 	@Async("auditExecutor")
-	public void recordAuth(String action, String outcome, String username, String reason, String ipAddress, String userAgent) {
+	public void recordAuth(String action, String outcome, String username, String reason, String ipAddress, String forwardedFor, String userAgent) {
 		AuditLog auditLog = new AuditLog();
 		auditLog.setOccurredAt(LocalDateTime.now(ZoneOffset.UTC));
 		auditLog.setCategory("AUTH");
 		auditLog.setAction(action);
 		auditLog.setOutcome(outcome);
 		auditLog.setUsername(AuditRequests.truncate(username, 100));
-		if(username != null) {
-			userRepository.findByUsername(username).ifPresent(user -> setUser(auditLog, user));
-		}
 		auditLog.setEntityType("User");
-		auditLog.setEntityId(auditLog.getUserId() == null ? null : auditLog.getUserId().toString());
 		auditLog.setEntityRef(auditLog.getUsername());
 		String summary = authSummary(action, username);
 		auditLog.setSummary(AuditRequests.truncate(reason == null ? summary : summary + ": " + reason, 255));
 		auditLog.setIpAddress(ipAddress);
 		auditLog.setUserAgent(userAgent);
-		save(auditLog);
+		finishAndSave(auditLog, username, forwardedFor, entry -> entry.setEntityId(entry.getUserId() == null ? null : entry.getUserId().toString()));
 	}
 
 	@Override
 	@Async("auditExecutor")
-	public void recordAccessDenied(String username, String path, String ipAddress, String userAgent) {
+	public void recordAccessDenied(String username, String path, String ipAddress, String forwardedFor, String userAgent) {
 		AuditLog auditLog = new AuditLog();
 		auditLog.setOccurredAt(LocalDateTime.now(ZoneOffset.UTC));
 		auditLog.setCategory("SECURITY");
 		auditLog.setAction("ACCESS_DENIED");
 		auditLog.setOutcome(FAILURE);
 		auditLog.setUsername(AuditRequests.truncate(username, 100));
-		if(username != null) {
-			userRepository.findByUsername(username).ifPresent(user -> setUser(auditLog, user));
-		}
 		auditLog.setSummary(AuditRequests.truncate("Access denied to " + path, 255));
 		auditLog.setIpAddress(ipAddress);
 		auditLog.setUserAgent(userAgent);
-		save(auditLog);
+		finishAndSave(auditLog, username, forwardedFor, null);
 	}
 
 	@Override
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public PageResponseDTO<AuditLogResponseDTO> getAuditLogPage(String from, String to, String category, String action, String outcome,
 			Long userId, Long branchId, int page, int size, String search, HttpServletRequest request) {
 		// The period is sent as UTC instants (ISO-8601); without one, the last seven days are shown
@@ -136,6 +129,7 @@ public class AuditLogServiceController implements AuditLogService {
 	}
 
 	@Override
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public AuditLogResponseDTO get(Long id, HttpServletRequest request) {
 		Optional<AuditLog> auditLog_ = auditLogRepository.findById(id);
 		if(auditLog_.isEmpty()) {
@@ -144,12 +138,28 @@ public class AuditLogServiceController implements AuditLogService {
 		return auditLogResponseDTOMapper(auditLog_.get());
 	}
 
-	// Saves the entry in a transaction of its own; a failure is logged and never reaches the action or sign-in
-	private void save(AuditLog auditLog) {
+	/**
+	 * Finishes the entry and saves it, in a transaction of its own: looks up the user, then lets the caller complete
+	 * the entry (e.g. with values read after the commit). A failure is logged and never reaches the action or sign-in.
+	 */
+	private void finishAndSave(AuditLog auditLog, String username, String forwardedFor, Consumer<AuditLog> finish) {
 		try {
 			TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager);
 			transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-			transactionTemplate.executeWithoutResult(status -> auditLogRepository.save(auditLog));
+			transactionTemplate.executeWithoutResult(status -> {
+				if(username != null) {
+					userRepository.findByUsername(username).ifPresent(user -> setUser(auditLog, user));
+				}
+				if(finish != null) {
+					try {
+						finish.accept(auditLog);
+					}catch(Exception e) {
+						log.error("Could not complete audit log entry {}: {}", auditLog.getAction(), e.getMessage());
+					}
+				}
+				auditLog.setDetails(withForwardedFor(auditLog.getDetails(), forwardedFor));
+				auditLogRepository.save(auditLog);
+			});
 		}catch(Exception e) {
 			log.error("Could not write audit log entry {} {} for {}: {}", auditLog.getCategory(), auditLog.getAction(), auditLog.getUsername(), e.getMessage());
 		}
@@ -165,13 +175,30 @@ public class AuditLogServiceController implements AuditLogService {
 		auditLog.setBranchId(user.getBranch() == null ? null : user.getBranch().getId());
 	}
 
+	// Adds the X-Forwarded-For header to the details, when the request carried one
+	private String withForwardedFor(String details, String forwardedFor) {
+		if(forwardedFor == null) {
+			return details;
+		}
+		try {
+			com.fasterxml.jackson.databind.node.ObjectNode node = (details == null || details.isEmpty())
+					? objectMapper.createObjectNode()
+					: (com.fasterxml.jackson.databind.node.ObjectNode) objectMapper.readTree(details);
+			node.put("forwardedFor", forwardedFor);
+			return objectMapper.writeValueAsString(node);
+		}catch(Exception e) {
+			return details;
+		}
+	}
+
 	private String authSummary(String action, String username) {
+		String name = username == null ? "(no username given)" : username;
 		switch(action) {
-			case "LOGIN_SUCCESS": return "Signed in as " + username;
-			case "LOGIN_FAILED": return "Failed sign-in as " + username;
-			case "TOKEN_REFRESHED": return "Session renewed for " + username;
-			case "LOGOUT": return "Signed out " + username;
-			default: return action + " " + username;
+			case "LOGIN_SUCCESS": return "Signed in as " + name;
+			case "LOGIN_FAILED": return "Failed sign-in as " + name;
+			case "TOKEN_REFRESHED": return "Session renewed for " + name;
+			case "LOGOUT": return "Signed out " + name;
+			default: return action + " " + name;
 		}
 	}
 

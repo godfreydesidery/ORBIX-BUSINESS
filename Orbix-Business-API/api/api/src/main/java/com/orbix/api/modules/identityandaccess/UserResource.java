@@ -367,7 +367,7 @@ public class UserResource {
 		String username = request.getUserPrincipal() == null ? null : request.getUserPrincipal().getName();
 		if(username != null) {
 			auditLogService.recordAuth("LOGOUT", AuditLogServiceController.SUCCESS, username, null,
-					AuditRequests.ipAddress(request), AuditRequests.userAgent(request));
+					AuditRequests.ipAddress(request), AuditRequests.forwardedFor(request), AuditRequests.userAgent(request));
 		}
 		return ResponseEntity.ok().body(true);
 	}
@@ -409,7 +409,7 @@ public class UserResource {
 
 				// Session renewal recorded in the audit log, in the background
 				auditLogService.recordAuth("TOKEN_REFRESHED", AuditLogServiceController.SUCCESS, username, null,
-						AuditRequests.ipAddress(request), AuditRequests.userAgent(request));
+						AuditRequests.ipAddress(request), AuditRequests.forwardedFor(request), AuditRequests.userAgent(request));
 			}catch(Exception exception) {
 				response.setHeader("error", exception.getMessage());
 				response.setStatus(HttpStatus.FORBIDDEN.value());

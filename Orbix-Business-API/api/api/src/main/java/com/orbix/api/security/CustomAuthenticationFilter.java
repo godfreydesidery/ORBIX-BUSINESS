@@ -100,7 +100,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 		
 		// Sign-in recorded in the audit log, in the background
 		auditLogService.recordAuth("LOGIN_SUCCESS", AuditLogServiceController.SUCCESS, user.getUsername(), null,
-				AuditRequests.ipAddress(request), AuditRequests.userAgent(request));
+				AuditRequests.ipAddress(request), AuditRequests.forwardedFor(request), AuditRequests.userAgent(request));
 		
 		new ObjectMapper().writeValue(response.getOutputStream(), tokens);
 	}
@@ -113,7 +113,7 @@ public class CustomAuthenticationFilter extends UsernamePasswordAuthenticationFi
 		// Failed sign-in recorded in the audit log, in the background; the response is unchanged
 		try {
 			auditLogService.recordAuth("LOGIN_FAILED", AuditLogServiceController.FAILURE, request.getParameter("username"), failed.getMessage(),
-					AuditRequests.ipAddress(request), AuditRequests.userAgent(request));
+					AuditRequests.ipAddress(request), AuditRequests.forwardedFor(request), AuditRequests.userAgent(request));
 		}catch(Exception e) {
 			// Recording must never change the response
 		}

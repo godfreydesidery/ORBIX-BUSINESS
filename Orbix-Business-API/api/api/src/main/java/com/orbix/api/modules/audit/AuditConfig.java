@@ -24,7 +24,6 @@ public class AuditConfig {
 		executor.setThreadNamePrefix("audit-");
 		// If the queue is ever full, the entry is written on the calling thread instead of being dropped
 		executor.setRejectedExecutionHandler(new ThreadPoolExecutor.CallerRunsPolicy());
-		executor.initialize();
 		return executor;
 	}
 }

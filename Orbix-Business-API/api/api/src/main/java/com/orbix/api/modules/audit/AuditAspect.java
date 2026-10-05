@@ -35,6 +35,9 @@ import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.beans.factory.ObjectProvider;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.PlatformTransactionManager;
+import org.springframework.transaction.TransactionDefinition;
+import org.springframework.transaction.support.TransactionTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -62,6 +65,7 @@ public class AuditAspect {
 	// Looked up when first needed, so creating this aspect does not create the services early
 	private final ObjectProvider<AuditLogService> auditLogService;
 	private final ObjectProvider<ObjectMapper> objectMapper;
+	private final ObjectProvider<PlatformTransactionManager> transactionManager;
 
 	@PersistenceContext
 	private EntityManager entityManager;
@@ -76,7 +80,7 @@ public class AuditAspect {
 			for(int i = 0; names != null && i < names.length && i < args.length; i++) {
 				values.put(names[i], args[i]);
 			}
-			before = columns(audited.changeOf(), resolve(values, audited.changeId()));
+			before = readColumns(audited.changeOf(), resolve(values, audited.changeId()));
 		}catch(Exception e) {
 			log.error("Could not read the record before audited action {}: {}", audited.action(), e.getMessage());
 		}
@@ -86,37 +90,11 @@ public class AuditAspect {
 		try {
 			values.put("result", result instanceof ResponseEntity ? ((ResponseEntity<?>) result).getBody() : result);
 			Map<String, Object> details = details(values, audited.details());
-			String action = audited.action();
+
 			String reference = text(resolve(values, audited.entityRef()));
-
-			if(audited.changeOf() != void.class && before != null) {
-				Map<String, Object> after = columns(audited.changeOf(), resolve(values, audited.changeId()));
-				if(after == null) {
-					// The record was deleted: keep everything it held
-					details.put("before", before);
-				}else {
-					Map<String, Object> changedBefore = new LinkedHashMap<>();
-					Map<String, Object> changedAfter = new LinkedHashMap<>();
-					Set<String> columns = new LinkedHashSet<>(before.keySet());
-					columns.addAll(after.keySet());
-					for(String column : columns) {
-						if(!Objects.equals(before.get(column), after.get(column))) {
-							changedBefore.put(column, before.get(column));
-							changedAfter.put(column, after.get(column));
-						}
-					}
-					details.put("before", changedBefore);
-					details.put("after", changedAfter);
-					if(!audited.changedFieldPattern().isEmpty() && !audited.changedAction().isEmpty()
-							&& changedAfter.keySet().stream().anyMatch(column -> column.matches(audited.changedFieldPattern()))) {
-						action = audited.changedAction();
-					}
-				}
-				if(reference == null) {
-					reference = reference(before);
-				}
+			if(reference == null && before != null) {
+				reference = reference(before);
 			}
-
 			if(reference == null) {
 				Object resultValue = values.get("result");
 				for(int i = 0; i < REFERENCE_COLUMNS.length && reference == null && resultValue != null; i++) {
@@ -131,21 +109,77 @@ public class AuditAspect {
 
 			AuditLog auditLog = new AuditLog();
 			auditLog.setCategory(audited.category());
-			auditLog.setAction(action);
+			auditLog.setAction(audited.action());
 			auditLog.setEntityType(audited.entityType().isEmpty() ? null : audited.entityType());
+			Object changeId = resolve(values, audited.changeId());
 			String entityId = text(resolve(values, audited.entityId()));
 			if(entityId == null && audited.changeOf() != void.class) {
-				entityId = text(resolve(values, audited.changeId()));
+				entityId = text(changeId);
 			}
 			auditLog.setEntityId(AuditRequests.truncate(entityId, 40));
 			auditLog.setEntityRef(AuditRequests.truncate(reference, 100));
 			auditLog.setSummary(AuditRequests.truncate(fill(values, audited.summary()), 255));
-			auditLog.setDetails(details.isEmpty() ? null : json(details));
-			auditLogService.getObject().recordAction(auditLog);
+
+			if(audited.changeOf() != void.class && before != null) {
+				// The values after the action are read once it has committed, so they are the stored ones
+				Map<String, Object> recordBefore = before;
+				auditLogService.getObject().recordAction(auditLog, entry -> completeChange(entry, audited, details, recordBefore, changeId));
+			}else {
+				auditLog.setDetails(details.isEmpty() ? null : json(details));
+				auditLogService.getObject().recordAction(auditLog, null);
+			}
 		}catch(Exception e) {
 			log.error("Could not record audit log entry {}: {}", audited.action(), e.getMessage());
 		}
 		return result;
+	}
+
+	// Reads the record in a short read-only transaction of its own, so that nothing here can affect the action's transaction
+	private Map<String, Object> readColumns(Class<?> entityClass, Object id) {
+		if(entityClass == void.class || id == null) {
+			return null;
+		}
+		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager.getObject());
+		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
+		transactionTemplate.setReadOnly(true);
+		return transactionTemplate.execute(status -> {
+			try {
+				return columns(entityClass, id);
+			}catch(Exception e) {
+				throw new IllegalStateException(e.getMessage(), e);
+			}
+		});
+	}
+
+	// Adds what the change did to the entry. Runs after the action has committed, inside the entry's own transaction
+	private void completeChange(AuditLog auditLog, Audited audited, Map<String, Object> details, Map<String, Object> before, Object id) {
+		try {
+			Map<String, Object> after = columns(audited.changeOf(), id);
+			if(after == null) {
+				// The record was deleted: keep everything it held
+				details.put("before", before);
+			}else {
+				Map<String, Object> changedBefore = new LinkedHashMap<>();
+				Map<String, Object> changedAfter = new LinkedHashMap<>();
+				Set<String> columns = new LinkedHashSet<>(before.keySet());
+				columns.addAll(after.keySet());
+				for(String column : columns) {
+					if(!Objects.equals(before.get(column), after.get(column))) {
+						changedBefore.put(column, before.get(column));
+						changedAfter.put(column, after.get(column));
+					}
+				}
+				details.put("before", changedBefore);
+				details.put("after", changedAfter);
+				if(!audited.changedFieldPattern().isEmpty() && !audited.changedAction().isEmpty()
+						&& changedAfter.keySet().stream().anyMatch(column -> column.matches(audited.changedFieldPattern()))) {
+					auditLog.setAction(audited.changedAction());
+				}
+			}
+		}catch(Exception e) {
+			log.error("Could not read the record after audited action {}: {}", audited.action(), e.getMessage());
+		}
+		auditLog.setDetails(details.isEmpty() ? null : json(details));
 	}
 
 	// The record's own columns (and the ids of the records it points to), or null when there is no such record
