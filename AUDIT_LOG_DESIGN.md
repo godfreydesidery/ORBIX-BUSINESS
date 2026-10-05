@@ -86,9 +86,8 @@ The `AuditLog` entity is created automatically, with its indexes, by `ddl-auto=u
 `AuditLogService` (implemented by `AuditLogServiceController`), in the new package `com.orbix.api.modules.audit`:
 
 ```java
-// A critical action of the current user, saved once the action's transaction commits;
-// afterCommit (optional) completes the entry just before it is saved, e.g. with values read after the commit
-void recordAction(AuditLog auditLog, Consumer<AuditLog> afterCommit);
+// A critical action of the current user, saved in the background once the action's transaction (if any) commits
+void recordAction(AuditLog auditLog);
 // Sign-in events and refused requests, saved in the background
 void recordAuth(String action, String outcome, String username, String reason, String ipAddress, String forwardedFor, String userAgent);
 void recordAccessDenied(String username, String path, String ipAddress, String forwardedFor, String userAgent);
@@ -112,15 +111,17 @@ Tokens are stateless, so a user who closes the browser without logging out leave
 
 ### 5.3 Critical actions
 
-An `@Audited` annotation goes on the **service** methods (not the resources) that perform the actions in section 6:
+An `@Audited` annotation goes on the **resource** methods (the endpoints) that perform the actions in section 6:
 
 ```java
-@Audited(category = "FINANCE", action = "PAYMENT_CONFIRMED", entity = "BillReceivable")
-public BillReceivable confirmBillPayment(...) { ... }
+@Audited(category = "FINANCE", action = "PAYMENT_CONFIRMED", entityType = "BillReceivable", summary = "...")
+public ResponseEntity<...> confirmBillPayment(...) { ... }
 ```
 
 `AuditAspect` (Spring AOP, already on the classpath) records the entry **after the method returns successfully**:
-- It is written **right after the action's transaction commits**, in a transaction of its own, on the same request. A rolled back action leaves no entry. A failure to write the entry is logged and never fails the action, so the audit log cannot break business operations. The only gap: an entry is lost if the server stops in the moment between the two writes.
+- The aspect runs **around the action's transaction** (it is ordered first), so the method returns to it only once the transaction has committed. A rolled back action leaves no entry.
+- The entry is then **written by the audit thread** (`auditExecutor`), in a transaction of its own. The request never waits on it, and never holds a second database connection for it: with open-in-view the request keeps its connection until it ends, so a write on the request itself would take another, and many audited changes at once could use up the pool.
+- A failure to write the entry is logged and never fails the action, so the audit log cannot break business operations. The only gap: an entry is lost if the server stops between the action's commit and the entry's write. If ever more than 1000 entries are waiting, the next one is written on the request itself instead of being dropped.
 - **Record id and reference** come from the returned DTO (`getId()`, `getNo()`) or from a named argument (`@Audited(entityId = "discountRequest.id")`).
 - **Summary and key values** come from expressions in the annotation, e.g. `summary = "Confirmed payment of {totalAmount} for {billReceivableRequests.size} bill(s)"`.
 
@@ -149,8 +150,9 @@ Some screens name the record by other keys than its id; the shop, restaurant and
 ```
 
 How it works:
-- **Before the action**, the aspect reads the record named by `changeOf` and `changeId` (or, without an id, the records matching `changeQuery`), in a short read-only transaction of its own. It takes the record's own columns, plus the ids of the records it points to, from the JPA metamodel. When the keys match several records (a supplier's product in several branches), the one whose id the action returns is used.
-- **After the action has committed**, it reads them again, in another short read-only transaction, and keeps only the columns that changed, as `before` and `after`, listed by column name. If the record was deleted, everything it held is kept as `before`. Neither read takes part in the action's transaction or the entry's, so neither can affect them; if the second read fails, the entry is still written, without the values.
+- **Before the action**, the aspect reads the record named by `changeOf` and `changeId` (or, without an id, the records matching `changeQuery`), through a short-lived EntityManager of its own, before the action's transaction starts and while the request holds no database connection. It takes the record's own columns, plus the ids of the records it points to, from the JPA metamodel. When the keys match several records (a supplier's product in several branches), the one whose id the action returns is used.
+- **After the action has committed**, it reads them again through the request's own EntityManager, which already holds the request's connection and has the changed record in memory (usually no query is run). It keeps only the columns that changed, as `before` and `after`, listed by column name; a record saved unchanged adds neither. If the record was deleted, everything it held is kept as `before`. Neither read takes part in the action's transaction, so neither can affect it; if the second read fails, the entry is still written, without the values.
+- **Size:** the details are kept within the `TEXT` column (16,000 characters), so a very large action still gets its entry.
 - **Price changes:** when a changed column matches `changedFieldPattern`, the entry is recorded as `changedAction` (for example `PRICE_CHANGED`) instead of `action`.
 - **Reference:** `{ref}` in a summary is the record's number, username, code or name, or `#` and its id when it has none of these.
 - **Safety:** reading the record before and after never throws, and the action's result and exceptions pass through unchanged.
@@ -249,7 +251,7 @@ Rules:
 
 ## 10. Performance
 
-- **Writes:** per critical action, after it commits: one user look-up and one insert, plus for edits one read of the record before and one after. Per sign-in event, the same look-up and insert in the background.
+- **Writes:** per critical action, after it commits and on the audit thread: one user look-up and one insert; for edits, one read of the record before the action (the read after it usually needs no query). Per sign-in event, the same look-up and insert in the background.
 - **Reads:** only from the audit screens, which are paged and indexed.
 - **Growth:** roughly logins plus critical actions per day, small next to bills and collections, and bounded by retention.
 
