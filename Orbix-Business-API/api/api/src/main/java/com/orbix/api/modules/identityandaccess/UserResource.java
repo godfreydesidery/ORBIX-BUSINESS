@@ -635,10 +635,8 @@ public class UserResource {
 			Branch branch = null;
 			branch = userService.getUser(request).getBranch();
 			
-			List<RestaurantAgent> users = restaurantAgentRepository.findAll();
-			for(RestaurantAgent user : users) {
-				nicknames.add(user.getName());
-			}	
+			// Only the names are needed, so read them instead of loading every agent with its related data
+			nicknames.addAll(restaurantAgentRepository.getNames());
 		}catch(Exception e) {
 			return nicknames;
 		}

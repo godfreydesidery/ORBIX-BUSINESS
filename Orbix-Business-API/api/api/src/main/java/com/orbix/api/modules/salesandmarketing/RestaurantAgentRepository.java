@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.List;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import com.orbix.api.modules.adminunits.Restaurant;
 
@@ -16,5 +17,8 @@ public interface RestaurantAgentRepository extends JpaRepository<RestaurantAgent
 	boolean existsByRestaurantBadgeId(Long restaurantBadgeId);
 
 	List<RestaurantAgent> findAllByRestaurantAndRestaurantBadgeNotNull(Restaurant restaurant);
+
+	@Query("SELECT a.name FROM RestaurantAgent a ORDER BY a.id")
+	List<String> getNames();
 
 }

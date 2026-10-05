@@ -14,6 +14,9 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
 	List<Parking> findAllByStatusIn(List<String> statuses);
 
 	List<Parking> findAllByVehicleEquipmentAndStatusIn(VehicleEquipment vehicleEquipment, List<String> statuses);
+
+	@Query("SELECT p.id FROM Parking p WHERE p.vehicleEquipment = :vehicleEquipment AND p.status IN :statuses ORDER BY p.id")
+	List<Long> getIdsByVehicleEquipmentAndStatusIn(@Param("vehicleEquipment") VehicleEquipment vehicleEquipment, @Param("statuses") List<String> statuses);
 	
 	
 	@Query("SELECT COUNT(p) FROM Parking p WHERE p.checkedInDateTime BETWEEN :startDate AND :endDate AND status IN :statuses")

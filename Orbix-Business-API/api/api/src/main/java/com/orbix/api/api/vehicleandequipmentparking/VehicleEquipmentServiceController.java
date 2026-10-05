@@ -109,9 +109,10 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		
 		ParkingResponseDTO parkingResponse = new ParkingResponseDTO();
 		
-		List<Parking> parkings = parkingRepository.findAllByVehicleEquipmentAndStatusIn(vehicleEquipment_.get(), statuses);
-		for(Parking p : parkings) {
-			parkingResponse.setId(p.getId().toString());
+		// Only the id of the open parking is needed, so read ids instead of whole parkings
+		List<Long> parkingIds = parkingRepository.getIdsByVehicleEquipmentAndStatusIn(vehicleEquipment_.get(), statuses);
+		for(Long parkingId : parkingIds) {
+			parkingResponse.setId(parkingId.toString());
 		}
 		
 		return vehicleEquipmentResponseDTOMapper(vehicleEquipment_.get(), parkingResponse, null);
@@ -130,9 +131,10 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		
 		MaintenanceResponseDTO maintenanceResponse = new MaintenanceResponseDTO();
 		
-		List<Maintenance> maintenances = maintenanceRepository.findAllByVehicleEquipmentAndStatusIn(vehicleEquipment_.get(), statuses);
-		for(Maintenance m : maintenances) {
-			maintenanceResponse.setId(m.getId().toString());
+		// Only the id of the open maintenance is needed, so read ids instead of whole maintenances
+		List<Long> maintenanceIds = maintenanceRepository.getIdsByVehicleEquipmentAndStatusIn(vehicleEquipment_.get(), statuses);
+		for(Long maintenanceId : maintenanceIds) {
+			maintenanceResponse.setId(maintenanceId.toString());
 		}
 		
 		return vehicleEquipmentResponseDTOMapper(vehicleEquipment_.get(), null, maintenanceResponse);

@@ -47,9 +47,10 @@ public class RestaurantBadgeServiceController implements RestaurantBadgeService 
 	@Override
 	public String generateBadge(HttpServletRequest request) {
 		Long id = 0L;
-		RestaurantBadge badge = restaurantBadgeRepository.findTopByOrderByIdDesc();
-		if(badge != null) {
-			id = badge.getId();
+		// Only the last id is needed, so read it instead of loading the last badge with its related data
+		Long maxId = restaurantBadgeRepository.getMaxId();
+		if(maxId != null) {
+			id = maxId;
 		}
 		return "Sighman_Res-" + (id + 1);
 	}
