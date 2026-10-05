@@ -16,6 +16,9 @@
 --      Otherwise the application creates them itself at startup, and startup waits
 --      until large tables are indexed.
 --   3. Safe to run more than once: an index that already exists is skipped.
+--   4. The user running it needs CREATE ROUTINE / ALTER ROUTINE privileges (the
+--      script uses a temporary procedure) and the application database must be
+--      the default schema (USE <database>; or the command line above).
 --
 -- ONLINE BUILD
 --   Each index is built with ALGORITHM=INPLACE, LOCK=NONE: reads and writes continue
@@ -23,6 +26,12 @@
 --   online, that statement fails instead of locking the table; the script can then
 --   be re-run in a maintenance window without the ALGORITHM/LOCK options.
 -- =============================================================================
+
+-- An online index build still needs a short exclusive metadata lock. If a long
+-- transaction holds the table, give up after 10 seconds instead of making every
+-- query on that table queue behind the waiting build. If a statement times out,
+-- simply run the script again later; finished indexes are skipped.
+SET SESSION lock_wait_timeout = 10;
 
 DELIMITER $$
 
@@ -112,6 +121,11 @@ ORDER BY table_name, index_name;
 -- Rollback (only if ever needed): remove the indexes again.
 -- Also remove the matching @Index entries from the entities, or the application
 -- recreates them at the next startup.
+-- Indexes that start with a foreign-key column (..._id) replace the index InnoDB
+-- created for that foreign key, so DROP fails with error 1553. For those, first
+-- create an index on the foreign-key column alone, e.g.
+--   CREATE INDEX ix_parkings_created_by_user ON parkings (created_by_user_id);
+-- and then drop the composite index.
 -- -----------------------------------------------------------------------------
 -- DROP INDEX `ix_discount_requests_bill_id_name` ON `discount_requests`;
 -- DROP INDEX `ix_pbr_discount_status_parking` ON `parking_bill_receivables`;
