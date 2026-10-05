@@ -8,7 +8,6 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { PosReceiptPrinterService } from '@services/custom/pos-receipt-printer.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from 'src/app/auth.service';
-import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { IShop } from 'src/app/domain/shop';
 import { environment } from 'src/environments/environment';
 import { HttpHeaders } from '@angular/common/http';
@@ -16,6 +15,8 @@ import { ILpo } from 'src/app/domain/lpo';
 import { IGrn } from 'src/app/domain/grn';
 import { NotificationComponent } from '../../misc/notification/notification.component';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 
 
@@ -26,7 +27,6 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    SearchFilterPipe,
     NgxPaginationModule,
     RouterModule
   ],
@@ -50,7 +50,11 @@ export class SelectShopComponent {
   shopLoaded :boolean = false 
 
   lpoPage: number = 1; // Initialize the current page to 1
+  pageSizeLpos : number = 10
+  listSearchTimerLpos : any = null
   grnPage: number = 1; // Initialize the current page to 1
+  pageSizeGrns : number = 10
+  listSearchTimerGrns : any = null
   filterLpoRecords : string = ''
   filterGrnRecords : string = ''
   selectedOption: string = '';
@@ -145,47 +149,104 @@ export class SelectShopComponent {
   }
 
   lpos : ILpo[] = []
+  totalLpos : number = 0
+  lposRequest : number = 0 // number of the latest list request; answers to older ones are ignored
   async getAllPendingOrders(){
-        let options = {
-          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    // One page at a time, searched on the server against the shown columns
+    var page = this.lpoPage
+    var request = ++this.lposRequest
+
+    await this.http.get<IPage<ILpo>>(API_URL+'/lpos/get_all_visible_by_shop_page?shop_id=' + this.selectedShopId + '&' + pageParams(page, this.pageSizeLpos, this.filterLpoRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.lposRequest){
+          return
         }
-        this.lpos = []
-      
-        await this.http.get<ILpo[]>(API_URL+'/lpos/get_all_visible_by_shop?shop_id=' + this.selectedShopId, options)
-        .toPromise()
-        .then(
-          data => {
-            this.lpos = [...data!]
-            
-            console.log(data)
-          }
-        )
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSizeLpos))
+        if(page > lastPage){
+          this.lpoPage = lastPage
+          this.getAllPendingOrders()
+          return
+        }
+        this.lpos = data!.content
+        this.totalLpos = data!.totalElements
       }
+    )
+  }
+
+  pageChangedLpos(page : number){
+    this.lpoPage = page
+    this.getAllPendingOrders()
+  }
+
+  searchListLpos(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimerLpos)
+    this.listSearchTimerLpos = setTimeout(() => {
+      this.lpoPage = 1
+      this.getAllPendingOrders()
+    }, 300)
+  }
 
       grns : IGrn[] = []
-      async getAllPendingGrns(){
-        let options = {
-          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+  totalGrns : number = 0
+  grnsRequest : number = 0 // number of the latest list request; answers to older ones are ignored
+  async getAllPendingGrns(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    // One page at a time, searched on the server against the shown columns
+    var page = this.grnPage
+    var request = ++this.grnsRequest
+
+    await this.http.get<IPage<IGrn>>(API_URL+'/grns/get_all_visible_by_shop_page?shop_id=' + this.selectedShopId + '&' + pageParams(page, this.pageSizeGrns, this.filterGrnRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.grnsRequest){
+          return
         }
-        this.grns = []
-      
-        await this.http.get<IGrn[]>(API_URL+'/grns/get_all_visible_by_shop?shop_id=' + this.selectedShopId, options)
-        .toPromise()
-        .then(
-          data => {
-            var sn = 1
-            data?.forEach(element => {
-              element.sn = sn
-              this.grns.push(element)
-              sn = sn + 1
-            })
-            console.log(data)
-          }
-        )
-        .catch(error => {
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSizeGrns))
+        if(page > lastPage){
+          this.grnPage = lastPage
+          this.getAllPendingGrns()
+          return
+        }
+        var sn = (page - 1) * this.pageSizeGrns + 1
+        data!.content.forEach(element => {
+          element.sn = sn
+          sn = sn + 1
+        })
+        this.grns = data!.content
+        this.totalGrns = data!.totalElements
+      }
+    )
+    .catch(error => {
           console.log(error)
         })
-      }
+  }
+
+  pageChangedGrns(page : number){
+    this.grnPage = page
+    this.getAllPendingGrns()
+  }
+
+  searchListGrns(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimerGrns)
+    this.listSearchTimerGrns = setTimeout(() => {
+      this.grnPage = 1
+      this.getAllPendingGrns()
+    }, 300)
+  }
 
 
       lpoId : any = null
