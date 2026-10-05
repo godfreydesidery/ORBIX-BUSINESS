@@ -502,6 +502,9 @@ export class SupplierProductListComponent {
     async onSupplierChange(event: any): Promise<void> {
       this.selectedSupplierId = await event.target.value;
       this.supplierProductPage = 1
+      // do not show the previous supplier's products while the new supplier's products load
+      this.supplierProducts = []
+      this.totalSupplierProducts = 0
       await this.loadSelectedSupplier()
       await this.loadSupplierProductsByBranch()
     }

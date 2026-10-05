@@ -284,6 +284,9 @@ export class SupplierPriceListComponent {
   loadSupplierProductsByBranch = async (id : any) => {
     this.viewedSupplierId = id
     this.productPage = 1
+    // do not show the previous supplier's products while the new supplier's products load
+    this.supplierProducts = []
+    this.totalSupplierProducts = 0
     await this.loadViewedSupplierProducts()
   }
 

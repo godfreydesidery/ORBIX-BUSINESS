@@ -256,6 +256,9 @@ export class UserComponent {
         this.totalUsers = data!.totalElements
       }
     )
+    .catch(error => {
+      this.msg.showErrorMessage(error, 'Could not load users')
+    })
   }
 
   pageChanged(page : number){

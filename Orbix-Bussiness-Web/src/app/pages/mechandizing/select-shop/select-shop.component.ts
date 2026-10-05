@@ -180,6 +180,21 @@ export class SelectShopComponent {
     )
   }
 
+  // Opening a list starts at its first page, without the rows of a previous shop
+  openLpoList(){
+    this.lpos = []
+    this.totalLpos = 0
+    this.lpoPage = 1
+    this.getAllPendingOrders()
+  }
+
+  openGrnList(){
+    this.grns = []
+    this.totalGrns = 0
+    this.grnPage = 1
+    this.getAllPendingGrns()
+  }
+
   pageChangedLpos(page : number){
     this.lpoPage = page
     this.getAllPendingOrders()

@@ -38,9 +38,9 @@
                             [routerLink]="'/app/mechandizing/shop-product-stock-status'"
                             [queryParams]="{ shop_id: selectedShopId }">Stock Status</button>
                         <!-- <button class="btn btn-success btn-round-custom" [routerLink]="'/app/mechandizing/shop-lpo'" [queryParams]="{ shop_id: selectedShopId }">LPO</button> -->
-                        <button class="btn btn-success btn-round-custom" (click)="getAllPendingOrders()"
+                        <button class="btn btn-success btn-round-custom" (click)="openLpoList()"
                             data-toggle="modal" data-target="#sales-order-list-modal">Local Purchase Orders</button>
-                        <button class="btn btn-success btn-round-custom" (click)="getAllPendingGrns()"
+                        <button class="btn btn-success btn-round-custom" (click)="openGrnList()"
                             data-toggle="modal" data-target="#grn-list-modal">Goods Received Notes</button>
                         <button class="btn btn-success btn-round-custom"
                             [routerLink]="'/app/mechandizing/import-product'"
