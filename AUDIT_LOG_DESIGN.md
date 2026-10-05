@@ -96,7 +96,7 @@ void recordAccessDenied(String username, String path, String ipAddress, String f
 - **No part in the action's transaction:** the service is deliberately not transactional at class level. Each entry is saved in a transaction of its own, and any failure there is logged and never reaches the action.
 - **Acting user:** the username is taken from the request. The user's record (id, company, branch) is looked up when the entry is saved, in the entry's own transaction, so a missing or renamed user can never affect the action.
 - **IP address and browser:** the connection's remote address, which the client cannot fake. Any `X-Forwarded-For` header is kept in the details as `forwardedFor`, not trusted as the address.
-- **Insert only:** `AuditLogRepository` has no update or delete, and no endpoint changes or removes entries.
+- **Insert only:** `AuditLogRepository` has no update, and no endpoint changes or removes entries. The only delete is the clean-up of entries older than 90 days (section 9).
 
 ### 5.2 Logins (`AUTH`)
 
@@ -247,7 +247,7 @@ Rules:
 
 - **No edits:** the application has no update or delete path for `audit_logs`.
 - **Database account:** if the hosting allows separate accounts, the application's MySQL user gets only `INSERT, SELECT` on `audit_logs` (D6). Archiving then runs under a separate administrative account.
-- **Retention:** entries stay online for **2 years** (D2). After that, a scheduled job moves them to an archive table (`audit_logs_archive`), which stays readable for audits.
+- **Retention:** entries are kept for **90 days** (D2), then deleted; there is no archive. `AuditLogCleanup` runs in the background, 10 minutes after start-up and then every 6 hours (not at a fixed night-time hour, so a server switched off at night still clears its log). It deletes in batches of 1,000, each in a short transaction of its own, using the index on `occurredAt`, and records each clearing as a `SECURITY` / `AUDIT_LOG_CLEARED` entry with the number of entries removed, so the gap is explained. Anything older than 90 days can no longer be traced, including login history.
 
 ## 10. Performance
 
@@ -271,7 +271,7 @@ Each phase is independent and can ship on its own.
 | # | Decision | Agreed |
 |---|---|---|
 | D1 | Prerequisites, including rotating the token key (everyone signs in again once) and making end of day a POST | Yes |
-| D2 | Retention period online | 2 years, then archive |
+| D2 | Retention period | 90 days, then deleted (no archive) |
 | D3 | Who may view the log | ROOT, plus a dedicated auditor role with `AUDIT-READ` |
 | D4 | Log reference-data changes (SETTINGS) | Yes, in phase 4 |
 | D5 | Record failed critical actions beyond logins and access denials | No |
