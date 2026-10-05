@@ -16,9 +16,13 @@
 --      Otherwise the application creates them itself at startup, and startup waits
 --      until large tables are indexed.
 --   3. Safe to run more than once: an index that already exists is skipped.
---   4. The user running it needs CREATE ROUTINE / ALTER ROUTINE privileges (the
---      script uses a temporary procedure) and the application database must be
---      the default schema (USE <database>; or the command line above).
+--   4. The user running it needs the INDEX privilege on the tables and CREATE
+--      ROUTINE / ALTER ROUTINE (the script uses a temporary procedure), and the
+--      application database must be the default schema (USE <database>; or the
+--      command line above).
+--   5. The mysql client stops at the first error (for example a lock timeout).
+--      The temporary procedure may then be left behind; running the script again
+--      removes it and continues with the indexes not yet created.
 --
 -- ONLINE BUILD
 --   Each index is built with ALGORITHM=INPLACE, LOCK=NONE: reads and writes continue
@@ -27,10 +31,11 @@
 --   be re-run in a maintenance window without the ALGORITHM/LOCK options.
 -- =============================================================================
 
--- An online index build still needs a short exclusive metadata lock. If a long
--- transaction holds the table, give up after 10 seconds instead of making every
--- query on that table queue behind the waiting build. If a statement times out,
--- simply run the script again later; finished indexes are skipped.
+-- An online index build still needs a short exclusive metadata lock at its start
+-- and end. If a long transaction holds the table, give up after 10 seconds, so
+-- queries on that table queue for at most 10 seconds behind the waiting build.
+-- If a statement times out, run the script again later; finished indexes are
+-- skipped.
 SET SESSION lock_wait_timeout = 10;
 
 DELIMITER $$
@@ -121,8 +126,9 @@ ORDER BY table_name, index_name;
 -- Rollback (only if ever needed): remove the indexes again.
 -- Also remove the matching @Index entries from the entities, or the application
 -- recreates them at the next startup.
--- Indexes that start with a foreign-key column (..._id) replace the index InnoDB
--- created for that foreign key, so DROP fails with error 1553. For those, first
+-- Indexes that start with a foreign-key column (..._id) may replace the index
+-- InnoDB created for that foreign key; DROP then fails with error 1553. For those,
+-- first
 -- create an index on the foreign-key column alone, e.g.
 --   CREATE INDEX ix_parkings_created_by_user ON parkings (created_by_user_id);
 -- and then drop the composite index.
