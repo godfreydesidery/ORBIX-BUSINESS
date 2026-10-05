@@ -71,9 +71,18 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
 		    nativeQuery = true)
 		List<Object[]> getMonthlyStats(@Param("year") int year);
 
+	// Report rows read only the columns the report shows, instead of loading whole entities with their eager relations
+	@Query("SELECT p.chasisNo AS chasisNo, t.name AS vehicleEquipmentTypeName, p.createdDateTime AS createdDateTime, u.nickname AS createdByNickname, p.hasKeys AS hasKeys FROM Parking p LEFT JOIN p.vehicleEquipmentType t LEFT JOIN p.createdByUser u WHERE p.createdDateTime BETWEEN :from AND :to AND p.status IN :statuses")
+	List<IParkingRegistration> getRegistrationReport(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("statuses") List<String> statuses);
 
+	@Query("SELECT p.chasisNo AS chasisNo, t.name AS vehicleEquipmentTypeName, p.createdDateTime AS createdDateTime, u.nickname AS createdByNickname, p.hasKeys AS hasKeys FROM Parking p LEFT JOIN p.vehicleEquipmentType t LEFT JOIN p.createdByUser u WHERE p.createdByUser = :user AND p.createdDateTime BETWEEN :from AND :to AND p.status IN :statuses")
+	List<IParkingRegistration> getRegistrationReportByCreatedByUser(@Param("user") User user, @Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("statuses") List<String> statuses);
+}
 
-
-	
-
+interface IParkingRegistration {
+	String getChasisNo();
+	String getVehicleEquipmentTypeName();
+	LocalDateTime getCreatedDateTime();
+	String getCreatedByNickname();
+	boolean getHasKeys();
 }

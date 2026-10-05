@@ -109,13 +109,13 @@ public class ParkingReportResource {
 			}
 		}
 		
-		List<Parking> parkings = new ArrayList<>();
+		List<IParkingRegistration> parkings = new ArrayList<>();
 		List<String> statuses = new ArrayList<>();
 		statuses.add("CHECKED-IN");
 		statuses.add("CHECKED-OUT");
 		if(user != null) {
 			
-			parkings = parkingRepository.findAllByCreatedByUserAndCreatedDateTimeBetweenAndStatusIn(
+			parkings = parkingRepository.getRegistrationReportByCreatedByUser(
 			        user, 
 			        dateRange.getFrom().atStartOfDay(),
 			        dateRange.getTo().atTime(LocalTime.MAX),
@@ -123,7 +123,7 @@ public class ParkingReportResource {
 			    );		
 					
 		}else {
-			parkings = parkingRepository.findAllByCreatedDateTimeBetweenAndStatusIn(
+			parkings = parkingRepository.getRegistrationReport(
 			        dateRange.getFrom().atStartOfDay(),
 			        dateRange.getTo().atTime(LocalTime.MAX),
 			        statuses
@@ -132,13 +132,13 @@ public class ParkingReportResource {
 		
 		List<RegistrationResponseDTO> registrationResponses = new ArrayList<>();
 		int sn = 1;
-		for(Parking parking : parkings) {
+		for(IParkingRegistration parking : parkings) {
 			RegistrationResponseDTO registrationResponse = new RegistrationResponseDTO();
 			registrationResponse.setChassisNo(parking.getChasisNo());
-			registrationResponse.setVehicleType(parking.getVehicleEquipmentType().getName());
+			registrationResponse.setVehicleType(parking.getVehicleEquipmentTypeName());
 			registrationResponse.setRegisteredDate(parking.getCreatedDateTime().toString());
-			registrationResponse.setRegisteredBy(parking.getCreatedByUser().getNickname());
-			registrationResponse.setKeyStatus(parking.isHasKeys() ? "YES" : "NO");
+			registrationResponse.setRegisteredBy(parking.getCreatedByNickname());
+			registrationResponse.setKeyStatus(parking.getHasKeys() ? "YES" : "NO");
 			registrationResponse.setSn(String.valueOf(sn));
 			registrationResponses.add(registrationResponse);
 			sn++;

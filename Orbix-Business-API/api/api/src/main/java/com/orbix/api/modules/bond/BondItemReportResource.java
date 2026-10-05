@@ -66,13 +66,13 @@ public class BondItemReportResource {
 			}
 		}
 		
-		List<BondItem> bondItems = new ArrayList<>();
+		List<IBondItemRegistration> bondItems = new ArrayList<>();
 		List<String> statuses = new ArrayList<>();
 		statuses.add("CHECKED-IN");
 		statuses.add("CHECKED-OUT");
 		if(user != null) {
 			
-			bondItems = bondItemRepository.findAllByCreatedByUserAndCreatedDateTimeBetweenAndStatusIn(
+			bondItems = bondItemRepository.getRegistrationReportByCreatedByUser(
 			        user, 
 			        dateRange.getFrom().atStartOfDay(),
 			        dateRange.getTo().atTime(LocalTime.MAX),
@@ -80,7 +80,7 @@ public class BondItemReportResource {
 			    );		
 					
 		}else {
-			bondItems = bondItemRepository.findAllByCreatedDateTimeBetweenAndStatusIn(
+			bondItems = bondItemRepository.getRegistrationReport(
 			        dateRange.getFrom().atStartOfDay(),
 			        dateRange.getTo().atTime(LocalTime.MAX),
 			        statuses
@@ -89,10 +89,10 @@ public class BondItemReportResource {
 		
 		List<RegistrationResponseDTO> registrationResponses = new ArrayList<>();
 		int sn = 1;
-		for(BondItem bondItem : bondItems) {
+		for(IBondItemRegistration bondItem : bondItems) {
 			RegistrationResponseDTO registrationResponse = new RegistrationResponseDTO();
 			registrationResponse.setRegisteredDate(bondItem.getCreatedDateTime().toString());
-			registrationResponse.setRegisteredBy(bondItem.getCreatedByUser().getNickname());
+			registrationResponse.setRegisteredBy(bondItem.getCreatedByNickname());
 			registrationResponse.setSn(String.valueOf(sn));
 			registrationResponses.add(registrationResponse);
 			sn++;
@@ -109,7 +109,7 @@ public class BondItemReportResource {
 			HttpServletRequest request){
 		
 		
-		List<BondItem> bondItems = new ArrayList<>();
+		List<IBondItemReportRow> bondItems = new ArrayList<>();
 		List<String> statuses = new ArrayList<>();
 		if(status.equals("") || status.equals("--All--")) {
 			statuses.add("CHECKED-IN");
@@ -122,7 +122,7 @@ public class BondItemReportResource {
 			throw new InvalidOperationException("Invalid Option selected");
 		}
 		
-		bondItems = bondItemRepository.findAllByCheckedInDateTimeBetweenAndStatusIn(
+		bondItems = bondItemRepository.getBondItemReport(
 		        dateRange.getFrom().atStartOfDay(),
 		        dateRange.getTo().atTime(LocalTime.MAX),
 		        statuses
@@ -130,7 +130,7 @@ public class BondItemReportResource {
 		
 		List<BondItemResponseDTO> bondItemResponses = new ArrayList<>();
 		int sn = 1;
-		for(BondItem bondItem : bondItems) {
+		for(IBondItemReportRow bondItem : bondItems) {
 			BondItemResponseDTO bondItemResponse = new BondItemResponseDTO();
 			bondItemResponse.setNo(bondItem.getNo());
 			bondItemResponse.setBondItemName(bondItem.getBondItemName());
@@ -152,14 +152,14 @@ public class BondItemReportResource {
 				);
 			bondItemResponse.setSn(String.valueOf(sn));
 			bondItemResponse.setStatus(bondItem.getStatus());
-			bondItemResponse.setCreatedBy(bondItem.getCreatedByUser().getNickname());
+			bondItemResponse.setCreatedBy(bondItem.getCreatedByNickname());
 			
-			if(bondItem.getCheckedInByUser() != null) {
-				bondItemResponse.setCheckedInBy(bondItem.getCheckedInByUser().getNickname());
+			if(bondItem.getCheckedInByNickname() != null) {
+				bondItemResponse.setCheckedInBy(bondItem.getCheckedInByNickname());
 			}
 			
-			if(bondItem.getCheckedOutByUser() != null) {
-				bondItemResponse.setCheckedOutBy(bondItem.getCheckedOutByUser().getNickname());
+			if(bondItem.getCheckedOutByNickname() != null) {
+				bondItemResponse.setCheckedOutBy(bondItem.getCheckedOutByNickname());
 			}
 			
 			bondItemResponses.add(bondItemResponse);
