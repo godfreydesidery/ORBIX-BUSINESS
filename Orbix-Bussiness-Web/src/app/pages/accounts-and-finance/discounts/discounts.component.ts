@@ -390,6 +390,7 @@ export class DiscountsComponent {
       )
       .catch(
         error => {
+          this.msg.showErrorMessage(error, 'Error')
           console.log(error)
         }
       )
@@ -416,7 +417,8 @@ export class DiscountsComponent {
       )
       .catch(
         error => {
-          
+          this.msg.showErrorMessage(error, 'Error')
+          console.log(error)
         }
       )
   }
