@@ -18,6 +18,7 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
 import { IRestaurant } from 'src/app/domain/restaurant';
 import { IRestaurantSalesListingReport } from 'src/app/domain/restaurant-sales-listing-report';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 
@@ -36,6 +37,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './restaurant-sales-listing-report.component.scss'
 })
 export class RestaurantSalesListingReportComponent {
+  trackById = trackById
   documentHeader!: any
 
   from: Date | string | null = null

@@ -54,7 +54,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr *ngFor="let item of grn.grnDetails">
+                                            <tr *ngFor="let item of grn.grnDetails; trackBy: trackById">
                                                 <td>{{item.sn}}</td>
                                                 <td>{{item.productCode}}</td>
                                                 <td>{{item.productName}}</td>
@@ -317,7 +317,7 @@
                       >
                         <button
                           class="dropdown-item form-control"
-                          *ngFor="let product of filteredProducts"
+                          *ngFor="let product of filteredProducts; trackBy: trackById"
                           (click)="selectProduct(product)"
                         >
                           {{ product.name }}
@@ -494,7 +494,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let grn of grns | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                <tr *ngFor="let grn of grns | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                     <td>{{grn.no}}</td>
                                     <td>{{grn.supplierName}}</td>
                                     <td>{{grn.status}}</td>

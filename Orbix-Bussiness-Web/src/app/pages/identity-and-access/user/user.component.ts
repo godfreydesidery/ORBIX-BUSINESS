@@ -15,6 +15,7 @@ import { IUser } from 'src/app/domain/user';
 import { DirectivesModule } from 'src/app/theme/directives/directives.module';
 
 import { environment } from 'src/environments/environment';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 
@@ -34,6 +35,7 @@ const API_URL = environment.apiUrl;
   encapsulation: ViewEncapsulation.None
 })
 export class UserComponent {
+  trackById = trackById
   public usernameLocked: boolean = true
   public passwordLocked: boolean = true
   public passwordConfLocked: boolean = true

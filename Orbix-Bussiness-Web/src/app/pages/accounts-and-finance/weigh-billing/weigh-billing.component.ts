@@ -17,6 +17,7 @@ import { IServiceBillItem } from 'src/app/domain/maintenance';
 // pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
 declare var pdfMake: any;
 import { IWeigh } from 'src/app/domain/weigh';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -35,6 +36,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './weigh-billing.component.scss'
 })
 export class WeighBillingComponent {
+  trackById = trackById
 page: number = 1; // Initialize the current page to 1
 
   filterRecords: string = ''

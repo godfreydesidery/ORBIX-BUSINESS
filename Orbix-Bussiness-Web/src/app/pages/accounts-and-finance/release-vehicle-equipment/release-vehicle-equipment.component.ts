@@ -16,6 +16,7 @@ declare var pdfMake: any;
 import { DataService } from '@services/custom/data.service';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { ReceiptItem } from 'src/app/domain/receipt-item';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -33,6 +34,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './release-vehicle-equipment.component.scss'
 })
 export class ReleaseVehicleEquipmentComponent {
+  trackById = trackById
   documentHeader!: any
 
   page: number = 1; // Initialize the current page to 1

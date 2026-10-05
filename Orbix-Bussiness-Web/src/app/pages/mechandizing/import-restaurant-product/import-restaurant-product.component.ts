@@ -14,6 +14,7 @@ import { environment } from 'src/environments/environment';
 import { HttpHeaders } from '@angular/common/http';
 import { IRestaurantProduct } from 'src/app/domain/restaurant-product';
 import { IProduct } from 'src/app/domain/product';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 
@@ -32,6 +33,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './import-restaurant-product.component.scss'
 })
 export class ImportRestaurantProductComponent {
+  trackById = trackById
 restaurantId: number;
   
     restaurantProducts : IRestaurantProduct[] = []

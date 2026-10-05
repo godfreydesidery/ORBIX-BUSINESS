@@ -24,7 +24,7 @@
                             <label class="form-control">Register Name</label>
                             <select class="form-control" [(ngModel)]="nickname">
                                 <option></option>
-                                <option *ngFor="let cashier of userNames">{{cashier}}</option>
+                                <option *ngFor="let cashier of userNames; trackBy: trackById">{{cashier}}</option>
                             </select>
                         </div>
                     </div>
@@ -50,7 +50,7 @@
                                     <td><b>Reg By</b></td>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let r of registrations">
+                                    <tr *ngFor="let r of registrations; trackBy: trackById">
                                         <td>{{r.sn}}</td>
                                         <td>{{r.chassisNo}}</td>
                                         <td>{{r.vehicleType}}</td>

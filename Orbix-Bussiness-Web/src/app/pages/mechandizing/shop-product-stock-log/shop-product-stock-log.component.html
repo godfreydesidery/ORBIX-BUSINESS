@@ -53,7 +53,7 @@
                                     <td><b>Reference</b></td>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let s of fastMovingProducts">
+                                    <tr *ngFor="let s of fastMovingProducts; trackBy: trackById">
                                         <td>{{s.sn}}</td>
                                         <td>{{s.dateTime}}</td>
                                         <td>{{s.productName}}</td>

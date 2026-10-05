@@ -16,6 +16,7 @@ import { ILpo } from 'src/app/domain/lpo';
 import { IGrn } from 'src/app/domain/grn';
 import { NotificationComponent } from '../../misc/notification/notification.component';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 
@@ -35,6 +36,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './select-restaurant.component.scss'
 })
 export class SelectRestaurantComponent {
+  trackById = trackById
   underStock: number = 0
   outofStock: number = 0
 

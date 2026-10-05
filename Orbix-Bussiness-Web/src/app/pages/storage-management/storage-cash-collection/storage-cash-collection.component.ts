@@ -16,6 +16,7 @@ import { environment } from 'src/environments/environment';
 import { ICashCollection, IMaintenanceCashCollection, IParkingCashCollection, IParkingServiceCashCollection, ISalesCashCollection, IStorageCashCollection } from 'src/app/domain/cash-collection';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 
@@ -35,6 +36,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './storage-cash-collection.component.scss'
 })
 export class StorageCashCollectionComponent {
+  trackById = trackById
 
   documentHeader! : any
   

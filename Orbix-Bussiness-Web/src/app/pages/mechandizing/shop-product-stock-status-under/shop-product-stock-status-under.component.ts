@@ -15,6 +15,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { IShopProduct } from 'src/app/domain/shop-product';
 import { IProduct } from 'src/app/domain/product';
 import { JwtHelperService } from '@auth0/angular-jwt';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 
@@ -33,6 +34,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './shop-product-stock-status-under.component.scss'
 })
 export class ShopProductStockStatusUnderComponent {
+  trackById = trackById
 shopId: number;
 
   shopProducts: IShopProduct[] = []

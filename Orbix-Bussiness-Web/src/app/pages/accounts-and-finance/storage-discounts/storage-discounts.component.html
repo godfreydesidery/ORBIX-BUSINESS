@@ -31,7 +31,7 @@
                             </tr>
                         </thead>
                         <tbody> 
-                            <tr *ngFor="let storage of storages | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }">
+                            <tr *ngFor="let storage of storages | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }; trackBy: trackById">
                                 <td>{{storage.sn}}</td>
                                 <td>{{storage.no}}</td>
                                 <td>{{storage.ownerFirstName}} {{storage.ownerMiddleName}} {{storage.ownerLastName}}</td>
@@ -150,7 +150,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let p of storageBillReceivables">
+                            <tr *ngFor="let p of storageBillReceivables; trackBy: trackById">
                                 <td>{{p.sn}}</td>
                                 <td>{{p.startedAt}}</td>
                                 <td>{{p.endedAt}}</td>

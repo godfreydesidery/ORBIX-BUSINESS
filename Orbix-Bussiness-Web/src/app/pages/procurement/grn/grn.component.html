@@ -70,7 +70,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr *ngFor="let item of grn.grnDetails">
+                                            <tr *ngFor="let item of grn.grnDetails; trackBy: trackById">
                                                 <td>{{item.sn}}</td>
                                                 <td>{{item.productCode}}</td>
                                                 <td>{{item.productName}}</td>
@@ -320,7 +320,7 @@
                             placeholder="Type to search products..." autocomplete="off" />
                         <div class="dropdown-menu show mt-1" *ngIf="isDropdownOpen && filteredProducts.length > 0"
                             style="max-height: 200px; overflow-y: auto; width: 100%;">
-                            <button class="dropdown-item form-control" *ngFor="let product of filteredProducts"
+                            <button class="dropdown-item form-control" *ngFor="let product of filteredProducts; trackBy: trackById"
                                 (click)="selectProduct(product)">
                                 {{ product.name }}
                             </button>
@@ -507,7 +507,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let grn of grns | searchFilter : filterRecords | paginate: { itemsPerPage: 8, currentPage: page }">
+                                    *ngFor="let grn of grns | searchFilter : filterRecords | paginate: { itemsPerPage: 8, currentPage: page }; trackBy: trackById">
                                     <td>{{grn.no}}</td>
                                     <td>{{grn.supplierName}}</td>
                                     <td>

@@ -25,6 +25,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 // pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
 declare var pdfMake: any;
 import { ICustomer } from 'src/app/domain/customer';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 
@@ -44,6 +45,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './lpo.component.scss'
 })
 export class LpoComponent {
+  trackById = trackById
 
   show : boolean = false
 

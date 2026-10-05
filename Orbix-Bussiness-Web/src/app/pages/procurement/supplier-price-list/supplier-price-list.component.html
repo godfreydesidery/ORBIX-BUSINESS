@@ -33,7 +33,7 @@
                             </tr>
                         </thead>
                         <tbody>        
-                            <tr *ngFor="let supplier of suppliers | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                            <tr *ngFor="let supplier of suppliers | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                 <td>{{supplier.sn}}</td>
                                 <td>{{supplier.code}}</td>
                                 <td>{{supplier.name}}</td>
@@ -92,7 +92,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let supplierProduct of supplierProducts | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                            <tr *ngFor="let supplierProduct of supplierProducts | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                 <td>{{supplierProduct.productCode}}</td>
                                 <td>{{supplierProduct.productName}}</td>
                                 <td>{{supplierProduct.productDescription}}</td>
@@ -150,7 +150,7 @@
                       >
                         <button
                             class="dropdown-item form-control btn-outline-primary"
-                            *ngFor="let product of filteredProducts"
+                            *ngFor="let product of filteredProducts; trackBy: trackById"
                             (click)="searchProduct(product.id)"                           
                         >
                           {{ product.name }}
@@ -226,7 +226,7 @@
                       >
                         <button
                             class="dropdown-item form-control btn-outline-primary"
-                            *ngFor="let product of filteredProducts"
+                            *ngFor="let product of filteredProducts; trackBy: trackById"
                             (click)="searchSupplierProduct(product.id)"                           
                         >
                           {{ product.name }}

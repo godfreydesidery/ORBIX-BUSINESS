@@ -24,7 +24,7 @@
                             <label class="form-control">Cashier Name</label>
                             <select class="form-control" [(ngModel)]="nickname">
                                 <option></option>
-                                <option *ngFor="let cashier of userNames">{{cashier}}</option>
+                                <option *ngFor="let cashier of userNames; trackBy: trackById">{{cashier}}</option>
                             </select>
                         </div>
                     </div>
@@ -49,7 +49,7 @@
                                     <td><b>Cashier Name</b></td>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let cashCollection of cashCollections">
+                                    <tr *ngFor="let cashCollection of cashCollections; trackBy: trackById">
                                         <td>{{cashCollection.sn}}</td>
                                         <td class="text-primary" style="font-weight: bolder;">{{cashCollection.reason}}
                                         </td>
@@ -157,7 +157,7 @@
                                                         <td><b>Cashier Name</b></td>
                                                     </thead>
                                                     <tbody>
-                                                        <tr *ngFor="let p of parkingCashCollections">
+                                                        <tr *ngFor="let p of parkingCashCollections; trackBy: trackById">
                                                             <td>{{p.sn}}</td>
                                                             <td>{{p.vehicleEquipmentCategory}}</td>
                                                             <td>{{p.vehicleEquipmentName}}</td>
@@ -208,7 +208,7 @@
                                                         <td><b>Cashier Name</b></td>
                                                     </thead>
                                                     <tbody>
-                                                        <tr *ngFor="let p of parkingServiceCashCollections">
+                                                        <tr *ngFor="let p of parkingServiceCashCollections; trackBy: trackById">
                                                             <td>{{p.sn}}</td>
                                                             <td>{{p.vehicleEquipmentCategory}}</td>
                                                             <td>{{p.vehicleEquipmentName}}</td>
@@ -254,7 +254,7 @@
                                                         <td><b>Cashier Name</b></td>
                                                     </thead>
                                                     <tbody>
-                                                        <tr *ngFor="let p of salesCashCollections">
+                                                        <tr *ngFor="let p of salesCashCollections; trackBy: trackById">
                                                             <td>{{p.sn}}</td>
                                                             <td>{{p.productName}}</td>
                                                             <td>{{p.dateTime}}</td>
@@ -297,7 +297,7 @@
                                                         <td><b>Cashier Name</b></td>
                                                     </thead>
                                                     <tbody>
-                                                        <tr *ngFor="let p of storageCashCollections">
+                                                        <tr *ngFor="let p of storageCashCollections; trackBy: trackById">
                                                             <td>{{p.sn}}</td>
                                                             <td>{{p.goodName}}</td>
                                                             <td>{{p.ownerFirstName}} {{p.ownerLastName}}</td>
@@ -345,7 +345,7 @@
                                                         <td><b>Cashier Name</b></td>
                                                     </thead>
                                                     <tbody>
-                                                        <tr *ngFor="let p of maintenanceCashCollections">
+                                                        <tr *ngFor="let p of maintenanceCashCollections; trackBy: trackById">
                                                             <td>{{p.sn}}</td>
                                                             <td>{{p.vehicleEquipmentName}}</td>
                                                             <td>{{p.issueName}}</td>
@@ -393,7 +393,7 @@
                                                         <td><b>Cashier Name</b></td>
                                                     </thead>
                                                     <tbody>
-                                                        <tr *ngFor="let p of weighCashCollections">
+                                                        <tr *ngFor="let p of weighCashCollections; trackBy: trackById">
                                                             <td>{{p.sn}}</td>
                                                             <td>{{p.ownerFirstName}}</td>
                                                             <td>{{p.regNo}}</td>
@@ -437,7 +437,7 @@
                                                         <td><b>Cashier Name</b></td>
                                                     </thead>
                                                     <tbody>
-                                                        <tr *ngFor="let p of workshopCashCollections">
+                                                        <tr *ngFor="let p of workshopCashCollections; trackBy: trackById">
                                                             <td>{{p.sn}}</td>
                                                             <td>{{p.ownerName}}</td>
                                                             <td>{{p.ownerPhoneNo}}</td>
@@ -478,7 +478,7 @@
                                                         <td><b>Cashier Name</b></td>
                                                     </thead>
                                                     <tbody>
-                                                        <tr *ngFor="let p of restaurantSalesCashCollections">
+                                                        <tr *ngFor="let p of restaurantSalesCashCollections; trackBy: trackById">
                                                             <td>{{p.sn}}</td>
                                                             <td>{{p.productName}}</td>
 
@@ -511,7 +511,7 @@
                                             <select class="form-control" [(ngModel)]="selectedBondZoneName"
                                                 (change)="filterBondItems(selectedBondZoneName)">
                                                 <option>--All--</option>
-                                                <option *ngFor="let b of availableBondZones" value="{{b.name}}">{{b.name}}</option>
+                                                <option *ngFor="let b of availableBondZones; trackBy: trackById" value="{{b.name}}">{{b.name}}</option>
                                             </select>
                                         </div>
                                     </div>
@@ -536,7 +536,7 @@
                                                         <td><b>Cashier Name</b></td>
                                                     </thead>
                                                     <tbody>
-                                                        <tr *ngFor="let p of filteredBondItemCashCollections">
+                                                        <tr *ngFor="let p of filteredBondItemCashCollections; trackBy: trackById">
                                                             <td>{{p.sn}}</td>
                                                             <td>{{p.bondItemName}}</td>
                                                             <td>{{p.chasisNo}}</td>

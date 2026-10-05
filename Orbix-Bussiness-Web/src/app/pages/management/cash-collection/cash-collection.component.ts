@@ -19,6 +19,7 @@ import { DataService } from '@services/custom/data.service';
 
 import { FormControl } from '@angular/forms';
 import { IBondZone } from 'src/app/domain/bond-zone';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 
@@ -38,6 +39,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './cash-collection.component.scss'
 })
 export class CashCollectionComponent {
+  trackById = trackById
   documentHeader!: any
 
   from: Date | string | null = null

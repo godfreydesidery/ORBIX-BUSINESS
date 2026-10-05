@@ -18,6 +18,7 @@ import { IShopSalesOrder, IShopSalesOrderDetail } from 'src/app/domain/shop-sale
 
 import { ReceiptItem } from 'src/app/domain/receipt-item';
 import { ICustomer } from 'src/app/domain/customer';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 
@@ -36,6 +37,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './shop-sales-order.component.scss'
 })
 export class ShopSalesOrderComponent {
+  trackById = trackById
   shopId: number;
 
   shopProducts : IShopProduct[] = []

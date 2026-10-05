@@ -54,7 +54,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr *ngFor="let item of lpo.lpoDetails">
+                                            <tr *ngFor="let item of lpo.lpoDetails; trackBy: trackById">
                                                 <td>{{item.sn}}</td>
                                                 <td>{{item.productCode}}</td>
                                                 <td>{{item.productName}}</td>
@@ -308,7 +308,7 @@
                       >
                         <button
                           class="dropdown-item form-control"
-                          *ngFor="let product of filteredProducts"
+                          *ngFor="let product of filteredProducts; trackBy: trackById"
                           (click)="selectProduct(product)"
                         >
                           {{ product.name }}
@@ -404,7 +404,7 @@
                     <select class="form-control" [(ngModel)]="supplierId" (change)="onSupplierChange($event)">
                         <option value = ''></option>
                         <optgroup label="">  
-                            <option *ngFor="let supplier of suppliers" [value]="supplier.id" style="font-size: larger;">Supplier name: <b>{{supplier.name}}</b></option>                   
+                            <option *ngFor="let supplier of suppliers; trackBy: trackById" [value]="supplier.id" style="font-size: larger;">Supplier name: <b>{{supplier.name}}</b></option>                   
                         </optgroup>
                     </select>
                 </div>
@@ -414,7 +414,7 @@
                     <select class="form-control" [(ngModel)]="shopId" (change)="onShopChange($event)">
                         <option value = ''></option>
                         <optgroup label="">  
-                            <option *ngFor="let shop of shops" [value]="shop.id" style="font-size: larger;">Shop name: <b>{{shop.name}}</b></option>                   
+                            <option *ngFor="let shop of shops; trackBy: trackById" [value]="shop.id" style="font-size: larger;">Shop name: <b>{{shop.name}}</b></option>                   
                         </optgroup>
                     </select>
                 </div>
@@ -478,7 +478,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let lpo of lpos | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                <tr *ngFor="let lpo of lpos | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                     <td>{{lpo.no}}</td>
                                     <td>{{lpo.supplierName}}</td>
                                     <td>{{lpo.status}}</td>

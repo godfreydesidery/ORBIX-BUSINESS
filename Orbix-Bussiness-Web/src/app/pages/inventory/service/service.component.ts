@@ -11,6 +11,7 @@ import { ICompany } from 'src/app/domain/company';
 import { IService } from 'src/app/domain/service';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 @Component({
@@ -26,6 +27,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './service.component.scss'
 })
 export class ServiceComponent {
+  trackById = trackById
 /**Data */
   id: any = null
   code: string = ''

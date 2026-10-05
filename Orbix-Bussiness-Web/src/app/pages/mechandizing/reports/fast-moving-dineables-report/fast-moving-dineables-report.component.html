@@ -55,7 +55,7 @@
                                     <td><b>Amount</b></td>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let s of fastMovingDineables">
+                                    <tr *ngFor="let s of fastMovingDineables; trackBy: trackById">
                                         <td>{{s.sn}}</td>
                                         <td>{{s.dineableName}}</td>
                                         <td class="text-danger" style="font-weight: bold;">{{s.qty}}</td>

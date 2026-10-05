@@ -9,6 +9,7 @@ import { IUser } from 'src/app/domain/user';
 
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 
@@ -23,6 +24,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './service-specialist.component.scss'
 })
 export class ServiceSpecialistComponent {
+  trackById = trackById
 /**Data */
     id : any = null
     nickname : string = '' 

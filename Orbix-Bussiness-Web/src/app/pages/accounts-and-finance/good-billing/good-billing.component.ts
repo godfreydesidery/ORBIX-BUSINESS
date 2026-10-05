@@ -17,6 +17,7 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
 import { IServiceBillItem, IStorage } from 'src/app/domain/storage';
 import { ICustomer } from 'src/app/domain/customer';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -34,6 +35,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './good-billing.component.scss'
 })
 export class GoodBillingComponent {
+  trackById = trackById
   // Storage attributes
   storageId: any = null
   storageNo: string = ''

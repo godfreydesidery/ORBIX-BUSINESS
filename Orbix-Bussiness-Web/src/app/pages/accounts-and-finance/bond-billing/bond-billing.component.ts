@@ -19,6 +19,7 @@ import { IServiceBillItem } from 'src/app/domain/maintenance';
 declare var pdfMake: any;
 import { IBondItem } from 'src/app/domain/bond-item';
 import { IBondZone } from 'src/app/domain/bond-zone';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -37,6 +38,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './bond-billing.component.scss'
 })
 export class BondBillingComponent {
+  trackById = trackById
   page: number = 1; // Initialize the current page to 1
 
   filterRecords: string = ''

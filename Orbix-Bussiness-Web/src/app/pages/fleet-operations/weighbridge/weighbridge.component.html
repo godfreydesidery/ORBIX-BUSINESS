@@ -64,7 +64,7 @@
                                 <select id="tare" class="form-control" [(ngModel)]="selectedTareValue"
                                     (change)="onTareChange()" style="font-size: large; font-weight: bold;">
                                     <option value="">-- Select Tare --</option>
-                                    <option *ngFor="let option of tareOptions" [value]="option.value">
+                                    <option *ngFor="let option of tareOptions; trackBy: trackById" [value]="option.value">
                                         {{ option.label }}
                                     </option>
                                 </select>
@@ -140,7 +140,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr style="font-size: large;" *ngFor="let bill of bills">
+                                        <tr style="font-size: large;" *ngFor="let bill of bills; trackBy: trackById">
                                             <td>1</td>
                                             <td>{{bill.description}}</td>
                                             <td>{{bill.weightOne}}</td>
@@ -204,7 +204,7 @@
                                     </thead>
                                     <tbody>
                                         <tr
-                                            *ngFor="let weigh of weighs | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                            *ngFor="let weigh of weighs | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                             <td>{{weigh.sn}}</td>
                                             <td>{{weigh.no}}</td>
                                             <td>{{weigh.ownerName}}</td>
@@ -276,7 +276,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let weigh of weighs | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                    *ngFor="let weigh of weighs | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                     <td>{{weigh.no}}</td>
                                     <td>{{weigh.ownerName}}</td>
                                     <td>{{weigh.regNo}}</td>

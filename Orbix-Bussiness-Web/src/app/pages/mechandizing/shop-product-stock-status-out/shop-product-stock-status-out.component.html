@@ -46,7 +46,7 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let shopProduct of shopProducts | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                    <tr *ngFor="let shopProduct of shopProducts | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                         <td>{{shopProduct.productCode}}</td>
                                         <td>{{shopProduct.productName}}</td>
                                         <td>{{shopProduct.productDescription}}</td>

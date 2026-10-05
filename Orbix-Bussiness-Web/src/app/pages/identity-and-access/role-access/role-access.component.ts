@@ -14,6 +14,7 @@ import { BrowserModule } from '@angular/platform-browser';
 import { RouterLink } from '@angular/router';
 import { IPrivilege } from 'src/app/domain/priviledge';
 import { MsgBoxService } from '@services/custom/msg-box.service';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 
@@ -28,6 +29,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './role-access.component.scss'
 })
 export class RoleAccessComponent {
+  trackById = trackById
 
   public object       : string
   public operation    : string

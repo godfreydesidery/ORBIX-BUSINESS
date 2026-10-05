@@ -25,6 +25,7 @@ import { IServiceBillItem } from 'src/app/domain/maintenance';
 import { IMachine } from 'src/app/domain/machine';
 import { IMachineService } from 'src/app/domain/machine-service';
 import { IService } from 'src/app/domain/service';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -43,6 +44,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './select-workshop.component.scss'
 })
 export class SelectWorkshopComponent {
+  trackById = trackById
 
   machineId: any = null
   machineNo: string = ''

@@ -20,6 +20,7 @@ import { IDineable } from 'src/app/domain/dineable';
 import { IRestaurantSalesOrder, IRestaurantSalesOrderDetail } from 'src/app/domain/restaurant-sales-order';
 import { IRestaurantAgent } from 'src/app/domain/restaurant-agent';
 import { error } from 'src/custom-packages/util';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 
@@ -38,6 +39,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './restaurant-sales-order.component.scss'
 })
 export class RestaurantSalesOrderComponent {
+  trackById = trackById
   restaurantId: number;
 
   restaurantDineables: IRestaurantDineable[] = []

@@ -54,7 +54,7 @@
                                     <td><b>Date Time</b>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let s of salesListings">
+                                    <tr *ngFor="let s of salesListings; trackBy: trackById">
                                         <td>{{s.sn}}</td>
                                         <td>{{s.productName}}</td>
                                         <td>{{s.qty}}</td>

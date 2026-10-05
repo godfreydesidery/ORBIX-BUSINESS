@@ -14,6 +14,7 @@ import { ISupplier } from 'src/app/domain/supplier';
 import { ISupplierProduct } from 'src/app/domain/supplier-product';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 @Component({
@@ -30,6 +31,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './supplier-price-list.component.scss'
 })
 export class SupplierPriceListComponent {
+  trackById = trackById
 /**Data */
   id : any = null
   code : string = ''

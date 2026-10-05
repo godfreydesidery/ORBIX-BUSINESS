@@ -27,6 +27,7 @@ import { error } from 'src/custom-packages/util';
 import { IProduct } from 'src/app/domain/product';
 import { IRestaurantProduct } from 'src/app/domain/restaurant-product';
 import { IRestaurantDinableProduct } from 'src/app/domain/restaurant-dineable-product';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 
@@ -44,6 +45,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './restaurant-dineable-product.component.scss'
 })
 export class RestaurantDineableProductComponent {
+  trackById = trackById
 
   // ============================
   // Restaurant & Product Context

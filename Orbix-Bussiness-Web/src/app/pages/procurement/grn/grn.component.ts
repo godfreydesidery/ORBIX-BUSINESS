@@ -25,6 +25,7 @@ import { IGrn, IGrnDetail } from 'src/app/domain/grn';
 // pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
 declare var pdfMake: any;
 import { ICustomer } from 'src/app/domain/customer';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 
@@ -43,6 +44,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './grn.component.scss'
 })
 export class GrnComponent {
+  trackById = trackById
 
   documentHeader! : any
 

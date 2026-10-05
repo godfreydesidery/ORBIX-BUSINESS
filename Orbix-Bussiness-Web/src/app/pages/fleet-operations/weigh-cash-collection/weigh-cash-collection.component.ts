@@ -16,6 +16,7 @@ import { environment } from 'src/environments/environment';
 import { IWeighCashCollection } from 'src/app/domain/cash-collection';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -34,6 +35,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './weigh-cash-collection.component.scss'
 })
 export class WeighCashCollectionComponent {
+  trackById = trackById
   documentHeader!: any
 
   from: Date | string | null = null

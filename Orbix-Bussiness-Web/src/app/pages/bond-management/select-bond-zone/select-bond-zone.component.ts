@@ -23,6 +23,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 // pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
 declare var pdfMake: any;
 import { IServiceBillItem } from 'src/app/domain/maintenance';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -42,6 +43,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './select-bond-zone.component.scss'
 })
 export class SelectBondZoneComponent {
+  trackById = trackById
 
   documentHeader!: any
 

@@ -17,6 +17,7 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
 import { IServiceBillItem, IBondItem } from 'src/app/domain/bond-item';
 import { ICustomer } from 'src/app/domain/customer';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -35,6 +36,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './bond-item-billing.component.scss'
 })
 export class BondItemBillingComponent {
+  trackById = trackById
   // BondItem attributes
   bondItemId: any = null
   bondItemNo: string = ''

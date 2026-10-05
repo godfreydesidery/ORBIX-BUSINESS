@@ -20,6 +20,7 @@ import { TimePipe } from 'src/app/custom-pipes/time.pipe';
 
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 
@@ -40,6 +41,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './goods-removed-report.component.scss'
 })
 export class GoodsRemovedReportComponent {
+  trackById = trackById
 documentHeader! : any
 
   from : Date | string | null = null

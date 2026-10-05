@@ -61,7 +61,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let detail of invoiceReceivable.invoiceReceivableDetails">
+                                <tr *ngFor="let detail of invoiceReceivable.invoiceReceivableDetails; trackBy: trackById">
                                     <td>{{detail.billReceivable.createdDateTime}}</td>
                                     <td>{{detail?.billReceivable?.summary}}</td>
                                     <td>{{detail?.billReceivable?.qty}}</td>
@@ -101,7 +101,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr *ngFor="let b of billReceivables">
+                                        <tr *ngFor="let b of billReceivables; trackBy: trackById">
                                             <td>{{b?.summary}}</td>
                                             <td style="text-align: right;">{{b?.amount | currency:'':''}}</td>
                                         </tr>

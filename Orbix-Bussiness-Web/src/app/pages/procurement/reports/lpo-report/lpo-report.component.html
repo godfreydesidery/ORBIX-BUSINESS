@@ -51,7 +51,7 @@
                                     <td><b>Approved At</b></td>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let s of fastMovingProducts">
+                                    <tr *ngFor="let s of fastMovingProducts; trackBy: trackById">
                                         <td>{{s.sn}}</td>
                                         <td>{{s.no}}</td>
                                         <td>{{s.productName}}</td>

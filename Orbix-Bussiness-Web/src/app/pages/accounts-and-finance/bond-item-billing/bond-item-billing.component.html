@@ -37,7 +37,7 @@
                                         </tr>
                                     </thead>
                                     <tbody>
-                                        <tr *ngFor="let p of bondItemBillReceivables">
+                                        <tr *ngFor="let p of bondItemBillReceivables; trackBy: trackById">
                                             <td>{{p.sn}}</td>
                                             <td>Bond Item From {{p.startedAt}} To {{p.endedAt}} </td>
                                             <td style="text-align: right;">{{p.price | currency:'':''}}</td>
@@ -79,7 +79,7 @@
                                                 </tr>
                                             </thead>
                                             <tbody>
-                                                <tr *ngFor="let b of billReceivables">
+                                                <tr *ngFor="let b of billReceivables; trackBy: trackById">
                                                     <td>{{b.sn}}</td>
                                                     <td>{{b.summary}}</td>
                                                     <td style="text-align: right;">{{b.amount | currency:'':''}}</td>
@@ -226,7 +226,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let b of billReceivables">
+                                <tr *ngFor="let b of billReceivables; trackBy: trackById">
                                     <td>{{b.sn}}</td>
                                     <td>{{b.summary}}</td>
                                     <td style="text-align: right;">{{b.amount | currency:'':''}}</td>
@@ -648,7 +648,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let release of releases">
+                        <tr *ngFor="let release of releases; trackBy: trackById">
                             <td>{{release.no}}</td>
                             <td>{{release.releaseDate | date: 'dd-MM-yyyy'}}</td>
                             <td>{{release.qty}}</td>

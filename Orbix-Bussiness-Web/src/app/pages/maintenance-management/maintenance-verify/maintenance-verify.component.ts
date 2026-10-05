@@ -18,6 +18,7 @@ import { IMaintenanceJobCard } from 'src/app/domain/maintenance-job-card';
 import { IMaintenanceIssueType } from 'src/app/domain/maintenance-issue-type';
 import { IServiceSpecialist } from 'src/app/domain/service-specialist';
 import { IMaintenanceJobCardIssue } from 'src/app/domain/maintenance-job-card-issue';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -34,6 +35,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './maintenance-verify.component.scss'
 })
 export class MaintenanceVerifyComponent {
+  trackById = trackById
 documentHeader! : any
   
     page: number = 1; // Initialize the current page to 1

@@ -18,6 +18,7 @@ import { IServiceBillItem } from 'src/app/domain/maintenance';
 // pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
 declare var pdfMake: any;
 import { IBondItem } from 'src/app/domain/bond-item';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -36,6 +37,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './bond-discounts.component.scss'
 })
 export class BondDiscountsComponent {
+  trackById = trackById
 page: number = 1; // Initialize the current page to 1
 
   filterRecords: string = ''

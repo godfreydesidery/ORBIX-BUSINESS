@@ -17,6 +17,7 @@ import { ReceiptItem } from 'src/app/domain/receipt-item';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
 import { ICustomer } from 'src/app/domain/customer';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -35,6 +36,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './discounts.component.scss'
 })
 export class DiscountsComponent {
+  trackById = trackById
 // Parking attributes
   parkingId: any = null
   parkingNo: string = ''

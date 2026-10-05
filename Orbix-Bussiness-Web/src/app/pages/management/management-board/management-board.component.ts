@@ -24,6 +24,7 @@ declare var pdfMake: any;
 import { DataService } from '@services/custom/data.service';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { ChartConfiguration, ChartOptions } from 'chart.js';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -44,6 +45,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './management-board.component.scss'
 })
 export class ManagementBoardComponent {
+  trackById = trackById
 
   from: Date | string | null = null
   to: Date | string | null = null

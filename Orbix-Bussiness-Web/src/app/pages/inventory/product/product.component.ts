@@ -11,6 +11,7 @@ import { ICompany } from 'src/app/domain/company';
 import { IProduct } from 'src/app/domain/product';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 
@@ -27,6 +28,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './product.component.scss'
 })
 export class ProductComponent {
+  trackById = trackById
   /**Data */
   id: any = null
   code: string = ''

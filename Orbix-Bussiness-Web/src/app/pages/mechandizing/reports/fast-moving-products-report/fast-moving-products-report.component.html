@@ -49,7 +49,7 @@
                                     <td><b>Amount</b></td>
                                 </thead>
                                 <tbody>
-                                    <tr *ngFor="let s of fastMovingProducts">
+                                    <tr *ngFor="let s of fastMovingProducts; trackBy: trackById">
                                         <td>{{s.sn}}</td>
                                         <td>{{s.productName}}</td>
                                         <td>{{s.qty}}</td>

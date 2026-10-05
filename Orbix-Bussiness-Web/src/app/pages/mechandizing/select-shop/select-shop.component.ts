@@ -15,6 +15,7 @@ import { HttpHeaders } from '@angular/common/http';
 import { ILpo } from 'src/app/domain/lpo';
 import { IGrn } from 'src/app/domain/grn';
 import { NotificationComponent } from '../../misc/notification/notification.component';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 
@@ -33,6 +34,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './select-shop.component.scss'
 })
 export class SelectShopComponent {
+  trackById = trackById
 
   underStock : number = 0
   outofStock : number = 0

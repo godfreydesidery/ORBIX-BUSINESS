@@ -17,7 +17,7 @@
                                 <select class="form-control" [(ngModel)]="selectedBondZoneId"
                                     (change)="onBondZoneChange($event)">
                                     <option value=''></option>
-                                    <option *ngFor="let bondZone of availableBondZones" [value]="bondZone.id"
+                                    <option *ngFor="let bondZone of availableBondZones; trackBy: trackById" [value]="bondZone.id"
                                         style="font-size: larger;"><b>{{bondZone.name}}</b></option>
                                 </select>
                             </div>
@@ -69,7 +69,7 @@
                                 </thead>
                                 <tbody>
                                     <tr
-                                        *ngFor="let bondItem of bondItems | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }">
+                                        *ngFor="let bondItem of bondItems | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }; trackBy: trackById">
                                         <td>{{bondItem.sn}}</td>
                                         <td>{{bondItem.no}}</td>
                                         <td>{{bondItem.bondItemTypeName}}</td>
@@ -228,7 +228,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let p of bondItemBillReceivables">
+                            <tr *ngFor="let p of bondItemBillReceivables; trackBy: trackById">
                                 <td>{{p.sn}}</td>
                                 <td>{{p.startedAt}}</td>
                                 <td>{{p.endedAt}}</td>

@@ -14,7 +14,7 @@
                         <select class="form-control" [(ngModel)]="selectedBondZoneId"
                             (change)="onBondZoneChange($event)">
                             <option value=''></option>
-                            <option *ngFor="let bondZone of availableBondZones" [value]="bondZone.id"
+                            <option *ngFor="let bondZone of availableBondZones; trackBy: trackById" [value]="bondZone.id"
                                 style="font-size: larger;"><b>{{bondZone.name}}</b></option>
                         </select>
                     </div>
@@ -673,7 +673,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let bondItem of bondItems | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index">
+                                    *ngFor="let bondItem of bondItems | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index; trackBy: trackById">
                                     <td>{{bondItem.sn}}</td>
                                     <td>{{bondItem.no}}</td>
                                     <td>{{bondItem.bondItemName}}</td>
@@ -770,7 +770,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let bondItem of bondItems | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index">
+                                    *ngFor="let bondItem of bondItems | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; let i = index; trackBy: trackById">
                                     <td>{{bondItem.sn}}</td>
                                     <td>{{bondItem.no}}</td>
                                     <td>{{bondItem.bondItemName}}</td>
@@ -935,7 +935,7 @@
                                         list="vehicleTypes" placeholder="Select Vehicle Type">
 
                                     <datalist id="vehicleTypes">
-                                        <option *ngFor="let option of bondItemTypes" [value]="option.name"></option>
+                                        <option *ngFor="let option of bondItemTypes; trackBy: trackById" [value]="option.name"></option>
                                     </datalist>
                                     <!-- <select class="form-control" [(ngModel)]="bondItemTypeName">
                                         <option></option>
@@ -1069,7 +1069,7 @@
                                     <label>Select Good Type</label>
                                     <select class="form-control" [(ngModel)]="bondItemTypeName">
                                         <option></option>
-                                        <option *ngFor="let option of bondItemTypes" [value]="option.name">{{
+                                        <option *ngFor="let option of bondItemTypes; trackBy: trackById" [value]="option.name">{{
                                             option.name }}
                                         </option>
                                     </select>
@@ -1372,7 +1372,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr *ngFor="let release of releases">
+                        <tr *ngFor="let release of releases; trackBy: trackById">
                             <td>{{release.no}}</td>
                             <td>{{release.releaseDate | date: 'dd-MM-yyyy'}}</td>
                             <td>{{release.qty}}</td>
@@ -1551,7 +1551,7 @@
                                         list="bondItemTypes" placeholder="Select Vehicle Type">
 
                                     <datalist id="bondItemTypes">
-                                        <option *ngFor="let option of bondItemTypes" [value]="option.name"></option>
+                                        <option *ngFor="let option of bondItemTypes; trackBy: trackById" [value]="option.name"></option>
                                     </datalist>
                                 </div>
                             </div>

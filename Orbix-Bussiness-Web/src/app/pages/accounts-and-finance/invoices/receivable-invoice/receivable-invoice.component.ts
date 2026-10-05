@@ -10,6 +10,7 @@ import { IParkingZone } from 'src/app/domain/parking-zone';
 
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 
@@ -24,6 +25,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './receivable-invoice.component.scss'
 })
 export class ReceivableInvoiceComponent {
+  trackById = trackById
   id : any
 
   no : string = ''

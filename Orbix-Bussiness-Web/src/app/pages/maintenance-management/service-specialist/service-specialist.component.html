@@ -86,7 +86,7 @@
                             <label>Select User to set as Service specialist</label>
                             <select class="form-control" [(ngModel)]="nickname">
                                 <option></option>
-                                <option *ngFor="let user of users">{{user.nickname}}</option>
+                                <option *ngFor="let user of users; trackBy: trackById">{{user.nickname}}</option>
                             </select>
                         </div>
                     </div>

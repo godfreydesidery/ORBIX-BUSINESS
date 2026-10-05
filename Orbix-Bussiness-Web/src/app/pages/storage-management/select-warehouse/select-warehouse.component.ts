@@ -22,6 +22,7 @@ import { error } from 'src/custom-packages/util';
 // pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
 declare var pdfMake: any;
 import { IServiceBillItem } from 'src/app/domain/maintenance';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -40,6 +41,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './select-warehouse.component.scss'
 })
 export class SelectWarehouseComponent {
+  trackById = trackById
 
   documentHeader!: any
 

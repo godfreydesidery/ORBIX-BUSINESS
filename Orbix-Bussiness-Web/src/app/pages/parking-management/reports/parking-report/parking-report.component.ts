@@ -19,6 +19,7 @@ import { DataService } from '@services/custom/data.service';
 
 import * as XLSX from 'xlsx';
 import * as FileSaver from 'file-saver';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 
@@ -37,6 +38,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './parking-report.component.scss'
 })
 export class ParkingReportComponent {
+  trackById = trackById
   documentHeader! : any
 
   from : Date | string | null = null

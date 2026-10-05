@@ -38,7 +38,7 @@
                             </tr>
                         </thead>
                         <tbody>        
-                            <tr *ngFor="let service of services | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                            <tr *ngFor="let service of services | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                 <td>{{service.sn}}</td>
                                 <td>{{service.code}}</td>
                                 <td>{{service.name}}</td>

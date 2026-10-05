@@ -79,7 +79,7 @@
                 </thead>
 
                 <tbody>
-                  <tr *ngFor="let r of vehicleEquipmentRemovedReports">
+                  <tr *ngFor="let r of vehicleEquipmentRemovedReports; trackBy: trackById">
                     <td>{{ r.sn }}</td>
                     <td>{{ r.ownerName }}</td>
                     <td>{{ r.phoneNo }}</td>

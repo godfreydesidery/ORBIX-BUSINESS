@@ -33,7 +33,7 @@
                                 </tr>
                             </thead> 
                             <tbody>
-                                <tr *ngFor="let badge of restaurantBadges | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                <tr *ngFor="let badge of restaurantBadges | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                     <td>{{badge.sn}}</td>
                                     <td style="font-weight: bold; font-size: large;">{{badge.code}}</td>
                                     <td>{{badge.activeStatus}}</td>

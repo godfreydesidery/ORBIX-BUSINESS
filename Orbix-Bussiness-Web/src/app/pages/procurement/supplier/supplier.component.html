@@ -39,7 +39,7 @@
                             </tr>
                         </thead>
                         <tbody>        
-                            <tr *ngFor="let supplier of suppliers | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                            <tr *ngFor="let supplier of suppliers | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                 <td>{{supplier.sn}}</td>
                                 <td>{{supplier.code}}</td>
                                 <td>{{supplier.name}}</td>

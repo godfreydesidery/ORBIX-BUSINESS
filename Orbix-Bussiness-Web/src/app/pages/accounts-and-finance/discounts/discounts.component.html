@@ -29,7 +29,7 @@
                                 </thead>
                                 <tbody>
                                     <tr
-                                        *ngFor="let discount of discounts | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }">
+                                        *ngFor="let discount of discounts | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }; trackBy: trackById">
                                         <td>{{discount.id}}</td>
                                         <td>{{discount.serviceBillName}}</td>
                                         <td>{{discount.description}}</td>

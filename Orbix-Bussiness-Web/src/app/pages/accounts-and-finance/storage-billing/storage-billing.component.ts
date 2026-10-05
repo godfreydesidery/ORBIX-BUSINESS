@@ -15,6 +15,7 @@ import { IStorageBillReceivable } from 'src/app/domain/bill-receivable';
 import { IBillView } from 'src/app/domain/bill-view';
 import { DataService } from '@services/custom/data.service';
 import { IServiceBillItem } from 'src/app/domain/maintenance';
+import { trackById } from 'src/app/common/utils/track-by-id';
 // pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
 declare var pdfMake: any;
 
@@ -35,6 +36,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './storage-billing.component.scss'
 })
 export class StorageBillingComponent {
+  trackById = trackById
   page: number = 1; // Initialize the current page to 1
 
   filterRecords: string = ''

@@ -38,7 +38,7 @@
                             </tr>
                         </thead>
                         <tbody>        
-                            <tr *ngFor="let dineable of dineables | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                            <tr *ngFor="let dineable of dineables | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                 <td>{{dineable.sn}}</td>
                                 <td>{{dineable.code}}</td>
                                 <td>{{dineable.name}}</td>

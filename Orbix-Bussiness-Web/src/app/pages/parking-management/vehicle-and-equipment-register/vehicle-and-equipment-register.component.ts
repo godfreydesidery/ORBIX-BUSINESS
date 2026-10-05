@@ -14,6 +14,7 @@ import { IVehicleEquipment } from 'src/app/domain/vehicle-equipment';
 import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 const API_URL = environment.apiUrl;
 
@@ -29,6 +30,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './vehicle-and-equipment-register.component.scss'
 })
 export class VehicleEquipmentRegisterComponent {
+  trackById = trackById
 
 
 

@@ -136,7 +136,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr *ngFor="let item of shopSalesOrder.shopSalesOrderDetails">
+                                            <tr *ngFor="let item of shopSalesOrder.shopSalesOrderDetails; trackBy: trackById">
                                                 <td>{{item.sn}}</td>
                                                 <td>{{item.productCode}}</td>
                                                 <td>{{item.productName}}</td>
@@ -280,7 +280,7 @@
                       >
                         <button
                           class="dropdown-item form-control"
-                          *ngFor="let product of filteredProducts"
+                          *ngFor="let product of filteredProducts; trackBy: trackById"
                           (click)="selectProduct(product)"
                         >
                           {{ product.name }}
@@ -431,7 +431,7 @@
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr *ngFor="let shopSalesOrder of shopSalesOrders | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                <tr *ngFor="let shopSalesOrder of shopSalesOrders | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                     <td>{{shopSalesOrder.no}}</td>
                                     <td>{{shopSalesOrder.customerName}}</td>
                                     <td>{{shopSalesOrder.status}}</td>

@@ -160,7 +160,7 @@
                                                             style="max-height: 200px; overflow-y: auto; width: 100%;">
                                                             <button class="dropdown-item form-control"
                                                                 style="font-weight: bold;"
-                                                                *ngFor="let dineable of filteredDineables"
+                                                                *ngFor="let dineable of filteredDineables; trackBy: trackById"
                                                                 (click)="selectDineable(dineable)">
                                                                 {{ dineable.name }}
                                                             </button>
@@ -212,7 +212,7 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr *ngFor="let item of restaurantSalesOrder.restaurantSalesOrderDetails">
+                                            <tr *ngFor="let item of restaurantSalesOrder.restaurantSalesOrderDetails; trackBy: trackById">
                                                 <td>{{item.sn}}</td>
                                                 <td>{{item.dineableCode}}</td>
                                                 <td>{{item.dineableName}}</td>
@@ -354,7 +354,7 @@
                             placeholder="Type to search dineables..." autocomplete="off" />
                         <div class="dropdown-menu show mt-1" *ngIf="isDropdownOpen && filteredDineables.length > 0"
                             style="max-height: 200px; overflow-y: auto; width: 100%;">
-                            <button class="dropdown-item form-control" *ngFor="let dineable of filteredDineables"
+                            <button class="dropdown-item form-control" *ngFor="let dineable of filteredDineables; trackBy: trackById"
                                 (click)="selectDineable(dineable)">
                                 {{ dineable.name }}
                             </button>
@@ -461,7 +461,7 @@
                             <label for="dineableCode">Select Agent</label>
                             <select class="form-control" [(ngModel)]="selectedAgentId" (change)="onAgentChange($event)">
                                 <option [ngValue]="null"></option>
-                                <option *ngFor="let availableAgent of restaurantAgents" [value]="availableAgent.id">
+                                <option *ngFor="let availableAgent of restaurantAgents; trackBy: trackById" [value]="availableAgent.id">
                                     {{availableAgent.name}} | {{availableAgent.restaurantBadgeCode}}
                                 </option>
                             </select>
@@ -523,7 +523,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let restaurantSalesOrder of restaurantSalesOrders | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                    *ngFor="let restaurantSalesOrder of restaurantSalesOrders | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                     <td>{{restaurantSalesOrder.no}}</td>
                                     <td>{{restaurantSalesOrder.restaurantAgentName}}</td>
                                     <td>{{restaurantSalesOrder.restaurantBadgeCode}}</td>

@@ -17,6 +17,7 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DataService } from '@services/custom/data.service';
 import { IServiceBillItem, IWeigh } from 'src/app/domain/weigh';
 import { ICustomer } from 'src/app/domain/customer';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl; 
@@ -34,6 +35,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './weight-billing.component.scss'
 })
 export class WeightBillingComponent {
+  trackById = trackById
   // Weigh attributes
   weighId: any = null
   weighNo: string = ''

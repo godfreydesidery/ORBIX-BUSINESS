@@ -44,7 +44,7 @@
                                 </thead>
                                 <tbody>
                                     <tr
-                                        *ngFor="let user of users | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }">
+                                        *ngFor="let user of users | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
                                         <td>{{user.code}}</td>
                                         <td>{{user.username}}</td>
                                         <td>{{user.lastName}}, {{user.firstName}}</td>
@@ -198,7 +198,7 @@
                                 <tr>
                                     <td style="margin: 2mm;">
                                         <div class="row">
-                                            <div class="col-12" *ngFor="let role of roles">
+                                            <div class="col-12" *ngFor="let role of roles; trackBy: trackById">
                                                 <span *ngIf="role.owner === 'SYSTEM'">
                                                     <input type="checkbox" id="role.name" name="role.name"
                                                         [(ngModel)]="role.granted"><label
@@ -209,7 +209,7 @@
                                     </td>
                                     <td style="margin: 2mm;">
                                         <div class="row">
-                                            <div class="col-12" *ngFor="let role of roles">
+                                            <div class="col-12" *ngFor="let role of roles; trackBy: trackById">
                                                 <span *ngIf="role.owner === 'ORGANIZATION'">
                                                     <input type="checkbox" id="role.name" name="role.name"
                                                         [(ngModel)]="role.granted"><label

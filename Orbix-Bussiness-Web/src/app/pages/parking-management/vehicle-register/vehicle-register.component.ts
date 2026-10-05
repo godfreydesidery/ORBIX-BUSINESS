@@ -15,6 +15,7 @@ declare var pdfMake: any;
 
 import { DataService } from '@services/custom/data.service';
 import { MsgBoxService } from '@services/custom/msg-box.service';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -32,6 +33,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './vehicle-register.component.scss'
 })
 export class VehicleRegisterComponent {
+  trackById = trackById
 
   documentHeader! : any
 

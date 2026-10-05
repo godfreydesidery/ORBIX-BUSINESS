@@ -18,6 +18,7 @@ import { IMaintenanceJobCardIssueBillReceivable } from 'src/app/domain/maintenan
 import { IBillReceivable } from 'src/app/domain/bill-receivable';
 import { IMaintenance, IServiceBillItem } from 'src/app/domain/maintenance';
 import { ICustomer } from 'src/app/domain/customer';
+import { trackById } from 'src/app/common/utils/track-by-id';
 
 
 const API_URL = environment.apiUrl;
@@ -35,6 +36,7 @@ const API_URL = environment.apiUrl;
   styleUrl: './maintenance-vehicle-equipment-billing.component.scss'
 })
 export class MaintenanceVehicleEquipmentBillingComponent {
+  trackById = trackById
 // Maintenance attributes
   maintenanceId : any = null
   maintenanceNo : string = ''

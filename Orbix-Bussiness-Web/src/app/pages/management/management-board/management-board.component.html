@@ -133,7 +133,7 @@
                     <div class="col-sm-3">
                         <br>
                         <select class="form-control" [(ngModel)]="year" (change)="refreshYearlyStats()">
-                            <option *ngFor="let y of availableYears" [ngValue]="y">
+                            <option *ngFor="let y of availableYears; trackBy: trackById" [ngValue]="y">
                                 {{ y }}
                             </option>
                         </select>
