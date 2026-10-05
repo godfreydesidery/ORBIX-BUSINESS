@@ -20,7 +20,7 @@
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchDineables($event)" placeholder="Search..." style="max-width: 8cm;">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchDineables()" placeholder="Search..." style="max-width: 8cm;">
                     </div>
                 </div>
 
@@ -38,7 +38,7 @@
                             </tr>
                         </thead>
                         <tbody>        
-                            <tr *ngFor="let dineable of dineables | searchFilter : filterRecords | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: allDineablesLoaded ? undefined : totalDineables }; trackBy: trackById">
+                            <tr *ngFor="let dineable of dineables | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalDineables }; trackBy: trackById">
                                 <td>{{dineable.sn}}</td>
                                 <td>{{dineable.code}}</td>
                                 <td>{{dineable.name}}</td>

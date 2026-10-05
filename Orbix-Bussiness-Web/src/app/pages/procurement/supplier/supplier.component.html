@@ -20,7 +20,7 @@
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchSuppliers($event)" placeholder="Search..." style="max-width: 8cm;">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchSuppliers()" placeholder="Search..." style="max-width: 8cm;">
                     </div>
                 </div>
 
@@ -39,7 +39,7 @@
                             </tr>
                         </thead>
                         <tbody>        
-                            <tr *ngFor="let supplier of suppliers | searchFilter : filterRecords | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: allSuppliersLoaded ? undefined : totalSuppliers }; trackBy: trackById">
+                            <tr *ngFor="let supplier of suppliers | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalSuppliers }; trackBy: trackById">
                                 <td>{{supplier.sn}}</td>
                                 <td>{{supplier.code}}</td>
                                 <td>{{supplier.name}}</td>
