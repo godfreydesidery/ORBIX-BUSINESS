@@ -669,6 +669,14 @@ export class BondBillingComponent {
 
           this.msg.showSuccessMessage('Checked out Successifully')
 
+          // A checked out item leaves the checked-in list, so remove its row instead of reloading the whole list
+          this.bondItems = this.bondItems.filter(element => element.id != id)
+          var sn = 1
+          this.bondItems.forEach(element => {
+            element.sn = sn
+            sn = sn + 1
+          })
+
           this.printGatePassRcpt(data!.serviceBillItems, '', 0);
         }
       )
@@ -676,9 +684,9 @@ export class BondBillingComponent {
         error => {
           console.log(error)
           this.msg.showErrorMessage(error, 'Error')
+          this.getAllCheckedInBondItems()
         }
       )
-    this.getAllCheckedInBondItems()
   }
 
   lastBillingDate: string = ''

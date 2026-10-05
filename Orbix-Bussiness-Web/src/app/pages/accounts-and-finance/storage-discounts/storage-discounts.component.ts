@@ -529,6 +529,14 @@ export class StorageDiscountsComponent {
 
           this.msg.showSuccessMessage('Checked out Successifully')
 
+          // A checked out item leaves the checked-in list, so remove its row instead of reloading the whole list
+          this.storages = this.storages.filter(element => element.id != id)
+          var sn = 1
+          this.storages.forEach(element => {
+            element.sn = sn
+            sn = sn + 1
+          })
+
           this.printGatePassRcpt(data!.serviceBillItems, '', 0);
         }
       )
@@ -536,9 +544,9 @@ export class StorageDiscountsComponent {
         error => {
           console.log(error)
           this.msg.showErrorMessage(error, 'Error')
+          this.getAllCheckedInStorages()
         }
       )
-    this.getAllCheckedInStorages()
   }
 
   lastBillingDate: string = ''
