@@ -22,6 +22,8 @@ import { ISupplier } from 'src/app/domain/supplier';
 import { ISupplierProduct } from 'src/app/domain/supplier-product';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 
 
@@ -103,6 +105,8 @@ export class WeighbridgeComponent {
 
   weigh: IWeighbridge
   weighs: IWeighbridge[] = []
+  totalWeighs : number = 0
+  weighsRequest : number = 0 // number of the latest list request; answers to older ones are ignored
   lpos: ILpo[] = []
 
   weightOne : number | string = ''
@@ -122,6 +126,8 @@ export class WeighbridgeComponent {
 
 
   page: number = 1; // Initialize the current page to 1
+  pageSize : number = 15
+  listSearchTimer : any = null
   filterRecords: string = ''
   selectedOption: string = '';
 
@@ -225,28 +231,52 @@ export class WeighbridgeComponent {
       )
   }
 
-  async getAllRecent() {
+  async getAllRecent(){
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    this.weighs = []
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.weighsRequest
 
-    await this.http.get<IWeighbridge[]>(API_URL + '/weighs/recent', options)
-      .toPromise()
-      .then(
-        data => {
-          var sn = 1
-          data?.forEach(element => {
-            this.weighs.push(element)
-          })
-          this.weighs.reverse()
-          this.weighs.forEach(ele => {
-            ele.sn = sn
-            sn = sn + 1
-          })
-          console.log(data)
+    await this.http.get<IPage<IWeighbridge>>(API_URL + '/weighs/recent_page?' + pageParams(page, this.pageSize, this.filterRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.weighsRequest){
+          return
         }
-      )
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getAllRecent()
+          return
+        }
+        var sn = (page - 1) * this.pageSize + 1
+        data!.content.forEach(element => {
+          element.sn = sn
+          sn = sn + 1
+        })
+        this.weighs = data!.content
+        this.totalWeighs = data!.totalElements
+      }
+    )
+  }
+
+  pageChanged(page : number){
+    this.page = page
+    this.getAllRecent()
+  }
+
+  searchList(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimer)
+    this.listSearchTimer = setTimeout(() => {
+      this.page = 1
+      this.getAllRecent()
+    }, 300)
   }
 
   lpo!: ILpo

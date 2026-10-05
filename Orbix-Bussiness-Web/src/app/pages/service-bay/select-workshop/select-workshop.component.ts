@@ -26,6 +26,8 @@ import { IMachine } from 'src/app/domain/machine';
 import { IMachineService } from 'src/app/domain/machine-service';
 import { IService } from 'src/app/domain/service';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 
 const API_URL = environment.apiUrl;
@@ -367,31 +369,59 @@ export class SelectWorkshopComponent {
 
 
   machines : IMachine[] = []
+  totalMachines : number = 0
+  machinesRequest : number = 0 // number of the latest list request; answers to older ones are ignored
 
 
-  async getAllMachinesByWorkshop() {
+  async getAllMachinesByWorkshop(){
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    this.machines = []
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.machinesRequest
 
-    await this.http.get<IMachine[]>(API_URL + '/machines/by_workshop?workshop_id=' + this.workshopId, options)
-      .toPromise()
-      .then(
-        data => {
-          data?.reverse()
-          var sn = 1
-          data?.forEach(element => {
-            element.sn = sn
-            this.machines.push(element)
-            sn = sn + 1
-          })
-          console.log(data)
+    await this.http.get<IPage<IMachine>>(API_URL + '/machines/by_workshop_page?workshop_id=' + this.workshopId + '&' + pageParams(page, this.pageSize, this.filterRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.machinesRequest){
+          return
         }
-      )
-      .catch(error => {
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getAllMachinesByWorkshop()
+          return
+        }
+        var sn = (page - 1) * this.pageSize + 1
+        data!.content.forEach(element => {
+          element.sn = sn
+          sn = sn + 1
+        })
+        this.machines = data!.content
+        this.totalMachines = data!.totalElements
+      }
+    )
+    .catch(error => {
         console.log(error)
       })
+  }
+
+  pageChanged(page : number){
+    this.page = page
+    this.getAllMachinesByWorkshop()
+  }
+
+  searchList(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimer)
+    this.listSearchTimer = setTimeout(() => {
+      this.page = 1
+      this.getAllMachinesByWorkshop()
+    }, 300)
   }
 
 
@@ -619,6 +649,8 @@ export class SelectWorkshopComponent {
   nickname = ''
 
   page: number = 1; // Initialize the current page to 1
+  pageSize : number = 15
+  listSearchTimer : any = null
 
   filterRecords: string = ''
 
