@@ -77,12 +77,15 @@ export class ProductComponent {
       .toPromise()
       .then(
         data => {
+          // Built apart and assigned at the end, so two overlapping loads cannot mix their rows
+          var products : IProduct[] = []
           var sn = 1
           data?.forEach(element => {
             element.sn = sn
-            this.products.push(element)
+            products.push(element)
             sn = sn + 1
           })
+          this.products = products
           this.allProductsLoaded = true
           console.log(data)
         }

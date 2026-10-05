@@ -77,12 +77,15 @@ export class DineableComponent {
       .toPromise()
       .then(
         data => {
+          // Built apart and assigned at the end, so two overlapping loads cannot mix their rows
+          var dineables : IDineable[] = []
           var sn = 1
           data?.forEach(element => {
             element.sn = sn
-            this.dineables.push(element)
+            dineables.push(element)
             sn = sn + 1
           })
+          this.dineables = dineables
           this.allDineablesLoaded = true
           console.log(data)
         }

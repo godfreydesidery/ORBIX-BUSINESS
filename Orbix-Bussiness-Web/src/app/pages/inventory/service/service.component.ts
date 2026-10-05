@@ -77,12 +77,15 @@ export class ServiceComponent {
       .toPromise()
       .then(
         data => {
+          // Built apart and assigned at the end, so two overlapping loads cannot mix their rows
+          var services : IService[] = []
           var sn = 1
           data?.forEach(element => {
             element.sn = sn
-            this.services.push(element)
+            services.push(element)
             sn = sn + 1
           })
+          this.services = services
           this.allServicesLoaded = true
           console.log(data)
         }
