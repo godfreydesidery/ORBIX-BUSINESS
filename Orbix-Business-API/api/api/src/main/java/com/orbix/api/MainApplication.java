@@ -262,6 +262,9 @@ public class MainApplication {
 			try {
 				userService.addPrivilegeToRole("ROOT", "AUDIT-ACCESS");
 			}catch(Exception e) {}	
+			try {
+				userService.addPrivilegeToRole("ROOT", "AUDIT-UPDATE");
+			}catch(Exception e) {}	
 			
 			Field[] operationFields = Operation.class.getDeclaredFields();
 			List<String> operations = new ArrayList<>();

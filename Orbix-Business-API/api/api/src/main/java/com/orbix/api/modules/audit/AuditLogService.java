@@ -22,4 +22,12 @@ public interface AuditLogService {
 			Long userId, Long branchId, int page, int size, String search, HttpServletRequest request);
 
 	AuditLogResponseDTO get(Long id, HttpServletRequest request);
+
+	/** Whether sign-ins and critical actions are recorded; on unless turned off */
+	boolean isRecordingEnabled();
+
+	AuditSettingResponseDTO getAuditSetting(HttpServletRequest request);
+
+	/** Turns recording on or off; the change itself is always recorded */
+	AuditSettingResponseDTO setRecordingEnabled(boolean recordingEnabled, HttpServletRequest request);
 }

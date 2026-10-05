@@ -31,6 +31,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orbix.api.api.commons.PageRequests;
 import com.orbix.api.api.commons.PageResponseDTO;
 import com.orbix.api.exceptions.InvalidEntryException;
+import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserRepository;
@@ -56,6 +57,11 @@ public class AuditLogServiceController implements AuditLogService {
 	private final UserRepository userRepository;
 	private final PlatformTransactionManager transactionManager;
 	private final ObjectMapper objectMapper;
+	private final AuditSettingRepository auditSettingRepository;
+
+	// Whether recording is on: read from the database when first needed, then kept here and changed only by
+	// setRecordingEnabled, so checking it costs no query
+	private volatile Boolean recordingEnabled;
 
 	@Autowired
 	@Qualifier("auditExecutor")
@@ -63,6 +69,14 @@ public class AuditLogServiceController implements AuditLogService {
 
 	@Override
 	public void recordAction(AuditLog auditLog) {
+		if(!isRecordingEnabled()) {
+			return;
+		}
+		recordEntry(auditLog);
+	}
+
+	// Records the entry whether or not recording is on (used directly only for turning recording on and off)
+	private void recordEntry(AuditLog auditLog) {
 		// Who and where are read now, while the request is still being handled; the user's record is looked up when saving
 		HttpServletRequest request = currentRequest();
 		String username = (request != null && request.getUserPrincipal() != null) ? request.getUserPrincipal().getName() : null;
@@ -103,6 +117,9 @@ public class AuditLogServiceController implements AuditLogService {
 	@Override
 	@Async("auditExecutor")
 	public void recordAuth(String action, String outcome, String username, String reason, String ipAddress, String forwardedFor, String userAgent) {
+		if(!isRecordingEnabled()) {
+			return;
+		}
 		AuditLog auditLog = new AuditLog();
 		auditLog.setOccurredAt(LocalDateTime.now(ZoneOffset.UTC));
 		auditLog.setCategory("AUTH");
@@ -121,6 +138,9 @@ public class AuditLogServiceController implements AuditLogService {
 	@Override
 	@Async("auditExecutor")
 	public void recordAccessDenied(String username, String path, String ipAddress, String forwardedFor, String userAgent) {
+		if(!isRecordingEnabled()) {
+			return;
+		}
 		AuditLog auditLog = new AuditLog();
 		auditLog.setOccurredAt(LocalDateTime.now(ZoneOffset.UTC));
 		auditLog.setCategory("SECURITY");
@@ -165,6 +185,65 @@ public class AuditLogServiceController implements AuditLogService {
 			throw new NotFoundException("Audit log entry not found");
 		}
 		return auditLogResponseDTOMapper(auditLog_.get());
+	}
+
+	@Override
+	public boolean isRecordingEnabled() {
+		Boolean enabled = recordingEnabled;
+		return enabled != null ? enabled : loadRecordingEnabled();
+	}
+
+	private synchronized boolean loadRecordingEnabled() {
+		if(recordingEnabled == null) {
+			try {
+				// Without a saved setting, recording is on
+				recordingEnabled = auditSettingRepository.findFirstByOrderByIdAsc().map(AuditSetting::isRecordingEnabled).orElse(true);
+			}catch(Exception e) {
+				// Read again next time; meanwhile keep recording
+				log.error("Could not read the audit log setting: {}", e.getMessage());
+				return true;
+			}
+		}
+		return recordingEnabled;
+	}
+
+	@Override
+	public AuditSettingResponseDTO getAuditSetting(HttpServletRequest request) {
+		return auditSettingResponseDTOMapper(auditSettingRepository.findFirstByOrderByIdAsc().orElseGet(AuditSetting::new));
+	}
+
+	@Override
+	public AuditSettingResponseDTO setRecordingEnabled(boolean enabled, HttpServletRequest request) {
+		AuditSetting auditSetting = auditSettingRepository.findFirstByOrderByIdAsc().orElseGet(AuditSetting::new);
+		if(auditSetting.isRecordingEnabled() == enabled) {
+			throw new InvalidOperationException(enabled ? "Audit log recording is already on" : "Audit log recording is already off");
+		}
+		String username = (request != null && request.getUserPrincipal() != null) ? request.getUserPrincipal().getName() : null;
+		auditSetting.setRecordingEnabled(enabled);
+		auditSetting.setUpdatedAt(LocalDateTime.now(ZoneOffset.UTC));
+		auditSetting.setUpdatedBy(AuditRequests.truncate(username, 100));
+		auditSettingRepository.save(auditSetting);
+
+		// Takes effect once the change has committed
+		if(TransactionSynchronizationManager.isSynchronizationActive()) {
+			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
+				@Override
+				public void afterCommit() {
+					recordingEnabled = enabled;
+				}
+			});
+		}else {
+			recordingEnabled = enabled;
+		}
+
+		// Always recorded, also when recording is turned off, so the gap in the log is explained
+		AuditLog auditLog = new AuditLog();
+		auditLog.setCategory("SECURITY");
+		auditLog.setAction(enabled ? "AUDIT_RECORDING_ENABLED" : "AUDIT_RECORDING_DISABLED");
+		auditLog.setEntityType("AuditSetting");
+		auditLog.setSummary(enabled ? "Turned audit log recording on" : "Turned audit log recording off");
+		recordEntry(auditLog);
+		return auditSettingResponseDTOMapper(auditSetting);
 	}
 
 	/**
@@ -235,6 +314,14 @@ public class AuditLogServiceController implements AuditLogService {
 	private static HttpServletRequest currentRequest() {
 		RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
 		return requestAttributes instanceof ServletRequestAttributes ? ((ServletRequestAttributes) requestAttributes).getRequest() : null;
+	}
+
+	private AuditSettingResponseDTO auditSettingResponseDTOMapper(AuditSetting auditSetting) {
+		AuditSettingResponseDTO auditSettingResponse = new AuditSettingResponseDTO();
+		auditSettingResponse.setRecordingEnabled(auditSetting.isRecordingEnabled());
+		auditSettingResponse.setUpdatedAt(auditSetting.getUpdatedAt() == null ? null : auditSetting.getUpdatedAt().toString() + "Z");
+		auditSettingResponse.setUpdatedBy(auditSetting.getUpdatedBy());
+		return auditSettingResponse;
 	}
 
 	private AuditLogResponseDTO auditLogResponseDTOMapper(AuditLog auditLog) {

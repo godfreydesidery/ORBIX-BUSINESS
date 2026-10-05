@@ -85,6 +85,10 @@ public class AuditAspect {
 
 	@Around(value = "@annotation(audited)", argNames = "audited")
 	public Object recordAction(ProceedingJoinPoint joinPoint, Audited audited) throws Throwable {
+		// With recording turned off, the action runs as if it were not marked at all
+		if(!auditLogService.getObject().isRecordingEnabled()) {
+			return joinPoint.proceed();
+		}
 		Map<String, Object> values = new HashMap<>();
 		// The changed record's columns before the action, by its id (more than one only when its keys match several records)
 		Map<String, Map<String, Object>> recordsBefore = null;
