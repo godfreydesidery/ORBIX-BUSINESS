@@ -58,7 +58,7 @@ export class StorageCashCollectionComponent {
         this.from = today.toISOString().split('T')[0];
         this.to = today.toISOString().split('T')[0];
   
-        this.getTotalsByDates(this.from, this.to);
+        //this.getTotalsByDates(this.from, this.to); // its totals are not shown on this screen
         this.getBranchUserNames();
       }
   

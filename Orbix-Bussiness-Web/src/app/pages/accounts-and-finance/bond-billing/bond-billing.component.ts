@@ -202,7 +202,10 @@ export class BondBillingComponent {
       this.selectedBondZoneName = localStorage.getItem('selected-bond-zone-name')
       await this.loadSelectedBondZone()
     }
-    await this.getAllCheckedInBondItems()
+    // Without a selected zone the request can only fail, so it is not sent
+    if (this.selectedBondZoneId != '' && this.selectedBondZoneId != null) {
+      await this.getAllCheckedInBondItems()
+    }
   }
 
   loadAvailableBondZones = async () => {

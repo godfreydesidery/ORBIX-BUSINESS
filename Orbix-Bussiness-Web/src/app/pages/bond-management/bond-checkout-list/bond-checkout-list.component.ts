@@ -159,7 +159,10 @@ documentHeader!: any
       this.selectedBondZoneId = localStorage.getItem('selected-bond-zone-id')
       await this.loadSelectedBondZone()
     }
-    await this.getAllRecentCheckedOutBondItems()
+    // Without a loaded zone the request can only fail, so it is not sent
+    if (this.bondZoneId != null) {
+      await this.getAllRecentCheckedOutBondItems()
+    }
   }
 
   loadAvailableBondZones = async () => {
