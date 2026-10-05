@@ -226,13 +226,11 @@ export class RoleAccessComponent {
   removePrivilege(object : string, operation : string){
     for (const [key, value] of Object.entries(this.privileges)) {
       if(key == object){
-        var i = -1
-        value.forEach(element => {
-          if(element == operation){
-            value.splice(i, 1)
-            return
-          }
-        })
+        // Remove the unticked operation itself (splice(-1, 1) used to remove the last operation instead)
+        var i = value.indexOf(operation)
+        if(i > -1){
+          value.splice(i, 1)
+        }
       }
     }
   }
