@@ -1,6 +1,6 @@
 # ORBIX Business: audit log design
 
-**Status:** design agreed on 5 October 2026, with the decisions in section 12. Phases 1 and 2 are implemented on branch `performance-improvements`; phases 3 and 4 follow.
+**Status:** design agreed on 5 October 2026, with the decisions in section 12. All four phases are implemented on branch `performance-improvements`.
 
 ## 1. Goal
 
@@ -128,7 +128,20 @@ Failed critical actions are not logged (decision D5); validation failures such a
 
 ### 5.4 Before and after values
 
-For edits, the service method itself calls `auditService.recordChange(...)`, because only it knows the old values. It reads the fields before applying the change and records only those that changed. See section 7.
+The same annotation handles edits, with no change to the service code:
+
+```java
+@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "ParkingZone", summary = "Updated parking zone {ref}",
+		changeOf = ParkingZone.class, changeId = "parkingZoneRequest.id",
+		changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+```
+
+How it works:
+- **Before the action**, the aspect reads the record named by `changeOf` and `changeId`. It takes the record's own columns, plus the ids of the records it points to, from the JPA metamodel.
+- **After the action**, it reads them again and keeps only the columns that changed, as `before` and `after`. If the record was deleted, everything it held is kept as `before`.
+- **Price changes:** when a changed column matches `changedFieldPattern`, the entry is recorded as `changedAction` (for example `PRICE_CHANGED`) instead of `action`.
+- **Reference:** `{ref}` in a summary is the record's number, code, username or name.
+- **Safety:** reading the record before and after never throws, and the action's result and exceptions pass through unchanged.
 
 ## 6. Action catalogue
 
@@ -179,7 +192,12 @@ Endpoint paths are relative to `/orbix-business-api`.
 `SALES_ORDER_CONFIRMED` and `SALES_ORDER_CANCELLED` (confirm and cancel under `/shop_sales_orders/` and `/restaurant_sales_orders/`); `MACHINE_SERVICE_CONFIRMED` (`/machine-services/confirm`)
 
 ### SETTINGS (phase 4, decision D4)
-Create, update, activate and deactivate of reference data: companies, branches, shops, restaurants, warehouses, workshops, zones, types, units, suppliers, service specialists, agents and badges; also `/company_profile/save_logo`.
+`RECORD_CREATED`, `RECORD_UPDATED`, `RECORD_ACTIVATED`, `RECORD_DEACTIVATED`. `entityType` names the kind of record.
+- **Covers:** companies, branches, shops, restaurants, warehouses, workshops, parking and bond zones, vehicle/equipment, bond item, good and maintenance issue types, units of measure, suppliers, service specialists, restaurant agents and badges.
+- **Badges:** `BADGE_ASSIGNED` / `BADGE_UNASSIGNED`.
+- **Logo:** `LOGO_CHANGED` (`/company_profile/save_logo`; the logo itself is never stored).
+- **Catalogue records** (products, dineables, services, shop/restaurant/supplier products, restaurant dineables) use the same actions under the INVENTORY category.
+- **Updates** carry before/after values. A change to a price column is recorded as `PRICE_CHANGED`.
 
 **Not logged:** reads, reports, lists and searches.
 
