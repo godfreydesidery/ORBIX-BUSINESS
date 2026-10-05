@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/auth.service';
-import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { IParking } from 'src/app/domain/parking';
 import { IParkingZone } from 'src/app/domain/parking-zone';
@@ -16,6 +15,8 @@ import { Router, RouterModule } from '@angular/router';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { IBillView } from 'src/app/domain/bill-view';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 const API_URL = environment.apiUrl;
 
@@ -26,7 +27,6 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    SearchFilterPipe,
     NgxPaginationModule,
     RouterModule
   ],
@@ -37,6 +37,8 @@ export class ParkingBillingComponent {
   trackById = trackById
 
   page: number = 1; // Initialize the current page to 1
+  pageSize : number = 10
+  listSearchTimer : any = null
 
   filterRecords : string = ''
 
@@ -174,6 +176,8 @@ export class ParkingBillingComponent {
 
   /**Collections */
   parkings : IParking[] = []
+  totalParkings : number = 0
+  parkingsRequest : number = 0 // number of the latest list request; answers to older ones are ignored
   // parkingBillReceivables : IParkingBillReceivable[] = []
 
   constructor(
@@ -192,22 +196,48 @@ export class ParkingBillingComponent {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    this.parkings = []
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.parkingsRequest
 
-    await this.http.get<IParking[]>(API_URL+'/parkings/get_all_checked_in', options)
+    await this.http.get<IPage<IParking>>(API_URL+'/parkings/get_all_checked_in_page?' + pageParams(page, this.pageSize, this.filterRecords), options)
     .toPromise()
     .then(
       data => {
-        data?.reverse()
-        var sn = 1
-        data?.forEach(element => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.parkingsRequest){
+          return
+        }
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getAllCheckedInParkings()
+          return
+        }
+        var sn = (page - 1) * this.pageSize + 1
+        data!.content.forEach(element => {
           element.sn = sn
-          this.parkings.push(element)
           sn = sn + 1
         })
-        console.log(data)
+        this.parkings = data!.content
+        this.totalParkings = data!.totalElements
       }
     )
+  }
+
+  pageChanged(page : number){
+    this.page = page
+    this.getAllCheckedInParkings()
+  }
+
+  searchList(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimer)
+    this.listSearchTimer = setTimeout(() => {
+      this.page = 1
+      this.getAllCheckedInParkings()
+    }, 300)
   }
 
   async getParkingBillReceivables(parkingId : any){
