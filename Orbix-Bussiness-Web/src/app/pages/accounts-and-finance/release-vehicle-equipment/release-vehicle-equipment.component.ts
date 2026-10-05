@@ -140,6 +140,7 @@ export class ReleaseVehicleEquipmentComponent {
     this.getAllBranchActiveParkingZones()
   }
 
+  // Not used any more: after an action the screen reloads the list it shows (getTodayCheckedOut)
   async getAllClearedParkings() {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
@@ -364,7 +365,7 @@ export class ReleaseVehicleEquipmentComponent {
 
             console.log(data)
 
-            this.getAllClearedParkings()
+            this.getTodayCheckedOut()
 
             this.msg.showSuccessMessage('Parking created successifully')
           }
@@ -386,7 +387,7 @@ export class ReleaseVehicleEquipmentComponent {
 
             console.log(data)
 
-            this.getAllClearedParkings()
+            this.getTodayCheckedOut()
 
             this.msg.showSuccessMessage('Parking updated successifully')
 
@@ -420,7 +421,7 @@ export class ReleaseVehicleEquipmentComponent {
 
           console.log(data)
 
-          this.getAllClearedParkings()
+          this.getTodayCheckedOut()
 
           this.msg.showSuccessMessage('Parking activated successifully')
 
@@ -455,7 +456,7 @@ export class ReleaseVehicleEquipmentComponent {
 
           console.log(data)
 
-          this.getAllClearedParkings()
+          this.getTodayCheckedOut()
 
           this.msg.showSuccessMessage('Checked in Successifully')
 
@@ -525,7 +526,7 @@ export class ReleaseVehicleEquipmentComponent {
 
           console.log(data)
 
-          this.getAllClearedParkings()
+          this.getTodayCheckedOut()
           this.msg.showSuccessMessage('Checked out Successifully')
 
           this.printGatePassRcpt(data!.serviceBillItems, '', 0);
@@ -555,7 +556,7 @@ export class ReleaseVehicleEquipmentComponent {
 
           console.log(data)
 
-          this.getAllClearedParkings()
+          this.getTodayCheckedOut()
 
           this.msg.showSuccessMessage('Parking deactivated successifully')
 
