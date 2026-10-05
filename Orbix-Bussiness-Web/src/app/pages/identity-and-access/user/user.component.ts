@@ -7,7 +7,6 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { DatatableComponent, NgxDatatableModule, SelectionType } from '@swimlane/ngx-datatable';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from 'src/app/auth.service';
-import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { IBranch } from 'src/app/domain/branch';
 import { ICompany } from 'src/app/domain/company';
 import { IRole } from 'src/app/domain/role';
@@ -16,6 +15,8 @@ import { DirectivesModule } from 'src/app/theme/directives/directives.module';
 
 import { environment } from 'src/environments/environment';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 const API_URL = environment.apiUrl;
 
@@ -25,7 +26,6 @@ const API_URL = environment.apiUrl;
   imports: [
     DirectivesModule,
     NgxDatatableModule,
-    SearchFilterPipe,
     NgxPaginationModule,
     CommonModule,
     FormsModule
@@ -64,8 +64,12 @@ export class UserComponent {
   public roles: IRole[]
 
   public users: IUser[]
+  totalUsers : number = 0
+  usersRequest : number = 0 // number of the latest list request; answers to older ones are ignored
 
   page: number = 1; // Initialize the current page to 1
+  pageSize : number = 15
+  listSearchTimer : any = null
 
   filterRecords: string = ''
 
@@ -225,29 +229,47 @@ export class UserComponent {
       })
   }
 
-  async getUsers() {
-    this.users = []
+  async getUsers(){
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    //this.spinner.show()
-    await this.http.get<IUser[]>(API_URL + '/users', options)
-      //.pipe(finalize(() => this.spinner.hide()))
-      .toPromise()
-      .then(
-        data => {
-          data?.forEach(
-            element => {
-              this.users.push(element)
-            }
-          )
-          console.log(data)
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.usersRequest
+
+    await this.http.get<IPage<IUser>>(API_URL + '/users/get_page?' + pageParams(page, this.pageSize, this.filterRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.usersRequest){
+          return
         }
-      )
-      .catch(error => {
-        this.msg.showErrorMessage(error, 'Could not load users')
-      })
-    return
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getUsers()
+          return
+        }
+        this.users = data!.content
+        this.totalUsers = data!.totalElements
+      }
+    )
+  }
+
+  pageChanged(page : number){
+    this.page = page
+    this.getUsers()
+  }
+
+  searchList(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimer)
+    this.listSearchTimer = setTimeout(() => {
+      this.page = 1
+      this.getUsers()
+    }, 300)
   }
 
   async getUser(key: string) {

@@ -18,7 +18,7 @@
                         <div class="row">
                             <div class="col-sm-4"></div>
                             <div class="col-sm-8">
-                                <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                                <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchList()" placeholder="Search..." style="max-width: 8cm;">
                             </div>
                         </div>
                         <br>
@@ -33,7 +33,7 @@
                                 </tr>
                             </thead> 
                             <tbody>
-                                <tr *ngFor="let badge of restaurantBadges | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
+                                <tr *ngFor="let badge of $any(restaurantBadges) | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalRestaurantBadges }; trackBy: trackById">
                                     <td>{{badge.sn}}</td>
                                     <td style="font-weight: bold; font-size: large;">{{badge.code}}</td>
                                     <td>{{badge.activeStatus}}</td>
@@ -62,7 +62,7 @@
                         <br>
                         <div class="row">
                             <div class="col-sm-12" style="text-align: right;">
-                                <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                                <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
                             </div>
                         </div>
                     </div>    
