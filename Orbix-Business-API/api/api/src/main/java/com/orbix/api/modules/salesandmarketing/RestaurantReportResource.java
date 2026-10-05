@@ -45,6 +45,7 @@ public class RestaurantReportResource {
 	    return ResponseEntity.ok(report);
 	}
 	@PostMapping("/sales_reports/get_fast_moving_dineables_report_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<IFastMovingDineable>> getFastMovingDineablesReportByDates(
 	        @RequestBody DateRange dateRange,
 	        HttpServletRequest request) {

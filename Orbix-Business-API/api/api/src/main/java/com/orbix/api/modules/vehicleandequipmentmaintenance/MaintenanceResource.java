@@ -32,36 +32,43 @@ public class MaintenanceResource {
 	private final MaintenanceService maintenanceService;	
 	
 	@GetMapping("/maintenances")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MaintenanceResponseDTO>>getAll(HttpServletRequest request){
 		return ResponseEntity.ok().body(maintenanceService.getAllMaintenances(request));
 	}
 	
 	@GetMapping("/maintenances/get_all_pending_or_checked_in")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MaintenanceResponseDTO>>getAllPendingAndCheckedIn(HttpServletRequest request){
 		return ResponseEntity.ok().body(maintenanceService.getAllPendingOrCheckedInMaintenances(request));
 	}
 	
 	@GetMapping("/maintenances/get_all_checked_in_with_open_jobs")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MaintenanceResponseDTO>>getAllCheckedInWithOpenJobs(HttpServletRequest request){
 		return ResponseEntity.ok().body(maintenanceService.getAllCheckedInMaintenancesWithOpenJobs(request));
 	}
 	
 	@GetMapping("/maintenances/get_all_checked_in_with_open_jobs_and_mine")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MaintenanceResponseDTO>>getAllCheckedInWithOpenJobsAndMine(HttpServletRequest request){
 		return ResponseEntity.ok().body(maintenanceService.getAllCheckedInMaintenancesWithOpenJobsAndMine(request));
 	}
 	
 	@GetMapping("/maintenances/get_all_checked_in_with_closed_jobs_and_mine")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MaintenanceResponseDTO>>getAllCheckedInWithClosedJobsAndMine(HttpServletRequest request){
 		return ResponseEntity.ok().body(maintenanceService.getAllCheckedInMaintenancesWithClosedJobsAndMine(request));
 	}
 	
 	@GetMapping("/maintenances/get_all_checked_in")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MaintenanceResponseDTO>>getAllCheckedIn(HttpServletRequest request){
 		return ResponseEntity.ok().body(maintenanceService.getAllCheckedInMaintenances(request));
 	}
 	
 	@GetMapping("/maintenances/get_all_cleared")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MaintenanceResponseDTO>>getAllCleared(HttpServletRequest request){
 		return ResponseEntity.ok().body(maintenanceService.getAllCleared(request));
 	}
@@ -72,6 +79,7 @@ public class MaintenanceResource {
 	}
 	
 	@GetMapping("/maintenances/get_recent_checked_out")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MaintenanceResponseDTO>>getRecentCheckedOut(HttpServletRequest request){
 		return ResponseEntity.ok().body(maintenanceService.getRecentCheckedOut(request));
 	}
@@ -85,6 +93,7 @@ public class MaintenanceResource {
 	}
 	
 	@GetMapping("/maintenances/get_maintenance_bill_receivables")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MaintenanceJobCardIssueBillReceivableResponseDTO>>getMaintenanceBillReceivables(
 			@RequestParam(name = "maintenance_id") Long id,
 			HttpServletRequest request){		

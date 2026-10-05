@@ -28,6 +28,7 @@ public class GrnResource {
 	private final GrnService grnService;
 	
 	@GetMapping("/grns/get_all_pending")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<GrnResponseDTO>>getAllPendingByShop(
 			@RequestParam(name = "shop_id") Long shopId,
 			HttpServletRequest request){
@@ -35,12 +36,14 @@ public class GrnResource {
 	}
 	
 	@GetMapping("/grns/get_all_visible_by_branch")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<GrnResponseDTO>>getAllVisibleByBranch(
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(grnService.getAllVisibleGrnsByBranch(request));
 	}
 	
 	@GetMapping("/grns/get_all_visible_by_shop")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<GrnResponseDTO>>getAllVisibleByShop(
 			@RequestParam(name = "shop_id") Long shopId,
 			HttpServletRequest request){

@@ -28,6 +28,7 @@ public class LpoResource {
 	private final LpoService lpoService;
 	
 	@GetMapping("/lpos/get_all_pending")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<LpoResponseDTO>>getAllPendingByShop(
 			@RequestParam(name = "shop_id") Long shopId,
 			HttpServletRequest request){
@@ -35,12 +36,14 @@ public class LpoResource {
 	}
 	
 	@GetMapping("/lpos/get_all_visible_by_branch")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<LpoResponseDTO>>getAllVisibleByBranch(
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(lpoService.getAllVisibleLposByBranch(request));
 	}
 	
 	@GetMapping("/lpos/get_all_visible_by_shop")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<LpoResponseDTO>>getAllVisibleByShop(
 			@RequestParam(name = "shop_id") Long shopId,
 			HttpServletRequest request){

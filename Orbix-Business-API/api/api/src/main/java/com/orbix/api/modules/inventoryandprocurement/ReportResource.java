@@ -60,6 +60,7 @@ public class ReportResource {
 //    }
 	
 	@PostMapping("/shop_stock_logs/get_stock_logs_report_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StockLogReportProjection>> getSalesListingReportByDates(
 			@RequestParam(name = "shop_id") Long shopId,
 	        @RequestBody DateRange dateRange,
@@ -71,6 +72,7 @@ public class ReportResource {
 	}
 	
 	@PostMapping("/lpos/get_lpo_report_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ILpoProjection>> getLpoReportByDates(
 	        @RequestBody DateRange dateRange,
 	        HttpServletRequest request) {
@@ -79,6 +81,7 @@ public class ReportResource {
 	}
 	
 	@PostMapping("/grns/get_grn_report_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<IGrnProjection>> getGrnReportByDates(
 	        @RequestBody DateRange dateRange,
 	        HttpServletRequest request) {
@@ -87,6 +90,7 @@ public class ReportResource {
 	}
 	
 	@PostMapping("/restaurant_stock_logs/get_stock_logs_report_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<RestaurantStockLogReportProjection>> getRestaurantSalesListingReportByDates(
 			@RequestParam(name = "restaurant_id") Long restaurantId,
 			@RequestParam(name = "product_id") Long productId,

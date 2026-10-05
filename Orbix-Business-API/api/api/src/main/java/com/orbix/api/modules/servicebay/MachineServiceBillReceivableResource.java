@@ -32,6 +32,7 @@ public class MachineServiceBillReceivableResource {
 	private final MachineServiceBillReceivableService machineServiceBillReceivableService;
 	
 	@GetMapping("/machine_service_bill_receivables/get_all_by_machine")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MachineServiceBillReceivableResponseDTO>> getAllByMachine(
 			@RequestParam(name = "machine_id") Long machineId,
 			HttpServletRequest request)

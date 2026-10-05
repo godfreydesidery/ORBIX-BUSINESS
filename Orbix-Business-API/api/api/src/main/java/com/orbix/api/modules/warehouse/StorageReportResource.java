@@ -41,6 +41,7 @@ public class StorageReportResource {
 	
 	
 	@PostMapping("/storage_reports/get_totals_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<StorageTotalsResponseDTO>getTotalsByDates(
 			@RequestBody DateRange dateRange,
 			HttpServletRequest request){
@@ -52,6 +53,7 @@ public class StorageReportResource {
 	}
 	
 	@PostMapping("/storage_reports/get_registration_report")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<RegistrationResponseDTO>>getRegistrationReportByDateAndReceptionist(
 			@RequestBody DateRange dateRange,
 			@RequestParam(name = "nickname") String cashierName,
@@ -103,6 +105,7 @@ public class StorageReportResource {
 	}
 	
 	@PostMapping("/storage_reports/get_storage_report")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StorageResponseDTO>>getStorageReportByDateAndReceptionist(
 			@RequestBody DateRange dateRange,
 			@RequestParam(name = "status") String status,
@@ -172,6 +175,7 @@ public class StorageReportResource {
 	}
 	
 	@PostMapping("/storage_reports/get_goods_removed_report")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<GoodsRemovedResponseDTO>>getGoodsRemovedReport(
 			@RequestBody DateRange dateRange,
 			HttpServletRequest request){

@@ -37,6 +37,7 @@ public class FinanceReportResource {
 	
 	
 	@PostMapping("/finance_reports/get_cash_collections_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<IBillReceivableCollection>>getCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,
@@ -55,6 +56,7 @@ public class FinanceReportResource {
 	}
 	
 	@PostMapping("/finance_reports/get_cashier_collections_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ICashierCollection>>getCashierCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,
@@ -74,6 +76,7 @@ public class FinanceReportResource {
 	
 	
 	@PostMapping("/finance_reports/get_parking_detailed_collections_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<IParkingCollection>>getParkingDetailedCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,
@@ -90,6 +93,7 @@ public class FinanceReportResource {
 	}
 	
 	@PostMapping("/finance_reports/get_parking_service_detailed_collections_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<IParkingServiceCollection>>getParkingServiceDetailedCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,
@@ -105,6 +109,7 @@ public class FinanceReportResource {
 	}
 	
 	@PostMapping("/finance_reports/get_sales_detailed_collections_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ISalesCollection>>getSalesDetailedCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,
@@ -121,6 +126,7 @@ public class FinanceReportResource {
 	}
 	
 	@PostMapping("/finance_reports/get_restaurant_sales_detailed_collections_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<IRestaurantSalesCollection>>getRestaurantSalesDetailedCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,
@@ -137,6 +143,7 @@ public class FinanceReportResource {
 	}
 	
 	@PostMapping("/finance_reports/get_storage_detailed_collections_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<IStorageCollection>>getStorageDetailedCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,
@@ -153,6 +160,7 @@ public class FinanceReportResource {
 	}
 	
 	@PostMapping("/finance_reports/get_bond_item_detailed_collections_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<IBondItemCollection>>getBondItemDetailedCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,
@@ -171,6 +179,7 @@ public class FinanceReportResource {
 	}
 	
 	@PostMapping("/finance_reports/get_maintenance_detailed_collections_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<IMaintenanceCollection>>getMaintenanceDetailedCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,
@@ -187,6 +196,7 @@ public class FinanceReportResource {
 	}
 	
 	@PostMapping("/finance_reports/get_weigh_detailed_collections_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<IWeighCollection>>getWeighDetailedCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,
@@ -204,6 +214,7 @@ public class FinanceReportResource {
 	}
 	
 	@PostMapping("/finance_reports/get_workshop_detailed_collections_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<IWorkshopCollection>>getWorkshopDetailedCollectionByDates(
 			@RequestBody DateRange dateRange,
 	        @RequestParam(name = "nickname", required = false) String nickname,

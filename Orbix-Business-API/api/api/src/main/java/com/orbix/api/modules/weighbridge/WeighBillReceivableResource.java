@@ -48,6 +48,7 @@ public class WeighBillReceivableResource {
 	private final WeighBillReceivableService weighBillReceivableService;
 	
 	@GetMapping("/weigh_bill_receivables/get_all_by_weigh")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<WeighBillReceivableResponseDTO>> getAllByWeigh(
 			@RequestParam(name = "weigh_id") Long weighId,
 			HttpServletRequest request)
@@ -56,6 +57,7 @@ public class WeighBillReceivableResource {
 	}
 	
 	@GetMapping("/weigh_bills/get_by_weigh_id")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<WeighBillReceivableResponseDTO>>getAllByWeighId(@RequestParam(name = "weigh_id") Long weighId, HttpServletRequest request){
 		
 		Optional<Weigh> weigh_ = weighRepository.findById(weighId);

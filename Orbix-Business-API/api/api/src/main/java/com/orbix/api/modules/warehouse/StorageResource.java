@@ -39,21 +39,25 @@ public class StorageResource {
 	private final StorageRepository storageRepository;
 	
 	@GetMapping("/storages")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StorageResponseDTO>>getAll(HttpServletRequest request){
 		return ResponseEntity.ok().body(storageService.getAllStorages(request));
 	}
 	
 	@GetMapping("/storages/get_all_pending_or_checked_in")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StorageResponseDTO>>getAllPendingAndCheckedIn(HttpServletRequest request){
 		return ResponseEntity.ok().body(storageService.getAllPendingOrCheckedInStorages(request));
 	}
 	
 	@GetMapping("/storages/get_all_with_discounts")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StorageResponseDTO>>getAllWithDiscounts(HttpServletRequest request){
 		return ResponseEntity.ok().body(storageService.getAllWithDiscounts(request));
 	}
 	
 	@GetMapping("/storages/get_all_pending_or_checked_in_by_warehouse")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StorageResponseDTO>>getAllPendingAndCheckedInByWarehouse(
 			@RequestParam(name = "warehouse_id") Long warehouseId,
 			HttpServletRequest request){
@@ -61,6 +65,7 @@ public class StorageResource {
 	}
 	
 	@GetMapping("/storages/get_all_checked_in_by_warehouse")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StorageResponseDTO>>getAllCheckedInByWarehouse(
 			@RequestParam(name = "warehouse_id") Long warehouseId,
 			HttpServletRequest request){
@@ -68,6 +73,7 @@ public class StorageResource {
 	}
 	
 	@GetMapping("/storages/get_all_recent_checked_out_by_warehouse")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StorageResponseDTO>>getAllRecentCheckedOutByWarehouse(
 			@RequestParam(name = "warehouse_id") Long warehouseId,
 			HttpServletRequest request){
@@ -75,16 +81,19 @@ public class StorageResource {
 	}
 	
 	@GetMapping("/storages/get_all_checked_in")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StorageResponseDTO>>getAllCheckedIn(HttpServletRequest request){
 		return ResponseEntity.ok().body(storageService.getAllCheckedInStorages(request));
 	}
 	
 	@GetMapping("/storages/get_all_cleared")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StorageResponseDTO>>getAllCleared(HttpServletRequest request){
 		return ResponseEntity.ok().body(storageService.getAllCleared(request));
 	}
 	
 	@GetMapping("/storages/get_today_checked_out")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StorageResponseDTO>>getTodayCheckedOut(HttpServletRequest request){
 		return ResponseEntity.ok().body(storageService.getTodayCheckedOut(request));
 	}
@@ -98,6 +107,7 @@ public class StorageResource {
 	}
 	
 	@GetMapping("/storages/get_storage_bill_receivables")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StorageBillReceivableResponseDTO>>getStorageBillReceivables(
 			@RequestParam(name = "storage_id") Long id,
 			HttpServletRequest request){		
@@ -214,6 +224,7 @@ public class StorageResource {
 	}
 	
 	@GetMapping("/storages/get_storage_summary")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MonthlyStorageStatusResponseDTO>>getStorageSummary(
 			@RequestParam(name = "year") int year,
 			HttpServletRequest request){

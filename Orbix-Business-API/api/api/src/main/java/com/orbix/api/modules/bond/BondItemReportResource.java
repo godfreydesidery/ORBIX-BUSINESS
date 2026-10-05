@@ -38,6 +38,7 @@ public class BondItemReportResource {
 	private final UserRepository userRepository;
 	
 	@PostMapping("/bond_item_reports/get_totals_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<BondItemTotalsResponseDTO>getTotalsByDates(
 			@RequestBody DateRange dateRange,
 			HttpServletRequest request){
@@ -49,6 +50,7 @@ public class BondItemReportResource {
 	}
 	
 	@PostMapping("/bond_item_reports/get_registration_report")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<RegistrationResponseDTO>>getRegistrationReportByDateAndReceptionist(
 			@RequestBody DateRange dateRange,
 			@RequestParam(name = "nickname") String cashierName,
@@ -100,6 +102,7 @@ public class BondItemReportResource {
 	}
 	
 	@PostMapping("/bond_item_reports/get_bond_item_report")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BondItemResponseDTO>>getBondItemReportByDateAndReceptionist(
 			@RequestBody DateRange dateRange,
 			@RequestParam(name = "status") String status,

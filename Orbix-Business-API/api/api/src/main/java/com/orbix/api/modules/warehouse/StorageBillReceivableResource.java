@@ -28,6 +28,7 @@ public class StorageBillReceivableResource {
 	private final StorageBillReceivableService storageBillReceivableService;
 	
 	@GetMapping("/storage_bill_receivables/get_all_by_storage")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StorageBillReceivableResponseDTO>> getAllByStorage(
 			@RequestParam(name = "storage_id") Long storageId,
 			HttpServletRequest request)
@@ -62,6 +63,7 @@ public class StorageBillReceivableResource {
 	}
 	
 	@GetMapping("/storage_bill_receivables/get_bill_view")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<BillViewResponseDTO> getBillView(
 			@RequestParam(name = "storage_id") Long storageId,
 			HttpServletRequest request)

@@ -50,6 +50,7 @@ public class ParkingReportResource {
 	
 	
 	@PostMapping("/parking_reports/get_totals_by_dates")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<ParkingTotalsResponseDTO>getTotalsByDates(
 			@RequestBody DateRange dateRange,
 			HttpServletRequest request){
@@ -92,6 +93,7 @@ public class ParkingReportResource {
 	}
 	
 	@PostMapping("/parking_reports/get_registration_report")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<RegistrationResponseDTO>>getRegistrationReportByDateAndReceptionist(
 			@RequestBody DateRange dateRange,
 			@RequestParam(name = "nickname") String cashierName,
@@ -148,6 +150,7 @@ public class ParkingReportResource {
 	private static final int IN_CLAUSE_CHUNK_SIZE = 1000;
 	
 	@PostMapping("/parking_reports/get_parking_report")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ParkingResponseDTO>>getParkingReportByDateAndReceptionist(
 			@RequestBody DateRange dateRange,
 			@RequestParam(name = "nickname") String cashierName,
@@ -271,6 +274,7 @@ public class ParkingReportResource {
 	
 	
 	@PostMapping("/parking_reports/get_vehicle_equipment_removed_report")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<VehicleEquipmentRemovedResponseDTO>>getVehicleEquipmentRemovedReport(
 			@RequestBody DateRange dateRange,
 			HttpServletRequest request){

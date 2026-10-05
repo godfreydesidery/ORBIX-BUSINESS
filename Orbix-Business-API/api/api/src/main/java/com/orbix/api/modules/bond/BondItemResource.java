@@ -40,21 +40,25 @@ public class BondItemResource {
 	private final BondItemRepository bondItemRepository;
 	
 	@GetMapping("/bond_items")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BondItemResponseDTO>>getAll(HttpServletRequest request){
 		return ResponseEntity.ok().body(bondItemService.getAllBondItems(request));
 	}
 	
 	@GetMapping("/bond_items/get_all_pending_or_checked_in")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BondItemResponseDTO>>getAllPendingAndCheckedIn(HttpServletRequest request){
 		return ResponseEntity.ok().body(bondItemService.getAllPendingOrCheckedInBondItems(request));
 	}
 	
 	@GetMapping("/bond_items/get_all_with_discounts")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BondItemResponseDTO>>getAllWithDiscounts(HttpServletRequest request){
 		return ResponseEntity.ok().body(bondItemService.getAllWithDiscounts(request));
 	}
 	
 	@GetMapping("/bond_items/get_all_pending_or_checked_in_by_bond_zone")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BondItemResponseDTO>>getAllPendingAndCheckedInByBondZone(
 			@RequestParam(name = "bond_zone_id") Long bondZoneId,
 			HttpServletRequest request){
@@ -62,6 +66,7 @@ public class BondItemResource {
 	}
 	
 	@GetMapping("/bond_items/get_all_checked_in_by_bond_zone")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BondItemResponseDTO>>getAllCheckedInByBondZone(
 			@RequestParam(name = "bond_zone_id") Long bondZoneId,
 			HttpServletRequest request){
@@ -69,6 +74,7 @@ public class BondItemResource {
 	}
 	
 	@GetMapping("/bond_items/get_all_recent_checked_out_by_bond_zone")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BondItemResponseDTO>>getAllRecentCheckedOutByBondZone(
 			@RequestParam(name = "bond_zone_id") Long bondZoneId,
 			HttpServletRequest request){
@@ -76,6 +82,7 @@ public class BondItemResource {
 	}
 	
 	@GetMapping("/bond_items/get_all_checked_in")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BondItemResponseDTO>>getAllCheckedIn(
 			@RequestParam(name = "bond_zone_id") Long bondZoneId,
 			HttpServletRequest request){
@@ -83,11 +90,13 @@ public class BondItemResource {
 	}
 	
 	@GetMapping("/bond_items/get_all_cleared")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BondItemResponseDTO>>getAllCleared(HttpServletRequest request){
 		return ResponseEntity.ok().body(bondItemService.getAllCleared(request));
 	}
 	
 	@GetMapping("/bond_items/get_today_checked_out")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BondItemResponseDTO>>getTodayCheckedOut(HttpServletRequest request){
 		return ResponseEntity.ok().body(bondItemService.getTodayCheckedOut(request));
 	}
@@ -101,6 +110,7 @@ public class BondItemResource {
 	}
 	
 	@GetMapping("/bond_items/get_bond_item_bill_receivables")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<BondItemBillReceivableResponseDTO>>getBondItemBillReceivables(
 			@RequestParam(name = "bond_item_id") Long id,
 			HttpServletRequest request){		
@@ -213,6 +223,7 @@ public class BondItemResource {
 	}
 	
 	@GetMapping("/bond_items/get_bond_item_summary")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MonthlyBondItemStatusResponseDTO>>getBondItemSummary(
 			@RequestParam(name = "year") int year,
 			HttpServletRequest request){

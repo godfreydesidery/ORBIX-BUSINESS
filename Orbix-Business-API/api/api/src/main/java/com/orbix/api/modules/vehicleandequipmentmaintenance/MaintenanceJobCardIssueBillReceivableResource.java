@@ -28,6 +28,7 @@ public class MaintenanceJobCardIssueBillReceivableResource {
 	private final MaintenanceJobCardIssueBillReceivableService maintenanceJobCardIssueBillReceivableService;
 	
 	@GetMapping("/maintenance_bill_receivables/get_all_by_maintenance")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MaintenanceJobCardIssueBillReceivableResponseDTO>> getAllByMaintenance(
 			@RequestParam(name = "maintenance_id") Long maintenanceId,
 			HttpServletRequest request)
