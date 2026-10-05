@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -77,6 +78,46 @@ public class ParkingResource {
 	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<ParkingResponseDTO>>getRecentCheckedOut(HttpServletRequest request){
 		return ResponseEntity.ok().body(parkingService.getRecentCheckedOut(request));
+	}
+
+	@GetMapping("/parkings/get_all_pending_or_checked_in_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<ParkingResponseDTO>>getPendingAndCheckedInPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(parkingService.getPendingOrCheckedInParkingPage(page, size, search, request));
+	}
+
+	@GetMapping("/parkings/get_all_checked_in_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<ParkingResponseDTO>>getCheckedInPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(parkingService.getCheckedInParkingPage(page, size, search, request));
+	}
+
+	@GetMapping("/parkings/get_all_with_discounts_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<ParkingResponseDTO>>getWithDiscountsPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(parkingService.getWithDiscountsParkingPage(page, size, search, request));
+	}
+
+	@GetMapping("/parkings/get_recent_checked_out_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<ParkingResponseDTO>>getRecentCheckedOutPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(parkingService.getRecentCheckedOutParkingPage(page, size, search, request));
 	}
 	
 	@PostMapping("/parkings/remove")
