@@ -114,6 +114,7 @@ public class Grn {
 	
 	// Loaded only when read, so lists do not load the lines of every document
 	@OneToMany(targetEntity = GrnDetail.class, mappedBy = "grn", fetch = FetchType.LAZY, orphanRemoval = true)
+	@ToString.Exclude
     @Valid
     @JsonIgnoreProperties("grn")
 	@Fetch(FetchMode.SUBSELECT)

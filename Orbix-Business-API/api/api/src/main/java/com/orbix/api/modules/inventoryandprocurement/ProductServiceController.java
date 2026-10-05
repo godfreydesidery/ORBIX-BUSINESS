@@ -54,7 +54,7 @@ public class ProductServiceController implements ProductService {
 	 */
 	@Override
 	public List<ProductResponseDTO> getAllProductes(HttpServletRequest request) {
-		List<Product> products = productRepository.findAll();
+		List<Product> products = productRepository.findAll(Sort.by("id")); // same order as the paged list
 		List<ProductResponseDTO> productResponses = new ArrayList<>();
 
 		for(Product product : products) {
@@ -66,7 +66,8 @@ public class ProductServiceController implements ProductService {
 	@Override
 	public PageResponseDTO<ProductResponseDTO> getProductPage(int page, int size, HttpServletRequest request) {
 		// One page of the list, in the same order as the full list (by id)
-		PageRequest pageRequest = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), MAX_PAGE_SIZE), Sort.by("id"));
+		int pageSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+		PageRequest pageRequest = PageRequest.of(Math.min(Math.max(page, 0), Integer.MAX_VALUE / pageSize), pageSize, Sort.by("id"));
 		Page<Product> products = productRepository.findAll(pageRequest);
 		List<ProductResponseDTO> productResponses = new ArrayList<>();
 

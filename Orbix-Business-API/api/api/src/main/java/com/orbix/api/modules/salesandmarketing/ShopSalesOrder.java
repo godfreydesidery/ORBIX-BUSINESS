@@ -96,6 +96,7 @@ public class ShopSalesOrder {
 	
 	// Loaded only when read, so lists do not load the lines of every document
 	@OneToMany(targetEntity = ShopSalesOrderDetail.class, mappedBy = "shopSalesOrder", fetch = FetchType.LAZY, orphanRemoval = true)
+	@ToString.Exclude
     @Valid
     @JsonIgnoreProperties("shopSalesOrder")
 	@Fetch(FetchMode.SUBSELECT)

@@ -50,7 +50,7 @@ public class DineableServiceController implements DineableService {
 	 */
 	@Override
 	public List<DineableResponseDTO> getAllDineablees(HttpServletRequest request) {
-		List<Dineable> dineables = dineableRepository.findAll();
+		List<Dineable> dineables = dineableRepository.findAll(Sort.by("id")); // same order as the paged list
 		List<DineableResponseDTO> dineableResponses = new ArrayList<>();
 
 		for(Dineable dineable : dineables) {
@@ -62,7 +62,8 @@ public class DineableServiceController implements DineableService {
 	@Override
 	public PageResponseDTO<DineableResponseDTO> getDineablePage(int page, int size, HttpServletRequest request) {
 		// One page of the list, in the same order as the full list (by id)
-		PageRequest pageRequest = PageRequest.of(Math.max(page, 0), Math.min(Math.max(size, 1), MAX_PAGE_SIZE), Sort.by("id"));
+		int pageSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
+		PageRequest pageRequest = PageRequest.of(Math.min(Math.max(page, 0), Integer.MAX_VALUE / pageSize), pageSize, Sort.by("id"));
 		Page<Dineable> dineables = dineableRepository.findAll(pageRequest);
 		List<DineableResponseDTO> dineableResponses = new ArrayList<>();
 

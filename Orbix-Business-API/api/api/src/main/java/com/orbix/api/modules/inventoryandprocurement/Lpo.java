@@ -118,6 +118,7 @@ public class Lpo {
 	
 	// Loaded only when read, so lists do not load the lines of every document
 	@OneToMany(targetEntity = LpoDetail.class, mappedBy = "lpo", fetch = FetchType.LAZY, orphanRemoval = true)
+	@ToString.Exclude
     @Valid
     @JsonIgnoreProperties("lpo")
 	@Fetch(FetchMode.SUBSELECT)
