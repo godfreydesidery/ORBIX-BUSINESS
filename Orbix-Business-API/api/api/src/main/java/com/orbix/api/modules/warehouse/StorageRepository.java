@@ -6,6 +6,8 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.orbix.api.modules.identityandaccess.User;
 
@@ -90,6 +92,27 @@ public interface StorageRepository extends JpaRepository<Storage, Long> {
 			+ "FROM Storage p LEFT JOIN p.createdByUser u LEFT JOIN p.checkedInByUser ciu LEFT JOIN p.checkedOutByUser cou "
 			+ "WHERE p.checkedInDateTime BETWEEN :from AND :to AND p.status IN :statuses")
 	List<IStorageReportRow> getStorageReport(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("statuses") List<String> statuses);
+
+	// Search on the columns the storage lists show (s is the storage, gt its good type, w its warehouse)
+	String STORAGE_SEARCH = "(:search = '%%' OR LOWER(s.no) LIKE :search OR LOWER(s.goodName) LIKE :search OR LOWER(s.goodDescription) LIKE :search"
+			+ " OR LOWER(s.ownerFirstName) LIKE :search OR LOWER(s.ownerMiddleName) LIKE :search OR LOWER(s.ownerLastName) LIKE :search"
+			+ " OR LOWER(s.ownerIdNo) LIKE :search OR LOWER(s.ownerIdType) LIKE :search OR LOWER(s.ownerPhoneNo) LIKE :search"
+			+ " OR LOWER(s.billingType) LIKE :search OR LOWER(s.status) LIKE :search OR LOWER(gt.name) LIKE :search OR LOWER(w.name) LIKE :search)";
+
+	@Query("SELECT s FROM Storage s LEFT JOIN s.goodType gt LEFT JOIN s.warehouse w WHERE s.status IN :statuses AND " + STORAGE_SEARCH)
+	Page<Storage> getPageByStatusIn(@Param("statuses") List<String> statuses, @Param("search") String search, Pageable pageable);
+
+	@Query("SELECT s FROM Storage s LEFT JOIN s.goodType gt LEFT JOIN s.warehouse w WHERE s.warehouse = :warehouse AND s.status IN :statuses AND " + STORAGE_SEARCH)
+	Page<Storage> getPageByWarehouseAndStatusIn(@Param("warehouse") Warehouse warehouse, @Param("statuses") List<String> statuses, @Param("search") String search, Pageable pageable);
+
+	// Storages with at least one bill whose discount has the given status
+	@Query("SELECT s FROM Storage s LEFT JOIN s.goodType gt LEFT JOIN s.warehouse w WHERE s.status IN :statuses"
+			+ " AND EXISTS (SELECT b.id FROM StorageBillReceivable b WHERE b.storage = s AND b.discountStatus = :discountStatus) AND " + STORAGE_SEARCH)
+	Page<Storage> getPageByStatusInAndDiscountStatus(@Param("statuses") List<String> statuses, @Param("discountStatus") String discountStatus, @Param("search") String search, Pageable pageable);
+
+	@Query("SELECT s FROM Storage s LEFT JOIN s.goodType gt LEFT JOIN s.warehouse w WHERE s.warehouse = :warehouse AND s.status IN :statuses"
+			+ " AND s.checkedOutDateTime > :checkedOutAfter AND " + STORAGE_SEARCH)
+	Page<Storage> getPageByWarehouseAndStatusInAndCheckedOutDateTimeAfter(@Param("warehouse") Warehouse warehouse, @Param("statuses") List<String> statuses, @Param("checkedOutAfter") LocalDateTime checkedOutAfter, @Param("search") String search, Pageable pageable);
 }
 
 interface IStorageRegistration {
