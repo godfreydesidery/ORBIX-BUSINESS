@@ -21,6 +21,7 @@ import com.orbix.api.modules.inventoryandprocurement.ProductResponseDTO;
 import com.orbix.api.modules.inventoryandprocurement.UomRequestDTO;
 import com.orbix.api.modules.inventoryandprocurement.UomResponseDTO;
 import com.orbix.api.modules.inventoryandprocurement.UomService;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -39,6 +40,17 @@ public class ShopSalesOrderResource {
 			@RequestParam(name = "shop_id") Long shopId,
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(shopSalesOrderService.getAllPendingShopSalesOrders(shopId, request));
+	}
+
+	@GetMapping("/shop_sales_orders/get_all_pending_by_shop_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<ShopSalesOrderResponseDTO>>getAllPendingByShopPage(
+			@RequestParam(name = "shop_id") Long shopId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(shopSalesOrderService.getPendingShopSalesOrderPage(shopId, page, size, search, request));
 	}
 	
 	@GetMapping("/shop_sales_orders/get")

@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.PayCode;
 import com.orbix.api.api.commons.PayStatus;
@@ -34,6 +36,8 @@ import com.orbix.api.modules.inventoryandprocurement.ShopProductLog;
 import com.orbix.api.modules.inventoryandprocurement.ShopProductLogRepository;
 import com.orbix.api.modules.inventoryandprocurement.ShopProductRepository;
 import com.orbix.api.modules.inventoryandprocurement.ShopProductResponseDTO;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -73,6 +77,17 @@ public class ShopSalesOrderServiceController implements ShopSalesOrderService {
 		return null;
 	}
 	
+	@Override
+	public PageResponseDTO<ShopSalesOrderResponseDTO> getPendingShopSalesOrderPage(Long shopId, int page, int size, String search, HttpServletRequest request) {
+
+		Shop shop = shopRepository.findById(shopId)
+			    .orElseThrow(() -> new NotFoundException("Shop not found, with id " + shopId));
+
+		// One page, by id, searched on the shown columns
+		Page<ShopSalesOrder> shopSalesOrders = shopSalesOrderRepository.getPageByShopAndStatus(shop, WorkFlowStatus.PENDING, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+		return new PageResponseDTO<>(shopSalesOrders.getContent().stream().map(this::shopSalesOrderResponseDTOMapper).collect(Collectors.toList()), shopSalesOrders.getTotalElements());
+	}
+
 	@Override
 	public List<ShopSalesOrderResponseDTO> getAllPendingShopSalesOrders(Long shopId, HttpServletRequest request) {
 		

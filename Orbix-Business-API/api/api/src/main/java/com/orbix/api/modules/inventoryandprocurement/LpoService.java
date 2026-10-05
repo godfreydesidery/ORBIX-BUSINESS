@@ -5,12 +5,15 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.orbix.api.api.commons.PayCode;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface LpoService {
 	List<LpoResponseDTO> getAllLpos(HttpServletRequest request);
 	List<LpoResponseDTO> getAllPendingLpos(HttpServletRequest request);
 	List<LpoResponseDTO> getAllVisibleLposByBranch(HttpServletRequest request);
 	List<LpoResponseDTO> getAllVisibleLposByShop(Long shopId, HttpServletRequest request);
+	PageResponseDTO<LpoResponseDTO> getVisibleLpoPageByBranch(int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<LpoResponseDTO> getVisibleLpoPageByShop(Long shopId, int page, int size, String search, HttpServletRequest request);
 	LpoResponseDTO get(Long id, HttpServletRequest request);
 	LpoResponseDTO createLpo(LpoRequestDTO lpoRequest, HttpServletRequest request);
 	LpoResponseDTO updateLpo(LpoRequestDTO lpoRequest, HttpServletRequest request);

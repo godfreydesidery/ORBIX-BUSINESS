@@ -11,6 +11,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.WorkFlowStatus;
 import com.orbix.api.exceptions.InvalidOperationException;
@@ -26,6 +28,8 @@ import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.salesandmarketing.SaleDetailBillReceivableRepository;
 import com.orbix.api.modules.salesandmarketing.SaleRepository;
 import com.orbix.api.modules.salesandmarketing.SaleService;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -76,6 +80,48 @@ public class LpoServiceController implements LpoService {
 			    .collect(Collectors.toList());
 	}
 	
+	@Override
+	public PageResponseDTO<LpoResponseDTO> getVisibleLpoPageByBranch(int page, int size, String search, HttpServletRequest request) {
+
+		// Same rows as the full list: pending and processing LPOs, plus those approved in the last 48 hours
+		List<WorkFlowStatus> openStatuses = new ArrayList<>();
+		openStatuses.add(WorkFlowStatus.PENDING);
+		openStatuses.add(WorkFlowStatus.PROCESSING);
+
+		List<WorkFlowStatus> approvedStatuses = new ArrayList<>();
+		approvedStatuses.add(WorkFlowStatus.APPROVED);
+
+		LocalDateTime cutoffTime = LocalDateTime.now().minusHours(48);
+
+		// One page, in the order of the full list (by id), searched on the shown columns
+		Page<Lpo> lpos = lpoRepository.getVisibleLpoPageByBranch(userService.getUserBranch(request), openStatuses, approvedStatuses, cutoffTime, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+		return new PageResponseDTO<>(lpos.getContent().stream().map(this::lpoResponseDTOMapper).collect(Collectors.toList()), lpos.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<LpoResponseDTO> getVisibleLpoPageByShop(Long shopId, int page, int size, String search, HttpServletRequest request) {
+
+		Optional<Shop> shop_ = shopRepository.findById(shopId);
+		if(shop_.isEmpty()) {
+			throw new NotFoundException("Shop not found");
+		}
+
+		// Same rows as the full list: pending and processing LPOs, plus those approved or completed in the last 48 hours
+		List<WorkFlowStatus> openStatuses = new ArrayList<>();
+		openStatuses.add(WorkFlowStatus.PENDING);
+		openStatuses.add(WorkFlowStatus.PROCESSING);
+
+		List<WorkFlowStatus> approvedStatuses = new ArrayList<>();
+		approvedStatuses.add(WorkFlowStatus.APPROVED);
+		approvedStatuses.add(WorkFlowStatus.COMPLETED);
+
+		LocalDateTime cutoffTime = LocalDateTime.now().minusHours(48);
+
+		// One page, in the order of the full list (by id), searched on the shown columns
+		Page<Lpo> lpos = lpoRepository.getVisibleLpoPageByBranchAndShop(userService.getUserBranch(request), shop_.get(), openStatuses, approvedStatuses, cutoffTime, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+		return new PageResponseDTO<>(lpos.getContent().stream().map(this::lpoResponseDTOMapper).collect(Collectors.toList()), lpos.getTotalElements());
+	}
+
 	@Override
 	public List<LpoResponseDTO> getAllVisibleLposByBranch(HttpServletRequest request) {
 		

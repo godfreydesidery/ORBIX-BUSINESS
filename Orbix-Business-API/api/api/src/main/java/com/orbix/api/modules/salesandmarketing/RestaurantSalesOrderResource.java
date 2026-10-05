@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.PayCode;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +34,17 @@ public class RestaurantSalesOrderResource {
 			@RequestParam(name = "restaurant_id") Long restaurantId, HttpServletRequest request) {
 		return ResponseEntity.ok()
 				.body(restaurantSalesOrderService.getAllPendingRestaurantSalesOrders(restaurantId, request));
+	}
+
+	@GetMapping("/restaurant_sales_orders/get_all_pending_by_restaurant_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<RestaurantSalesOrderResponseDTO>>getAllPendingByRestaurantPage(
+			@RequestParam(name = "restaurant_id") Long restaurantId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(restaurantSalesOrderService.getPendingRestaurantSalesOrderPage(restaurantId, page, size, search, request));
 	}
 
 	@GetMapping("/restaurant_sales_orders/get")

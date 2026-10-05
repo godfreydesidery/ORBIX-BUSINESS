@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.WorkFlowStatus;
 import com.orbix.api.exceptions.InvalidOperationException;
@@ -25,6 +27,8 @@ import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.salesandmarketing.SaleDetailBillReceivableRepository;
 import com.orbix.api.modules.salesandmarketing.SaleRepository;
 import com.orbix.api.modules.salesandmarketing.SaleService;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -75,6 +79,37 @@ public class GrnServiceController implements GrnService {
 	return grns.stream()
 	    .map(this::grnResponseDTOMapper)
 	    .collect(Collectors.toList());
+	}
+
+	@Override
+	public PageResponseDTO<GrnResponseDTO> getVisibleGrnPageByBranch(int page, int size, String search, HttpServletRequest request) {
+		List<WorkFlowStatus> statuses = new ArrayList<>();
+		statuses.add(WorkFlowStatus.PENDING);
+		statuses.add(WorkFlowStatus.APPROVED);
+		statuses.add(WorkFlowStatus.PROCESSING);
+
+		// One page, by id, searched on the shown columns
+		Page<Grn> grns = grnRepository.getPageByStatusInAndBranch(statuses, userService.getUserBranch(request), PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+		return new PageResponseDTO<>(grns.getContent().stream().map(this::grnResponseDTOMapper).collect(Collectors.toList()), grns.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<GrnResponseDTO> getVisibleGrnPageByShop(Long shopId, int page, int size, String search, HttpServletRequest request) {
+
+		Optional<Shop> shop_ = shopRepository.findById(shopId);
+		if(shop_.isEmpty()) {
+			throw new NotFoundException("Shop not found");
+		}
+
+		List<WorkFlowStatus> statuses = new ArrayList<>();
+		statuses.add(WorkFlowStatus.PENDING);
+		statuses.add(WorkFlowStatus.PROCESSING);
+		statuses.add(WorkFlowStatus.APPROVED);
+		statuses.add(WorkFlowStatus.COMPLETED);
+
+		// One page, by id, searched on the shown columns
+		Page<Grn> grns = grnRepository.getPageByStatusInAndBranchAndShop(statuses, userService.getUserBranch(request), shop_.get(), PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+		return new PageResponseDTO<>(grns.getContent().stream().map(this::grnResponseDTOMapper).collect(Collectors.toList()), grns.getTotalElements());
 	}
 
 	@Override
