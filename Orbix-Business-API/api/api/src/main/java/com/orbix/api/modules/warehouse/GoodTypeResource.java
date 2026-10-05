@@ -17,6 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -49,6 +50,7 @@ public class GoodTypeResource {
 	}
 	
 	@PostMapping("/good_types/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "GoodType", summary = "Created good type {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<GoodTypeResponseDTO>create(
 			@RequestBody GoodTypeRequestDTO goodTypeRequest,
@@ -58,6 +60,7 @@ public class GoodTypeResource {
 	}
 	
 	@PostMapping("/good_types/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "GoodType", summary = "Updated good type {ref}", changeOf = GoodType.class, changeId = "goodTypeRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<GoodTypeResponseDTO>update(
 			@RequestBody GoodTypeRequestDTO goodTypeRequest,
@@ -67,6 +70,7 @@ public class GoodTypeResource {
 	}
 	
 	@PostMapping("/good_types/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "GoodType", entityId = "goodTypeRequest.id", summary = "Activated good type {ref}", changeOf = GoodType.class, changeId = "goodTypeRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody GoodTypeRequestDTO goodTypeRequest,
@@ -77,6 +81,7 @@ public class GoodTypeResource {
 	
 	
 	@PostMapping("/good_types/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "GoodType", entityId = "goodTypeRequest.id", summary = "Deactivated good type {ref}", changeOf = GoodType.class, changeId = "goodTypeRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody GoodTypeRequestDTO goodTypeRequest,

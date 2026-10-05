@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.orbix.api.exceptions.InvalidOperationException;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +37,7 @@ public class MachineServiceResource {
 	}
 	
 	@PostMapping("/machine-services/confirm")
+	@Audited(category = "SALES", action = "MACHINE_SERVICE_CONFIRMED", entityType = "Machine", entityId = "machineId", summary = "Confirmed the services of machine {ref}", changeOf = Machine.class, changeId = "machineId")
 	public boolean confirm(@RequestParam("machine_id") Long machineId, HttpServletRequest request) {
 		machineServiceService.confirm(machineId, request);
 		return true;

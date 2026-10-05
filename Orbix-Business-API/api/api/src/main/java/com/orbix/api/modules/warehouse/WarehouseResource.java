@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.modules.adminunits.ShopResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -49,6 +50,7 @@ public class WarehouseResource {
 	}
 	
 	@PostMapping("/warehouses/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "Warehouse", summary = "Created warehouse {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<WarehouseResponseDTO>create(
 			@RequestBody WarehouseRequestDTO warehouseRequest,
@@ -58,6 +60,7 @@ public class WarehouseResource {
 	}
 	
 	@PostMapping("/warehouses/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Warehouse", summary = "Updated warehouse {ref}", changeOf = Warehouse.class, changeId = "warehouseRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<WarehouseResponseDTO>update(
 			@RequestBody WarehouseRequestDTO warehouseRequest,
@@ -67,6 +70,7 @@ public class WarehouseResource {
 	}
 	
 	@PostMapping("/warehouses/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "Warehouse", entityId = "warehouseRequest.id", summary = "Activated warehouse {ref}", changeOf = Warehouse.class, changeId = "warehouseRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody WarehouseRequestDTO warehouseRequest,
@@ -77,6 +81,7 @@ public class WarehouseResource {
 	
 	
 	@PostMapping("/warehouses/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "Warehouse", entityId = "warehouseRequest.id", summary = "Deactivated warehouse {ref}", changeOf = Warehouse.class, changeId = "warehouseRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody WarehouseRequestDTO warehouseRequest,

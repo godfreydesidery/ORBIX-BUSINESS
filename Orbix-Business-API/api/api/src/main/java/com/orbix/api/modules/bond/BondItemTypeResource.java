@@ -19,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -61,6 +62,7 @@ public class BondItemTypeResource {
 	}
 	
 	@PostMapping("/bond_item_types/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "BondItemType", summary = "Created bond item type {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BondItemTypeResponseDTO>create(
 			@RequestBody BondItemTypeRequestDTO bondItemTypeRequest,
@@ -70,6 +72,7 @@ public class BondItemTypeResource {
 	}
 	
 	@PostMapping("/bond_item_types/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "BondItemType", summary = "Updated bond item type {ref}", changeOf = BondItemType.class, changeId = "bondItemTypeRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BondItemTypeResponseDTO>update(
 			@RequestBody BondItemTypeRequestDTO bondItemTypeRequest,
@@ -79,6 +82,7 @@ public class BondItemTypeResource {
 	}
 	
 	@PostMapping("/bond_item_types/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "BondItemType", entityId = "bondItemTypeRequest.id", summary = "Activated bond item type {ref}", changeOf = BondItemType.class, changeId = "bondItemTypeRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody BondItemTypeRequestDTO bondItemTypeRequest,
@@ -89,6 +93,7 @@ public class BondItemTypeResource {
 	
 	
 	@PostMapping("/bond_item_types/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "BondItemType", entityId = "bondItemTypeRequest.id", summary = "Deactivated bond item type {ref}", changeOf = BondItemType.class, changeId = "bondItemTypeRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody BondItemTypeRequestDTO bondItemTypeRequest,

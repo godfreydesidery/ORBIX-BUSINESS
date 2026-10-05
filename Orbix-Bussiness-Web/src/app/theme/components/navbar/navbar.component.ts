@@ -4,6 +4,7 @@ import { Router, RouterLink } from '@angular/router';
 import { MessagesComponent } from '../messages/messages.component';
 import { SidebarService } from '@services/sidebar.service';
 import { MsgBoxService } from '@services/custom/msg-box.service';
+import { AuthService } from 'src/app/auth.service';
 
 @Component({
     selector: 'az-navbar',
@@ -33,7 +34,8 @@ export class NavbarComponent {
         private _state: AppState, 
         private _sidebarService: SidebarService,
         private msg : MsgBoxService,
-        private router : Router
+        private router : Router,
+        private auth : AuthService
     ) {
         this._state.subscribe('menu.isCollapsed', (isCollapsed: boolean) => {
             this.isMenuCollapsed = isCollapsed;
@@ -56,6 +58,7 @@ export class NavbarComponent {
     }
 
     public async logout() : Promise<any>{
+        this.auth.recordLogout() // for the audit log; sent before the token is removed
         localStorage.removeItem('current-user')
         this.msg.showSuccessMessage('You have logged out!')
         await this.router.navigate(['login'])

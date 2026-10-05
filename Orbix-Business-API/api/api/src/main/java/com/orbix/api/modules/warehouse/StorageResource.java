@@ -22,6 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponseDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -187,6 +188,7 @@ public class StorageResource {
 	}
 	
 	@PostMapping("/storages/remove")
+	@Audited(category = "OPERATIONS", action = "GOODS_REMOVED", entityType = "Storage", entityId = "storageId", summary = "Removed {qty} from storage {ref}: {reason}", details = {"qty", "reason"}, changeOf = Storage.class, changeId = "storageId")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public void remove(
 			@RequestParam(name = "storage_id") Long storageId,
@@ -198,6 +200,7 @@ public class StorageResource {
 	}
 	
 	@PostMapping("/storages/check_in")
+	@Audited(category = "OPERATIONS", action = "CHECKED_IN", entityType = "Storage", entityRef = "result.no", summary = "Checked in storage {result.no} ({result.goodName})", details = {"result.goodName"})
 	public ResponseEntity<StorageResponseDTO>checkIn(
 			@RequestBody StorageRequestDTO storageRequest,
 			HttpServletRequest request){		
@@ -205,6 +208,7 @@ public class StorageResource {
 	}
 	
 	@PostMapping("/storages/check_out")
+	@Audited(category = "OPERATIONS", action = "CHECKED_OUT", entityType = "Storage", entityRef = "result.no", summary = "Checked out storage {result.no} ({result.goodName})", details = {"result.goodName"})
 	public ResponseEntity<StorageResponseDTO>checkOut(
 			@RequestBody StorageRequestDTO storageRequest,
 			HttpServletRequest request){		
@@ -233,6 +237,7 @@ public class StorageResource {
 	}
 	
 	@PostMapping("/storages/create_storage_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_CREATED", entityType = "StorageBillReceivable", entityRef = "result.storageId", summary = "Created storage bill {result.id} for storage {result.storageId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.storageId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<StorageBillReceivableResponseDTO>createStorageBillReceivable(
 			@RequestBody StorageBillReceivableRequestDTO storageBillReceivableRequest,
@@ -250,6 +255,7 @@ public class StorageResource {
 	}
 	
 	@PostMapping("/storages/create_storage_custom_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_CREATED", entityType = "StorageBillReceivable", entityRef = "result.storageId", summary = "Created custom storage bill {result.id} for storage {result.storageId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.storageId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<StorageBillReceivableResponseDTO>createStorageCustomBillReceivable(
 			@RequestBody StorageBillReceivableRequestDTO storageBillReceivableRequest,

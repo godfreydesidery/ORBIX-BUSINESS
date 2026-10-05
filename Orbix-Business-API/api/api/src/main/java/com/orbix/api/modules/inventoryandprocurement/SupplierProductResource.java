@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -62,6 +63,7 @@ private final SupplierProductRepository supplierProductRepository;
 	}
 	
 	@PostMapping("/supplier_products/create")
+	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "SupplierProduct", entityRef = "result.productCode", summary = "Created supplier product {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<SupplierProductResponseDTO>create(
 			@RequestBody SupplierProductRequestDTO supplierProductRequest,
@@ -71,6 +73,7 @@ private final SupplierProductRepository supplierProductRepository;
 	}
 	
 	@PostMapping("/supplier_products/update")
+	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "SupplierProduct", entityRef = "result.productCode", summary = "Updated supplier product {ref}", changeOf = SupplierProduct.class, changeId = "supplierProductRequest.id", changeQuery = "select p.id from SupplierProduct p where p.supplier.id = ?1 and p.product.id = ?2", changeKeys = {"supplierProductRequest.supplierId", "supplierProductRequest.productId"}, changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<SupplierProductResponseDTO>update(
 			@RequestBody SupplierProductRequestDTO supplierProductRequest,
@@ -89,6 +92,7 @@ private final SupplierProductRepository supplierProductRepository;
 	}
 	
 	@PostMapping("/supplier_products/activate")
+	@Audited(category = "INVENTORY", action = "RECORD_ACTIVATED", entityType = "SupplierProduct", entityId = "supplierProductRequest.id", summary = "Activated supplier product {ref}", changeOf = SupplierProduct.class, changeId = "supplierProductRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody SupplierProductRequestDTO supplierProductRequest,
@@ -98,6 +102,7 @@ private final SupplierProductRepository supplierProductRepository;
 	}
 	
 	@PostMapping("/supplier_products/deactivate")
+	@Audited(category = "INVENTORY", action = "RECORD_DEACTIVATED", entityType = "SupplierProduct", entityId = "supplierProductRequest.id", summary = "Deactivated supplier product {ref}", changeOf = SupplierProduct.class, changeId = "supplierProductRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody SupplierProductRequestDTO supplierProductRequest,

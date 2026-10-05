@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -59,6 +60,7 @@ public class ServiceResource {
 	}
 	
 	@PostMapping("/services/create")
+	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "Servicel", summary = "Created service {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ServiceResponseDTO>create(
 			@RequestBody ServiceRequestDTO serviceRequest,
@@ -68,6 +70,7 @@ public class ServiceResource {
 	}
 	
 	@PostMapping("/services/update")
+	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "Servicel", summary = "Updated service {ref}", changeOf = Servicel.class, changeId = "serviceRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ServiceResponseDTO>update(
 			@RequestBody ServiceRequestDTO serviceRequest,
@@ -77,6 +80,7 @@ public class ServiceResource {
 	}
 	
 	@PostMapping("/services/activate")
+	@Audited(category = "INVENTORY", action = "RECORD_ACTIVATED", entityType = "Servicel", entityId = "serviceRequest.id", summary = "Activated service {ref}", changeOf = Servicel.class, changeId = "serviceRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody ServiceRequestDTO serviceRequest,
@@ -86,6 +90,7 @@ public class ServiceResource {
 	}
 	
 	@PostMapping("/services/deactivate")
+	@Audited(category = "INVENTORY", action = "RECORD_DEACTIVATED", entityType = "Servicel", entityId = "serviceRequest.id", summary = "Deactivated service {ref}", changeOf = Servicel.class, changeId = "serviceRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody ServiceRequestDTO serviceRequest,

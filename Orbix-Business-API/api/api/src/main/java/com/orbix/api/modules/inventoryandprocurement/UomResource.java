@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,6 +41,7 @@ private final UomService uomService;
 	}
 	
 	@PostMapping("/uoms/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "Uom", summary = "Created unit of measure {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<UomResponseDTO>create(
 			@RequestBody UomRequestDTO uomRequest,
@@ -49,6 +51,7 @@ private final UomService uomService;
 	}
 	
 	@PostMapping("/uoms/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Uom", summary = "Updated unit of measure {ref}", changeOf = Uom.class, changeId = "uomRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<UomResponseDTO>update(
 			@RequestBody UomRequestDTO uomRequest,
@@ -58,6 +61,7 @@ private final UomService uomService;
 	}
 	
 	@PostMapping("/uoms/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "Uom", entityId = "uomRequest.id", summary = "Activated unit of measure {ref}", changeOf = Uom.class, changeId = "uomRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody UomRequestDTO uomRequest,
@@ -67,6 +71,7 @@ private final UomService uomService;
 	}
 	
 	@PostMapping("/uoms/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "Uom", entityId = "uomRequest.id", summary = "Deactivated unit of measure {ref}", changeOf = Uom.class, changeId = "uomRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody UomRequestDTO uomRequest,

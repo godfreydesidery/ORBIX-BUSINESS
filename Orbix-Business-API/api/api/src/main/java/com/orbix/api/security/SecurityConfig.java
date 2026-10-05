@@ -21,6 +21,8 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
+import com.orbix.api.modules.audit.AuditAccessDeniedHandler;
+import com.orbix.api.modules.audit.AuditLogService;
 import com.orbix.api.modules.identityandaccess.UserRepository;
 
 import lombok.RequiredArgsConstructor;
@@ -40,6 +42,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 	private final BCryptPasswordEncoder bCryptPasswordEncoder;
 	
 	private final UserRepository userRepository;
+
+	private final AuditLogService auditLogService;
 	
 	@Override
 	protected void configure(AuthenticationManagerBuilder auth) throws Exception {		
@@ -69,12 +73,14 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter implements WebM
 
 	@Override
 	protected void configure(HttpSecurity http) throws Exception {
-		CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), userRepository);
+		CustomAuthenticationFilter customAuthenticationFilter = new CustomAuthenticationFilter(authenticationManagerBean(), userRepository, auditLogService);
 		customAuthenticationFilter.setFilterProcessesUrl("/orbix-business-api/login");
 		http.cors();
 		http.csrf().disable();
 		http.anonymous().disable();
 		http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+		// Refused requests are recorded in the audit log; the 403 response is the same as before
+		http.exceptionHandling().accessDeniedHandler(new AuditAccessDeniedHandler(auditLogService));
 		http.authorizeRequests()
 		//Public end points
 		.antMatchers("/v2/api-docs").permitAll()

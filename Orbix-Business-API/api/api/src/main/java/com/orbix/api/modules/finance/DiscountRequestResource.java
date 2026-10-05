@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.vehicleandequipmentparking.ParkingRequestDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -57,6 +58,7 @@ public class DiscountRequestResource {
 	}
 	
 	@PostMapping("/discount_requests/create")
+	@Audited(category = "FINANCE", action = "DISCOUNT_REQUESTED", entityType = "DiscountRequest", entityRef = "serviceBillId", summary = "Requested a discount of {discountAmount} on {serviceBillName} bill {serviceBillId} (bill amount {billAmount})", details = {"serviceBillId", "serviceBillName", "billAmount", "discountAmount", "reason=discountRequest.reason"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<DiscountRequestResponseDTO>create(
 			@RequestParam(name = "service_bill_id") Long serviceBillId,
@@ -70,6 +72,7 @@ public class DiscountRequestResource {
 	}
 	
 	@PostMapping("/discount_requests/approve")
+	@Audited(category = "FINANCE", action = "DISCOUNT_APPROVED", entityType = "DiscountRequest", entityId = "discountRequest.id", summary = "Approved discount request {discountRequest.id}", details = {"comments=discountRequest.comments"}, changeOf = DiscountRequest.class, changeId = "discountRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<Boolean>approve(
 			@RequestBody DiscountRequestRequestDTO discountRequest,
@@ -79,6 +82,7 @@ public class DiscountRequestResource {
 	}
 	
 	@PostMapping("/discount_requests/reject")
+	@Audited(category = "FINANCE", action = "DISCOUNT_REJECTED", entityType = "DiscountRequest", entityId = "discountRequest.id", summary = "Rejected discount request {discountRequest.id}", details = {"comments=discountRequest.comments"}, changeOf = DiscountRequest.class, changeId = "discountRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<Boolean>reject(
 			@RequestBody DiscountRequestRequestDTO discountRequest,

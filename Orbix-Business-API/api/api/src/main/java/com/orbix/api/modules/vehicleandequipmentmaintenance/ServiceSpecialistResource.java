@@ -17,6 +17,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -49,6 +50,7 @@ public class ServiceSpecialistResource {
 	}
 	
 	@PostMapping("/service_specialists/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "ServiceSpecialist", summary = "Created service specialist {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ServiceSpecialistResponseDTO>create(
 			@RequestBody ServiceSpecialistRequestDTO serviceSpecialistRequest,
@@ -58,6 +60,7 @@ public class ServiceSpecialistResource {
 	}
 	
 	@PostMapping("/service_specialists/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "ServiceSpecialist", summary = "Updated service specialist {ref}", changeOf = ServiceSpecialist.class, changeId = "serviceSpecialistRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ServiceSpecialistResponseDTO>update(
 			@RequestBody ServiceSpecialistRequestDTO serviceSpecialistRequest,
@@ -67,6 +70,7 @@ public class ServiceSpecialistResource {
 	}
 	
 	@PostMapping("/service_specialists/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "ServiceSpecialist", entityId = "serviceSpecialistRequest.id", summary = "Activated service specialist {ref}", changeOf = ServiceSpecialist.class, changeId = "serviceSpecialistRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody ServiceSpecialistRequestDTO serviceSpecialistRequest,
@@ -77,6 +81,7 @@ public class ServiceSpecialistResource {
 	
 	
 	@PostMapping("/service_specialists/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "ServiceSpecialist", entityId = "serviceSpecialistRequest.id", summary = "Deactivated service specialist {ref}", changeOf = ServiceSpecialist.class, changeId = "serviceSpecialistRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody ServiceSpecialistRequestDTO serviceSpecialistRequest,

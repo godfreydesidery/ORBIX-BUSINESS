@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -50,6 +51,7 @@ public class RestaurantProductResource {
 	}
 
 	@PostMapping("/restaurant_products/create")
+	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "RestaurantProduct", entityRef = "result.productCode", summary = "Created restaurant product {ref}")
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantProductResponseDTO> create(@RequestBody RestaurantProductRequestDTO restaurantProductRequest,
 			HttpServletRequest request) {
@@ -59,6 +61,7 @@ public class RestaurantProductResource {
 	}
 
 	@PostMapping("/restaurant_products/update")
+	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "RestaurantProduct", entityRef = "result.productCode", summary = "Updated restaurant product {ref}", changeOf = RestaurantProduct.class, changeId = "restaurantProductRequest.id", changeQuery = "select p.id from RestaurantProduct p where p.restaurant.id = ?1 and p.product.id = ?2", changeKeys = {"restaurantProductRequest.restaurantId", "restaurantProductRequest.productId"}, changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantProductResponseDTO> update(@RequestBody RestaurantProductRequestDTO restaurantProductRequest,
 			HttpServletRequest request) {
@@ -68,6 +71,7 @@ public class RestaurantProductResource {
 	}
 
 	@PostMapping("/restaurant_products/adjust_stock")
+	@Audited(category = "INVENTORY", action = "STOCK_ADJUSTED", entityType = "RestaurantProduct", entityRef = "result.productCode", summary = "Adjusted the stock of {result.productCode} {result.productName} to {result.currentStock}", details = {"reason=restaurantProductRequest.reason"}, changeOf = RestaurantProduct.class, changeId = "restaurantProductRequest.id", changeQuery = "select p.id from RestaurantProduct p where p.restaurant.id = ?1 and p.product.id = ?2", changeKeys = {"restaurantProductRequest.restaurantId", "restaurantProductRequest.productId"})
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantProductResponseDTO> adjustStock(@RequestBody RestaurantProductRequestDTO restaurantProductRequest,
 			HttpServletRequest request) {
@@ -77,6 +81,7 @@ public class RestaurantProductResource {
 	}
 	
 	@PostMapping("/restaurant_products/add_stock")
+	@Audited(category = "INVENTORY", action = "STOCK_ADJUSTED", entityType = "RestaurantProduct", entityRef = "result.productCode", summary = "Added {restaurantProductRequest.qty} to the stock of {result.productCode} {result.productName}", details = {"qty=restaurantProductRequest.qty", "reason=restaurantProductRequest.reason"}, changeOf = RestaurantProduct.class, changeId = "restaurantProductRequest.id", changeQuery = "select p.id from RestaurantProduct p where p.restaurant.id = ?1 and p.product.id = ?2", changeKeys = {"restaurantProductRequest.restaurantId", "restaurantProductRequest.productId"})
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantProductResponseDTO> addStock(@RequestBody RestaurantProductRequestDTO restaurantProductRequest,
 			HttpServletRequest request) {
@@ -86,6 +91,7 @@ public class RestaurantProductResource {
 	}
 	
 	@PostMapping("/restaurant_products/deduct_stock")
+	@Audited(category = "INVENTORY", action = "STOCK_ADJUSTED", entityType = "RestaurantProduct", entityRef = "result.productCode", summary = "Deducted {restaurantProductRequest.qty} from the stock of {result.productCode} {result.productName}", details = {"qty=restaurantProductRequest.qty", "reason=restaurantProductRequest.reason"}, changeOf = RestaurantProduct.class, changeId = "restaurantProductRequest.id", changeQuery = "select p.id from RestaurantProduct p where p.restaurant.id = ?1 and p.product.id = ?2", changeKeys = {"restaurantProductRequest.restaurantId", "restaurantProductRequest.productId"})
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantProductResponseDTO> deductStock(@RequestBody RestaurantProductRequestDTO restaurantProductRequest,
 			HttpServletRequest request) {
@@ -95,6 +101,7 @@ public class RestaurantProductResource {
 	}
 
 	@PostMapping("/restaurant_products/activate")
+	@Audited(category = "INVENTORY", action = "RECORD_ACTIVATED", entityType = "RestaurantProduct", entityId = "restaurantProductRequest.id", summary = "Activated restaurant product {ref}", changeOf = RestaurantProduct.class, changeId = "restaurantProductRequest.id")
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse> activate(@RequestBody RestaurantProductRequestDTO restaurantProductRequest,
 			HttpServletRequest request) {
@@ -104,6 +111,7 @@ public class RestaurantProductResource {
 	}
 
 	@PostMapping("/restaurant_products/deactivate")
+	@Audited(category = "INVENTORY", action = "RECORD_DEACTIVATED", entityType = "RestaurantProduct", entityId = "restaurantProductRequest.id", summary = "Deactivated restaurant product {ref}", changeOf = RestaurantProduct.class, changeId = "restaurantProductRequest.id")
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse> deactivate(@RequestBody RestaurantProductRequestDTO restaurantProductRequest,
 			HttpServletRequest request) {

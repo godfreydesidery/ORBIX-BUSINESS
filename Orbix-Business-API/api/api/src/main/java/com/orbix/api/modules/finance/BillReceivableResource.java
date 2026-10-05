@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.orbix.api.api.commons.PayCode;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -28,6 +29,7 @@ public class BillReceivableResource {
 	private final BillReceivableService billReceivableService;
 	
 	@PostMapping("/bill_receivables/confirm_bills_payment")
+	@Audited(category = "FINANCE", action = "PAYMENT_CONFIRMED", entityType = "BillReceivable", entityId = "", entityRef = "payRefNo", summary = "Confirmed payment of {totalAmount} for {billReceivableRequests.size} bill(s) ({payCode}, ref {payRefNo})", details = {"totalAmount", "payCode", "payRefNo", "billIds=billReceivableRequests.id", "billNos=billReceivableRequests.no"})
 	//@PreAuthorize("hasAnyAuthority('BILL-A')")
 	public ResponseEntity<List<BillReceivableResponseDTO>> confirmBillPayment(
 			@RequestBody List<BillReceivableRequestDTO> billReceivableRequests,

@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -40,6 +41,7 @@ public class BranchResource {
 	}
 	
 	@PostMapping("/branches/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "Branch", summary = "Created branch {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BranchResponseDTO>create(
 			@RequestBody BranchRequestDTO branchRequest,
@@ -49,6 +51,7 @@ public class BranchResource {
 	}
 	
 	@PostMapping("/branches/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Branch", summary = "Updated branch {ref}", changeOf = Branch.class, changeId = "branchRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BranchResponseDTO>update(
 			@RequestBody BranchRequestDTO branchRequest,
@@ -58,6 +61,7 @@ public class BranchResource {
 	}
 	
 	@PostMapping("/branches/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "Branch", entityId = "branchRequest.id", summary = "Activated branch {ref}", changeOf = Branch.class, changeId = "branchRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody BranchRequestDTO branchRequest,
@@ -67,6 +71,7 @@ public class BranchResource {
 	}
 	
 	@PostMapping("/branches/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "Branch", entityId = "branchRequest.id", summary = "Deactivated branch {ref}", changeOf = Branch.class, changeId = "branchRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody BranchRequestDTO branchRequest,

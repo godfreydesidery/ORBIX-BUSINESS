@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
+import com.orbix.api.modules.audit.Audited;
 
 @RestController
 @RequestMapping("/orbix-business-api")
@@ -60,6 +61,7 @@ public class ParkingBillReceivableResource {
 	}
 	
 	@PostMapping("/parking_bill_receivables/create_parking_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_CREATED", entityType = "ParkingBillReceivable", entityRef = "result.parkingId", summary = "Created parking bill {result.id} for parking {result.parkingId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.parkingId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ParkingBillReceivableResponseDTO>createParkingBill(
 			@RequestBody ParkingBillReceivableRequestDTO parkingBillReceivableRequest,
@@ -69,6 +71,7 @@ public class ParkingBillReceivableResource {
 	}
 	
 	@PostMapping("/parking_bill_receivables/update_parking_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_UPDATED", entityType = "ParkingBillReceivable", entityRef = "result.parkingId", summary = "Updated parking bill {result.id} for parking {result.parkingId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.parkingId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"}, changeOf = ParkingBillReceivable.class, changeId = "parkingBillReceivableRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ParkingBillReceivableResponseDTO>updateParkingBill(
 			@RequestBody ParkingBillReceivableRequestDTO parkingBillReceivableRequest,
@@ -78,6 +81,7 @@ public class ParkingBillReceivableResource {
 	}
 	
 	@PostMapping("/parking_bill_receivables/create_service_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_CREATED", entityType = "ParkingServiceBillReceivable", entityRef = "result.parkingId", summary = "Created parking service bill {result.id} for parking {result.parkingId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.parkingId", "result.description", "result.qty", "result.price", "result.discount", "result.amount"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ParkingServiceBillReceivableResponseDTO>createServiceBill(
 			@RequestBody ParkingServiceBillReceivableRequestDTO parkingServiceBillReceivableRequest,
@@ -87,6 +91,7 @@ public class ParkingBillReceivableResource {
 	}
 	
 	@PostMapping("/parking_bill_receivables/update_service_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_UPDATED", entityType = "ParkingServiceBillReceivable", entityRef = "result.parkingId", summary = "Updated parking service bill {result.id} for parking {result.parkingId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.parkingId", "result.description", "result.qty", "result.price", "result.discount", "result.amount"}, changeOf = ParkingServiceBillReceivable.class, changeId = "parkingServiceBillReceivableRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ParkingServiceBillReceivableResponseDTO>updateServiceBill(
 			@RequestBody ParkingServiceBillReceivableRequestDTO parkingServiceBillReceivableRequest,
@@ -96,6 +101,7 @@ public class ParkingBillReceivableResource {
 	}
 	
 	@PostMapping("/parking_bill_receivables/delete_service_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_DELETED", entityType = "ParkingServiceBillReceivable", entityId = "parkingServiceBillReceivableRequest.id", entityRef = "parkingServiceBillReceivableRequest.parkingId", summary = "Deleted parking service bill {parkingServiceBillReceivableRequest.id} for parking {parkingServiceBillReceivableRequest.parkingId}", details = {"parkingId=parkingServiceBillReceivableRequest.parkingId", "description=parkingServiceBillReceivableRequest.description", "amount=parkingServiceBillReceivableRequest.amount"}, changeOf = ParkingServiceBillReceivable.class, changeId = "parkingServiceBillReceivableRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<Boolean> deleteServiceBill(
 			@RequestBody ParkingServiceBillReceivableRequestDTO parkingServiceBillReceivableRequest,

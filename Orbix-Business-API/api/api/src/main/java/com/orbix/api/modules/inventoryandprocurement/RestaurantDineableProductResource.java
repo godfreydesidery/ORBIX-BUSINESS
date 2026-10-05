@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
+import com.orbix.api.modules.audit.Audited;
 
 @RestController
 @RequestMapping("/orbix-business-api")
@@ -44,6 +45,7 @@ public class RestaurantDineableProductResource {
 
 	
 	@PostMapping("/restaurant_dineable_products/create")
+	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "RestaurantDineableProduct", summary = "Created restaurant dineable product {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantDineableProductResponseDTO>create(
 			@RequestBody RestaurantDineableProductRequestDTO restaurantDineableProductRequest,
@@ -53,6 +55,7 @@ public class RestaurantDineableProductResource {
 	}
 	
 	@PostMapping("/restaurant_dineable_products/update")
+	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "RestaurantDineableProduct", summary = "Updated restaurant dineable product {ref}", changeOf = RestaurantDineableProduct.class, changeId = "restaurantDineableProductRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantDineableProductResponseDTO>cupdate(
 			@RequestBody RestaurantDineableProductRequestDTO restaurantDineableProductRequest,

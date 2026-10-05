@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
+import com.orbix.api.modules.audit.Audited;
 
 @RestController
 @RequestMapping("/orbix-business-api")
@@ -35,6 +36,7 @@ public class SystemProfileResource {
 	
 	
 	@PostMapping("/company_profile/save_logo")
+	@Audited(category = "SETTINGS", action = "LOGO_CHANGED", entityType = "SystemProfile", entityId = "", summary = "Changed the company logo")
 	//@PreAuthorize("hasAnyAuthority('ADMIN-ACCESS')")
 	public ResponseEntity<SystemProfile> saveCompanyLogo(
 			@RequestParam("logo") MultipartFile logo,

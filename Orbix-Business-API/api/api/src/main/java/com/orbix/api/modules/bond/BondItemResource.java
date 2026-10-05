@@ -23,6 +23,7 @@ import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponse
 import com.orbix.api.api.vehicleandequipmentparking.ParkingRequestDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -180,6 +181,7 @@ public class BondItemResource {
 	}
 	
 	@PostMapping("/bond_items/check_in")
+	@Audited(category = "OPERATIONS", action = "CHECKED_IN", entityType = "BondItem", entityRef = "result.no", summary = "Checked in bond item {result.no} ({result.bondItemName})", details = {"result.bondItemName"})
 	public ResponseEntity<BondItemResponseDTO>checkIn(
 			@RequestBody BondItemRequestDTO bondItemRequest,
 			HttpServletRequest request){		
@@ -187,6 +189,7 @@ public class BondItemResource {
 	}
 	
 	@PostMapping("/bond_items/check_out")
+	@Audited(category = "OPERATIONS", action = "CHECKED_OUT", entityType = "BondItem", entityRef = "result.no", summary = "Checked out bond item {result.no} ({result.bondItemName})", details = {"result.bondItemName"})
 	public ResponseEntity<BondItemResponseDTO>checkOut(
 			@RequestBody BondItemRequestDTO bondItemRequest,
 			HttpServletRequest request){		
@@ -194,6 +197,7 @@ public class BondItemResource {
 	}
 	
 	@PostMapping("/bond_items/archive")
+	@Audited(category = "OPERATIONS", action = "BOND_ITEM_ARCHIVED", entityType = "BondItem", entityRef = "result.no", summary = "Archived bond item {ref}", changeOf = BondItem.class, changeId = "bondItemRequest.id")
 	public ResponseEntity<BondItemResponseDTO>archive(
 			@RequestBody BondItemRequestDTO bondItemRequest,
 			HttpServletRequest request){		
@@ -222,6 +226,7 @@ public class BondItemResource {
 	}
 	
 	@PostMapping("/bond_items/create_bond_item_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_CREATED", entityType = "BondItemBillReceivable", entityRef = "result.bondItemId", summary = "Created bond item bill {result.id} for bond item {result.bondItemId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.bondItemId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BondItemBillReceivableResponseDTO>createBondItemBillReceivable(
 			@RequestBody BondItemBillReceivableRequestDTO bondItemBillReceivableRequest,
@@ -239,6 +244,7 @@ public class BondItemResource {
 	}
 	
 	@PostMapping("/bond_items/create_bond_item_custom_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_CREATED", entityType = "BondItemBillReceivable", entityRef = "result.bondItemId", summary = "Created custom bond item bill {result.id} for bond item {result.bondItemId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.bondItemId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BondItemBillReceivableResponseDTO>createBondItemCustomBillReceivable(
 			@RequestBody BondItemBillReceivableRequestDTO bondItemBillReceivableRequest,
@@ -275,6 +281,7 @@ public class BondItemResource {
 	}
 	
 	@PostMapping("/bond_items/modify")
+	@Audited(category = "OPERATIONS", action = "RECORD_MODIFIED", entityType = "BondItem", entityRef = "result.no", summary = "Modified bond item {ref}", changeOf = BondItem.class, changeId = "bondItemRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BondItemResponseDTO>modify(
 			@RequestBody BondItemRequestDTO bondItemRequest,

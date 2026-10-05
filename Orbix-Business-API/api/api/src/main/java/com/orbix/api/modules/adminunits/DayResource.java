@@ -12,11 +12,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +46,9 @@ public class DayResource {
 		return dayData;
 	}
 	
-	@GetMapping("/days/end_day")
+	// POST is the intended method; GET still works so that nothing calling it today breaks
+	@RequestMapping(value = "/days/end_day", method = {RequestMethod.GET, RequestMethod.POST})
+	@Audited(category = "FINANCE", action = "DAY_ENDED", entityType = "Day", entityId = "", summary = "Ended the business day")
 	@PreAuthorize("hasAnyAuthority('ADMIN-ACCESS','DAY-ACCESS')")
 	public boolean endDay(HttpServletRequest request){		
 		return dayService.endDay();

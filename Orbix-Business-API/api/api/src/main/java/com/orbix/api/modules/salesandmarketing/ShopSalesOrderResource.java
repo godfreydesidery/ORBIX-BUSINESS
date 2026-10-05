@@ -22,6 +22,7 @@ import com.orbix.api.modules.inventoryandprocurement.UomRequestDTO;
 import com.orbix.api.modules.inventoryandprocurement.UomResponseDTO;
 import com.orbix.api.modules.inventoryandprocurement.UomService;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -88,6 +89,7 @@ public class ShopSalesOrderResource {
 	}
 	
 	@PostMapping("/shop_sales_orders/confirm")
+	@Audited(category = "SALES", action = "SALES_ORDER_CONFIRMED", entityType = "ShopSalesOrder", entityId = "shopOrderId", summary = "Confirmed shop sales order {ref} ({payCode}, ref {payRefNo})", details = {"payCode", "payRefNo"}, changeOf = ShopSalesOrder.class, changeId = "shopOrderId")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public boolean confirm(
 			@RequestParam(name = "shop_sales_order_id") Long shopOrderId,
@@ -98,6 +100,7 @@ public class ShopSalesOrderResource {
 	}
 	
 	@PostMapping("/shop_sales_orders/cancel")
+	@Audited(category = "SALES", action = "SALES_ORDER_CANCELLED", entityType = "ShopSalesOrder", entityId = "shopOrderId", summary = "Cancelled shop sales order {ref}", changeOf = ShopSalesOrder.class, changeId = "shopOrderId")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public boolean cancel(
 			@RequestParam(name = "shop_sales_order_id") Long shopOrderId,

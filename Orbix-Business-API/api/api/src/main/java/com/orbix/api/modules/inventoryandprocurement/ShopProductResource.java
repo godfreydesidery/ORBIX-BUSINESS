@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -55,6 +56,7 @@ public class ShopProductResource {
 	}
 	
 	@PostMapping("/shop_products/create")
+	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "ShopProduct", entityRef = "result.productCode", summary = "Created shop product {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ShopProductResponseDTO>create(
 			@RequestBody ShopProductRequestDTO shopProductRequest,
@@ -64,6 +66,7 @@ public class ShopProductResource {
 	}
 	
 	@PostMapping("/shop_products/update")
+	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "ShopProduct", entityRef = "result.productCode", summary = "Updated shop product {ref}", changeOf = ShopProduct.class, changeId = "shopProductRequest.id", changeQuery = "select p.id from ShopProduct p where p.shop.id = ?1 and p.product.id = ?2", changeKeys = {"shopProductRequest.shopId", "shopProductRequest.productId"}, changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ShopProductResponseDTO>update(
 			@RequestBody ShopProductRequestDTO shopProductRequest,
@@ -73,6 +76,7 @@ public class ShopProductResource {
 	}
 	
 	@PostMapping("/shop_products/adjust_stock")
+	@Audited(category = "INVENTORY", action = "STOCK_ADJUSTED", entityType = "ShopProduct", entityRef = "result.productCode", summary = "Adjusted the stock of {result.productCode} {result.productName} to {result.currentStock}", changeOf = ShopProduct.class, changeId = "shopProductRequest.id", changeQuery = "select p.id from ShopProduct p where p.shop.id = ?1 and p.product.id = ?2", changeKeys = {"shopProductRequest.shopId", "shopProductRequest.productId"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ShopProductResponseDTO>adjustStock(
 			@RequestBody ShopProductRequestDTO shopProductRequest,
@@ -82,6 +86,7 @@ public class ShopProductResource {
 	}
 	
 	@PostMapping("/shop_products/activate")
+	@Audited(category = "INVENTORY", action = "RECORD_ACTIVATED", entityType = "ShopProduct", entityId = "shopProductRequest.id", summary = "Activated shop product {ref}", changeOf = ShopProduct.class, changeId = "shopProductRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody ShopProductRequestDTO shopProductRequest,
@@ -91,6 +96,7 @@ public class ShopProductResource {
 	}
 	
 	@PostMapping("/shop_products/deactivate")
+	@Audited(category = "INVENTORY", action = "RECORD_DEACTIVATED", entityType = "ShopProduct", entityId = "shopProductRequest.id", summary = "Deactivated shop product {ref}", changeOf = ShopProduct.class, changeId = "shopProductRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody ShopProductRequestDTO shopProductRequest,

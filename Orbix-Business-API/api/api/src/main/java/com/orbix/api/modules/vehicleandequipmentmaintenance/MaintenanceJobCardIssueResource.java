@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import com.orbix.api.modules.audit.Audited;
 
 @RestController
 @RequestMapping("/orbix-business-api")
@@ -110,6 +111,7 @@ private final MaintenanceJobCardIssueService maintenanceJobCardIssueService;
 	}
 	
 	@PostMapping("/maintenance_job_card_issues/close")
+	@Audited(category = "OPERATIONS", action = "JOB_ISSUE_CLOSED", entityType = "MaintenanceJobCardIssue", entityRef = "result.maintenanceNo", summary = "Closed job issue {result.name} on maintenance {result.maintenanceNo}", changeOf = MaintenanceJobCardIssue.class, changeId = "maintenanceJobCardIssueRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<MaintenanceJobCardIssueResponseDTO>close(
 			@RequestBody MaintenanceJobCardIssueRequestDTO maintenanceJobCardIssueRequest,
@@ -119,6 +121,7 @@ private final MaintenanceJobCardIssueService maintenanceJobCardIssueService;
 	}
 	
 	@PostMapping("/maintenance_job_card_issues/remove")
+	@Audited(category = "OPERATIONS", action = "JOB_ISSUE_REMOVED", entityType = "MaintenanceJobCardIssue", entityId = "maintenanceJobCardIssueRequest.id", summary = "Removed job issue {ref}", changeOf = MaintenanceJobCardIssue.class, changeId = "maintenanceJobCardIssueRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<MaintenanceJobCardIssueResponseDTO>remove(
 			@RequestBody MaintenanceJobCardIssueRequestDTO maintenanceJobCardIssueRequest,

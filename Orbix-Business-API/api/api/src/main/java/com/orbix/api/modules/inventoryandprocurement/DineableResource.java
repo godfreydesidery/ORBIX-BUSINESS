@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -58,6 +59,7 @@ public class DineableResource {
 	}
 	
 	@PostMapping("/dineables/create")
+	@Audited(category = "INVENTORY", action = "RECORD_CREATED", entityType = "Dineable", summary = "Created dineable {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<DineableResponseDTO>create(
 			@RequestBody DineableRequestDTO dineableRequest,
@@ -67,6 +69,7 @@ public class DineableResource {
 	}
 	
 	@PostMapping("/dineables/update")
+	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "Dineable", summary = "Updated dineable {ref}", changeOf = Dineable.class, changeId = "dineableRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<DineableResponseDTO>update(
 			@RequestBody DineableRequestDTO dineableRequest,
@@ -76,6 +79,7 @@ public class DineableResource {
 	}
 	
 	@PostMapping("/dineables/activate")
+	@Audited(category = "INVENTORY", action = "RECORD_ACTIVATED", entityType = "Dineable", entityId = "dineableRequest.id", summary = "Activated dineable {ref}", changeOf = Dineable.class, changeId = "dineableRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody DineableRequestDTO dineableRequest,
@@ -85,6 +89,7 @@ public class DineableResource {
 	}
 	
 	@PostMapping("/dineables/deactivate")
+	@Audited(category = "INVENTORY", action = "RECORD_DEACTIVATED", entityType = "Dineable", entityId = "dineableRequest.id", summary = "Deactivated dineable {ref}", changeOf = Dineable.class, changeId = "dineableRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody DineableRequestDTO dineableRequest,

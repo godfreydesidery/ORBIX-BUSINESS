@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
+import com.orbix.api.modules.audit.Audited;
 
 @RestController
 @RequestMapping("/orbix-business-api")
@@ -45,6 +46,7 @@ public class StorageBillReceivableResource {
 	}
 	
 	@PostMapping("/storage_bill_receivables/create_storage_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_CREATED", entityType = "StorageBillReceivable", entityRef = "result.storageId", summary = "Created storage bill {result.id} for storage {result.storageId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.storageId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<StorageBillReceivableResponseDTO>createStorageBill(
 			@RequestBody StorageBillReceivableRequestDTO storageBillReceivableRequest,
@@ -54,6 +56,7 @@ public class StorageBillReceivableResource {
 	}
 	
 	@PostMapping("/storage_bill_receivables/update_storage_bill_receivable")
+	@Audited(category = "FINANCE", action = "BILL_UPDATED", entityType = "StorageBillReceivable", entityRef = "result.storageId", summary = "Updated storage bill {result.id} for storage {result.storageId}: {result.qty} x {result.price}, discount {result.discount}", details = {"result.storageId", "result.qty", "result.price", "result.discount", "result.amount", "result.startedAt", "result.endedAt"}, changeOf = StorageBillReceivable.class, changeId = "storageBillReceivableRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<StorageBillReceivableResponseDTO>updateStorageBill(
 			@RequestBody StorageBillReceivableRequestDTO storageBillReceivableRequest,

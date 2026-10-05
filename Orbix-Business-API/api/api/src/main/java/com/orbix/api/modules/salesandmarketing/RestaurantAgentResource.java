@@ -19,6 +19,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.modules.inventoryandprocurement.ProductRequestDTO;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -59,6 +60,7 @@ public class RestaurantAgentResource {
 	
 	
 	@PostMapping("/restaurants/create_agent")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "RestaurantAgent", entityRef = "result.name", summary = "Created restaurant agent {result.name}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantAgentResponseDTO>create(
 			@RequestBody RestaurantAgentRequestDTO restaurantAgentRequest,
@@ -75,6 +77,7 @@ public class RestaurantAgentResource {
 	}
 	
 	@PostMapping("/restaurant-agents/assign-badge-to-agent")
+	@Audited(category = "SETTINGS", action = "BADGE_ASSIGNED", entityType = "RestaurantAgent", entityId = "agentBadgeData.restaurantAgentId", summary = "Gave badge {agentBadgeData.restaurantBadgeId} to restaurant agent {ref}", changeOf = RestaurantAgent.class, changeId = "agentBadgeData.restaurantAgentId")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<Boolean>assignBadge(
 			@RequestBody AgentBadgeData agentBadgeData,
@@ -84,6 +87,7 @@ public class RestaurantAgentResource {
 	}
 	
 	@PostMapping("/restaurant-agents/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "RestaurantAgent", entityId = "restaurantAgentRequest.id", summary = "Activated restaurant agent {ref}", changeOf = RestaurantAgent.class, changeId = "restaurantAgentRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody RestaurantAgentRequestDTO restaurantAgentRequest,
@@ -93,6 +97,7 @@ public class RestaurantAgentResource {
 	}
 	
 	@PostMapping("/restaurant-agents/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "RestaurantAgent", entityId = "restaurantAgentRequest.id", summary = "Deactivated restaurant agent {ref}", changeOf = RestaurantAgent.class, changeId = "restaurantAgentRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody RestaurantAgentRequestDTO restaurantAgentRequest,
@@ -102,6 +107,7 @@ public class RestaurantAgentResource {
 	}
 	
 	@PostMapping("/restaurant-agents/unassign-badge")
+	@Audited(category = "SETTINGS", action = "BADGE_UNASSIGNED", entityType = "RestaurantAgent", entityId = "restaurantAgentRequest.id", summary = "Took the badge from restaurant agent {ref}", changeOf = RestaurantAgent.class, changeId = "restaurantAgentRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>unassignBadge(
 			@RequestBody RestaurantAgentRequestDTO restaurantAgentRequest,

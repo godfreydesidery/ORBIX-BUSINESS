@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.modules.audit.Audited;
 import lombok.RequiredArgsConstructor;
 
 @RestController
@@ -45,6 +46,7 @@ public class ParkingZoneResource {
 	}
 	
 	@PostMapping("/parking_zones/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "ParkingZone", summary = "Created parking zone {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ParkingZoneResponseDTO>create(
 			@RequestBody ParkingZoneRequestDTO parkingZoneRequest,
@@ -54,6 +56,7 @@ public class ParkingZoneResource {
 	}
 	
 	@PostMapping("/parking_zones/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "ParkingZone", summary = "Updated parking zone {ref}", changeOf = ParkingZone.class, changeId = "parkingZoneRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ParkingZoneResponseDTO>update(
 			@RequestBody ParkingZoneRequestDTO parkingZoneRequest,
@@ -63,6 +66,7 @@ public class ParkingZoneResource {
 	}
 	
 	@PostMapping("/parking_zones/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "ParkingZone", entityId = "parkingZoneRequest.id", summary = "Activated parking zone {ref}", changeOf = ParkingZone.class, changeId = "parkingZoneRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody ParkingZoneRequestDTO parkingZoneRequest,
@@ -73,6 +77,7 @@ public class ParkingZoneResource {
 	
 	
 	@PostMapping("/parking_zones/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "ParkingZone", entityId = "parkingZoneRequest.id", summary = "Deactivated parking zone {ref}", changeOf = ParkingZone.class, changeId = "parkingZoneRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody ParkingZoneRequestDTO parkingZoneRequest,

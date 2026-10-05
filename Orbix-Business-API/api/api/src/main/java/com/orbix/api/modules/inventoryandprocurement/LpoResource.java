@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 @RestController
 @RequestMapping("/orbix-business-api")
@@ -106,6 +107,7 @@ public class LpoResource {
 	}
 	
 	@PostMapping("/lpos/approve")
+	@Audited(category = "PROCUREMENT", action = "LPO_APPROVED", entityType = "Lpo", entityId = "lpoId", summary = "Approved LPO {ref}", changeOf = Lpo.class, changeId = "lpoId")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public boolean approve(
 			@RequestParam(name = "lpo_id") Long lpoId,
@@ -114,6 +116,7 @@ public class LpoResource {
 	}
 	
 	@PostMapping("/lpos/cancel")
+	@Audited(category = "PROCUREMENT", action = "LPO_CANCELLED", entityType = "Lpo", entityId = "lpoId", summary = "Cancelled LPO {ref}", changeOf = Lpo.class, changeId = "lpoId")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public boolean cancel(
 			@RequestParam(name = "lpo_id") Long lpoId,
@@ -122,6 +125,7 @@ public class LpoResource {
 	}
 	
 	@PostMapping("/lpos/archive")
+	@Audited(category = "PROCUREMENT", action = "LPO_ARCHIVED", entityType = "Lpo", entityId = "lpoId", summary = "Archived LPO {ref}", changeOf = Lpo.class, changeId = "lpoId")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public boolean archive(
 			@RequestParam(name = "lpo_id") Long lpoId,

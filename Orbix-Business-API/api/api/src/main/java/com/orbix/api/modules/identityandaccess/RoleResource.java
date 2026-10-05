@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
+import com.orbix.api.modules.audit.Audited;
 
 @RestController
 @RequestMapping("/orbix-business-api")
@@ -35,6 +36,7 @@ public class RoleResource {
 	}
 	
 	@PostMapping("/roles/create_role")
+	@Audited(category = "SECURITY", action = "ROLE_CREATED", entityType = "Role", entityRef = "result.name", summary = "Created role {result.name}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RoleResponseDTO>createRole(
 			@RequestBody RoleRequestDTO roleRequest,
@@ -44,6 +46,7 @@ public class RoleResource {
 	}
 	
 	@PostMapping("/companies/update_role")
+	@Audited(category = "SECURITY", action = "ROLE_UPDATED", entityType = "Role", summary = "Updated role {ref}", changeOf = Role.class, changeId = "roleRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RoleResponseDTO>updateRole(
 			@RequestBody RoleRequestDTO roleRequest,

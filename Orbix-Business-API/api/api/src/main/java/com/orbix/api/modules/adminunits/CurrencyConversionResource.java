@@ -5,6 +5,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.modules.audit.Audited;
 
 import javax.servlet.http.HttpServletRequest;
 import java.net.URI;
@@ -32,18 +33,21 @@ public class CurrencyConversionResource {
     }
 
     @PostMapping("/currency_conversions/create")
+    @Audited(category = "FINANCE", action = "CURRENCY_RATES_CHANGED", entityType = "CurrencyConversion", summary = "Created currency rate {result.sourceCurrencyCode} {result.sourceCurrencyValue} = {result.finalCurrencyCode} {result.finalCurrencyValue}", details = {"result.sourceCurrencyCode", "result.sourceCurrencyValue", "result.finalCurrencyCode", "result.finalCurrencyValue", "result.active"})
     public ResponseEntity<CurrencyConversionResponseDTO> createCurrencyConversion(@RequestBody CurrencyConversionRequestDTO conversionRequest, HttpServletRequest request) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/currency-conversions/create").toUriString());
         return ResponseEntity.created(uri).body(currencyConversionService.createCurrencyConversion(conversionRequest, request));
     }
 
     @PostMapping("/currency_conversions/update")
+    @Audited(category = "FINANCE", action = "CURRENCY_RATES_CHANGED", entityType = "CurrencyConversion", summary = "Updated currency rate {result.sourceCurrencyCode} {result.sourceCurrencyValue} = {result.finalCurrencyCode} {result.finalCurrencyValue}", details = {"result.sourceCurrencyCode", "result.sourceCurrencyValue", "result.finalCurrencyCode", "result.finalCurrencyValue", "result.active"}, changeOf = CurrencyConversion.class, changeId = "conversionRequest.id")
     public ResponseEntity<CurrencyConversionResponseDTO> updateCurrencyConversion(@RequestBody CurrencyConversionRequestDTO conversionRequest, HttpServletRequest request) {
         URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath().path("/orbix-business-api/currency-conversions/update").toUriString());
         return ResponseEntity.created(uri).body(currencyConversionService.updateCurrencyConversion(conversionRequest, request));
     }
     
     @PostMapping("/currency_conversions/activate")
+    @Audited(category = "FINANCE", action = "CURRENCY_RATES_CHANGED", entityType = "CurrencyConversion", entityId = "currencyConversionRequest.id", summary = "Activated currency rate {currencyConversionRequest.id}", changeOf = CurrencyConversion.class, changeId = "currencyConversionRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody CurrencyConversionRequestDTO currencyConversionRequest,
@@ -53,6 +57,7 @@ public class CurrencyConversionResource {
 	}
     
     @PostMapping("/currency_conversions/deactivate")
+    @Audited(category = "FINANCE", action = "CURRENCY_RATES_CHANGED", entityType = "CurrencyConversion", entityId = "currencyConversionRequest.id", summary = "Deactivated currency rate {currencyConversionRequest.id}", changeOf = CurrencyConversion.class, changeId = "currencyConversionRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody CurrencyConversionRequestDTO currencyConversionRequest,

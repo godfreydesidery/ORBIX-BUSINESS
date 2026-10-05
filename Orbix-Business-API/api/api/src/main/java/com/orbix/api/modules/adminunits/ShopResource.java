@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +42,7 @@ public class ShopResource {
 	}
 	
 	@PostMapping("/shops/create")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "Shop", summary = "Created shop {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ShopResponseDTO>create(
 			@RequestBody ShopRequestDTO shopRequest,
@@ -50,6 +52,7 @@ public class ShopResource {
 	}
 	
 	@PostMapping("/shops/update")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Shop", summary = "Updated shop {ref}", changeOf = Shop.class, changeId = "shopRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ShopResponseDTO>update(
 			@RequestBody ShopRequestDTO shopRequest,
@@ -59,6 +62,7 @@ public class ShopResource {
 	}
 	
 	@PostMapping("/shops/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "Shop", entityId = "shopRequest.id", summary = "Activated shop {ref}", changeOf = Shop.class, changeId = "shopRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody ShopRequestDTO shopRequest,
@@ -68,6 +72,7 @@ public class ShopResource {
 	}
 	
 	@PostMapping("/shops/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "Shop", entityId = "shopRequest.id", summary = "Deactivated shop {ref}", changeOf = Shop.class, changeId = "shopRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody ShopRequestDTO shopRequest,

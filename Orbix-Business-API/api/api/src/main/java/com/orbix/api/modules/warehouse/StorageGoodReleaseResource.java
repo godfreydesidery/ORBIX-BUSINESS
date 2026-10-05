@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
+import com.orbix.api.modules.audit.Audited;
 
 @RestController
 @RequestMapping("/orbix-business-api")
@@ -58,6 +59,7 @@ public class StorageGoodReleaseResource {
 	}
 	
 	@PostMapping("/storage_good_releases/create_storage_good_release")
+	@Audited(category = "OPERATIONS", action = "GOODS_RELEASED", entityType = "StorageGoodRelease", entityRef = "result.no", summary = "Released {result.qty} of {result.goodName} from storage {result.storageId} to {result.clientName}", details = {"result.storageId", "result.qty", "result.unitPrice", "result.total", "result.clientName"})
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<StorageGoodReleaseResponseDTO>createStorageCustomBillReceivable(
 			@RequestBody StorageGoodReleaseRequestDTO storageGoodReleaseRequest,

@@ -24,6 +24,7 @@ import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.inventoryandprocurement.ProductRequestDTO;
 import com.orbix.api.modules.inventoryandprocurement.ProductResponseDTO;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.modules.audit.Audited;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -67,6 +68,7 @@ public class RestaurantBadgeResource {
 	}
 	
 	@PostMapping("/restaurants/create_badge")
+	@Audited(category = "SETTINGS", action = "RECORD_CREATED", entityType = "RestaurantBadge", summary = "Created restaurant badge {ref}")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<RestaurantBadgeResponseDTO>create(
 			@RequestBody RestaurantBadgeRequestDTO restaurantBadgeRequest,
@@ -76,6 +78,7 @@ public class RestaurantBadgeResource {
 	}
 	
 	@PostMapping("/restaurant-badges/activate")
+	@Audited(category = "SETTINGS", action = "RECORD_ACTIVATED", entityType = "RestaurantBadge", entityId = "restaurantBadgeRequest.id", summary = "Activated restaurant badge {ref}", changeOf = RestaurantBadge.class, changeId = "restaurantBadgeRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>activate(
 			@RequestBody RestaurantBadgeRequestDTO restaurantBadgeRequest,
@@ -85,6 +88,7 @@ public class RestaurantBadgeResource {
 	}
 	
 	@PostMapping("/restaurant-badges/deactivate")
+	@Audited(category = "SETTINGS", action = "RECORD_DEACTIVATED", entityType = "RestaurantBadge", entityId = "restaurantBadgeRequest.id", summary = "Deactivated restaurant badge {ref}", changeOf = RestaurantBadge.class, changeId = "restaurantBadgeRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ApiCustomResponse>deactivate(
 			@RequestBody RestaurantBadgeRequestDTO restaurantBadgeRequest,

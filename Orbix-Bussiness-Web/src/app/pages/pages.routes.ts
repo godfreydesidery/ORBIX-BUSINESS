@@ -52,6 +52,18 @@ export const routes: Routes = [
         data : { breadcrumb : 'Identity and Acces/Role Access'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'identity-and-access/audit-log',
+        loadComponent : () => import('./identity-and-access/audit-log/audit-log.component').then(c => c.AuditLogComponent),
+        data : { breadcrumb : 'Identity and Acces/Audit Log'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'identity-and-access/login-history',
+        loadComponent : () => import('./identity-and-access/audit-log/audit-log.component').then(c => c.AuditLogComponent),
+        data : { breadcrumb : 'Identity and Acces/Login History', loginHistory : true},
+        canActivate : [AuthGuard]
+      },
 
 
 // Refactor later
