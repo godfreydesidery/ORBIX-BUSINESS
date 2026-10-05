@@ -21,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 @RestController
 @RequestMapping("/orbix-business-api")
@@ -65,6 +66,56 @@ public class MaintenanceResource {
 	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<MaintenanceResponseDTO>>getAllCheckedIn(HttpServletRequest request){
 		return ResponseEntity.ok().body(maintenanceService.getAllCheckedInMaintenances(request));
+	}
+
+	@GetMapping("/maintenances/get_all_pending_or_checked_in_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<MaintenanceResponseDTO>>getPendingAndCheckedInPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(maintenanceService.getPendingOrCheckedInMaintenancePage(page, size, search, request));
+	}
+
+	@GetMapping("/maintenances/get_all_checked_in_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<MaintenanceResponseDTO>>getCheckedInPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(maintenanceService.getCheckedInMaintenancePage(page, size, search, request));
+	}
+
+	@GetMapping("/maintenances/get_all_checked_in_with_open_jobs_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<MaintenanceResponseDTO>>getCheckedInWithOpenJobsPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(maintenanceService.getCheckedInMaintenancePageWithOpenJobs(page, size, search, request));
+	}
+
+	@GetMapping("/maintenances/get_all_checked_in_with_open_jobs_and_mine_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<MaintenanceResponseDTO>>getCheckedInWithOpenJobsAndMinePage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(maintenanceService.getCheckedInMaintenancePageWithOpenJobsAndMine(page, size, search, request));
+	}
+
+	@GetMapping("/maintenances/get_all_checked_in_with_closed_jobs_and_mine_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<MaintenanceResponseDTO>>getCheckedInWithClosedJobsAndMinePage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(maintenanceService.getCheckedInMaintenancePageWithClosedJobsAndMine(page, size, search, request));
 	}
 	
 	@GetMapping("/maintenances/get_all_cleared")

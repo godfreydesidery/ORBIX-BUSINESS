@@ -13,6 +13,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.api.vehicleandequipmentparking.VehicleEquipment;
@@ -32,6 +34,8 @@ import com.orbix.api.modules.finance.InvoiceReceivableDetailRepository;
 import com.orbix.api.modules.finance.InvoiceReceivableRepository;
 import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -226,6 +230,93 @@ public class MaintenanceServiceController implements MaintenanceService {
 			if(cleared) maintenanceResponses.add(maintenanceResponseDTOMapper(maintenance));
 		}
 		return maintenanceResponses;
+	}
+
+	@Override
+	public PageResponseDTO<MaintenanceResponseDTO> getPendingOrCheckedInMaintenancePage(int page, int size, String search, HttpServletRequest request) {
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");
+		statuses.add("CHECKED-IN");
+
+		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
+		Page<Maintenance> maintenances = maintenanceRepository.getPageByStatusIn(statuses, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<MaintenanceResponseDTO> maintenanceResponses = new ArrayList<>();
+
+		for(Maintenance maintenance : maintenances) {
+			maintenanceResponses.add(maintenanceResponseDTOMapper(maintenance));
+		}
+		return new PageResponseDTO<>(maintenanceResponses, maintenances.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<MaintenanceResponseDTO> getCheckedInMaintenancePage(int page, int size, String search, HttpServletRequest request) {
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+
+		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
+		Page<Maintenance> maintenances = maintenanceRepository.getPageByStatusIn(statuses, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<MaintenanceResponseDTO> maintenanceResponses = new ArrayList<>();
+
+		for(Maintenance maintenance : maintenances) {
+			maintenanceResponses.add(maintenanceResponseDTOMapper(maintenance));
+		}
+		return new PageResponseDTO<>(maintenanceResponses, maintenances.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<MaintenanceResponseDTO> getCheckedInMaintenancePageWithOpenJobs(int page, int size, String search, HttpServletRequest request) {
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");
+		statuses.add("CHECKED-IN");
+
+		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
+		Page<Maintenance> maintenances = maintenanceRepository.getPageByStatusInAndOpenMaintenanceJobCardIssues(statuses, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<MaintenanceResponseDTO> maintenanceResponses = new ArrayList<>();
+
+		for(Maintenance maintenance : maintenances) {
+			maintenanceResponses.add(maintenanceResponseDTOMapper(maintenance));
+		}
+		return new PageResponseDTO<>(maintenanceResponses, maintenances.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<MaintenanceResponseDTO> getCheckedInMaintenancePageWithOpenJobsAndMine(int page, int size, String search, HttpServletRequest request) {
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");
+		statuses.add("CHECKED-IN");
+		
+		User user = userService.getUser(request);
+
+		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
+		Page<Maintenance> maintenances = maintenanceRepository.getPageByStatusInAndOpenMaintenanceJobCardIssuesAndServiceSpecialistUser(statuses, user, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<MaintenanceResponseDTO> maintenanceResponses = new ArrayList<>();
+
+		for(Maintenance maintenance : maintenances) {
+			maintenanceResponses.add(maintenanceResponseDTOMapper(maintenance));
+		}
+		return new PageResponseDTO<>(maintenanceResponses, maintenances.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<MaintenanceResponseDTO> getCheckedInMaintenancePageWithClosedJobsAndMine(int page, int size, String search, HttpServletRequest request) {
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");
+		statuses.add("CHECKED-IN");
+		statuses.add("CHECKED-OUT");
+		
+		User user = userService.getUser(request);
+		
+		// Same 24 hour window as the full list
+		LocalDateTime closedSince = LocalDateTime.now().minusHours(24);
+
+		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
+		Page<Maintenance> maintenances = maintenanceRepository.getPageByStatusInAndClosedMaintenanceJobCardIssuesAndServiceSpecialistUser(statuses, user, closedSince, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<MaintenanceResponseDTO> maintenanceResponses = new ArrayList<>();
+
+		for(Maintenance maintenance : maintenances) {
+			maintenanceResponses.add(maintenanceResponseDTOMapper(maintenance));
+		}
+		return new PageResponseDTO<>(maintenanceResponses, maintenances.getTotalElements());
 	}
 
 	@Override
