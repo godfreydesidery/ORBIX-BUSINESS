@@ -93,7 +93,16 @@ export class DataService {
     
   }
 
+  // The logo and company profile do not change within a login, so they are loaded once per login
+  // (keyed by the access token) instead of on every printed document
+  cachedLogo : string = ''
+  cachedLogoToken : string = ''
+  cachedCompanyProfileToken : string = ''
+
   async getLogo() : Promise<string> {
+    if (this.cachedLogo !== '' && this.cachedLogoToken === this.auth.user?.access_token) {
+      return this.cachedLogo
+    }
     var logo : any = ''
     await this.http.get<ICompany>(API_URL+'/company_profile/get_logo')
     .toPromise()
@@ -102,6 +111,8 @@ export class DataService {
         var retrieveResponse : any = res
         var base64Data = retrieveResponse.logo
         logo = 'data:image/png;base64,'+base64Data
+        this.cachedLogo = logo
+        this.cachedLogoToken = this.auth.user?.access_token
       }
     )
     .catch(error => {
@@ -149,6 +160,9 @@ export class DataService {
 
 
   async getCompanyProfile() {
+    if (this.cachedCompanyProfileToken !== '' && this.cachedCompanyProfileToken === this.auth.user?.access_token) {
+      return
+    }
     var company! : ICompany
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
@@ -160,6 +174,7 @@ export class DataService {
     .then(
       data => {
 
+        this.cachedCompanyProfileToken = this.auth.user?.access_token
         this.companyId        = ''
         this.companyName      = 'SIGHMAN SAFARI HAULAGE LTD'
         this.contactName      = 'STANSLAUS MTANDI'
@@ -307,19 +322,36 @@ export class DataService {
 
   // }
 
+  // The branch receipt header depends only on the logged in user, so it is loaded once per login
+  // (keyed by the access token) instead of on every printed receipt
+  cachedBranchReceiptHeader : IBranchReceiptHeader | undefined = undefined
+  cachedBranchReceiptHeaderToken : string = ''
+
+  async getBranchReceiptHeaderData(options : { headers : HttpHeaders }) : Promise<IBranchReceiptHeader | undefined> {
+    if (this.cachedBranchReceiptHeader !== undefined && this.cachedBranchReceiptHeaderToken === this.auth.user?.access_token) {
+      return this.cachedBranchReceiptHeader
+    }
+    const data = await this.http
+      .get<IBranchReceiptHeader>(
+        API_URL + '/companies/get_branch_receipt_header_by_user',
+        options
+      )
+      .toPromise();
+    if (data) {
+      this.cachedBranchReceiptHeader = data
+      this.cachedBranchReceiptHeaderToken = this.auth.user?.access_token
+    }
+    return data
+  }
+
   async getBranchReceiptHeader(receiptNo: string) {
     try {
       const options = {
         headers: new HttpHeaders().set('Authorization','Bearer ' + this.auth.user.access_token),
       }
   
-      // Fetch data from the API
-      const data = await this.http
-        .get<IBranchReceiptHeader>(
-          API_URL + '/companies/get_branch_receipt_header_by_user',
-          options
-        )
-        .toPromise();
+      // Fetch data from the API (once per login)
+      const data = await this.getBranchReceiptHeaderData(options);
   
       if (data) {
         const {
@@ -375,13 +407,8 @@ export class DataService {
         headers: new HttpHeaders().set('Authorization','Bearer ' + this.auth.user.access_token),
       }
   
-      // Fetch data from the API
-      const data = await this.http
-        .get<IBranchReceiptHeader>(
-          API_URL + '/companies/get_branch_receipt_header_by_user',
-          options
-        )
-        .toPromise();
+      // Fetch data from the API (once per login)
+      const data = await this.getBranchReceiptHeaderData(options);
   
       if (data) {
         const {
