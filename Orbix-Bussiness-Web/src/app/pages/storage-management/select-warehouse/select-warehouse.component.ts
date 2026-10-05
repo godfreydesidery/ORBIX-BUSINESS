@@ -19,10 +19,10 @@ import { IStorage } from 'src/app/domain/storage';
 import { IGoodType } from 'src/app/domain/good-type';
 import { error } from 'src/custom-packages/util';
 
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 import { IServiceBillItem } from 'src/app/domain/maintenance';
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 
@@ -962,20 +962,6 @@ export class SelectWarehouseComponent {
     // var address : any = await this.data.getReceiptHeader(receiptNo)
     var address: any = await this.data.getBranchReceiptHeaderWithNoTinAndVrn(receiptNo)
 
-    // Set up VFS for pdfMake - try different approaches
-    try {
-      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
-      // Try different possible structures
-      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
-      } else if (vfsFonts.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.vfs;
-      } else {
-        (window as any).pdfMake.vfs = vfsFonts;
-      }
-    } catch (error) {
-      console.log('VFS setup failed, continuing without custom fonts:', error);
-    }
 
     var receipt = [
       [

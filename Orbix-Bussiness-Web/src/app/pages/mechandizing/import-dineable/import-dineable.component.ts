@@ -16,7 +16,6 @@ import { IRestaurantDineable } from 'src/app/domain/restaurant-dineable';
 import { IDineable } from 'src/app/domain/dineable';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
 const API_URL = environment.apiUrl;
 @Component({

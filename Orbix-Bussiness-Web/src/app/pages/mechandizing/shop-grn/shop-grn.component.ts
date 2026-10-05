@@ -22,11 +22,11 @@ import { ISupplier } from 'src/app/domain/supplier';
 import { ISupplierProduct } from 'src/app/domain/supplier-product';
 import { IGrn, IGrnDetail } from 'src/app/domain/grn';
 
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 import { ICustomer } from 'src/app/domain/customer';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
 const API_URL = environment.apiUrl;
 @Component({

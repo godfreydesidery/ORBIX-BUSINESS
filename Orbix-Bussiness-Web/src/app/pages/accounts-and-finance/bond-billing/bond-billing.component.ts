@@ -15,11 +15,11 @@ import { IBondItemBillReceivable } from 'src/app/domain/bill-receivable';
 import { IBillView } from 'src/app/domain/bill-view';
 import { DataService } from '@services/custom/data.service';
 import { IServiceBillItem } from 'src/app/domain/maintenance';
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 import { IBondItem } from 'src/app/domain/bond-item';
 import { IBondZone } from 'src/app/domain/bond-zone';
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 
@@ -723,20 +723,6 @@ export class BondBillingComponent {
     // var address : any = await this.data.getReceiptHeader(receiptNo)
     var address: any = await this.data.getBranchReceiptHeaderWithNoTinAndVrn(receiptNo)
 
-    // Set up VFS for pdfMake - try different approaches
-    try {
-      const vfsFonts = require('pdfmake/build/vfs_fonts.js');
-      // Try different possible structures
-      if (vfsFonts.pdfMake && vfsFonts.pdfMake.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.pdfMake.vfs;
-      } else if (vfsFonts.vfs) {
-        (window as any).pdfMake.vfs = vfsFonts.vfs;
-      } else {
-        (window as any).pdfMake.vfs = vfsFonts;
-      }
-    } catch (error) {
-      console.log('VFS setup failed, continuing without custom fonts:', error);
-    }
 
     var receipt = [
       [

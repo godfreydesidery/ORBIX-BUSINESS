@@ -18,7 +18,6 @@ import { NotificationComponent } from '../../misc/notification/notification.comp
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 

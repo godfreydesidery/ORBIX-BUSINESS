@@ -17,7 +17,6 @@ import { IDineable } from 'src/app/domain/dineable';
 import { IRestaurantBadge } from 'src/app/domain/restaurant-badge';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 

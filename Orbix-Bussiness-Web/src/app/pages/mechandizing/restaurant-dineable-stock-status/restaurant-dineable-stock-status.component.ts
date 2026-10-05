@@ -17,7 +17,6 @@ import { IDineable } from 'src/app/domain/dineable';
 import { JwtHelperService } from '@auth0/angular-jwt';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
 const API_URL = environment.apiUrl;
 @Component({

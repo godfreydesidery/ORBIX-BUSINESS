@@ -20,7 +20,6 @@ import { ReceiptItem } from 'src/app/domain/receipt-item';
 import { ICustomer } from 'src/app/domain/customer';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
 const API_URL = environment.apiUrl;
 @Component({

@@ -10,7 +10,8 @@ import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 
 import { DataService } from '@services/custom/data.service';
 import { MsgBoxService } from '@services/custom/msg-box.service';

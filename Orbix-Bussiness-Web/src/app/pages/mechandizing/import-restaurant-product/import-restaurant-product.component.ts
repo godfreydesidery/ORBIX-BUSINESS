@@ -16,7 +16,6 @@ import { IRestaurantProduct } from 'src/app/domain/restaurant-product';
 import { IProduct } from 'src/app/domain/product';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
 const API_URL = environment.apiUrl;
 @Component({

@@ -14,10 +14,10 @@ import { IMachineServiceBillReceivable } from 'src/app/domain/bill-receivable';
 import { IBillView } from 'src/app/domain/bill-view';
 import { DataService } from '@services/custom/data.service';
 import { IServiceBillItem } from 'src/app/domain/maintenance';
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 import { IMachine } from 'src/app/domain/machine';
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 @Component({

@@ -19,13 +19,13 @@ import { IStorage } from 'src/app/domain/storage';
 import { IGoodType } from 'src/app/domain/good-type';
 import { error } from 'src/custom-packages/util';
 
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 import { IServiceBillItem } from 'src/app/domain/maintenance';
 import { IMachine } from 'src/app/domain/machine';
 import { IMachineService } from 'src/app/domain/machine-service';
 import { IService } from 'src/app/domain/service';
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 

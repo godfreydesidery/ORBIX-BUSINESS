@@ -22,7 +22,6 @@ import { IRestaurantAgent } from 'src/app/domain/restaurant-agent';
 import { error } from 'src/custom-packages/util';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl;
 @Component({

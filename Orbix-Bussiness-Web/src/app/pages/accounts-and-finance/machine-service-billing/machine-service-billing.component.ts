@@ -9,7 +9,8 @@ import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { IBillReceivable, IMachineServiceBillReceivable, IServiceBillReceivable } from 'src/app/domain/bill-receivable';
 import { environment } from 'src/environments/environment';
 
-import * as pdfMake from 'pdfmake/build/pdfmake';
+// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
+declare var pdfMake: any;
 import { PosReceiptPrinterService } from '@services/custom/pos-receipt-printer.service';
 import { ReceiptItem } from 'src/app/domain/receipt-item';
 import { MsgBoxService } from '@services/custom/msg-box.service';
@@ -18,7 +19,6 @@ import { IServiceBillItem, IWeigh } from 'src/app/domain/weigh';
 import { ICustomer } from 'src/app/domain/customer';
 import { IMachine } from 'src/app/domain/machine';
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js');
 
 const API_URL = environment.apiUrl; 
 @Component({

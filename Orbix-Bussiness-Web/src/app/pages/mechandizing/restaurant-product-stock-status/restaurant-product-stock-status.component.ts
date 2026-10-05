@@ -17,7 +17,6 @@ import { JwtHelperService } from '@auth0/angular-jwt';
 import { IRestaurantProduct } from 'src/app/domain/restaurant-product';
 
 
-var pdfFonts = require('pdfmake/build/vfs_fonts.js'); 
 
 const API_URL = environment.apiUrl;
 
