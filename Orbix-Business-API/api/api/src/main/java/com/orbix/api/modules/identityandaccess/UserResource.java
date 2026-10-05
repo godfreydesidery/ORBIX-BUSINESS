@@ -567,10 +567,10 @@ public class UserResource {
 		}
 		
 		// All privilege names in one query instead of one look-up per object and operation
-		// (case-insensitive, as the database compares names)
+		// (case-insensitive and ignoring trailing spaces, as the database compares names)
 		Set<String> privilegeNames = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 		for(String privilegeName : privilegeRepository.getPrivilegeNames()) {
-			if(privilegeName != null) privilegeNames.add(privilegeName);
+			if(privilegeName != null) privilegeNames.add(privilegeName.stripTrailing());
 		}
 		
 		for(String object : objects) {
