@@ -77,7 +77,7 @@ public class CompanyResource {
 	 * @return
 	 */
 	@PostMapping("/companies/update")
-	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Company", summary = "Updated company {ref}", changeOf = Company.class, changeId = "companyRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Company", summary = "Updated company {ref}", changeOf = Company.class, changeId = "companyRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<CompanyResponseDTO>update(
 			@RequestBody CompanyRequestDTO companyRequest,

@@ -60,7 +60,7 @@ public class ServiceSpecialistResource {
 	}
 	
 	@PostMapping("/service_specialists/update")
-	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "ServiceSpecialist", summary = "Updated service specialist {ref}", changeOf = ServiceSpecialist.class, changeId = "serviceSpecialistRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "ServiceSpecialist", summary = "Updated service specialist {ref}", changeOf = ServiceSpecialist.class, changeId = "serviceSpecialistRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ServiceSpecialistResponseDTO>update(
 			@RequestBody ServiceSpecialistRequestDTO serviceSpecialistRequest,

@@ -52,7 +52,7 @@ public class ShopResource {
 	}
 	
 	@PostMapping("/shops/update")
-	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Shop", summary = "Updated shop {ref}", changeOf = Shop.class, changeId = "shopRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Shop", summary = "Updated shop {ref}", changeOf = Shop.class, changeId = "shopRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ShopResponseDTO>update(
 			@RequestBody ShopRequestDTO shopRequest,

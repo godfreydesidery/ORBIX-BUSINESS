@@ -71,7 +71,7 @@ public class ProductResource {
 	}
 	
 	@PostMapping("/products/update")
-	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "Product", summary = "Updated product {ref}", changeOf = Product.class, changeId = "productRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "Product", summary = "Updated product {ref}", changeOf = Product.class, changeId = "productRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ProductResponseDTO>update(
 			@RequestBody ProductRequestDTO productRequest,

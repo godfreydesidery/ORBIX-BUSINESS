@@ -60,7 +60,7 @@ public class MaintenanceIssueTypeResource {
 	}
 	
 	@PostMapping("/maintenance_issue_types/update")
-	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "MaintenanceIssueType", summary = "Updated maintenance issue type {ref}", changeOf = MaintenanceIssueType.class, changeId = "maintenanceIssueTypeRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "MaintenanceIssueType", summary = "Updated maintenance issue type {ref}", changeOf = MaintenanceIssueType.class, changeId = "maintenanceIssueTypeRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<MaintenanceIssueTypeResponseDTO>update(
 			@RequestBody MaintenanceIssueTypeRequestDTO maintenanceIssueTypeRequest,

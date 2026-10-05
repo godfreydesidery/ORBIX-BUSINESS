@@ -51,7 +51,7 @@ private final UomService uomService;
 	}
 	
 	@PostMapping("/uoms/update")
-	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Uom", summary = "Updated unit of measure {ref}", changeOf = Uom.class, changeId = "uomRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Uom", summary = "Updated unit of measure {ref}", changeOf = Uom.class, changeId = "uomRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<UomResponseDTO>update(
 			@RequestBody UomRequestDTO uomRequest,

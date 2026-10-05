@@ -69,7 +69,7 @@ private final SupplierService supplierService;
 	}
 	
 	@PostMapping("/suppliers/update")
-	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Supplier", summary = "Updated supplier {ref}", changeOf = Supplier.class, changeId = "supplierRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Supplier", summary = "Updated supplier {ref}", changeOf = Supplier.class, changeId = "supplierRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<SupplierResponseDTO>update(
 			@RequestBody SupplierRequestDTO supplierRequest,

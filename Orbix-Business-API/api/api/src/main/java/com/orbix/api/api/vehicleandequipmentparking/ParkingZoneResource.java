@@ -56,7 +56,7 @@ public class ParkingZoneResource {
 	}
 	
 	@PostMapping("/parking_zones/update")
-	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "ParkingZone", summary = "Updated parking zone {ref}", changeOf = ParkingZone.class, changeId = "parkingZoneRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "ParkingZone", summary = "Updated parking zone {ref}", changeOf = ParkingZone.class, changeId = "parkingZoneRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<ParkingZoneResponseDTO>update(
 			@RequestBody ParkingZoneRequestDTO parkingZoneRequest,

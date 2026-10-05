@@ -60,7 +60,7 @@ public class WarehouseResource {
 	}
 	
 	@PostMapping("/warehouses/update")
-	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Warehouse", summary = "Updated warehouse {ref}", changeOf = Warehouse.class, changeId = "warehouseRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Warehouse", summary = "Updated warehouse {ref}", changeOf = Warehouse.class, changeId = "warehouseRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<WarehouseResponseDTO>update(
 			@RequestBody WarehouseRequestDTO warehouseRequest,

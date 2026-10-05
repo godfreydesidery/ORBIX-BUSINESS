@@ -51,7 +51,7 @@ public class BranchResource {
 	}
 	
 	@PostMapping("/branches/update")
-	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Branch", summary = "Updated branch {ref}", changeOf = Branch.class, changeId = "branchRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Branch", summary = "Updated branch {ref}", changeOf = Branch.class, changeId = "branchRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BranchResponseDTO>update(
 			@RequestBody BranchRequestDTO branchRequest,

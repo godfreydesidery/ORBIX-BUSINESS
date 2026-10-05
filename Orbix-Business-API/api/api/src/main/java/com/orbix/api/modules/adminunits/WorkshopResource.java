@@ -49,7 +49,7 @@ public class WorkshopResource {
 	}
 
 	@PostMapping("/workshops/update")
-	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Workshop", summary = "Updated workshop {ref}", changeOf = Workshop.class, changeId = "workshopRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "Workshop", summary = "Updated workshop {ref}", changeOf = Workshop.class, changeId = "workshopRequest.id")
 	// @PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<WorkshopResponseDTO> update(@RequestBody WorkshopRequestDTO workshopRequest, HttpServletRequest request) {
 		URI uri = URI.create(ServletUriComponentsBuilder.fromCurrentContextPath()

@@ -60,7 +60,7 @@ public class BondZoneResource {
 	}
 	
 	@PostMapping("/bond_zones/update")
-	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "BondZone", summary = "Updated bond zone {ref}", changeOf = BondZone.class, changeId = "bondZoneRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "BondZone", summary = "Updated bond zone {ref}", changeOf = BondZone.class, changeId = "bondZoneRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<BondZoneResponseDTO>update(
 			@RequestBody BondZoneRequestDTO bondZoneRequest,

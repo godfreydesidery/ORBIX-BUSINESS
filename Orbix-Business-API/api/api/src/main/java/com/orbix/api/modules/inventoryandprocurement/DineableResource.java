@@ -69,7 +69,7 @@ public class DineableResource {
 	}
 	
 	@PostMapping("/dineables/update")
-	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "Dineable", summary = "Updated dineable {ref}", changeOf = Dineable.class, changeId = "dineableRequest.id", changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+	@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "Dineable", summary = "Updated dineable {ref}", changeOf = Dineable.class, changeId = "dineableRequest.id")
 	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
 	public ResponseEntity<DineableResponseDTO>update(
 			@RequestBody DineableRequestDTO dineableRequest,
