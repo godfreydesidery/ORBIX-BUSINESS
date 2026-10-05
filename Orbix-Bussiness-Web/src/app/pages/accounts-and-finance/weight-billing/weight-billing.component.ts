@@ -1115,8 +1115,8 @@ export class WeightBillingComponent {
 
   printGatePassRcpt = async (billItems: IServiceBillItem[], receiptNo: string, cash: number) => {
 
-    await this.get(this.weighId)
-    await this.getLastBillingDate(this.weighId)
+    // The record and its last billing date are independent, so they are loaded together
+    await Promise.all([this.get(this.weighId), this.getLastBillingDate(this.weighId)])
 
     var companyName = localStorage.getItem('company-name')!
 
