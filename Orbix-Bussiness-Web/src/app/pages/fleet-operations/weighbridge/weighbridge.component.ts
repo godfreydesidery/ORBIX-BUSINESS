@@ -23,8 +23,6 @@ import { ISupplierProduct } from 'src/app/domain/supplier-product';
 import { NgSelectModule } from '@ng-select/ng-select';
 import { trackById } from 'src/app/common/utils/track-by-id';
 
-// pdfmake and its fonts are loaded globally (angular.json scripts); use that instance instead of bundling a second copy
-declare var pdfMake: any;
 
 
 
