@@ -21,7 +21,9 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import javax.persistence.EntityManager;
+import javax.persistence.EntityManagerFactory;
 import javax.persistence.PersistenceContext;
+import javax.persistence.PersistenceUnit;
 import javax.persistence.Query;
 import javax.persistence.metamodel.Attribute;
 import javax.persistence.metamodel.EntityType;
@@ -35,11 +37,11 @@ import org.hibernate.Hibernate;
 import org.springframework.beans.BeanWrapper;
 import org.springframework.beans.PropertyAccessorFactory;
 import org.springframework.beans.factory.ObjectProvider;
+import org.springframework.core.Ordered;
+import org.springframework.core.annotation.Order;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
-import org.springframework.transaction.PlatformTransactionManager;
-import org.springframework.transaction.TransactionDefinition;
-import org.springframework.transaction.support.TransactionTemplate;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -50,9 +52,13 @@ import lombok.extern.slf4j.Slf4j;
  * Writes an audit log entry for each method marked @Audited that returns normally.
  * The method's result and exceptions pass through unchanged; building the entry never fails the action
  * (a value that cannot be read is left empty).
+ *
+ * Runs around the action's transaction (first in order), so the record is read before the transaction starts and
+ * the method returns here only once it has committed.
  */
 @Aspect
 @Component
+@Order(Ordered.HIGHEST_PRECEDENCE)
 @RequiredArgsConstructor
 @Slf4j
 public class AuditAspect {
@@ -69,10 +75,13 @@ public class AuditAspect {
 	// Looked up when first needed, so creating this aspect does not create the services early
 	private final ObjectProvider<AuditLogService> auditLogService;
 	private final ObjectProvider<ObjectMapper> objectMapper;
-	private final ObjectProvider<PlatformTransactionManager> transactionManager;
 
+	// The request's own EntityManager (open for the whole request)
 	@PersistenceContext
 	private EntityManager entityManager;
+
+	@PersistenceUnit
+	private EntityManagerFactory entityManagerFactory;
 
 	@Around(value = "@annotation(audited)", argNames = "audited")
 	public Object recordAction(ProceedingJoinPoint joinPoint, Audited audited) throws Throwable {
@@ -138,68 +147,72 @@ public class AuditAspect {
 			auditLog.setSummary(AuditRequests.truncate(fill(values, audited.summary()), 255));
 
 			if(before != null) {
-				// The values after the action are read once it has committed, so they are the stored ones
-				String recordId = changeId;
-				auditLogService.getObject().recordAction(auditLog, entry -> completeChange(entry, audited, details, before, recordId));
-			}else {
-				auditLog.setDetails(details.isEmpty() ? null : json(details));
-				auditLogService.getObject().recordAction(auditLog, null);
+				addChange(auditLog, audited, details, before, changeId);
 			}
+			auditLog.setDetails(details.isEmpty() ? null : json(details));
+			auditLogService.getObject().recordAction(auditLog);
 		}catch(Exception e) {
 			log.error("Could not record audit log entry {}: {}", audited.action(), e.getMessage());
 		}
 		return result;
 	}
 
-	// Reads the changed record (by changeId, or else the records matching changeQuery) before the action
-	private Map<String, Map<String, Object>> readRecordsBefore(Audited audited, Map<String, Object> values) {
+	/**
+	 * Reads the changed record (by changeId, or else the records matching changeQuery) before the action, through an
+	 * EntityManager of its own that is closed right after: nothing here touches the action's session or transaction.
+	 * This aspect runs before the action's transaction starts, when the request holds no database connection yet,
+	 * so the read never holds one connection while waiting for another.
+	 */
+	private Map<String, Map<String, Object>> readRecordsBefore(Audited audited, Map<String, Object> values) throws Exception {
 		Object id = resolve(values, audited.changeId());
 		if(audited.changeOf() == void.class || (id == null && audited.changeQuery().isEmpty())) {
 			return null;
 		}
-		return readOnly(() -> {
-			List<?> ids = id != null ? List.of(id) : changeIds(audited, values);
+		EntityManager reader = entityManagerFactory.createEntityManager();
+		try {
+			List<?> ids = id != null ? List.of(id) : changeIds(reader, audited, values);
 			Map<String, Map<String, Object>> records = new LinkedHashMap<>();
 			for(Object recordId : ids) {
-				Map<String, Object> columns = columns(audited.changeOf(), recordId);
+				Map<String, Object> columns = columns(reader, audited.changeOf(), recordId);
 				if(columns != null) {
 					records.put(text(recordId), columns);
 				}
 			}
 			return records;
-		});
+		}finally {
+			reader.close();
+		}
 	}
 
-	private List<?> changeIds(Audited audited, Map<String, Object> values) {
-		Query query = entityManager.createQuery(audited.changeQuery());
+	private List<?> changeIds(EntityManager reader, Audited audited, Map<String, Object> values) {
+		Query query = reader.createQuery(audited.changeQuery());
 		for(int i = 0; i < audited.changeKeys().length; i++) {
 			query.setParameter(i + 1, resolve(values, audited.changeKeys()[i]));
 		}
 		return query.setMaxResults(MAX_MATCHING_RECORDS).getResultList();
 	}
 
-	// Reads in a short read-only transaction of its own, so that nothing here can affect the action's transaction or the entry's
-	private <T> T readOnly(Reading<T> reading) {
-		TransactionTemplate transactionTemplate = new TransactionTemplate(transactionManager.getObject());
-		transactionTemplate.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-		transactionTemplate.setReadOnly(true);
-		return transactionTemplate.execute(status -> {
-			try {
-				return reading.read();
-			}catch(Exception e) {
-				throw new IllegalStateException(e.getMessage(), e);
-			}
-		});
-	}
-
-	private interface Reading<T> {
-		T read() throws Exception;
-	}
-
-	// Adds what the change did to the entry. Runs after the action has committed, inside the entry's own transaction
-	private void completeChange(AuditLog auditLog, Audited audited, Map<String, Object> details, Map<String, Object> before, String id) {
+	/**
+	 * Reads the record after the action has committed. The request's own EntityManager is used: it already holds the
+	 * request's connection and has the changed record in memory, so this usually runs no query and never waits on a
+	 * second connection. Inside a transaction still running (not expected here) an EntityManager of its own is used instead.
+	 */
+	private Map<String, Object> readAfter(Class<?> entityClass, String id) throws Exception {
+		if(!TransactionSynchronizationManager.isActualTransactionActive()) {
+			return columns(entityManager, entityClass, id);
+		}
+		EntityManager reader = entityManagerFactory.createEntityManager();
 		try {
-			Map<String, Object> after = readOnly(() -> columns(audited.changeOf(), id));
+			return columns(reader, entityClass, id);
+		}finally {
+			reader.close();
+		}
+	}
+
+	// Adds to the details what the change did to the record
+	private void addChange(AuditLog auditLog, Audited audited, Map<String, Object> details, Map<String, Object> before, String id) {
+		try {
+			Map<String, Object> after = readAfter(audited.changeOf(), id);
 			if(after == null) {
 				// The record was deleted: keep everything it held
 				details.put("before", new TreeMap<>(before));
@@ -215,8 +228,11 @@ public class AuditAspect {
 						changedAfter.put(column, after.get(column));
 					}
 				}
-				details.put("before", changedBefore);
-				details.put("after", changedAfter);
+				// Saving a record unchanged adds nothing
+				if(!changedAfter.isEmpty()) {
+					details.put("before", changedBefore);
+					details.put("after", changedAfter);
+				}
 				if(!audited.changedFieldPattern().isEmpty() && !audited.changedAction().isEmpty()
 						&& changedAfter.keySet().stream().anyMatch(column -> column.matches(audited.changedFieldPattern()))) {
 					auditLog.setAction(audited.changedAction());
@@ -225,16 +241,15 @@ public class AuditAspect {
 		}catch(Exception e) {
 			log.error("Could not read the record after audited action {}: {}", audited.action(), e.getMessage());
 		}
-		auditLog.setDetails(details.isEmpty() ? null : json(details));
 	}
 
 	// The record's own columns (and the ids of the records it points to), or null when there is no such record
-	private Map<String, Object> columns(Class<?> entityClass, Object id) throws Exception {
+	private Map<String, Object> columns(EntityManager reader, Class<?> entityClass, Object id) throws Exception {
 		if(entityClass == void.class || id == null) {
 			return null;
 		}
-		EntityType<?> entityType = entityManager.getMetamodel().entity(entityClass);
-		Object entity = entityManager.find(entityClass, idOfType(id, entityType.getIdType().getJavaType()));
+		EntityType<?> entityType = reader.getMetamodel().entity(entityClass);
+		Object entity = reader.find(entityClass, idOfType(id, entityType.getIdType().getJavaType()));
 		if(entity == null) {
 			return null;
 		}
@@ -258,7 +273,7 @@ public class AuditAspect {
 				case ONE_TO_ONE:
 					Object related = read(entity, attribute.getJavaMember());
 					columns.put(attribute.getName() + "Id", related == null ? null
-							: simple(entityManager.getEntityManagerFactory().getPersistenceUnitUtil().getIdentifier(related)));
+							: simple(entityManagerFactory.getPersistenceUnitUtil().getIdentifier(related)));
 					break;
 				default:
 					break;

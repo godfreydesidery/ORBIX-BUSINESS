@@ -1,7 +1,5 @@
 package com.orbix.api.modules.audit;
 
-import java.util.function.Consumer;
-
 import javax.servlet.http.HttpServletRequest;
 
 import com.orbix.api.api.commons.PageResponseDTO;
@@ -9,10 +7,10 @@ import com.orbix.api.api.commons.PageResponseDTO;
 public interface AuditLogService {
 
 	/**
-	 * Records a critical action of the current user once the current transaction commits.
-	 * afterCommit, if given, finishes the entry just before it is saved (e.g. with values read after the commit).
+	 * Records a critical action of the current user. The entry is written in the background, once the current
+	 * transaction (if any) commits.
 	 */
-	void recordAction(AuditLog auditLog, Consumer<AuditLog> afterCommit);
+	void recordAction(AuditLog auditLog);
 
 	/** Records a sign-in event (sign-in, failed sign-in, token refresh, sign-out) in the background */
 	void recordAuth(String action, String outcome, String username, String reason, String ipAddress, String forwardedFor, String userAgent);

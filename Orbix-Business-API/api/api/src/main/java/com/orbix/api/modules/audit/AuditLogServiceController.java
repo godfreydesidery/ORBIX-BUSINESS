@@ -3,13 +3,17 @@ package com.orbix.api.modules.audit;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneOffset;
+import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.Executor;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Sort;
 import org.springframework.scheduling.annotation.Async;
@@ -26,6 +30,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.orbix.api.api.commons.PageRequests;
 import com.orbix.api.api.commons.PageResponseDTO;
+import com.orbix.api.exceptions.InvalidEntryException;
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserRepository;
@@ -35,7 +40,7 @@ import lombok.extern.slf4j.Slf4j;
 
 /**
  * Deliberately not transactional at class level: recording never takes part in the action's transaction,
- * so nothing it does can roll the action back. Entries are written in transactions of their own.
+ * so nothing it does can roll the action back. Entries are written by the audit thread, in transactions of their own.
  */
 @Service
 @RequiredArgsConstructor
@@ -44,14 +49,20 @@ public class AuditLogServiceController implements AuditLogService {
 
 	public static final String SUCCESS = "SUCCESS";
 	public static final String FAILURE = "FAILURE";
+	// Characters; at up to 4 bytes each this stays within a TEXT column
+	private static final int MAX_DETAILS_LENGTH = 16000;
 
 	private final AuditLogRepository auditLogRepository;
 	private final UserRepository userRepository;
 	private final PlatformTransactionManager transactionManager;
 	private final ObjectMapper objectMapper;
 
+	@Autowired
+	@Qualifier("auditExecutor")
+	private Executor auditExecutor;
+
 	@Override
-	public void recordAction(AuditLog auditLog, Consumer<AuditLog> afterCommit) {
+	public void recordAction(AuditLog auditLog) {
 		// Who and where are read now, while the request is still being handled; the user's record is looked up when saving
 		HttpServletRequest request = currentRequest();
 		String username = (request != null && request.getUserPrincipal() != null) ? request.getUserPrincipal().getName() : null;
@@ -69,11 +80,23 @@ public class AuditLogServiceController implements AuditLogService {
 			TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
 				@Override
 				public void afterCommit() {
-					finishAndSave(auditLog, username, forwardedFor, afterCommit);
+					saveInBackground(auditLog, username, forwardedFor);
 				}
 			});
 		}else {
-			finishAndSave(auditLog, username, forwardedFor, afterCommit);
+			saveInBackground(auditLog, username, forwardedFor);
+		}
+	}
+
+	/**
+	 * Hands the entry to the audit thread. The request keeps its database connection until it ends,
+	 * so writing the entry here would make it wait for a second one, and many requests at once could use up the pool.
+	 */
+	private void saveInBackground(AuditLog auditLog, String username, String forwardedFor) {
+		try {
+			auditExecutor.execute(() -> finishAndSave(auditLog, username, forwardedFor, null));
+		}catch(Exception e) {
+			log.error("Could not write audit log entry {} {} for {}: {}", auditLog.getCategory(), auditLog.getAction(), username, e.getMessage());
 		}
 	}
 
@@ -115,8 +138,14 @@ public class AuditLogServiceController implements AuditLogService {
 	public PageResponseDTO<AuditLogResponseDTO> getAuditLogPage(String from, String to, String category, String action, String outcome,
 			Long userId, Long branchId, int page, int size, String search, HttpServletRequest request) {
 		// The period is sent as UTC instants (ISO-8601); without one, the last seven days are shown
-		LocalDateTime toTime = (to == null || to.isBlank()) ? LocalDateTime.now(ZoneOffset.UTC).plusMinutes(1) : LocalDateTime.ofInstant(Instant.parse(to), ZoneOffset.UTC);
-		LocalDateTime fromTime = (from == null || from.isBlank()) ? toTime.minusDays(7) : LocalDateTime.ofInstant(Instant.parse(from), ZoneOffset.UTC);
+		LocalDateTime toTime;
+		LocalDateTime fromTime;
+		try {
+			toTime = (to == null || to.isBlank()) ? LocalDateTime.now(ZoneOffset.UTC).plusMinutes(1) : LocalDateTime.ofInstant(Instant.parse(to), ZoneOffset.UTC);
+			fromTime = (from == null || from.isBlank()) ? toTime.minusDays(7) : LocalDateTime.ofInstant(Instant.parse(from), ZoneOffset.UTC);
+		}catch(DateTimeParseException e) {
+			throw new InvalidEntryException("Invalid period: dates must be ISO-8601 instants, e.g. 2026-01-31T21:00:00Z");
+		}
 
 		// One page, newest first, searched on the user, reference, summary and address
 		Page<AuditLog> auditLogs = auditLogRepository.getPage(fromTime, toTime, category == null ? "" : category, action == null ? "" : action,
@@ -157,7 +186,8 @@ public class AuditLogServiceController implements AuditLogService {
 						log.error("Could not complete audit log entry {}: {}", auditLog.getAction(), e.getMessage());
 					}
 				}
-				auditLog.setDetails(withForwardedFor(auditLog.getDetails(), forwardedFor));
+				// Kept within the TEXT column (64 KB), so a very large action still gets its entry
+				auditLog.setDetails(AuditRequests.truncate(withForwardedFor(auditLog.getDetails(), forwardedFor), MAX_DETAILS_LENGTH));
 				auditLogRepository.save(auditLog);
 			});
 		}catch(Exception e) {
