@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.orbix.api.api.commons.PageRequests;
 import com.orbix.api.api.commons.PageResponseDTO;
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidEntryException;
@@ -60,11 +61,10 @@ public class DineableServiceController implements DineableService {
 	}
 
 	@Override
-	public PageResponseDTO<DineableResponseDTO> getDineablePage(int page, int size, HttpServletRequest request) {
-		// One page of the list, in the same order as the full list (by id)
-		int pageSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
-		PageRequest pageRequest = PageRequest.of(Math.min(Math.max(page, 0), Integer.MAX_VALUE / pageSize), pageSize, Sort.by("id"));
-		Page<Dineable> dineables = dineableRepository.findAll(pageRequest);
+	public PageResponseDTO<DineableResponseDTO> getDineablePage(int page, int size, String search, HttpServletRequest request) {
+		// One page of the list, in the same order as the full list (by id), searched on the shown columns
+		PageRequest pageRequest = PageRequests.of(page, size, Sort.by("id"));
+		Page<Dineable> dineables = dineableRepository.getPageBySearch(PageRequests.searchPattern(search), pageRequest);
 		List<DineableResponseDTO> dineableResponses = new ArrayList<>();
 
 		for(Dineable dineable : dineables) {
@@ -72,8 +72,6 @@ public class DineableServiceController implements DineableService {
 		}
 		return new PageResponseDTO<>(dineableResponses, dineables.getTotalElements());
 	}
-	
-	private static final int MAX_PAGE_SIZE = 100;
 
 	/**
 	 * 

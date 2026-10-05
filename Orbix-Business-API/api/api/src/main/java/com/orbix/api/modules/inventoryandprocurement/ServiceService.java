@@ -9,7 +9,7 @@ import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface ServiceService {
 	List<ServiceResponseDTO> getAllServicels(HttpServletRequest request);
-	PageResponseDTO<ServiceResponseDTO> getServicePage(int page, int size, HttpServletRequest request);
+	PageResponseDTO<ServiceResponseDTO> getServicePage(int page, int size, String search, HttpServletRequest request);
 	ServiceResponseDTO get(Long id, HttpServletRequest request);
 	ServiceResponseDTO getCompanyService(Long serviceId, HttpServletRequest request);
 	ServiceResponseDTO createService(ServiceRequestDTO service, HttpServletRequest request);

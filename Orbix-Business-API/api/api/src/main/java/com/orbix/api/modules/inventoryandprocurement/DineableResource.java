@@ -39,8 +39,9 @@ public class DineableResource {
 	public ResponseEntity<PageResponseDTO<DineableResponseDTO>>getPage(
 			@RequestParam(name = "page") int page,
 			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
 			HttpServletRequest request){
-		return ResponseEntity.ok().body(dineableService.getDineablePage(page, size, request));
+		return ResponseEntity.ok().body(dineableService.getDineablePage(page, size, search, request));
 	}
 	@GetMapping("/dineables/get")
 	public ResponseEntity<DineableResponseDTO>get(

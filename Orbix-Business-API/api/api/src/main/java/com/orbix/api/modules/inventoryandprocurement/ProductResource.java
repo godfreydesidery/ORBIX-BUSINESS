@@ -41,8 +41,9 @@ public class ProductResource {
 	public ResponseEntity<PageResponseDTO<ProductResponseDTO>>getPage(
 			@RequestParam(name = "page") int page,
 			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
 			HttpServletRequest request){
-		return ResponseEntity.ok().body(productService.getProductPage(page, size, request));
+		return ResponseEntity.ok().body(productService.getProductPage(page, size, search, request));
 	}
 	@GetMapping("/products/get")
 	public ResponseEntity<ProductResponseDTO>get(

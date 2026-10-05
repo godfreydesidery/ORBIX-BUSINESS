@@ -9,7 +9,7 @@ import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface DineableService {
 	List<DineableResponseDTO> getAllDineablees(HttpServletRequest request);
-	PageResponseDTO<DineableResponseDTO> getDineablePage(int page, int size, HttpServletRequest request);
+	PageResponseDTO<DineableResponseDTO> getDineablePage(int page, int size, String search, HttpServletRequest request);
 	DineableResponseDTO get(Long id, HttpServletRequest request);
 	DineableResponseDTO getCompanyDineable(Long dineableId, HttpServletRequest request);
 	DineableResponseDTO createDineable(DineableRequestDTO dineable, HttpServletRequest request);

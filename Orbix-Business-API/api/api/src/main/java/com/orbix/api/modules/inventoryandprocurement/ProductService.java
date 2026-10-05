@@ -9,7 +9,7 @@ import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface ProductService {
 	List<ProductResponseDTO> getAllProductes(HttpServletRequest request);
-	PageResponseDTO<ProductResponseDTO> getProductPage(int page, int size, HttpServletRequest request);
+	PageResponseDTO<ProductResponseDTO> getProductPage(int page, int size, String search, HttpServletRequest request);
 	ProductResponseDTO get(Long id, HttpServletRequest request);
 	ProductResponseDTO getCompanyProduct(Long productId, HttpServletRequest request);
 	ProductResponseDTO createProduct(ProductRequestDTO product, HttpServletRequest request);

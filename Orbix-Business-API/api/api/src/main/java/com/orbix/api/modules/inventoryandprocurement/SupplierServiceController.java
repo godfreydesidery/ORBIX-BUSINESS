@@ -14,6 +14,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.orbix.api.api.commons.PageRequests;
 import com.orbix.api.api.commons.PageResponseDTO;
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidEntryException;
@@ -56,11 +57,10 @@ public class SupplierServiceController implements SupplierService {
 	}
 
 	@Override
-	public PageResponseDTO<SupplierResponseDTO> getSupplierPage(int page, int size, HttpServletRequest request) {
-		// One page of the list, in the same order as the full list (by id)
-		int pageSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
-		PageRequest pageRequest = PageRequest.of(Math.min(Math.max(page, 0), Integer.MAX_VALUE / pageSize), pageSize, Sort.by("id"));
-		Page<Supplier> suppliers = supplierRepository.findAll(pageRequest);
+	public PageResponseDTO<SupplierResponseDTO> getSupplierPage(int page, int size, String search, HttpServletRequest request) {
+		// One page of the list, in the same order as the full list (by id), searched on the shown columns
+		PageRequest pageRequest = PageRequests.of(page, size, Sort.by("id"));
+		Page<Supplier> suppliers = supplierRepository.getPageBySearch(PageRequests.searchPattern(search), pageRequest);
 		List<SupplierResponseDTO> supplierResponses = new ArrayList<>();
 
 		for(Supplier supplier : suppliers) {
@@ -68,8 +68,6 @@ public class SupplierServiceController implements SupplierService {
 		}
 		return new PageResponseDTO<>(supplierResponses, suppliers.getTotalElements());
 	}
-	
-	private static final int MAX_PAGE_SIZE = 100;
 	
 	@Override
 	public List<SupplierResponseDTO> getAllCompanySuppliers(HttpServletRequest request) {
