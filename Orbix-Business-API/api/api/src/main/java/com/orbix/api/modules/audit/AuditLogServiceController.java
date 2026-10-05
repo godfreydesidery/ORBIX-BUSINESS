@@ -196,12 +196,12 @@ public class AuditLogServiceController implements AuditLogService {
 	private synchronized boolean loadRecordingEnabled() {
 		if(recordingEnabled == null) {
 			try {
-				// Without a saved setting, recording is on
-				recordingEnabled = auditSettingRepository.findFirstByOrderByIdAsc().map(AuditSetting::isRecordingEnabled).orElse(true);
+				// Without a saved setting, recording is off
+				recordingEnabled = auditSettingRepository.findFirstByOrderByIdAsc().map(AuditSetting::isRecordingEnabled).orElse(false);
 			}catch(Exception e) {
-				// Read again next time; meanwhile keep recording
+				// Read again next time; meanwhile nothing is recorded, as when recording has not been turned on
 				log.error("Could not read the audit log setting: {}", e.getMessage());
-				return true;
+				return false;
 			}
 		}
 		return recordingEnabled;

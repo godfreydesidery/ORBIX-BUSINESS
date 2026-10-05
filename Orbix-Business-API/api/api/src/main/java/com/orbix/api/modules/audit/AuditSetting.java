@@ -14,7 +14,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 /**
- * The audit log's settings, for the whole system: a single row. Without a row, recording is on.
+ * The audit log's settings, for the whole system: a single row. Without a row, recording is off.
  */
 @Entity
 @Data
@@ -29,7 +29,7 @@ public class AuditSetting {
 
 	/** Whether sign-ins and critical actions are recorded */
 	@Column(nullable = false)
-	private boolean recordingEnabled = true;
+	private boolean recordingEnabled = false;
 
 	/** When recording was last turned on or off, in UTC */
 	private LocalDateTime updatedAt;

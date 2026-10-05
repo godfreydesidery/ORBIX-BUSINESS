@@ -23,7 +23,7 @@ public interface AuditLogService {
 
 	AuditLogResponseDTO get(Long id, HttpServletRequest request);
 
-	/** Whether sign-ins and critical actions are recorded; on unless turned off */
+	/** Whether sign-ins and critical actions are recorded; off until turned on */
 	boolean isRecordingEnabled();
 
 	AuditSettingResponseDTO getAuditSetting(HttpServletRequest request);
