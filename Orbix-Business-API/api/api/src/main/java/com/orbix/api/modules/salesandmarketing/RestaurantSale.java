@@ -50,7 +50,8 @@ public class RestaurantSale {
 	
 	private LocalDateTime createdDateTime = LocalDateTime.now();
 	
-	@OneToMany(targetEntity = RestaurantSaleDetail.class, mappedBy = "restaurantSale", fetch = FetchType.EAGER, orphanRemoval = true)
+	// Loaded only when read, so lists do not load the lines of every document
+	@OneToMany(targetEntity = RestaurantSaleDetail.class, mappedBy = "restaurantSale", fetch = FetchType.LAZY, orphanRemoval = true)
     @Valid
     @JsonIgnoreProperties("restaurantSale")
 	@Fetch(FetchMode.SUBSELECT)

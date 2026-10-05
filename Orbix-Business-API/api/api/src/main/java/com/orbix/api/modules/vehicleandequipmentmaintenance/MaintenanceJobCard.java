@@ -80,7 +80,8 @@ public class MaintenanceJobCard {
     private Maintenance maintenance;
 	
 	
-	@OneToMany(targetEntity = MaintenanceJobCardIssue.class, mappedBy = "maintenanceJobCard", fetch = FetchType.EAGER, orphanRemoval = true)
+	// Loaded only when read, so lists do not load the lines of every document
+	@OneToMany(targetEntity = MaintenanceJobCardIssue.class, mappedBy = "maintenanceJobCard", fetch = FetchType.LAZY, orphanRemoval = true)
     @Valid
     @JsonIgnoreProperties("maintenanceJobCard")
 	@Fetch(FetchMode.SUBSELECT)

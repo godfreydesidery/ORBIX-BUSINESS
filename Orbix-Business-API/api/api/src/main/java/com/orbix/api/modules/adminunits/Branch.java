@@ -97,7 +97,8 @@ public class Branch {
 	@JsonIgnoreProperties("timeZones")
     private TimeZone timeZone;
 	
-	@ManyToMany(fetch = FetchType.EAGER)
+	// Loaded only when read: every branch load used to walk its whole subtree
+	@ManyToMany(fetch = FetchType.LAZY)
 	@Fetch(FetchMode.SUBSELECT)
 	private Collection<Branch> childBranches = new ArrayList<>();
 	

@@ -53,7 +53,8 @@ public class InvoiceReceivable {
     @OnDelete(action = OnDeleteAction.NO_ACTION)
     private Branch branch;
 
-	@OneToMany(targetEntity = InvoiceReceivableDetail.class, mappedBy = "invoiceReceivable", fetch = FetchType.EAGER, orphanRemoval = true)
+	// Loaded only when read, so lists do not load the lines of every document
+	@OneToMany(targetEntity = InvoiceReceivableDetail.class, mappedBy = "invoiceReceivable", fetch = FetchType.LAZY, orphanRemoval = true)
     @Valid
     @JsonIgnoreProperties("invoiceReceivable")
 	@Fetch(value = FetchMode.SUBSELECT)

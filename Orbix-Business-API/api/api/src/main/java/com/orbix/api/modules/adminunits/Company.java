@@ -109,7 +109,8 @@ public class Company {
 		
 	private LocalDateTime createdDateTime = LocalDateTime.now();
 	
-	@ManyToMany(fetch = FetchType.EAGER)
+	// Loaded only when read: every company load used to load all its branches
+	@ManyToMany(fetch = FetchType.LAZY)
 	@Fetch(FetchMode.SUBSELECT)
 	@ToString.Exclude
     @EqualsAndHashCode.Exclude

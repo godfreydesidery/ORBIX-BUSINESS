@@ -94,7 +94,8 @@ public class ShopSalesOrder {
 	
 	private LocalDateTime canceledDateTime = LocalDateTime.now();
 	
-	@OneToMany(targetEntity = ShopSalesOrderDetail.class, mappedBy = "shopSalesOrder", fetch = FetchType.EAGER, orphanRemoval = true)
+	// Loaded only when read, so lists do not load the lines of every document
+	@OneToMany(targetEntity = ShopSalesOrderDetail.class, mappedBy = "shopSalesOrder", fetch = FetchType.LAZY, orphanRemoval = true)
     @Valid
     @JsonIgnoreProperties("shopSalesOrder")
 	@Fetch(FetchMode.SUBSELECT)

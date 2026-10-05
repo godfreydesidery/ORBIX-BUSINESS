@@ -116,7 +116,8 @@ public class Lpo {
 	
 	private LocalDateTime archivedDateTime;
 	
-	@OneToMany(targetEntity = LpoDetail.class, mappedBy = "lpo", fetch = FetchType.EAGER, orphanRemoval = true)
+	// Loaded only when read, so lists do not load the lines of every document
+	@OneToMany(targetEntity = LpoDetail.class, mappedBy = "lpo", fetch = FetchType.LAZY, orphanRemoval = true)
     @Valid
     @JsonIgnoreProperties("lpo")
 	@Fetch(FetchMode.SUBSELECT)
