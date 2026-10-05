@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/auth.service';
-import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { IMaintenance } from 'src/app/domain/maintenance';
 import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
@@ -19,6 +18,8 @@ import { IMaintenanceIssueType } from 'src/app/domain/maintenance-issue-type';
 import { IServiceSpecialist } from 'src/app/domain/service-specialist';
 import { IMaintenanceJobCardIssue } from 'src/app/domain/maintenance-job-card-issue';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 
 const API_URL = environment.apiUrl;
@@ -28,7 +29,6 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    SearchFilterPipe,
     NgxPaginationModule
   ],
   templateUrl: './my-jobs.component.html',
@@ -40,6 +40,8 @@ export class MyJobsComponent {
   documentHeader! : any
     
       page: number = 1; // Initialize the current page to 1
+  pageSize : number = 15
+  listSearchTimer : any = null
     
       filterRecords : string = ''
     
@@ -105,6 +107,8 @@ export class MyJobsComponent {
     
       /**Collections */
       maintenances : IMaintenance[] = []
+  totalMaintenances : number = 0
+  maintenancesRequest : number = 0 // number of the latest list request; answers to older ones are ignored
     
       vehicleEquipmentTypes  : IVehicleEquipmentType[] = []
       maintenanceIssueTypes : IMaintenanceIssueType[] = []
@@ -135,26 +139,53 @@ export class MyJobsComponent {
         this.getAllBranchServiceSpecialists()
       }
     
-      async getAllCheckedInMaintenancesWithOpenJobsAndMine(){
-        let options = {
-          headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+  async getAllCheckedInMaintenancesWithOpenJobsAndMine(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.maintenancesRequest
+
+    await this.http.get<IPage<IMaintenance>>(API_URL+'/maintenances/get_all_checked_in_with_open_jobs_and_mine_page?' + pageParams(page, this.pageSize, this.filterRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.maintenancesRequest){
+          return
         }
-        this.maintenances = []
-    
-        await this.http.get<IMaintenance[]>(API_URL+'/maintenances/get_all_checked_in_with_open_jobs_and_mine', options)
-        .toPromise()
-        .then(
-          data => {
-            var sn = 1
-            data?.reverse().forEach(element => {
-              element.sn = sn
-              this.maintenances.push(element)
-              sn = sn + 1
-            })
-            console.log(data)
-          }
-        )
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getAllCheckedInMaintenancesWithOpenJobsAndMine()
+          return
+        }
+        var sn = (page - 1) * this.pageSize + 1
+        data!.content.forEach(element => {
+          element.sn = sn
+          sn = sn + 1
+        })
+        this.maintenances = data!.content
+        this.totalMaintenances = data!.totalElements
       }
+    )
+  }
+
+  pageChanged(page : number){
+    this.page = page
+    this.getAllCheckedInMaintenancesWithOpenJobsAndMine()
+  }
+
+  searchList(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimer)
+    this.listSearchTimer = setTimeout(() => {
+      this.page = 1
+      this.getAllCheckedInMaintenancesWithOpenJobsAndMine()
+    }, 300)
+  }
     
       
     
