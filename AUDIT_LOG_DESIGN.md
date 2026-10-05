@@ -133,16 +133,26 @@ Failed critical actions are not logged (decision D5); validation failures such a
 The same annotation handles edits, with no change to the service code:
 
 ```java
-@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "ParkingZone", summary = "Updated parking zone {ref}",
-		changeOf = ParkingZone.class, changeId = "parkingZoneRequest.id",
+@Audited(category = "SETTINGS", action = "RECORD_UPDATED", entityType = "BondItemType", summary = "Updated bond item type {ref}",
+		changeOf = BondItemType.class, changeId = "bondItemTypeRequest.id",
+		changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
+```
+
+Some screens name the record by other keys than its id; the shop, restaurant and supplier product screens send the shop (or restaurant, or supplier) and the product. For these, `changeQuery` gives the ids of the matching records, with its parameters taken from `changeKeys`:
+
+```java
+@Audited(category = "INVENTORY", action = "RECORD_UPDATED", entityType = "ShopProduct", entityRef = "result.productCode",
+		summary = "Updated shop product {ref}", changeOf = ShopProduct.class, changeId = "shopProductRequest.id",
+		changeQuery = "select p.id from ShopProduct p where p.shop.id = ?1 and p.product.id = ?2",
+		changeKeys = {"shopProductRequest.shopId", "shopProductRequest.productId"},
 		changedFieldPattern = "(?i).*price.*", changedAction = "PRICE_CHANGED")
 ```
 
 How it works:
-- **Before the action**, the aspect reads the record named by `changeOf` and `changeId`, in a short read-only transaction of its own. It takes the record's own columns, plus the ids of the records it points to, from the JPA metamodel.
-- **After the action has committed**, it reads them again, in the entry's own transaction, and keeps only the columns that changed, as `before` and `after`. If the record was deleted, everything it held is kept as `before`. Neither read takes part in the action's transaction, so neither can affect it.
+- **Before the action**, the aspect reads the record named by `changeOf` and `changeId` (or, without an id, the records matching `changeQuery`), in a short read-only transaction of its own. It takes the record's own columns, plus the ids of the records it points to, from the JPA metamodel. When the keys match several records (a supplier's product in several branches), the one whose id the action returns is used.
+- **After the action has committed**, it reads them again, in another short read-only transaction, and keeps only the columns that changed, as `before` and `after`, listed by column name. If the record was deleted, everything it held is kept as `before`. Neither read takes part in the action's transaction or the entry's, so neither can affect them; if the second read fails, the entry is still written, without the values.
 - **Price changes:** when a changed column matches `changedFieldPattern`, the entry is recorded as `changedAction` (for example `PRICE_CHANGED`) instead of `action`.
-- **Reference:** `{ref}` in a summary is the record's number, code, username or name.
+- **Reference:** `{ref}` in a summary is the record's number, username, code or name, or `#` and its id when it has none of these.
 - **Safety:** reading the record before and after never throws, and the action's result and exceptions pass through unchanged.
 
 ## 6. Action catalogue
@@ -184,8 +194,8 @@ Endpoint paths are relative to `/orbix-business-api`.
 ### INVENTORY
 | Action | Endpoint | Before/after |
 |---|---|---|
-| `STOCK_ADJUSTED` | `/shop_products/adjust_stock`; `/restaurant_products/adjust_stock`, `add_stock`, `deduct_stock`; `/restaurant_dineables/adjust_stock`; `/supplier_products/adjust_stock` | Stock before/after, reason |
-| `PRICE_CHANGED` | `/products/update`, `/services/update`, `/shop_products/update`, `/restaurant_products/update`, `/restaurant_dineables/update`, `/supplier_products/update`, `/bond_item_types/update`, `/vehicle_equipment_types/update`, `/parking_zones/update` (only when a price field changes) | Prices before/after |
+| `STOCK_ADJUSTED` | `/shop_products/adjust_stock`; `/restaurant_products/adjust_stock`, `add_stock`, `deduct_stock`; `/restaurant_dineables/adjust_stock` | Stock before/after, reason |
+| `PRICE_CHANGED` | `/services/update`, `/shop_products/update`, `/restaurant_products/update`, `/restaurant_dineables/update`, `/supplier_products/update`, `/bond_item_types/update`, `/vehicle_equipment_types/update`, `/good_types/update` (only when a price field changes) | Prices before/after |
 
 ### PROCUREMENT
 `LPO_APPROVED`, `LPO_CANCELLED`, `LPO_ARCHIVED`, `GRN_APPROVED`, `GRN_CANCELLED`, `GRN_ARCHIVED` (approve, cancel and archive under `/lpos/` and `/grns/`)
