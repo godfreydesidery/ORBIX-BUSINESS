@@ -19,6 +19,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.api.commons.WorkFlowStatus;
@@ -43,6 +45,8 @@ import com.orbix.api.modules.finance.InvoiceReceivableDetail;
 import com.orbix.api.modules.finance.InvoiceReceivableDetailRepository;
 import com.orbix.api.modules.finance.InvoiceReceivableRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -263,6 +267,83 @@ public class BondItemServiceController implements BondItemService {
 				bondItemResponses.add(bondItemResponseDTOMapper(bondItem, bondItemBillReceivablesByBondItem));
 		}
 		return bondItemResponses;
+	}
+
+	@Override
+	public PageResponseDTO<BondItemResponseDTO> getCheckedInBondItemPage(Long bondZoneId, int page, int size, String search, HttpServletRequest request) {
+
+		BondZone bondZone = bondZoneRepository.findById(bondZoneId)
+				.orElseThrow(() -> new NotFoundException("BondZone not found"));
+
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+
+		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
+		Page<BondItem> bondItems = bondItemRepository.getPageByBondZoneAndStatusIn(bondZone, statuses, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<BondItemResponseDTO> bondItemResponses = new ArrayList<>();
+
+		for (BondItem bondItem : bondItems) {
+			bondItemResponses.add(bondItemResponseDTOMapper(bondItem));
+		}
+		return new PageResponseDTO<>(bondItemResponses, bondItems.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<BondItemResponseDTO> getWithDiscountsBondItemPage(int page, int size, String search, HttpServletRequest request) {
+
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+
+		// Checked-in bond items with a requested discount; one page, newest first, searched on the shown columns
+		Page<BondItem> bondItems = bondItemRepository.getPageByStatusInAndDiscountStatus(statuses, "Requested", PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<BondItemResponseDTO> bondItemResponses = new ArrayList<>();
+
+		for (BondItem bondItem : bondItems) {
+			bondItemResponses.add(bondItemResponseDTOMapper(bondItem));
+		}
+		return new PageResponseDTO<>(bondItemResponses, bondItems.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<BondItemResponseDTO> getPendingOrCheckedInBondItemPageByBondZone(Long bondZoneId, int page, int size, String search, HttpServletRequest request) {
+
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");
+		statuses.add("CHECKED-IN");
+
+		BondZone bondZone = bondZoneRepository.findById(bondZoneId)
+				.orElseThrow(() -> new NotFoundException("BondZone not found"));
+
+		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
+		Page<BondItem> bondItems = bondItemRepository.getPageByBondZoneAndStatusIn(bondZone, statuses, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<BondItemResponseDTO> bondItemResponses = new ArrayList<>();
+
+		for (BondItem bondItem : bondItems) {
+			bondItemResponses.add(bondItemResponseDTOMapper(bondItem));
+		}
+		return new PageResponseDTO<>(bondItemResponses, bondItems.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<BondItemResponseDTO> getRecentCheckedOutBondItemPageByBondZone(Long bondZoneId, int page, int size, String search, HttpServletRequest request) {
+
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-OUT");
+
+		BondZone bondZone = bondZoneRepository.findById(bondZoneId)
+				.orElseThrow(() -> new NotFoundException("BondZone not found"));
+
+		// Same 24 hour window as the full list; one page, newest first, searched on the shown columns
+		LocalDateTime yesterday = LocalDateTime.now().minusHours(24);
+		Page<BondItem> bondItems = bondItemRepository.getPageByBondZoneAndStatusInAndCheckedOutDateTimeAfter(bondZone, statuses, yesterday, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		Map<Long, List<BondItemBillReceivable>> bondItemBillReceivablesByBondItem = getBondItemBillReceivablesByBondItem(bondItems.getContent());
+
+		List<BondItemResponseDTO> bondItemResponses = new ArrayList<>();
+
+		for (BondItem bondItem : bondItems) {
+			bondItemResponses.add(bondItemResponseDTOMapper(bondItem, bondItemBillReceivablesByBondItem));
+		}
+		return new PageResponseDTO<>(bondItemResponses, bondItems.getTotalElements());
 	}
 
 	@Override

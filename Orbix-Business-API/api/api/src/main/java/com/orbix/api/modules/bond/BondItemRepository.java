@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.orbix.api.modules.identityandaccess.User;
 
@@ -95,6 +97,25 @@ public interface BondItemRepository extends JpaRepository<BondItem, Long> {
 			+ "FROM BondItem p LEFT JOIN p.createdByUser u LEFT JOIN p.checkedInByUser ciu LEFT JOIN p.checkedOutByUser cou "
 			+ "WHERE p.checkedInDateTime BETWEEN :from AND :to AND p.status IN :statuses")
 	List<IBondItemReportRow> getBondItemReport(@Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("statuses") List<String> statuses);
+
+	// Search on the columns the bond item lists show (i is the bond item, t its type, z its bond zone)
+	String BOND_ITEM_SEARCH = "(:search = '%%' OR LOWER(i.no) LIKE :search OR LOWER(i.bondItemName) LIKE :search OR LOWER(i.chasisNo) LIKE :search"
+			+ " OR LOWER(i.ownerFirstName) LIKE :search OR LOWER(i.ownerMiddleName) LIKE :search OR LOWER(i.ownerLastName) LIKE :search"
+			+ " OR LOWER(i.ownerAddress) LIKE :search OR LOWER(i.ownerPhoneNo) LIKE :search OR LOWER(i.ownerIdType) LIKE :search"
+			+ " OR LOWER(i.agentName) LIKE :search OR LOWER(i.agentPhoneNo) LIKE :search OR LOWER(i.billingType) LIKE :search"
+			+ " OR LOWER(i.status) LIKE :search OR LOWER(t.name) LIKE :search OR LOWER(z.name) LIKE :search)";
+
+	@Query("SELECT i FROM BondItem i LEFT JOIN i.bondItemType t LEFT JOIN i.bondZone z WHERE i.bondZone = :bondZone AND i.status IN :statuses AND " + BOND_ITEM_SEARCH)
+	Page<BondItem> getPageByBondZoneAndStatusIn(@Param("bondZone") BondZone bondZone, @Param("statuses") List<String> statuses, @Param("search") String search, Pageable pageable);
+
+	// Bond items with at least one bill whose discount has the given status
+	@Query("SELECT i FROM BondItem i LEFT JOIN i.bondItemType t LEFT JOIN i.bondZone z WHERE i.status IN :statuses"
+			+ " AND EXISTS (SELECT b.id FROM BondItemBillReceivable b WHERE b.bondItem = i AND b.discountStatus = :discountStatus) AND " + BOND_ITEM_SEARCH)
+	Page<BondItem> getPageByStatusInAndDiscountStatus(@Param("statuses") List<String> statuses, @Param("discountStatus") String discountStatus, @Param("search") String search, Pageable pageable);
+
+	@Query("SELECT i FROM BondItem i LEFT JOIN i.bondItemType t LEFT JOIN i.bondZone z WHERE i.bondZone = :bondZone AND i.status IN :statuses"
+			+ " AND i.checkedOutDateTime > :checkedOutAfter AND " + BOND_ITEM_SEARCH)
+	Page<BondItem> getPageByBondZoneAndStatusInAndCheckedOutDateTimeAfter(@Param("bondZone") BondZone bondZone, @Param("statuses") List<String> statuses, @Param("checkedOutAfter") LocalDateTime checkedOutAfter, @Param("search") String search, Pageable pageable);
 }
 
 interface IBondItemRegistration {

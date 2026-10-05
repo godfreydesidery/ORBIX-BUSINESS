@@ -8,6 +8,7 @@ import javax.servlet.http.HttpServletRequest;
 import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponseDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingRequestDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 
 
@@ -36,5 +37,9 @@ public interface BondItemService {
 	BondItemCustomBillDetail showBondItemCustomBillDetail(Long bondItemId, HttpServletRequest request);
 	
 	List<MonthlyBondItemStatusResponseDTO> getMonthlyStats(int year, HttpServletRequest request);
-	
+
+	PageResponseDTO<BondItemResponseDTO> getCheckedInBondItemPage(Long bondZoneId, int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<BondItemResponseDTO> getWithDiscountsBondItemPage(int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<BondItemResponseDTO> getPendingOrCheckedInBondItemPageByBondZone(Long bondZoneId, int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<BondItemResponseDTO> getRecentCheckedOutBondItemPageByBondZone(Long bondZoneId, int page, int size, String search, HttpServletRequest request);
 }
