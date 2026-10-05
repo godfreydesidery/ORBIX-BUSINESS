@@ -1,5 +1,7 @@
 package com.orbix.api.api.commons;
 
+import java.util.Locale;
+
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 
@@ -26,7 +28,7 @@ public final class PageRequests {
 	 * An empty search gives "%%", which the queries treat as "no search".
 	 */
 	public static String searchPattern(String search) {
-		String text = search == null ? "" : search.trim().toLowerCase();
+		String text = search == null ? "" : search.trim().toLowerCase(Locale.ROOT);
 		text = text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
 		return "%" + text + "%";
 	}
