@@ -6,7 +6,6 @@ import { RouterModule } from '@angular/router';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from 'src/app/auth.service';
-import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 
 import { ICompany } from 'src/app/domain/company';
 import { IProduct } from 'src/app/domain/product';
@@ -15,6 +14,8 @@ import { ISupplierProduct } from 'src/app/domain/supplier-product';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 const API_URL = environment.apiUrl;
 @Component({
@@ -23,7 +24,6 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    SearchFilterPipe,
     NgxPaginationModule,
     RouterModule
   ],
@@ -47,13 +47,19 @@ export class SupplierPriceListComponent {
   /**Collections */
 
   suppliers : ISupplier[] = []
+  totalSuppliers : number = 0
+  suppliersRequest : number = 0 // number of the latest list request; answers to older ones are ignored
 
   /**Identifiers */
   supplierId : string = ''
 
 
   page: number = 1; // Initialize the current page to 1
+  pageSizeSuppliers : number = 15
+  listSearchTimerSuppliers : any = null
   filterRecords : string = ''
+  productPage: number = 1 // the product list has its own page and search
+  filterProductRecords : string = ''
   selectedOption: string = '';
 
 
@@ -86,21 +92,48 @@ export class SupplierPriceListComponent {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    this.suppliers = []
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.suppliersRequest
 
-    await this.http.get<ISupplier[]>(API_URL+'/suppliers', options)
+    await this.http.get<IPage<ISupplier>>(API_URL+'/suppliers/get_page?' + pageParams(page, this.pageSizeSuppliers, this.filterRecords), options)
     .toPromise()
     .then(
       data => {
-        var sn = 1
-        data?.forEach(element => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.suppliersRequest){
+          return
+        }
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSizeSuppliers))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getAllSuppliers()
+          return
+        }
+        var sn = (page - 1) * this.pageSizeSuppliers + 1
+        data!.content.forEach(element => {
           element.sn = sn
-          this.suppliers.push(element)
           sn = sn + 1
         })
-        console.log(data)
+        this.suppliers = data!.content
+        this.totalSuppliers = data!.totalElements
       }
     )
+  }
+
+  pageChangedSuppliers(page : number){
+    this.page = page
+    this.getAllSuppliers()
+  }
+
+  searchListSuppliers(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimerSuppliers)
+    this.listSearchTimerSuppliers = setTimeout(() => {
+      this.page = 1
+      this.getAllSuppliers()
+    }, 300)
   }
 
 
@@ -241,28 +274,70 @@ export class SupplierPriceListComponent {
 
 
   supplierProducts : ISupplierProduct[] = []
+  totalSupplierProducts : number = 0
+  supplierProductsRequest : number = 0 // number of the latest list request; answers to older ones are ignored
+  pageSizeSupplierProducts : number = 15
+  listSearchTimerSupplierProducts : any = null
+
+  viewedSupplierId : any = null // supplier whose products the modal shows
 
   loadSupplierProductsByBranch = async (id : any) => {
-      let options = {
-        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
-      }
-  
-      this.supplierProducts = []
-  
-      await this.http.get<ISupplierProduct[]>(API_URL+'/supplier_products/get_all_by_supplier_and_branch?supplier_id=' + id, options)
-      .toPromise()
-      .then(
-        data => {
-          this.supplierProducts = data!
-          console.log(data)
-        }
-      )
-      .catch(
-        error => {
-          console.log(error)
-        }
-      )
+    this.viewedSupplierId = id
+    this.productPage = 1
+    await this.loadViewedSupplierProducts()
+  }
+
+  loadViewedSupplierProducts = async () => {
+    await this.getViewedSupplierProductPage()
+  }
+
+  async getViewedSupplierProductPage(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
+    // One page at a time, searched on the server against the shown columns
+    var page = this.productPage
+    var request = ++this.supplierProductsRequest
+
+    await this.http.get<IPage<ISupplierProduct>>(API_URL+'/supplier_products/get_all_by_supplier_and_branch_page?supplier_id=' + this.viewedSupplierId + '&' + pageParams(page, this.pageSizeSupplierProducts, this.filterProductRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.supplierProductsRequest){
+          return
+        }
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSizeSupplierProducts))
+        if(page > lastPage){
+          this.productPage = lastPage
+          this.getViewedSupplierProductPage()
+          return
+        }
+        this.supplierProducts = data!.content
+        this.totalSupplierProducts = data!.totalElements
+      }
+    )
+    .catch(
+      error => {
+        console.log(error)
+      }
+    )
+  }
+
+  pageChangedSupplierProducts(page : number){
+    this.productPage = page
+    this.getViewedSupplierProductPage()
+  }
+
+  searchListSupplierProducts(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimerSupplierProducts)
+    this.listSearchTimerSupplierProducts = setTimeout(() => {
+      this.productPage = 1
+      this.getViewedSupplierProductPage()
+    }, 300)
+  }
 
 
     searchTerm: string = '';

@@ -15,7 +15,7 @@
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchListSuppliers()" placeholder="Search..." style="max-width: 8cm;">
                     </div>
                 </div>
 
@@ -33,7 +33,7 @@
                             </tr>
                         </thead>
                         <tbody>        
-                            <tr *ngFor="let supplier of suppliers | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
+                            <tr *ngFor="let supplier of $any(suppliers) | paginate: { itemsPerPage: pageSizeSuppliers, currentPage: page, totalItems: totalSuppliers, id: 'suppliersPager' }; trackBy: trackById">
                                 <td>{{supplier.sn}}</td>
                                 <td>{{supplier.code}}</td>
                                 <td>{{supplier.name}}</td>
@@ -50,7 +50,7 @@
                     </table>
                     <div class="row">
                         <div class="col-sm-12" style="text-align: right;">
-                            <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                            <pagination-controls id="suppliersPager" (pageChange)="pageChangedSuppliers($event)"></pagination-controls>
                         </div>
                     </div>
                 </div>
@@ -73,7 +73,7 @@
                     </div>
                     <div class="col-sm-4"></div>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" placeholder="Search..." style="max-width: 8cm;">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterProductRecords" (ngModelChange)="searchListSupplierProducts()" placeholder="Search..." style="max-width: 8cm;">
                     </div>
                 </div>
                 <br>
@@ -92,7 +92,7 @@
                             </tr>
                         </thead>
                         <tbody>
-                            <tr *ngFor="let supplierProduct of supplierProducts | searchFilter : filterRecords | paginate: { itemsPerPage: 15, currentPage: page }; trackBy: trackById">
+                            <tr *ngFor="let supplierProduct of $any(supplierProducts) | paginate: { itemsPerPage: pageSizeSupplierProducts, currentPage: productPage, totalItems: totalSupplierProducts, id: 'supplierProductsPager' }; trackBy: trackById">
                                 <td>{{supplierProduct.productCode}}</td>
                                 <td>{{supplierProduct.productName}}</td>
                                 <td>{{supplierProduct.productDescription}}</td>
@@ -109,7 +109,7 @@
                     <br>
                     <div class="row">
                         <div class="col-sm-12" style="text-align: right;">
-                            <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                            <pagination-controls id="supplierProductsPager" (pageChange)="pageChangedSupplierProducts($event)"></pagination-controls>
                         </div>
                     </div>
                 </div>

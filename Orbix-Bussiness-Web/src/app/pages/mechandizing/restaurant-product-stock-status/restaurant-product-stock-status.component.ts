@@ -8,7 +8,6 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { PosReceiptPrinterService } from '@services/custom/pos-receipt-printer.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from 'src/app/auth.service';
-import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { IRestaurant } from 'src/app/domain/restaurant';
 import { environment } from 'src/environments/environment';
 import { HttpHeaders } from '@angular/common/http';
@@ -16,6 +15,8 @@ import { IProduct } from 'src/app/domain/product';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { IRestaurantProduct } from 'src/app/domain/restaurant-product';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 
 
@@ -27,7 +28,6 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    SearchFilterPipe,
     NgxPaginationModule,
     RouterModule
   ],
@@ -39,6 +39,8 @@ export class RestaurantProductStockStatusComponent {
 restaurantId: number;
 
   restaurantProducts : IRestaurantProduct[] = []
+  totalRestaurantProducts : number = 0
+  restaurantProductsRequest : number = 0 // number of the latest list request; answers to older ones are ignored
 
   searchKey : string = ''
 
@@ -62,6 +64,9 @@ restaurantId: number;
   importProducts : IProduct[] = []
 
   page: number = 1; // Initialize the current page to 1
+  pageSize : number = 15
+  listSearchTimer : any = null
+  stockFilter : string = '' // '' all, 'below_min' understock, 'out' out of stock (filtered on the server)
   filterRecords : string = ''
   selectedOption: string = '';
   options: string[] = ['Option 1', 'Option 2', 'Option 3'];
@@ -95,21 +100,37 @@ restaurantId: number;
   showRestaurantProducts: IRestaurantProduct[] = [];
 
   loadRestaurantProductStockStatus = async () => {
+    // Reloading shows the whole stock again, as the full list did (clears an understock or out of stock filter)
+    this.stockFilter = ''
+    await this.getRestaurantProductStockPage()
+  }
+
+  async getRestaurantProductStockPage(){
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.restaurantProductsRequest
 
-    this.restaurantProducts = []
-
-    await this.http.get<IRestaurantProduct[]>(API_URL+'/restaurant_products/get_stock_by_restaurant?restaurant_id=' + this.restaurantId, options)
+    await this.http.get<IPage<IRestaurantProduct>>(API_URL+'/restaurant_products/get_stock_by_restaurant_page?restaurant_id=' + this.restaurantId + '&stock=' + this.stockFilter + '&' + pageParams(page, this.pageSize, this.filterRecords), options)
     .toPromise()
     .then(
       data => {
-        this.restaurantProducts = data!
-
+        // An answer to an older request (another page, search or filter) is ignored
+        if(request != this.restaurantProductsRequest){
+          return
+        }
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getRestaurantProductStockPage()
+          return
+        }
+        this.restaurantProducts = data!.content
         this.showRestaurantProducts = this.restaurantProducts
-
-        console.log(data)
+        this.totalRestaurantProducts = data!.totalElements
       }
     )
     .catch(
@@ -119,22 +140,32 @@ restaurantId: number;
     )
   }
 
+  pageChanged(page : number){
+    this.page = page
+    this.getRestaurantProductStockPage()
+  }
+
+  searchList(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimer)
+    this.listSearchTimer = setTimeout(() => {
+      this.page = 1
+      this.getRestaurantProductStockPage()
+    }, 300)
+  }
+
   filterUnderStock(){
-    this.showRestaurantProducts = []
-    this.restaurantProducts.forEach(element => {
-      if((+element.currentStock) < element.minStock){
-        this.showRestaurantProducts.push(element)
-      }
-    })
+    // Filtered on the server, from the first page
+    this.stockFilter = 'below_min'
+    this.page = 1
+    this.getRestaurantProductStockPage()
   }
 
   filterOutofStock(){
-    this.showRestaurantProducts = []
-    this.restaurantProducts.forEach(element => {
-      if((+element.currentStock) <= 0){
-        this.showRestaurantProducts.push(element)
-      }
-    })
+    // Filtered on the server, from the first page
+    this.stockFilter = 'out'
+    this.page = 1
+    this.getRestaurantProductStockPage()
   }
 
   restaurantProductId : any = null

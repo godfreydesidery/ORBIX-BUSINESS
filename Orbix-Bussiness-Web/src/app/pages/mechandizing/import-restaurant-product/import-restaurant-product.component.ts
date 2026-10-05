@@ -8,13 +8,14 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { PosReceiptPrinterService } from '@services/custom/pos-receipt-printer.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from 'src/app/auth.service';
-import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { IRestaurant } from 'src/app/domain/restaurant';
 import { environment } from 'src/environments/environment';
 import { HttpHeaders } from '@angular/common/http';
 import { IRestaurantProduct } from 'src/app/domain/restaurant-product';
 import { IProduct } from 'src/app/domain/product';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 
 
@@ -25,7 +26,6 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    SearchFilterPipe,
     NgxPaginationModule,
     RouterModule
   ],
@@ -56,8 +56,12 @@ restaurantId: number;
     showImportList : boolean = false
   
     importProducts : IProduct[] = []
+  totalImportProducts : number = 0
+  importProductsRequest : number = 0 // number of the latest list request; answers to older ones are ignored
 
     page: number = 1; // Initialize the current page to 1
+  pageSize : number = 15
+  listSearchTimer : any = null
     filterRecords : string = ''
     selectedOption: string = '';
     options: string[] = ['Option 1', 'Option 2', 'Option 3'];
@@ -355,25 +359,57 @@ restaurantId: number;
     }
     
   
-    getProductsToImportByRestaurant = async () => {
-      let options = {
-        headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
-      }
-      await this.http.get<IProduct[]>(API_URL+'/products/get_company_sellable_products_by_restaurant?restaurant_id=' + this.restaurantId, options)
-        .toPromise()
-        .then(
-          data => {
-            console.log(data)
-            this.importProducts = data!
-            
-          }
-        )
-        .catch(error => {
-          console.log(error)
-          
-        }       
-      ) 
+  getProductsToImportByRestaurant = async () => {
+    await this.getProductsToImportPage()
+  }
+
+  async getProductsToImportPage(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.importProductsRequest
+
+    await this.http.get<IPage<IProduct>>(API_URL+'/products/get_company_sellable_products_by_restaurant_page?restaurant_id=' + this.restaurantId + '&' + pageParams(page, this.pageSize, this.filterRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page, search or filter) is ignored
+        if(request != this.importProductsRequest){
+          return
+        }
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getProductsToImportPage()
+          return
+        }
+        this.importProducts = data!.content
+        this.totalImportProducts = data!.totalElements
+      }
+    )
+    .catch(
+      error => {
+        console.log(error)
+      }
+    )
+  }
+
+  pageChanged(page : number){
+    this.page = page
+    this.getProductsToImportPage()
+  }
+
+  searchList(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimer)
+    this.listSearchTimer = setTimeout(() => {
+      this.page = 1
+      this.getProductsToImportPage()
+    }, 300)
+  }
   
     clearImportList = () => {
       this.importProducts = []
