@@ -859,6 +859,26 @@ export const menuItems = [
     //     ]
     // },
     {
+        title: 'Audit',
+        icon: 'fa-history',
+        selected: false,
+        expanded: false,
+        show: grant(['AUDIT-ACCESS', 'AUDIT-READ']),
+        order: 710,
+        subMenu: [
+            {
+                title: 'Audit Log',
+                show: true,
+                routerLink: '/app/identity-and-access/audit-log'
+            },
+            {
+                title: 'Login History',
+                show: true,
+                routerLink: '/app/identity-and-access/login-history'
+            }
+        ]
+    },
+    {
         title: 'Admin',
         icon: 'fa-cogs',
         selected: false,

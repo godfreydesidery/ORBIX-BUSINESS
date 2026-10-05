@@ -1,0 +1,111 @@
+<div class="row bottom-30">
+    <div class="col">
+        <div widget class="card">
+            <div class="card-header">
+                <span *ngIf="!loginHistory">Audit Log</span>
+                <span *ngIf="loginHistory">Login History</span>
+            </div>
+            <div class="card-body widget-body">
+
+                <div class="row">
+                    <div class="col-sm-2">
+                        <label>From</label>
+                        <input type="date" class="form-control" [(ngModel)]="fromDate" (change)="filterChanged()">
+                    </div>
+                    <div class="col-sm-2">
+                        <label>To</label>
+                        <input type="date" class="form-control" [(ngModel)]="toDate" (change)="filterChanged()">
+                    </div>
+                    <div class="col-sm-2" *ngIf="!loginHistory">
+                        <label>Category</label>
+                        <select class="form-control" [(ngModel)]="category" (change)="filterChanged()">
+                            <option value="">All</option>
+                            <option *ngFor="let c of categories" [value]="c">{{c}}</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-2">
+                        <label>Outcome</label>
+                        <select class="form-control" [(ngModel)]="outcome" (change)="filterChanged()">
+                            <option value="">All</option>
+                            <option value="SUCCESS">Success</option>
+                            <option value="FAILURE">Failure</option>
+                        </select>
+                    </div>
+                    <div class="col-sm-4">
+                        <label>Search (user, reference, summary, IP address)</label>
+                        <input type="text" class="form-control" [(ngModel)]="filterRecords" (ngModelChange)="searchList()"
+                            placeholder="Search...">
+                    </div>
+                </div>
+
+                <br>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="getAuditLogs()">Refresh</button>
+                        <button type="button" class="btn btn-outline-primary btn-round-custom" (click)="exportCsv()">Export CSV</button>
+                        <span class="pull-right">{{totalAuditLogs}} entries</span>
+                    </div>
+                </div>
+
+                <br>
+
+                <div class="row">
+                    <div class="col-sm-12">
+                        <div class="table-responsive">
+                            <table class="table table-sm">
+                                <thead>
+                                    <tr>
+                                        <th>Time</th>
+                                        <th>User</th>
+                                        <th *ngIf="!loginHistory">Category</th>
+                                        <th>Action</th>
+                                        <th>Outcome</th>
+                                        <th>Summary</th>
+                                        <th>IP address</th>
+                                        <th></th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <ng-container
+                                        *ngFor="let auditLog of auditLogs | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalAuditLogs }; trackBy: trackById">
+                                        <tr>
+                                            <td style="white-space: nowrap;">{{localTime(auditLog.occurredAt)}}</td>
+                                            <td>{{auditLog.username}}</td>
+                                            <td *ngIf="!loginHistory">{{auditLog.category}}</td>
+                                            <td>{{auditLog.action}}</td>
+                                            <td>
+                                                <span *ngIf="auditLog.outcome === 'SUCCESS'" class="badge badge-success">Success</span>
+                                                <span *ngIf="auditLog.outcome === 'FAILURE'" class="badge badge-danger">Failure</span>
+                                            </td>
+                                            <td>{{auditLog.summary}}</td>
+                                            <td>{{auditLog.ipAddress}}</td>
+                                            <td>
+                                                <button type="button" class="btn btn-sm btn-outline-secondary" (click)="showDetails(auditLog)">
+                                                    {{selectedAuditLog?.id === auditLog.id ? 'Hide' : 'Details'}}
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr *ngIf="selectedAuditLog?.id === auditLog.id">
+                                            <td [attr.colspan]="loginHistory ? 7 : 8">
+                                                <div><b>Record:</b> {{auditLog.entityType}} {{auditLog.entityId}} {{auditLog.entityRef}}</div>
+                                                <div><b>Browser:</b> {{auditLog.userAgent}}</div>
+                                                <pre class="audit-log-details" *ngIf="auditLog.details">{{formattedDetails(auditLog.details)}}</pre>
+                                            </td>
+                                        </tr>
+                                    </ng-container>
+                                </tbody>
+                            </table>
+                            <div class="row">
+                                <div class="col-sm-12" style="text-align: right;">
+                                    <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
