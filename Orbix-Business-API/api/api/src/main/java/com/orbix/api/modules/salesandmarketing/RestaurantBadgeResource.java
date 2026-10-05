@@ -23,6 +23,7 @@ import com.orbix.api.modules.identityandaccess.UserRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.inventoryandprocurement.ProductRequestDTO;
 import com.orbix.api.modules.inventoryandprocurement.ProductResponseDTO;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -41,6 +42,17 @@ public class RestaurantBadgeResource {
 			@RequestParam(name = "restaurant_id") Long restaurantId, HttpServletRequest request) {
 		return ResponseEntity.ok()
 				.body(restaurantBadgeService.getAllRestaurantBadgesByRestaurantId(restaurantId, request));
+	}
+
+	@GetMapping("/restaurants/get_all_badges_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<RestaurantBadgeResponseDTO>>getAllBadgesPage(
+			@RequestParam(name = "restaurant_id") Long restaurantId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(restaurantBadgeService.getRestaurantBadgePageByRestaurantId(restaurantId, page, size, search, request));
 	}
 	
 	@GetMapping("/restaurants/generate_badge_code")

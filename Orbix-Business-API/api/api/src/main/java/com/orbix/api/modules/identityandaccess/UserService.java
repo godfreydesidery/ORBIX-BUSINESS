@@ -9,6 +9,7 @@ import com.orbix.api.modules.adminunits.Branch;
 import com.orbix.api.modules.adminunits.Company;
 import com.orbix.api.modules.adminunits.CompanyRequestDTO;
 import com.orbix.api.modules.utilities.Shortcut;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface UserService {
 	User saveUser(User user, HttpServletRequest request);
@@ -21,6 +22,7 @@ public interface UserService {
 	String getNicknameByUserId(Long id);
 	boolean deleteUser(User user);
 	List<UserResponseDTO>getUsers(); //edit this to limit the number, for perfomance.
+	PageResponseDTO<UserResponseDTO> getUserPage(int page, int size, String search);
 	void addPrivilegeToRole(String roleName, String privilegeName);
 	void removePrivilegeFromRole(String roleName, String privilegeName);
 	List<RoleResponseDTO>getRolesCustom(); // return all the roles

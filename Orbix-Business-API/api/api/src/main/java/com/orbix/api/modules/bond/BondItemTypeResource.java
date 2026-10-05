@@ -14,9 +14,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -33,6 +35,16 @@ public class BondItemTypeResource {
 	@GetMapping("/bond_item_types")
 	public ResponseEntity<List<BondItemTypeResponseDTO>>getAll(HttpServletRequest request){
 		return ResponseEntity.ok().body(bondItemTypeService.getAllBondItemTypes(request));
+	}
+
+	@GetMapping("/bond_item_types/get_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<BondItemTypeResponseDTO>>getPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(bondItemTypeService.getBondItemTypePage(page, size, search, request));
 	}
 	
 	@GetMapping("/bond_item_types/get_all_company_active")

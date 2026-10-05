@@ -63,6 +63,7 @@ import com.orbix.api.modules.salesandmarketing.RestaurantAgentRepository;
 import com.orbix.api.modules.utilities.Shortcut;
 import com.orbix.api.security.Object_;
 import com.orbix.api.security.Operation;
+import com.orbix.api.api.commons.PageResponseDTO;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -121,6 +122,16 @@ public class UserResource {
 	public ResponseEntity<List<UserResponseDTO>>getUsers(
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(userService.getUsers());
+	}
+
+	@GetMapping("/users/get_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<UserResponseDTO>>getUserPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(userService.getUserPage(page, size, search));
 	}
 	
 	@GetMapping("/users/get")

@@ -8,6 +8,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.api.commons.WorkFlowStatus;
@@ -18,6 +20,8 @@ import com.orbix.api.modules.adminunits.Restaurant;
 import com.orbix.api.modules.adminunits.RestaurantRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.inventoryandprocurement.DineableRepository;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -31,6 +35,17 @@ public class RestaurantBadgeServiceController implements RestaurantBadgeService 
 	private final RestaurantRepository restaurantRepository;
 	private final RestaurantBadgeRepository restaurantBadgeRepository;
 	
+	@Override
+	public PageResponseDTO<RestaurantBadgeResponseDTO> getRestaurantBadgePageByRestaurantId(Long restaurantId, int page, int size, String search, HttpServletRequest request) {
+
+		Restaurant restaurant = restaurantRepository.findById(restaurantId)
+			    .orElseThrow(() -> new NotFoundException("Restaurant not found, with id " + restaurantId));
+
+		// One page, in the order of the full list (by id), searched on the shown columns
+		Page<RestaurantBadge> restaurantBadges = restaurantBadgeRepository.getPageByRestaurant(restaurant, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+		return new PageResponseDTO<>(restaurantBadges.getContent().stream().map(this::toDto).toList(), restaurantBadges.getTotalElements());
+	}
+
 	@Override
 	public List<RestaurantBadgeResponseDTO> getAllRestaurantBadgesByRestaurantId(Long restaurantId, HttpServletRequest request) {
 		
