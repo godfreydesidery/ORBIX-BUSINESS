@@ -137,6 +137,7 @@ export class RestaurantSalesOrderComponent {
   }
 
   selectDineable(dineable: any): void {
+    clearTimeout(this.searchTimer) // a search still waiting would refill the list after the selection
     this.selectedDineable = dineable;
     this.searchTerm = dineable.name;
     this.isDropdownOpen = false;

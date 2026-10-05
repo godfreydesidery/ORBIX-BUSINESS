@@ -1189,6 +1189,7 @@ export class VehicleEquipmentRegisterComponent {
     }
 
     selectProduct(item: IVehicleEquipment): void {
+      clearTimeout(this.searchTimer) // a search still waiting would refill the list after the selection
       this.selectedVehicleEquipment = item;
       this.searchTerm = item.chasisNo;
       this.isDropdownOpen = false;

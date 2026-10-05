@@ -168,6 +168,7 @@ export class RestaurantDineableProductComponent {
   }
 
   selectProduct(product: any): void {
+    clearTimeout(this.searchTimer) // a search still waiting would refill the list after the selection
     this.selectedProduct = product
     this.searchTerm = product.name
     this.isDropdownOpen = false

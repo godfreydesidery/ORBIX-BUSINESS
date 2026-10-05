@@ -215,6 +215,7 @@ export class RestaurantProductStockLogComponent {
     productId : any = null
   
     selectProduct(product: any): void {
+      clearTimeout(this.searchTimer) // a search still waiting would refill the list after the selection
       this.selectedProduct = product
       this.productId = product.id
       this.searchTerm = product.name

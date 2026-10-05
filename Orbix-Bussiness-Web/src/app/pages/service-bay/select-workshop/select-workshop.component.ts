@@ -523,6 +523,7 @@ export class SelectWorkshopComponent {
   }
 
   selectService(service: any): void {
+    clearTimeout(this.searchTimer) // a search still waiting would refill the list after the selection
     this.selectedService = service
     this.searchTerm = service.name
     this.isDropdownOpen = false
