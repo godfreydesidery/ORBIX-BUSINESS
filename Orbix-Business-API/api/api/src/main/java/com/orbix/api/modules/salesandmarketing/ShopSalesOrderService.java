@@ -5,10 +5,12 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.orbix.api.api.commons.PayCode;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface ShopSalesOrderService {
 	List<ShopSalesOrderResponseDTO> getAllShopSalesOrders(Long shopId, HttpServletRequest request);
 	List<ShopSalesOrderResponseDTO> getAllPendingShopSalesOrders(Long shopId, HttpServletRequest request);
+	PageResponseDTO<ShopSalesOrderResponseDTO> getPendingShopSalesOrderPage(Long shopId, int page, int size, String search, HttpServletRequest request);
 	ShopSalesOrderResponseDTO get(Long id, HttpServletRequest request);
 	ShopSalesOrderResponseDTO createShopSalesOrder(ShopSalesOrderRequestDTO shopSalesOrder, HttpServletRequest request);
 	ShopSalesOrderResponseDTO updateShopSalesOrder(ShopSalesOrderRequestDTO shopSalesOrder, HttpServletRequest request);

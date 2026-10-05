@@ -22,6 +22,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponseDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingRequestDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -87,6 +88,49 @@ public class BondItemResource {
 			@RequestParam(name = "bond_zone_id") Long bondZoneId,
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(bondItemService.getAllCheckedInBondItems(bondZoneId, request));
+	}
+
+	@GetMapping("/bond_items/get_all_checked_in_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<BondItemResponseDTO>>getCheckedInPage(
+			@RequestParam(name = "bond_zone_id") Long bondZoneId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(bondItemService.getCheckedInBondItemPage(bondZoneId, page, size, search, request));
+	}
+
+	@GetMapping("/bond_items/get_all_with_discounts_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<BondItemResponseDTO>>getWithDiscountsPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(bondItemService.getWithDiscountsBondItemPage(page, size, search, request));
+	}
+
+	@GetMapping("/bond_items/get_all_pending_or_checked_in_by_bond_zone_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<BondItemResponseDTO>>getPendingAndCheckedInByBondZonePage(
+			@RequestParam(name = "bond_zone_id") Long bondZoneId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(bondItemService.getPendingOrCheckedInBondItemPageByBondZone(bondZoneId, page, size, search, request));
+	}
+
+	@GetMapping("/bond_items/get_all_recent_checked_out_by_bond_zone_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<BondItemResponseDTO>>getRecentCheckedOutByBondZonePage(
+			@RequestParam(name = "bond_zone_id") Long bondZoneId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(bondItemService.getRecentCheckedOutBondItemPageByBondZone(bondZoneId, page, size, search, request));
 	}
 	
 	@GetMapping("/bond_items/get_all_cleared")

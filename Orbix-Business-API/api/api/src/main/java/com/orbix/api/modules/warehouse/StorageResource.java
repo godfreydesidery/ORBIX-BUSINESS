@@ -21,6 +21,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponseDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -84,6 +85,59 @@ public class StorageResource {
 	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<StorageResponseDTO>>getAllCheckedIn(HttpServletRequest request){
 		return ResponseEntity.ok().body(storageService.getAllCheckedInStorages(request));
+	}
+
+	@GetMapping("/storages/get_all_checked_in_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<StorageResponseDTO>>getCheckedInPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(storageService.getCheckedInStoragePage(page, size, search, request));
+	}
+
+	@GetMapping("/storages/get_all_with_discounts_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<StorageResponseDTO>>getWithDiscountsPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(storageService.getWithDiscountsStoragePage(page, size, search, request));
+	}
+
+	@GetMapping("/storages/get_all_pending_or_checked_in_by_warehouse_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<StorageResponseDTO>>getPendingAndCheckedInByWarehousePage(
+			@RequestParam(name = "warehouse_id") Long warehouseId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(storageService.getPendingOrCheckedInStoragePageByWarehouse(warehouseId, page, size, search, request));
+	}
+
+	@GetMapping("/storages/get_all_checked_in_by_warehouse_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<StorageResponseDTO>>getCheckedInByWarehousePage(
+			@RequestParam(name = "warehouse_id") Long warehouseId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(storageService.getCheckedInStoragePageByWarehouse(warehouseId, page, size, search, request));
+	}
+
+	@GetMapping("/storages/get_all_recent_checked_out_by_warehouse_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<StorageResponseDTO>>getRecentCheckedOutByWarehousePage(
+			@RequestParam(name = "warehouse_id") Long warehouseId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(storageService.getRecentCheckedOutStoragePageByWarehouse(warehouseId, page, size, search, request));
 	}
 	
 	@GetMapping("/storages/get_all_cleared")

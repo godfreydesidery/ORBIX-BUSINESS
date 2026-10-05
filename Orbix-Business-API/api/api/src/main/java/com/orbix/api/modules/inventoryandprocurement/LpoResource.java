@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import lombok.RequiredArgsConstructor;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 @RestController
 @RequestMapping("/orbix-business-api")
@@ -48,6 +49,27 @@ public class LpoResource {
 			@RequestParam(name = "shop_id") Long shopId,
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(lpoService.getAllVisibleLposByShop(shopId, request));
+	}
+
+	@GetMapping("/lpos/get_all_visible_by_branch_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<LpoResponseDTO>>getAllVisibleByBranchPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(lpoService.getVisibleLpoPageByBranch(page, size, search, request));
+	}
+
+	@GetMapping("/lpos/get_all_visible_by_shop_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<LpoResponseDTO>>getAllVisibleByShopPage(
+			@RequestParam(name = "shop_id") Long shopId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(lpoService.getVisibleLpoPageByShop(shopId, page, size, search, request));
 	}
 	
 	@GetMapping("/lpos/get")

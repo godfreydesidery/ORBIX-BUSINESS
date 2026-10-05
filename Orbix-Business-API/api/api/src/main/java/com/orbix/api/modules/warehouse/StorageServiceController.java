@@ -17,6 +17,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.PayStatus;
 import com.orbix.api.api.commons.WorkFlowStatus;
@@ -39,6 +41,8 @@ import com.orbix.api.modules.finance.InvoiceReceivableDetail;
 import com.orbix.api.modules.finance.InvoiceReceivableDetailRepository;
 import com.orbix.api.modules.finance.InvoiceReceivableRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -257,6 +261,99 @@ public class StorageServiceController implements StorageService {
 		return storageResponses;
 	}
 	
+	@Override
+	public PageResponseDTO<StorageResponseDTO> getCheckedInStoragePage(int page, int size, String search, HttpServletRequest request) {
+
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+
+		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
+		Page<Storage> storages = storageRepository.getPageByStatusIn(statuses, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<StorageResponseDTO> storageResponses = new ArrayList<>();
+
+		for(Storage storage : storages) {
+			storageResponses.add(storageResponseDTOMapper(storage));
+		}
+		return new PageResponseDTO<>(storageResponses, storages.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<StorageResponseDTO> getWithDiscountsStoragePage(int page, int size, String search, HttpServletRequest request) {
+
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+
+		// Checked-in storages with a requested discount; one page, newest first, searched on the shown columns
+		Page<Storage> storages = storageRepository.getPageByStatusInAndDiscountStatus(statuses, "Requested", PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<StorageResponseDTO> storageResponses = new ArrayList<>();
+
+		for(Storage storage : storages) {
+			storageResponses.add(storageResponseDTOMapper(storage));
+		}
+		return new PageResponseDTO<>(storageResponses, storages.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<StorageResponseDTO> getPendingOrCheckedInStoragePageByWarehouse(Long warehouseId, int page, int size, String search, HttpServletRequest request) {
+
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");
+		statuses.add("CHECKED-IN");
+
+		Warehouse warehouse = warehouseRepository.findById(warehouseId)
+		        .orElseThrow(() -> new NotFoundException("Warehouse not found"));
+
+		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
+		Page<Storage> storages = storageRepository.getPageByWarehouseAndStatusIn(warehouse, statuses, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<StorageResponseDTO> storageResponses = new ArrayList<>();
+
+		for(Storage storage : storages) {
+			storageResponses.add(storageResponseDTOMapper(storage));
+		}
+		return new PageResponseDTO<>(storageResponses, storages.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<StorageResponseDTO> getCheckedInStoragePageByWarehouse(Long warehouseId, int page, int size, String search, HttpServletRequest request) {
+
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+
+		Warehouse warehouse = warehouseRepository.findById(warehouseId)
+		        .orElseThrow(() -> new NotFoundException("Warehouse not found"));
+
+		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
+		Page<Storage> storages = storageRepository.getPageByWarehouseAndStatusIn(warehouse, statuses, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<StorageResponseDTO> storageResponses = new ArrayList<>();
+
+		for(Storage storage : storages) {
+			storageResponses.add(storageResponseDTOMapper(storage));
+		}
+		return new PageResponseDTO<>(storageResponses, storages.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<StorageResponseDTO> getRecentCheckedOutStoragePageByWarehouse(Long warehouseId, int page, int size, String search, HttpServletRequest request) {
+
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-OUT");
+
+		Warehouse warehouse = warehouseRepository.findById(warehouseId)
+		        .orElseThrow(() -> new NotFoundException("Warehouse not found"));
+
+		// Same 24 hour window as the full list; one page, newest first, searched on the shown columns
+		LocalDateTime yesterday = LocalDateTime.now().minusHours(24);
+		Page<Storage> storages = storageRepository.getPageByWarehouseAndStatusInAndCheckedOutDateTimeAfter(warehouse, statuses, yesterday, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		Map<Long, List<StorageBillReceivable>> storageBillReceivablesByStorage = getStorageBillReceivablesByStorage(storages.getContent());
+
+		List<StorageResponseDTO> storageResponses = new ArrayList<>();
+
+		for(Storage storage : storages) {
+			storageResponses.add(storageResponseDTOMapper(storage, storageBillReceivablesByStorage));
+		}
+		return new PageResponseDTO<>(storageResponses, storages.getTotalElements());
+	}
+
 	@Override
 	public List<StorageResponseDTO> getAllCheckedInStorages(HttpServletRequest request) {
 		

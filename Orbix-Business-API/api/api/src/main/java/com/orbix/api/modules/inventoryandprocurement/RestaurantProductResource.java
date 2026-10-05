@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -116,6 +117,19 @@ public class RestaurantProductResource {
 			@RequestParam(name = "restaurant_id") Long restaurantId, HttpServletRequest request) {
 		return ResponseEntity.ok().body(restaurantProductService.getAllRestaurantProducts(restaurantId, request));
 	}
+
+	@GetMapping("/restaurant_products/get_stock_by_restaurant_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<RestaurantProductResponseDTO>>getStockByRestaurantPage(
+			@RequestParam(name = "restaurant_id") Long restaurantId,
+			@RequestParam(name = "stock", defaultValue = "") String stock,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(restaurantProductService.getRestaurantProductStockPage(restaurantId, stock, page, size, search, request));
+	}
+
 
 	@GetMapping("/restaurant_products/get_under_stock_by_restaurant")
 	public ResponseEntity<List<RestaurantProductResponseDTO>> getUnderstockRestaurantProductsByRestaurant(

@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidOperationException;
@@ -19,6 +21,8 @@ import com.orbix.api.modules.adminunits.RestaurantRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.inventoryandprocurement.Product;
 import com.orbix.api.modules.inventoryandprocurement.ProductRequestDTO;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -34,6 +38,17 @@ public class RestaurantAgentServiceController implements RestaurantAgentService 
 	
 	private final RestaurantBadgeRepository restaurantBadgeRepository;
 	private final UserService userService;
+
+	@Override
+	public PageResponseDTO<RestaurantAgentResponseDTO> getRestaurantAgentPageByRestaurantId(Long restaurantId, int page, int size, String search, HttpServletRequest request) {
+
+		Restaurant restaurant = restaurantRepository.findById(restaurantId)
+			    .orElseThrow(() -> new NotFoundException("Restaurant not found, with id " + restaurantId));
+
+		// One page, in the order of the full list (by id), searched on the shown columns
+		Page<RestaurantAgent> restaurantAgents = restaurantAgentRepository.getPageByRestaurant(restaurant, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+		return new PageResponseDTO<>(restaurantAgents.getContent().stream().map(this::agentToDto).toList(), restaurantAgents.getTotalElements());
+	}
 
 	@Override
 	public List<RestaurantAgentResponseDTO> getAllRestaurantAgentsByRestaurantId(Long restaurantId, HttpServletRequest request) {

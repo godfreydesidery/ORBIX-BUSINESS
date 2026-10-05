@@ -3,6 +3,7 @@ package com.orbix.api.modules.servicebay;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface MachineServiceInterface {
 	
@@ -15,4 +16,8 @@ public interface MachineServiceInterface {
 	public List<MachineResponseDTO> getMachinesByWorkshop(Long workshopId);
 	
 	public List<MachineResponseDTO> getMachinesByBranch(HttpServletRequest request);
+
+	public PageResponseDTO<MachineResponseDTO> getMachinePageByWorkshop(Long workshopId, int page, int size, String search, HttpServletRequest request);
+
+	public PageResponseDTO<MachineResponseDTO> getMachinePageByBranch(int page, int size, String search, HttpServletRequest request);
 }

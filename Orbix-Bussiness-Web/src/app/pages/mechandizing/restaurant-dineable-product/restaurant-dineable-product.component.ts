@@ -3,7 +3,6 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { RouterModule } from '@angular/router';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 
 import { IRestaurant } from 'src/app/domain/restaurant';
 import { environment } from 'src/environments/environment';
@@ -28,6 +27,8 @@ import { IProduct } from 'src/app/domain/product';
 import { IRestaurantProduct } from 'src/app/domain/restaurant-product';
 import { IRestaurantDinableProduct } from 'src/app/domain/restaurant-dineable-product';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 const API_URL = environment.apiUrl;
 
@@ -37,7 +38,6 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    SearchFilterPipe,
     NgxPaginationModule,
     RouterModule
   ],
@@ -95,6 +95,8 @@ export class RestaurantDineableProductComponent {
   searchKey: string = '';
   isUserTyping: boolean = true; // Flag to detect user typing
   page: number = 1; // Pagination
+  pageSize : number = 10
+  listSearchTimer : any = null
   filterRecords: string = '';
   selectedOption: string = '';
 
@@ -114,6 +116,8 @@ export class RestaurantDineableProductComponent {
 
 
   restaurantDineables: IRestaurantDineable[] = []
+  totalRestaurantDineables : number = 0
+  restaurantDineablesRequest : number = 0 // number of the latest list request; answers to older ones are ignored
 
   restaurantDinableProducts: IRestaurantDinableProduct[] = []
 
@@ -264,28 +268,60 @@ export class RestaurantDineableProductComponent {
   }
 
   loadRestaurantDineableStockStatus = async () => {
+    await this.getRestaurantDineablePage()
+  }
+
+  async getRestaurantDineablePage(){
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    this.restaurantDineables = []
-    await this.http.get<IRestaurantDineable[]>(API_URL + '/restaurant_dineables/get_stock_by_restaurant?restaurant_id=' + this.restaurantId, options)
-      .toPromise()
-      .then(
-        data => {
-          this.restaurantDineables = data!
-          var sn = 1
-          this.restaurantDineables.forEach(element => {
-            element.sn = sn
-            sn++
-          })
-          console.log(data)
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.restaurantDineablesRequest
+
+    await this.http.get<IPage<IRestaurantDineable>>(API_URL + '/restaurant_dineables/get_stock_by_restaurant_page?restaurant_id=' + this.restaurantId + '&' + pageParams(page, this.pageSize, this.filterRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page, search or filter) is ignored
+        if(request != this.restaurantDineablesRequest){
+          return
         }
-      )
-      .catch(
-        error => {
-          console.log(error)
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getRestaurantDineablePage()
+          return
         }
-      )
+        var sn = (page - 1) * this.pageSize + 1
+        data!.content.forEach(element => {
+          element.sn = sn
+          sn = sn + 1
+        })
+        this.restaurantDineables = data!.content
+        this.totalRestaurantDineables = data!.totalElements
+      }
+    )
+    .catch(
+      error => {
+        console.log(error)
+      }
+    )
+  }
+
+  pageChanged(page : number){
+    this.page = page
+    this.getRestaurantDineablePage()
+  }
+
+  searchList(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimer)
+    this.listSearchTimer = setTimeout(() => {
+      this.page = 1
+      this.getRestaurantDineablePage()
+    }, 300)
   }
 
   async loadRestaurantDinableProducts(dineableId: any, dineableCode: string, dineableName: string) {

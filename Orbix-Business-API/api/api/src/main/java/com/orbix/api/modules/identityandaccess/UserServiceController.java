@@ -18,6 +18,8 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.DuplicateEntryException;
@@ -38,6 +40,8 @@ import com.orbix.api.modules.utilities.Shortcut;
 import com.orbix.api.modules.utilities.ShortcutRepository;
 import com.orbix.api.security.Object_;
 import com.orbix.api.security.Operation;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -382,6 +386,17 @@ public class UserServiceController implements UserService, UserDetailsService {
 	@Override
 	public User getUser(String username) {
 		return userRepository.findByUsername(username).get();
+	}
+
+	@Override
+	public PageResponseDTO<UserResponseDTO> getUserPage(int page, int size, String search) {
+		// One page, in the order of the full list (by id), searched on the shown columns
+		Page<User> users = userRepository.getPageBySearch(PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+		List<UserResponseDTO> userList = new ArrayList<>();
+		for(User user : users) {
+			userList.add(userResponseDTOMapper(user));
+		}
+		return new PageResponseDTO<>(userList, users.getTotalElements());
 	}
 
 	@Override

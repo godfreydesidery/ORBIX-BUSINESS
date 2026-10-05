@@ -3,7 +3,6 @@ import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/auth.service';
-import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { NgxPaginationModule } from 'ngx-pagination';
 //import { IBondItem } from 'src/app/domain/bondItem';
 import { Byte } from 'src/custom-packages/util';
@@ -20,6 +19,8 @@ declare var pdfMake: any;
 import { IBondItem } from 'src/app/domain/bond-item';
 import { IBondZone } from 'src/app/domain/bond-zone';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 
 const API_URL = environment.apiUrl;
@@ -30,7 +31,6 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    SearchFilterPipe,
     NgxPaginationModule,
     RouterModule
   ],
@@ -40,6 +40,8 @@ const API_URL = environment.apiUrl;
 export class BondBillingComponent {
   trackById = trackById
   page: number = 1; // Initialize the current page to 1
+  pageSize : number = 10
+  listSearchTimer : any = null
 
   filterRecords: string = ''
 
@@ -183,6 +185,8 @@ export class BondBillingComponent {
 
   /**Collections */
   bondItems: IBondItem[] = []
+  totalBondItems : number = 0
+  bondItemsRequest : number = 0 // number of the latest list request; answers to older ones are ignored
   // bondItemBillReceivables : IBondItemBillReceivable[] = []
 
   constructor(
@@ -270,29 +274,56 @@ export class BondBillingComponent {
       return
     }
     await this.loadSelectedBondZone()
+    this.page = 1
     await this.getAllCheckedInBondItems()
   }
 
-  async getAllCheckedInBondItems() {
+  async getAllCheckedInBondItems(){
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    this.bondItems = []
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.bondItemsRequest
 
-    await this.http.get<IBondItem[]>(API_URL + '/bond_items/get_all_checked_in?bond_zone_id=' + this.selectedBondZoneId, options)
-      .toPromise()
-      .then(
-        data => {
-          data?.reverse()
-          var sn = 1
-          data?.forEach(element => {
-            element.sn = sn
-            this.bondItems.push(element)
-            sn = sn + 1
-          })
-          console.log(data)
+    await this.http.get<IPage<IBondItem>>(API_URL + '/bond_items/get_all_checked_in_page?bond_zone_id=' + this.selectedBondZoneId + '&' + pageParams(page, this.pageSize, this.filterRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.bondItemsRequest){
+          return
         }
-      )
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getAllCheckedInBondItems()
+          return
+        }
+        var sn = (page - 1) * this.pageSize + 1
+        data!.content.forEach(element => {
+          element.sn = sn
+          sn = sn + 1
+        })
+        this.bondItems = data!.content
+        this.totalBondItems = data!.totalElements
+      }
+    )
+  }
+
+  pageChanged(page : number){
+    this.page = page
+    this.getAllCheckedInBondItems()
+  }
+
+  searchList(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimer)
+    this.listSearchTimer = setTimeout(() => {
+      this.page = 1
+      this.getAllCheckedInBondItems()
+    }, 300)
   }
 
   async getBondItemBillReceivables(bondItemId: any) {
@@ -669,13 +700,8 @@ export class BondBillingComponent {
 
           this.msg.showSuccessMessage('Checked out Successifully')
 
-          // A checked out item leaves the checked-in list, so remove its row instead of reloading the whole list
-          this.bondItems = this.bondItems.filter(element => element.id != id)
-          var sn = 1
-          this.bondItems.forEach(element => {
-            element.sn = sn
-            sn = sn + 1
-          })
+          // The checked out item leaves the list: reload the current page so it fills up again
+          this.getAllCheckedInBondItems()
 
           this.printGatePassRcpt(data!.serviceBillItems, '', 0);
         }

@@ -22,6 +22,7 @@ import com.orbix.api.modules.vehicleandequipmentmaintenance.ServiceSpecialistReq
 import com.orbix.api.modules.vehicleandequipmentmaintenance.ServiceSpecialistResponseDTO;
 import com.orbix.api.modules.vehicleandequipmentmaintenance.ServiceSpecialistService;
 import com.orbix.api.modules.warehouse.StorageResponseDTO;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -38,6 +39,16 @@ public class WeighResource {
 	@org.springframework.transaction.annotation.Transactional(readOnly = true)
 	public ResponseEntity<List<WeighResponseDTO>>getAll(HttpServletRequest request){
 		return ResponseEntity.ok().body(weighService.getAllWeighs(request));
+	}
+
+	@GetMapping("/weighs/recent_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<WeighResponseDTO>>getRecentPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(weighService.getRecentWeighPage(page, size, search, request));
 	}
 	
 	@GetMapping("/weighs/get")

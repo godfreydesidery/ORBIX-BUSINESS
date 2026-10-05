@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.exceptions.NotFoundException;
 import com.orbix.api.modules.adminunits.Branch;
@@ -22,6 +24,8 @@ import com.orbix.api.modules.vehicleandequipmentmaintenance.ServiceSpecialist;
 import com.orbix.api.modules.vehicleandequipmentmaintenance.ServiceSpecialistRepository;
 import com.orbix.api.modules.vehicleandequipmentmaintenance.ServiceSpecialistResponseDTO;
 import com.orbix.api.modules.vehicleandequipmentmaintenance.ServiceSpecialistServiceController;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,6 +40,20 @@ public class WeighServiceController implements WeighService {
 	private final UserService userService;
 	private final DayService dayService;
 	private final BranchRepository branchRepository;
+
+	@Override
+	public PageResponseDTO<WeighResponseDTO> getRecentWeighPage(int page, int size, String search, HttpServletRequest request) {
+		// Same 48 hour window as the full list; one page, newest first (the screens showed the full list reversed),
+		// searched on the shown columns
+		LocalDateTime last48Hours = LocalDateTime.now().minusHours(48);
+		Page<Weigh> weighs = weighRepository.getPageByCreatedDateTimeAfter(last48Hours, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<WeighResponseDTO> weighResponses = new ArrayList<>();
+
+		for (Weigh weigh : weighs) {
+			weighResponses.add(weighResponseDTOMapper(weigh));
+		}
+		return new PageResponseDTO<>(weighResponses, weighs.getTotalElements());
+	}
 
 	@Override
 	public List<WeighResponseDTO> getAllWeighs(HttpServletRequest request) {

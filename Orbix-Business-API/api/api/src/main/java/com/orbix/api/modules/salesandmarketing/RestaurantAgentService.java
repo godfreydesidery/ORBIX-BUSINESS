@@ -6,9 +6,11 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.modules.inventoryandprocurement.ProductRequestDTO;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface RestaurantAgentService {
 	List<RestaurantAgentResponseDTO> getAllRestaurantAgentsByRestaurantId(Long restaurantId, HttpServletRequest request);
+	PageResponseDTO<RestaurantAgentResponseDTO> getRestaurantAgentPageByRestaurantId(Long restaurantId, int page, int size, String search, HttpServletRequest request);
 	List<RestaurantAgentResponseDTO> getAvailableRestaurantAgentsByRestaurantId(Long restaurantId, HttpServletRequest request);
 	RestaurantAgentResponseDTO createAgent(RestaurantAgentRequestDTO agentRequest, HttpServletRequest request);
 	List<RestaurantBadgeResponseDTO> getAvailableBadgeByRestaurantId(Long restaurantId, HttpServletRequest request);

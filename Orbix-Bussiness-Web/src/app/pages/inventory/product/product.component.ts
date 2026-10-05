@@ -5,11 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from 'src/app/auth.service';
-import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 
 import { ICompany } from 'src/app/domain/company';
 import { IProduct } from 'src/app/domain/product';
 import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
 import { trackById } from 'src/app/common/utils/track-by-id';
@@ -22,7 +22,6 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    SearchFilterPipe,
     NgxPaginationModule
   ],
   templateUrl: './product.component.html',
@@ -51,9 +50,9 @@ export class ProductComponent {
   page: number = 1; // Initialize the current page to 1
   pageSize: number = 15
   totalProducts: number = 0
-  // The list is loaded a page at a time; the whole list is loaded only when searching, so the search still covers every product
-  allProductsLoaded: boolean = false
-  requestedPage: number = 1
+  // The list is loaded a page at a time and searched on the server
+  productsRequest: number = 0 // number of the latest list request; answers to older ones are ignored
+  searchTimer: any = null
   filterRecords: string = ''
   selectedOption: string = '';
 
@@ -67,43 +66,22 @@ export class ProductComponent {
     this.getProductPage(1)
   }
 
-  async getAllProducts() {
-    let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
-    }
-    this.products = []
-
-    await this.http.get<IProduct[]>(API_URL + '/products', options)
-      .toPromise()
-      .then(
-        data => {
-          // Built apart and assigned at the end, so two overlapping loads cannot mix their rows
-          var products : IProduct[] = []
-          var sn = 1
-          data?.forEach(element => {
-            element.sn = sn
-            products.push(element)
-            sn = sn + 1
-          })
-          this.products = products
-          this.allProductsLoaded = true
-          console.log(data)
-        }
-      )
-  }
-
   async getProductPage(page: number) {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
-    this.requestedPage = page
+    var request = ++this.productsRequest
 
-    await this.http.get<IPage<IProduct>>(API_URL + '/products/get_page?page=' + (page - 1) + '&size=' + this.pageSize, options)
+    await this.http.get<IPage<IProduct>>(API_URL + '/products/get_page?' + pageParams(page, this.pageSize, this.filterRecords), options)
       .toPromise()
       .then(
         data => {
-          // Ignore a page that arrives after another page or the whole list was requested
-          if (this.allProductsLoaded || page != this.requestedPage) {
+          if (request != this.productsRequest) {
+            return
+          }
+          // The page no longer exists (rows were removed): show the one before it
+          if (data!.content.length == 0 && page > 1) {
+            this.getProductPage(page - 1)
             return
           }
           var sn = (page - 1) * this.pageSize + 1
@@ -119,27 +97,19 @@ export class ProductComponent {
   }
 
   pageChanged(page: number) {
-    if (this.allProductsLoaded) {
-      this.page = page
-    } else {
-      this.getProductPage(page)
-    }
+    this.getProductPage(page)
   }
 
-  searchProducts(filter: string) {
-    if (filter != '' && !this.allProductsLoaded) {
-      // Set before loading, so a page that arrives meanwhile is ignored
-      this.allProductsLoaded = true
-      this.getAllProducts()
-    }
+  searchProducts() {
+    // Search on the server once the user pauses typing, starting again from the first page
+    clearTimeout(this.searchTimer)
+    this.searchTimer = setTimeout(() => {
+      this.getProductPage(1)
+    }, 300)
   }
 
   refreshProducts() {
-    if (this.allProductsLoaded) {
-      this.getAllProducts()
-    } else {
-      this.getProductPage(this.page)
-    }
+    this.getProductPage(this.page)
   }
 
 

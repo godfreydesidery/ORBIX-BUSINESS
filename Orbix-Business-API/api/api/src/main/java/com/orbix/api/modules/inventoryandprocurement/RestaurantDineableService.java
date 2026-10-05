@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface RestaurantDineableService {
 	List<RestaurantDineableResponseDTO> getAllRestaurantDineables(Long restaurantId, HttpServletRequest request);
@@ -22,4 +23,6 @@ public interface RestaurantDineableService {
 	
 //	long checkUnderstockByRestaurant(Long restaurantId, HttpServletRequest request);
 //	long checkOutofstockByRestaurant(Long restaurantId, HttpServletRequest request);
+
+	PageResponseDTO<RestaurantDineableResponseDTO> getRestaurantDineablePage(Long restaurantId, int page, int size, String search, HttpServletRequest request);
 }

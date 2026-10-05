@@ -40,8 +40,9 @@ private final SupplierService supplierService;
 	public ResponseEntity<PageResponseDTO<SupplierResponseDTO>>getPage(
 			@RequestParam(name = "page") int page,
 			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
 			HttpServletRequest request){
-		return ResponseEntity.ok().body(supplierService.getSupplierPage(page, size, request));
+		return ResponseEntity.ok().body(supplierService.getSupplierPage(page, size, search, request));
 	}
 	
 	@GetMapping("/suppliers/get_all_by_company")

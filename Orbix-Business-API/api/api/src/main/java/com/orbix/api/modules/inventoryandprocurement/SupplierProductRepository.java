@@ -4,6 +4,10 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.orbix.api.modules.adminunits.Branch;
 
@@ -25,4 +29,7 @@ public interface SupplierProductRepository extends JpaRepository<SupplierProduct
 
 	Optional<SupplierProduct> findBySupplierAndProductAndBranch(Supplier supplier, Product product, Branch userBranch);
 
+	// A supplier's products in a branch, searched on the product columns the screens show
+	@Query("SELECT x FROM SupplierProduct x LEFT JOIN x.product p WHERE x.supplier = :supplier AND x.branch = :branch AND (:search = '%%' OR LOWER(p.code) LIKE :search OR LOWER(p.name) LIKE :search OR LOWER(p.description) LIKE :search OR LOWER(p.baseUom) LIKE :search)")
+	Page<SupplierProduct> getPageBySupplierAndBranch(@Param("supplier") Supplier supplier, @Param("branch") Branch branch, @Param("search") String search, Pageable pageable);
 }

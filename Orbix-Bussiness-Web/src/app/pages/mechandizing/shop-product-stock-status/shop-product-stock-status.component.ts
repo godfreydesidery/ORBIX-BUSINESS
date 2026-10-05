@@ -8,7 +8,6 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { PosReceiptPrinterService } from '@services/custom/pos-receipt-printer.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from 'src/app/auth.service';
-import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { IShop } from 'src/app/domain/shop';
 import { environment } from 'src/environments/environment';
 import { HttpHeaders } from '@angular/common/http';
@@ -16,6 +15,8 @@ import { IShopProduct } from 'src/app/domain/shop-product';
 import { IProduct } from 'src/app/domain/product';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 
 
@@ -26,7 +27,6 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    SearchFilterPipe,
     NgxPaginationModule,
     RouterModule
   ],
@@ -39,6 +39,8 @@ export class ShopProductStockStatusComponent {
   shopId: number;
 
   shopProducts : IShopProduct[] = []
+  totalShopProducts : number = 0
+  shopProductsRequest : number = 0 // number of the latest list request; answers to older ones are ignored
 
   searchKey : string = ''
 
@@ -62,6 +64,9 @@ export class ShopProductStockStatusComponent {
   importProducts : IProduct[] = []
 
   page: number = 1; // Initialize the current page to 1
+  pageSize : number = 15
+  listSearchTimer : any = null
+  stockFilter : string = '' // '' all, 'below_min' understock, 'out' out of stock (filtered on the server)
   filterRecords : string = ''
   selectedOption: string = '';
   options: string[] = ['Option 1', 'Option 2', 'Option 3'];
@@ -89,21 +94,37 @@ export class ShopProductStockStatusComponent {
   showShopProducts: IShopProduct[] = [];
 
   loadShopProductStockStatus = async () => {
+    // Reloading shows the whole stock again, as the full list did (clears an understock or out of stock filter)
+    this.stockFilter = ''
+    await this.getShopProductStockPage()
+  }
+
+  async getShopProductStockPage(){
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.shopProductsRequest
 
-    this.shopProducts = []
-
-    await this.http.get<IShopProduct[]>(API_URL+'/shop_products/get_stock_by_shop?shop_id=' + this.shopId, options)
+    await this.http.get<IPage<IShopProduct>>(API_URL+'/shop_products/get_stock_by_shop_page?shop_id=' + this.shopId + '&stock=' + this.stockFilter + '&' + pageParams(page, this.pageSize, this.filterRecords), options)
     .toPromise()
     .then(
       data => {
-        this.shopProducts = data!
-
+        // An answer to an older request (another page, search or filter) is ignored
+        if(request != this.shopProductsRequest){
+          return
+        }
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getShopProductStockPage()
+          return
+        }
+        this.shopProducts = data!.content
         this.showShopProducts = this.shopProducts
-
-        console.log(data)
+        this.totalShopProducts = data!.totalElements
       }
     )
     .catch(
@@ -113,22 +134,32 @@ export class ShopProductStockStatusComponent {
     )
   }
 
+  pageChanged(page : number){
+    this.page = page
+    this.getShopProductStockPage()
+  }
+
+  searchList(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimer)
+    this.listSearchTimer = setTimeout(() => {
+      this.page = 1
+      this.getShopProductStockPage()
+    }, 300)
+  }
+
   filterUnderStock(){
-    this.showShopProducts = []
-    this.shopProducts.forEach(element => {
-      if((+element.currentStock) < element.minStock){
-        this.showShopProducts.push(element)
-      }
-    })
+    // Filtered on the server, from the first page
+    this.stockFilter = 'below_min'
+    this.page = 1
+    this.getShopProductStockPage()
   }
 
   filterOutofStock(){
-    this.showShopProducts = []
-    this.shopProducts.forEach(element => {
-      if((+element.currentStock) <= 0){
-        this.showShopProducts.push(element)
-      }
-    })
+    // Filtered on the server, from the first page
+    this.stockFilter = 'out'
+    this.page = 1
+    this.getShopProductStockPage()
   }
 
   shopProductId : any = null

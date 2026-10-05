@@ -5,11 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from 'src/app/auth.service';
-import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 
 import { ICompany } from 'src/app/domain/company';
 import { ISupplier } from 'src/app/domain/supplier';
 import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
 import { trackById } from 'src/app/common/utils/track-by-id';
@@ -21,7 +21,6 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    SearchFilterPipe,
     NgxPaginationModule
   ],
   templateUrl: './supplier.component.html',
@@ -52,9 +51,9 @@ export class SupplierComponent {
   page: number = 1; // Initialize the current page to 1
   pageSize: number = 15
   totalSuppliers: number = 0
-  // The list is loaded a page at a time; the whole list is loaded only when searching, so the search still covers every supplier
-  allSuppliersLoaded: boolean = false
-  requestedPage: number = 1
+  // The list is loaded a page at a time and searched on the server
+  suppliersRequest: number = 0 // number of the latest list request; answers to older ones are ignored
+  searchTimer: any = null
   filterRecords : string = ''
   selectedOption: string = '';
 
@@ -68,43 +67,22 @@ export class SupplierComponent {
     this.getSupplierPage(1)
   }
 
-  async getAllSuppliers(){
-    let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
-    }
-    this.suppliers = []
-
-    await this.http.get<ISupplier[]>(API_URL+'/suppliers', options)
-    .toPromise()
-    .then(
-      data => {
-        // Built apart and assigned at the end, so two overlapping loads cannot mix their rows
-        var suppliers : ISupplier[] = []
-        var sn = 1
-        data?.forEach(element => {
-          element.sn = sn
-          suppliers.push(element)
-          sn = sn + 1
-        })
-        this.suppliers = suppliers
-        this.allSuppliersLoaded = true
-        console.log(data)
-      }
-    )
-  }
-
   async getSupplierPage(page: number) {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
-    this.requestedPage = page
+    var request = ++this.suppliersRequest
 
-    await this.http.get<IPage<ISupplier>>(API_URL + '/suppliers/get_page?page=' + (page - 1) + '&size=' + this.pageSize, options)
+    await this.http.get<IPage<ISupplier>>(API_URL + '/suppliers/get_page?' + pageParams(page, this.pageSize, this.filterRecords), options)
       .toPromise()
       .then(
         data => {
-          // Ignore a page that arrives after another page or the whole list was requested
-          if (this.allSuppliersLoaded || page != this.requestedPage) {
+          if (request != this.suppliersRequest) {
+            return
+          }
+          // The page no longer exists (rows were removed): show the one before it
+          if (data!.content.length == 0 && page > 1) {
+            this.getSupplierPage(page - 1)
             return
           }
           var sn = (page - 1) * this.pageSize + 1
@@ -120,27 +98,19 @@ export class SupplierComponent {
   }
 
   pageChanged(page: number) {
-    if (this.allSuppliersLoaded) {
-      this.page = page
-    } else {
-      this.getSupplierPage(page)
-    }
+    this.getSupplierPage(page)
   }
 
-  searchSuppliers(filter: string) {
-    if (filter != '' && !this.allSuppliersLoaded) {
-      // Set before loading, so a page that arrives meanwhile is ignored
-      this.allSuppliersLoaded = true
-      this.getAllSuppliers()
-    }
+  searchSuppliers() {
+    // Search on the server once the user pauses typing, starting again from the first page
+    clearTimeout(this.searchTimer)
+    this.searchTimer = setTimeout(() => {
+      this.getSupplierPage(1)
+    }, 300)
   }
 
   refreshSuppliers() {
-    if (this.allSuppliersLoaded) {
-      this.getAllSuppliers()
-    } else {
-      this.getSupplierPage(this.page)
-    }
+    this.getSupplierPage(this.page)
   }
 
 

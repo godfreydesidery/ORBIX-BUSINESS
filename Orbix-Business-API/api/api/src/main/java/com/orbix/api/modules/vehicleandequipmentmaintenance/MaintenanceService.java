@@ -5,6 +5,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.orbix.api.modules.identityandaccess.User;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface MaintenanceService {
 	List<MaintenanceResponseDTO> getAllMaintenances(HttpServletRequest request);	
@@ -31,4 +32,10 @@ public interface MaintenanceService {
 	
 	MaintenanceJobCardResponseDTO loadMyJobCard(MaintenanceRequestDTO maintenanceRequest, HttpServletRequest request);
 	MaintenanceJobCardResponseDTO loadMyClosedJobCard(MaintenanceRequestDTO maintenanceRequest, HttpServletRequest request);
+
+	PageResponseDTO<MaintenanceResponseDTO> getPendingOrCheckedInMaintenancePage(int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<MaintenanceResponseDTO> getCheckedInMaintenancePage(int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<MaintenanceResponseDTO> getCheckedInMaintenancePageWithOpenJobs(int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<MaintenanceResponseDTO> getCheckedInMaintenancePageWithOpenJobsAndMine(int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<MaintenanceResponseDTO> getCheckedInMaintenancePageWithClosedJobsAndMine(int page, int size, String search, HttpServletRequest request);
 }

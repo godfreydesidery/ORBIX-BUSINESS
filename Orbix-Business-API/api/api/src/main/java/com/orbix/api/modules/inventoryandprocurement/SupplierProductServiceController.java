@@ -9,6 +9,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidOperationException;
@@ -18,6 +20,8 @@ import com.orbix.api.modules.adminunits.BranchRepository;
 import com.orbix.api.modules.adminunits.CompanyRepository;
 import com.orbix.api.modules.adminunits.DayService;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +41,16 @@ public class SupplierProductServiceController implements SupplierProductService 
 	private final UserService userService;
 	private final DayService dayService;
 	
+	@Override
+	public PageResponseDTO<SupplierProductResponseDTO> getSupplierProductPageByBranch(Long supplierId, int page, int size, String search, HttpServletRequest request) {
+	    Supplier supplier = supplierRepository.findById(supplierId)
+	                              .orElseThrow(() -> new NotFoundException("Supplier not found"));
+
+	    // One page, by id, searched on the shown columns
+	    Page<SupplierProduct> supplierProducts = supplierProductRepository.getPageBySupplierAndBranch(supplier, userService.getUserBranch(request), PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+	    return new PageResponseDTO<>(supplierProducts.getContent().stream().map(this::supplierProductResponseDTOMapper).collect(Collectors.toList()), supplierProducts.getTotalElements());
+	}
+
 	@Override
 	public List<SupplierProductResponseDTO> getAllSupplierProductsByBranch(Long supplierId, HttpServletRequest request) {
 		// Validate and fetch the supplier

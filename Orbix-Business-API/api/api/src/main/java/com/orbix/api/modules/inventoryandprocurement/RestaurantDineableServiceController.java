@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidOperationException;
@@ -21,6 +23,8 @@ import com.orbix.api.modules.adminunits.Restaurant;
 import com.orbix.api.modules.adminunits.RestaurantRepository;
 import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +42,16 @@ public class RestaurantDineableServiceController implements RestaurantDineableSe
 	//private final RestaurantDineableLogRepository restaurantDineableLogRepository;
 	private final UserService userService;
 	private final DayService dayService;
+
+	@Override
+	public PageResponseDTO<RestaurantDineableResponseDTO> getRestaurantDineablePage(Long restaurantId, int page, int size, String search, HttpServletRequest request) {
+	    Restaurant restaurant = restaurantRepository.findById(restaurantId)
+	                              .orElseThrow(() -> new NotFoundException("Restaurant not found"));
+
+	    // One page, by id, searched on the shown columns
+	    Page<RestaurantDineable> restaurantDineables = restaurantDineableRepository.getPageByRestaurant(restaurant, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+	    return new PageResponseDTO<>(restaurantDineables.getContent().stream().map(this::restaurantDineableResponseDTOMapper).collect(Collectors.toList()), restaurantDineables.getTotalElements());
+	}
 
 	@Override
 	public List<RestaurantDineableResponseDTO> getAllRestaurantDineables(Long restaurantId, HttpServletRequest request) {

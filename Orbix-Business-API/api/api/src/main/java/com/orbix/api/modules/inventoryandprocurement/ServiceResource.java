@@ -40,8 +40,9 @@ public class ServiceResource {
 	public ResponseEntity<PageResponseDTO<ServiceResponseDTO>>getPage(
 			@RequestParam(name = "page") int page,
 			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
 			HttpServletRequest request){
-		return ResponseEntity.ok().body(serviceService.getServicePage(page, size, request));
+		return ResponseEntity.ok().body(serviceService.getServicePage(page, size, search, request));
 	}
 	@GetMapping("/services/get")
 	public ResponseEntity<ServiceResponseDTO>get(

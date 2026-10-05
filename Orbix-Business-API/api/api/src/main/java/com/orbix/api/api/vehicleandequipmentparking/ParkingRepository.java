@@ -6,8 +6,11 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.orbix.api.modules.identityandaccess.User;
+import com.orbix.api.api.commons.PayStatus;
 
 public interface ParkingRepository extends JpaRepository<Parking, Long> {
 
@@ -80,6 +83,27 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
 
 	@Query("SELECT p.chasisNo AS chasisNo, t.name AS vehicleEquipmentTypeName, p.createdDateTime AS createdDateTime, u.nickname AS createdByNickname, p.hasKeys AS hasKeys FROM Parking p LEFT JOIN p.vehicleEquipmentType t LEFT JOIN p.createdByUser u WHERE p.createdByUser = :user AND p.createdDateTime BETWEEN :from AND :to AND p.status IN :statuses")
 	List<IParkingRegistration> getRegistrationReportByCreatedByUser(@Param("user") User user, @Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("statuses") List<String> statuses);
+
+	// Search on the columns the parking lists show (p is the parking, t its vehicle or equipment type)
+	String PARKING_SEARCH = "(:search = '%%' OR LOWER(p.no) LIKE :search OR LOWER(p.chasisNo) LIKE :search"
+			+ " OR LOWER(p.ownerFirstName) LIKE :search OR LOWER(p.ownerMiddleName) LIKE :search OR LOWER(p.ownerLastName) LIKE :search"
+			+ " OR LOWER(p.ownerPhoneNo) LIKE :search OR LOWER(p.agentName) LIKE :search OR LOWER(p.cardNo) LIKE :search"
+			+ " OR LOWER(p.billingType) LIKE :search OR LOWER(p.status) LIKE :search OR LOWER(t.name) LIKE :search)";
+
+	@Query("SELECT p FROM Parking p LEFT JOIN p.vehicleEquipmentType t WHERE p.status IN :statuses AND " + PARKING_SEARCH)
+	Page<Parking> getPageByStatusIn(@Param("statuses") List<String> statuses, @Param("search") String search, Pageable pageable);
+
+	// Parkings with at least one bill whose discount has the given status
+	@Query("SELECT p FROM Parking p LEFT JOIN p.vehicleEquipmentType t WHERE p.status IN :statuses"
+			+ " AND EXISTS (SELECT b.id FROM ParkingBillReceivable b WHERE b.parking = p AND b.discountStatus = :discountStatus) AND " + PARKING_SEARCH)
+	Page<Parking> getPageByStatusInAndDiscountStatus(@Param("statuses") List<String> statuses, @Param("discountStatus") String discountStatus, @Param("search") String search, Pageable pageable);
+
+	// Checked out in the period and cleared: no parking or service bill that is not paid
+	@Query("SELECT p FROM Parking p LEFT JOIN p.vehicleEquipmentType t WHERE p.status IN :statuses AND p.checkedOutDateTime BETWEEN :from AND :to"
+			+ " AND NOT EXISTS (SELECT b.id FROM ParkingBillReceivable b WHERE b.parking = p AND (b.billReceivable.payStatus IS NULL OR b.billReceivable.payStatus <> :paid))"
+			+ " AND NOT EXISTS (SELECT sb.id FROM ParkingServiceBillReceivable sb WHERE sb.parking = p AND (sb.billReceivable.payStatus IS NULL OR sb.billReceivable.payStatus <> :paid))"
+			+ " AND " + PARKING_SEARCH)
+	Page<Parking> getClearedPageByStatusInAndCheckedOutDateTimeBetween(@Param("statuses") List<String> statuses, @Param("from") LocalDateTime from, @Param("to") LocalDateTime to, @Param("paid") PayStatus paid, @Param("search") String search, Pageable pageable);
 }
 
 interface IParkingRegistration {

@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.orbix.api.api.commons.WorkFlowStatus;
 import com.orbix.api.modules.adminunits.Branch;
@@ -47,6 +49,14 @@ public interface GrnRepository extends JpaRepository<Grn, Long> {
 		    @Param("endDateTime") LocalDateTime endDateTime
 		);
 
+	// Search on the columns the GRN lists show (sp is the supplier of the GRN's LPO)
+	String GRN_SEARCH = "(:search = '%%' OR LOWER(g.no) LIKE :search OR LOWER(sp.name) LIKE :search OR LOWER(str(g.status)) LIKE :search)";
+
+	@Query("SELECT g FROM Grn g LEFT JOIN g.lpo lp LEFT JOIN lp.supplier sp WHERE g.status IN :statuses AND g.branch = :branch AND " + GRN_SEARCH)
+	Page<Grn> getPageByStatusInAndBranch(@Param("statuses") List<WorkFlowStatus> statuses, @Param("branch") Branch branch, @Param("search") String search, Pageable pageable);
+
+	@Query("SELECT g FROM Grn g LEFT JOIN g.lpo lp LEFT JOIN lp.supplier sp WHERE g.status IN :statuses AND g.branch = :branch AND g.shop = :shop AND " + GRN_SEARCH)
+	Page<Grn> getPageByStatusInAndBranchAndShop(@Param("statuses") List<WorkFlowStatus> statuses, @Param("branch") Branch branch, @Param("shop") Shop shop, @Param("search") String search, Pageable pageable);
 }
 
 interface IGrnProjection {

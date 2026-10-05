@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidOperationException;
@@ -20,6 +22,8 @@ import com.orbix.api.modules.adminunits.Restaurant;
 import com.orbix.api.modules.adminunits.RestaurantRepository;
 import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -37,6 +41,16 @@ public class RestaurantProductServiceController implements RestaurantProductServ
 	private final RestaurantProductLogRepository restaurantProductLogRepository;
 	private final UserService userService;
 	private final DayService dayService;
+
+	@Override
+	public PageResponseDTO<RestaurantProductResponseDTO> getRestaurantProductStockPage(Long restaurantId, String stock, int page, int size, String search, HttpServletRequest request) {
+	    Restaurant restaurant = restaurantRepository.findById(restaurantId)
+	                              .orElseThrow(() -> new NotFoundException("Restaurant not found"));
+
+	    // One page, by id, filtered by stock and searched on the shown columns
+	    Page<RestaurantProduct> restaurantProducts = restaurantProductRepository.getStockPageByRestaurant(restaurant, stock == null ? "" : stock, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+	    return new PageResponseDTO<>(restaurantProducts.getContent().stream().map(this::restaurantProductResponseDTOMapper).collect(Collectors.toList()), restaurantProducts.getTotalElements());
+	}
 
 	@Override
 	public List<RestaurantProductResponseDTO> getAllRestaurantProducts(Long restaurantId, HttpServletRequest request) {

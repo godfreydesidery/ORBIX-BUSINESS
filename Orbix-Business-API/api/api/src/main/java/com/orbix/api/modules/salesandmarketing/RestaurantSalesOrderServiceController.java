@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.PayCode;
 import com.orbix.api.api.commons.PayStatus;
@@ -38,6 +40,8 @@ import com.orbix.api.modules.inventoryandprocurement.RestaurantProduct;
 import com.orbix.api.modules.inventoryandprocurement.RestaurantProductLog;
 import com.orbix.api.modules.inventoryandprocurement.RestaurantProductLogRepository;
 import com.orbix.api.modules.inventoryandprocurement.RestaurantProductRepository;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -82,6 +86,18 @@ public class RestaurantSalesOrderServiceController implements RestaurantSalesOrd
 		return null;
 	}
 	
+	@Override
+	public PageResponseDTO<RestaurantSalesOrderResponseDTO> getPendingRestaurantSalesOrderPage(Long restaurantId, int page, int size, String search, HttpServletRequest request) {
+
+		Restaurant restaurant = restaurantRepository.findById(restaurantId)
+			    .orElseThrow(() -> new NotFoundException("Restaurant not found, with id " + restaurantId));
+
+		// Same 12 hour window as the full list; one page, by id, searched on the shown columns
+		LocalDateTime since = LocalDateTime.now().minusHours(12);
+		Page<RestaurantSalesOrder> restaurantSalesOrders = restaurantSalesOrderRepository.getPageByRestaurantAndStatusAndCreatedDateTimeAfter(restaurant, WorkFlowStatus.PENDING, since, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+		return new PageResponseDTO<>(restaurantSalesOrders.getContent().stream().map(this::restaurantSalesOrderResponseDTOMapper).collect(Collectors.toList()), restaurantSalesOrders.getTotalElements());
+	}
+
 	@Override
 	public List<RestaurantSalesOrderResponseDTO> getAllPendingRestaurantSalesOrders(Long restaurantId, HttpServletRequest request) {
 		

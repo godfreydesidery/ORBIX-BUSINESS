@@ -18,6 +18,7 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.modules.inventoryandprocurement.ProductRequestDTO;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -36,6 +37,17 @@ public class RestaurantAgentResource {
 			@RequestParam(name = "restaurant_id") Long restaurantId, HttpServletRequest request) {
 		return ResponseEntity.ok()
 				.body(restaurantAgentService.getAllRestaurantAgentsByRestaurantId(restaurantId, request));
+	}
+
+	@GetMapping("/restaurants/get_all_agents_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<RestaurantAgentResponseDTO>>getAllAgentsPage(
+			@RequestParam(name = "restaurant_id") Long restaurantId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(restaurantAgentService.getRestaurantAgentPageByRestaurantId(restaurantId, page, size, search, request));
 	}
 	
 	@GetMapping("/restaurants/get_available_agents")

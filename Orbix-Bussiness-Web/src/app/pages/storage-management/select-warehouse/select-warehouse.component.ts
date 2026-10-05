@@ -23,6 +23,8 @@ import { error } from 'src/custom-packages/util';
 declare var pdfMake: any;
 import { IServiceBillItem } from 'src/app/domain/maintenance';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 
 const API_URL = environment.apiUrl;
@@ -51,6 +53,8 @@ export class SelectWarehouseComponent {
   nickname = ''
 
   page: number = 1; // Initialize the current page to 1
+  pageSize : number = 15
+  listSearchTimer : any = null
 
   filterRecords: string = ''
 
@@ -104,6 +108,9 @@ export class SelectWarehouseComponent {
 
 
   storages: IStorage[] = []
+  totalStorages : number = 0
+  releasedList : string = '' // which released list is shown: 'checked-in' or 'checked-out'
+  storagesRequest : number = 0 // number of the latest list request; answers to older ones are ignored
   goodTypes: IGoodType[] = []
 
   constructor(
@@ -223,10 +230,12 @@ export class SelectWarehouseComponent {
 
   setExisting() {
     this.mode = 'existing'
+    this.page = 1
   }
 
   setReleased() {
     this.mode = 'released'
+    this.page = 1
   }
 
   async getAllCompanyActiveGoodTypes() {
@@ -434,77 +443,140 @@ export class SelectWarehouseComponent {
 
 
 
-  async getAllCheckedInAndPendingStorages() {
+  async getAllCheckedInAndPendingStorages(){
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    this.storages = []
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.storagesRequest
 
-    await this.http.get<IStorage[]>(API_URL + '/storages/get_all_pending_or_checked_in_by_warehouse?warehouse_id=' + this.warehouseId, options)
-      .toPromise()
-      .then(
-        data => {
-          data?.reverse()
-          var sn = 1
-          data?.forEach(element => {
-            element.sn = sn
-            this.storages.push(element)
-            sn = sn + 1
-          })
-          console.log(data)
+    await this.http.get<IPage<IStorage>>(API_URL + '/storages/get_all_pending_or_checked_in_by_warehouse_page?warehouse_id=' + this.warehouseId + '&' + pageParams(page, this.pageSize, this.filterRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.storagesRequest){
+          return
         }
-      )
-      .catch(error => {
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getAllCheckedInAndPendingStorages()
+          return
+        }
+        var sn = (page - 1) * this.pageSize + 1
+        data!.content.forEach(element => {
+          element.sn = sn
+          sn = sn + 1
+        })
+        this.storages = data!.content
+        this.totalStorages = data!.totalElements
+      }
+    )
+    .catch(error => {
         console.log(error)
       })
   }
 
-  async getAllCheckedInStorages() {
-    let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
-    }
-    this.storages = []
+  pageChanged(page : number){
+    this.page = page
+    this.reloadList()
+  }
 
-    await this.http.get<IStorage[]>(API_URL + '/storages/get_all_checked_in_by_warehouse?warehouse_id=' + this.warehouseId, options)
-      .toPromise()
-      .then(
-        data => {
-          data?.reverse()
-          var sn = 1
-          data?.forEach(element => {
-            element.sn = sn
-            this.storages.push(element)
-            sn = sn + 1
-          })
-          console.log(data)
+  searchList(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimer)
+    this.listSearchTimer = setTimeout(() => {
+      this.page = 1
+      this.reloadList()
+    }, 300)
+  }
+
+  // The list on screen depends on the mode: the goods list, or one of the released lists
+  reloadList(){
+    if(this.mode !== 'released'){
+      this.getAllCheckedInAndPendingStorages()
+    }else if(this.releasedList === 'checked-out'){
+      this.getAllRecentCheckedOutStorages()
+    }else{
+      this.getAllCheckedInStorages()
+    }
+  }
+
+  async getAllCheckedInStorages(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    // One page at a time, searched on the server against the shown columns
+    this.releasedList = 'checked-in'
+    var page = this.page
+    var request = ++this.storagesRequest
+
+    await this.http.get<IPage<IStorage>>(API_URL + '/storages/get_all_checked_in_by_warehouse_page?warehouse_id=' + this.warehouseId + '&' + pageParams(page, this.pageSize, this.filterRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.storagesRequest){
+          return
         }
-      )
-      .catch(error => {
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getAllCheckedInStorages()
+          return
+        }
+        var sn = (page - 1) * this.pageSize + 1
+        data!.content.forEach(element => {
+          element.sn = sn
+          sn = sn + 1
+        })
+        this.storages = data!.content
+        this.totalStorages = data!.totalElements
+      }
+    )
+    .catch(error => {
         console.log(error)
       })
   }
 
-  async getAllRecentCheckedOutStorages() {
+  async getAllRecentCheckedOutStorages(){
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    this.storages = []
+    // One page at a time, searched on the server against the shown columns
+    this.releasedList = 'checked-out'
+    var page = this.page
+    var request = ++this.storagesRequest
 
-    await this.http.get<IStorage[]>(API_URL + '/storages/get_all_recent_checked_out_by_warehouse?warehouse_id=' + this.warehouseId, options)
-      .toPromise()
-      .then(
-        data => {
-          data?.reverse()
-          var sn = 1
-          data?.forEach(element => {
-            element.sn = sn
-            this.storages.push(element)
-            sn = sn + 1
-          })
-          console.log(data)
+    await this.http.get<IPage<IStorage>>(API_URL + '/storages/get_all_recent_checked_out_by_warehouse_page?warehouse_id=' + this.warehouseId + '&' + pageParams(page, this.pageSize, this.filterRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.storagesRequest){
+          return
         }
-      )
-      .catch(error => {
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getAllRecentCheckedOutStorages()
+          return
+        }
+        var sn = (page - 1) * this.pageSize + 1
+        data!.content.forEach(element => {
+          element.sn = sn
+          sn = sn + 1
+        })
+        this.storages = data!.content
+        this.totalStorages = data!.totalElements
+      }
+    )
+    .catch(error => {
         console.log(error)
       })
   }

@@ -5,11 +5,11 @@ import { FormsModule } from '@angular/forms';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from 'src/app/auth.service';
-import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 
 import { ICompany } from 'src/app/domain/company';
 import { IService } from 'src/app/domain/service';
 import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
 import { trackById } from 'src/app/common/utils/track-by-id';
@@ -21,7 +21,6 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    SearchFilterPipe,
     NgxPaginationModule
   ],
   templateUrl: './service.component.html',
@@ -51,9 +50,9 @@ export class ServiceComponent {
   page: number = 1; // Initialize the current page to 1
   pageSize: number = 15
   totalServices: number = 0
-  // The list is loaded a page at a time; the whole list is loaded only when searching, so the search still covers every service
-  allServicesLoaded: boolean = false
-  requestedPage: number = 1
+  // The list is loaded a page at a time and searched on the server
+  servicesRequest: number = 0 // number of the latest list request; answers to older ones are ignored
+  searchTimer: any = null
   filterRecords: string = ''
   selectedOption: string = '';
 
@@ -67,43 +66,22 @@ export class ServiceComponent {
     this.getServicePage(1)
   }
 
-  async getAllServices() {
-    let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
-    }
-    this.services = []
-
-    await this.http.get<IService[]>(API_URL + '/services', options)
-      .toPromise()
-      .then(
-        data => {
-          // Built apart and assigned at the end, so two overlapping loads cannot mix their rows
-          var services : IService[] = []
-          var sn = 1
-          data?.forEach(element => {
-            element.sn = sn
-            services.push(element)
-            sn = sn + 1
-          })
-          this.services = services
-          this.allServicesLoaded = true
-          console.log(data)
-        }
-      )
-  }
-
   async getServicePage(page: number) {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
-    this.requestedPage = page
+    var request = ++this.servicesRequest
 
-    await this.http.get<IPage<IService>>(API_URL + '/services/get_page?page=' + (page - 1) + '&size=' + this.pageSize, options)
+    await this.http.get<IPage<IService>>(API_URL + '/services/get_page?' + pageParams(page, this.pageSize, this.filterRecords), options)
       .toPromise()
       .then(
         data => {
-          // Ignore a page that arrives after another page or the whole list was requested
-          if (this.allServicesLoaded || page != this.requestedPage) {
+          if (request != this.servicesRequest) {
+            return
+          }
+          // The page no longer exists (rows were removed): show the one before it
+          if (data!.content.length == 0 && page > 1) {
+            this.getServicePage(page - 1)
             return
           }
           var sn = (page - 1) * this.pageSize + 1
@@ -119,27 +97,19 @@ export class ServiceComponent {
   }
 
   pageChanged(page: number) {
-    if (this.allServicesLoaded) {
-      this.page = page
-    } else {
-      this.getServicePage(page)
-    }
+    this.getServicePage(page)
   }
 
-  searchServices(filter: string) {
-    if (filter != '' && !this.allServicesLoaded) {
-      // Set before loading, so a page that arrives meanwhile is ignored
-      this.allServicesLoaded = true
-      this.getAllServices()
-    }
+  searchServices() {
+    // Search on the server once the user pauses typing, starting again from the first page
+    clearTimeout(this.searchTimer)
+    this.searchTimer = setTimeout(() => {
+      this.getServicePage(1)
+    }, 300)
   }
 
   refreshServices() {
-    if (this.allServicesLoaded) {
-      this.getAllServices()
-    } else {
-      this.getServicePage(this.page)
-    }
+    this.getServicePage(this.page)
   }
 
 

@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
+import com.orbix.api.api.commons.PageRequests;
 import com.orbix.api.api.commons.PageResponseDTO;
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidEntryException;
@@ -60,11 +61,10 @@ public class DineableServiceController implements DineableService {
 	}
 
 	@Override
-	public PageResponseDTO<DineableResponseDTO> getDineablePage(int page, int size, HttpServletRequest request) {
-		// One page of the list, in the same order as the full list (by id)
-		int pageSize = Math.min(Math.max(size, 1), MAX_PAGE_SIZE);
-		PageRequest pageRequest = PageRequest.of(Math.min(Math.max(page, 0), Integer.MAX_VALUE / pageSize), pageSize, Sort.by("id"));
-		Page<Dineable> dineables = dineableRepository.findAll(pageRequest);
+	public PageResponseDTO<DineableResponseDTO> getDineablePage(int page, int size, String search, HttpServletRequest request) {
+		// One page of the list, in the same order as the full list (by id), searched on the shown columns
+		PageRequest pageRequest = PageRequests.of(page, size, Sort.by("id"));
+		Page<Dineable> dineables = dineableRepository.getPageBySearch(PageRequests.searchPattern(search), pageRequest);
 		List<DineableResponseDTO> dineableResponses = new ArrayList<>();
 
 		for(Dineable dineable : dineables) {
@@ -72,8 +72,6 @@ public class DineableServiceController implements DineableService {
 		}
 		return new PageResponseDTO<>(dineableResponses, dineables.getTotalElements());
 	}
-	
-	private static final int MAX_PAGE_SIZE = 100;
 
 	/**
 	 * 
@@ -302,6 +300,20 @@ public class DineableServiceController implements DineableService {
 	}
 	
 	@Override
+	public PageResponseDTO<DineableResponseDTO> getCompanySellableDineablePageByRestaurant(Long restaurantId, int page, int size, String search, HttpServletRequest request) {
+	    Company company = userService.getUserCompany(request);
+	    if (company == null) {
+	        throw new NotFoundException("Company not found for the user");
+	    }
+	    Restaurant restaurant = restaurantRepository.findById(restaurantId)
+	    	    .orElseThrow(() -> new NotFoundException("Restaurant not found"));
+
+	    // One page, by id, searched on the shown columns
+	    Page<Dineable> dineables = dineableRepository.getPageByCompanyAndSellable(company, true, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+	    return new PageResponseDTO<>(dineableResponsesWithRestaurantImportedStatus(dineables.getContent(), restaurant), dineables.getTotalElements());
+	}
+
+	@Override
 	public List<DineableResponseDTO> getCompanySellableDineablesByRestaurant(Long restaurantId, HttpServletRequest request) {
 	    
 
@@ -315,6 +327,11 @@ public class DineableServiceController implements DineableService {
 
 	    // Fetch dineables
 	    List<Dineable> dineables = dineableRepository.findAllByCompanyAndSellable(company, true);
+	    return dineableResponsesWithRestaurantImportedStatus(dineables, restaurant);
+	}
+
+	// The dineables as response DTOs, each marked imported if it is already in the restaurant
+	private List<DineableResponseDTO> dineableResponsesWithRestaurantImportedStatus(List<Dineable> dineables, Restaurant restaurant) {
 	    List<DineableResponseDTO> dineableResponses = new ArrayList<>();
 	    
 	    // How many times each dineable is already in the restaurant, loaded once instead of one look-up per dineable
@@ -342,6 +359,7 @@ public class DineableServiceController implements DineableService {
 	    // Map to DTOs
 	    return dineableResponses;
 	}
+
 	
 	@Override
 	public List<DineableResponseDTO> getDineablesByCompanyAndName(String dineableName, HttpServletRequest request) {

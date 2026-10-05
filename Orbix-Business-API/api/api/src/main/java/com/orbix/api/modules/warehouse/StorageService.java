@@ -7,6 +7,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.orbix.api.api.vehicleandequipmentparking.MonthlyParkingStatusResponseDTO;
 import com.orbix.api.api.vehicleandequipmentparking.ParkingResponseDTO;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 
 
@@ -37,4 +38,10 @@ public interface StorageService {
 	List<MonthlyStorageStatusResponseDTO> getMonthlyStats(int year, HttpServletRequest request);
 	
 	void removeGoods(Long storageId, double qty, String reason, HttpServletRequest request);
+
+	PageResponseDTO<StorageResponseDTO> getCheckedInStoragePage(int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<StorageResponseDTO> getWithDiscountsStoragePage(int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<StorageResponseDTO> getPendingOrCheckedInStoragePageByWarehouse(Long warehouseId, int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<StorageResponseDTO> getCheckedInStoragePageByWarehouse(Long warehouseId, int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<StorageResponseDTO> getRecentCheckedOutStoragePageByWarehouse(Long warehouseId, int page, int size, String search, HttpServletRequest request);
 }

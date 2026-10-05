@@ -8,7 +8,6 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { PosReceiptPrinterService } from '@services/custom/pos-receipt-printer.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { AuthService } from 'src/app/auth.service';
-import { SearchFilterPipe } from 'src/app/custom-pipes/search-filter';
 import { ISupplier } from 'src/app/domain/supplier';
 import { environment } from 'src/environments/environment';
 import { HttpHeaders } from '@angular/common/http';
@@ -16,6 +15,8 @@ import { IProduct } from 'src/app/domain/product';
 import { JwtHelperService } from '@auth0/angular-jwt';
 import { ISupplierProduct } from 'src/app/domain/supplier-product';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 
 
@@ -26,7 +27,6 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    SearchFilterPipe,
     NgxPaginationModule,
     RouterModule
   ],
@@ -38,6 +38,10 @@ export class SupplierProductListComponent {
   supplierId: number;
 
   supplierProducts : ISupplierProduct[] = []
+  totalSupplierProducts : number = 0
+  supplierProductsRequest : number = 0 // number of the latest list request; answers to older ones are ignored
+  pageSizeSupplierProducts : number = 15
+  listSearchTimerSupplierProducts : any = null
 
   searchKey : string = ''
 
@@ -59,9 +63,15 @@ export class SupplierProductListComponent {
   showImportList : boolean = false
 
   importProducts : IProduct[] = []
+  totalImportProducts : number = 0
+  importProductsRequest : number = 0 // number of the latest list request; answers to older ones are ignored
+  pageSizeImportProducts : number = 15
+  listSearchTimerImportProducts : any = null
 
   page: number = 1; // Initialize the current page to 1
   filterRecords : string = ''
+  supplierProductPage: number = 1 // the product list has its own page and search
+  filterSupplierProductRecords : string = ''
   selectedOption: string = '';
   options: string[] = ['Option 1', 'Option 2', 'Option 3'];
 
@@ -82,18 +92,34 @@ export class SupplierProductListComponent {
   }
 
   loadSupplierProductsByBranch = async () => {
+    await this.getSupplierProductPage()
+  }
+
+  async getSupplierProductPage(){
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
+    // One page at a time, searched on the server against the shown columns
+    var page = this.supplierProductPage
+    var request = ++this.supplierProductsRequest
 
-    this.supplierProducts = []
-
-    await this.http.get<ISupplierProduct[]>(API_URL+'/supplier_products/get_all_by_supplier_and_branch?supplier_id=' + this.selectedSupplierId, options)
+    await this.http.get<IPage<ISupplierProduct>>(API_URL+'/supplier_products/get_all_by_supplier_and_branch_page?supplier_id=' + this.selectedSupplierId + '&' + pageParams(page, this.pageSizeSupplierProducts, this.filterSupplierProductRecords), options)
     .toPromise()
     .then(
       data => {
-        this.supplierProducts = data!
-        console.log(data)
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.supplierProductsRequest){
+          return
+        }
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSizeSupplierProducts))
+        if(page > lastPage){
+          this.supplierProductPage = lastPage
+          this.getSupplierProductPage()
+          return
+        }
+        this.supplierProducts = data!.content
+        this.totalSupplierProducts = data!.totalElements
       }
     )
     .catch(
@@ -101,6 +127,20 @@ export class SupplierProductListComponent {
         console.log(error)
       }
     )
+  }
+
+  pageChangedSupplierProducts(page : number){
+    this.supplierProductPage = page
+    this.getSupplierProductPage()
+  }
+
+  searchListSupplierProducts(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimerSupplierProducts)
+    this.listSearchTimerSupplierProducts = setTimeout(() => {
+      this.supplierProductPage = 1
+      this.getSupplierProductPage()
+    }, 300)
   }
 
   supplierProductId : any = null
@@ -322,24 +362,55 @@ export class SupplierProductListComponent {
   
 
   getProductsToImport = async () => {
+    await this.getProductsToImportPage()
+  }
+
+  async getProductsToImportPage(){
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.importProductsRequest
 
-    await this.http.get<IProduct[]>(API_URL+'/products/get_company_products', options)
-      .toPromise()
-      .then(
-        data => {
-          console.log(data)
-          this.importProducts = data!
-          
+    await this.http.get<IPage<IProduct>>(API_URL+'/products/get_company_products_page?' + pageParams(page, this.pageSizeImportProducts, this.filterRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.importProductsRequest){
+          return
         }
-      )
-      .catch(error => {
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSizeImportProducts))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getProductsToImportPage()
+          return
+        }
+        this.importProducts = data!.content
+        this.totalImportProducts = data!.totalElements
+      }
+    )
+    .catch(
+      error => {
         console.log(error)
-        
-      }       
-    ) 
+      }
+    )
+  }
+
+  pageChangedImportProducts(page : number){
+    this.page = page
+    this.getProductsToImportPage()
+  }
+
+  searchListImportProducts(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimerImportProducts)
+    this.listSearchTimerImportProducts = setTimeout(() => {
+      this.page = 1
+      this.getProductsToImportPage()
+    }, 300)
   }
 
   clearImportList = () => {
@@ -430,6 +501,10 @@ export class SupplierProductListComponent {
   
     async onSupplierChange(event: any): Promise<void> {
       this.selectedSupplierId = await event.target.value;
+      this.supplierProductPage = 1
+      // do not show the previous supplier's products while the new supplier's products load
+      this.supplierProducts = []
+      this.totalSupplierProducts = 0
       await this.loadSelectedSupplier()
       await this.loadSupplierProductsByBranch()
     }

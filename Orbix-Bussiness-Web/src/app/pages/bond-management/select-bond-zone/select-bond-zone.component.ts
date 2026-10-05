@@ -24,6 +24,8 @@ import { NgSelectModule } from '@ng-select/ng-select';
 declare var pdfMake: any;
 import { IServiceBillItem } from 'src/app/domain/maintenance';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 
 const API_URL = environment.apiUrl;
@@ -53,6 +55,8 @@ export class SelectBondZoneComponent {
   nickname = ''
 
   page: number = 1; // Initialize the current page to 1
+  pageSize : number = 15
+  listSearchTimer : any = null
 
   filterRecords: string = ''
 
@@ -106,6 +110,8 @@ export class SelectBondZoneComponent {
 
 
   bondItems: IBondItem[] = []
+  totalBondItems : number = 0
+  bondItemsRequest : number = 0 // number of the latest list request; answers to older ones are ignored
   bondItemTypes: IBondItemType[] = []
 
   /////////////////////////
@@ -280,10 +286,12 @@ export class SelectBondZoneComponent {
 
   setExisting() {
     this.mode = 'existing'
+    this.page = 1
   }
 
   setReleased() {
     this.mode = 'released'
+    this.page = 1
   }
 
   async getAllCompanyActiveBondItemTypes() {
@@ -661,29 +669,64 @@ export class SelectBondZoneComponent {
 
 
 
-  async getAllCheckedInAndPendingBondItems() {
+  async getAllCheckedInAndPendingBondItems(){
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    this.bondItems = []
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.bondItemsRequest
 
-    await this.http.get<IBondItem[]>(API_URL + '/bond_items/get_all_pending_or_checked_in_by_bond_zone?bond_zone_id=' + this.bondZoneId, options)
-      .toPromise()
-      .then(
-        data => {
-          data?.reverse()
-          var sn = 1
-          data?.forEach(element => {
-            element.sn = sn
-            this.bondItems.push(element)
-            sn = sn + 1
-          })
-          console.log(data)
+    await this.http.get<IPage<IBondItem>>(API_URL + '/bond_items/get_all_pending_or_checked_in_by_bond_zone_page?bond_zone_id=' + this.bondZoneId + '&' + pageParams(page, this.pageSize, this.filterRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.bondItemsRequest){
+          return
         }
-      )
-      .catch(error => {
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getAllCheckedInAndPendingBondItems()
+          return
+        }
+        var sn = (page - 1) * this.pageSize + 1
+        data!.content.forEach(element => {
+          element.sn = sn
+          sn = sn + 1
+        })
+        this.bondItems = data!.content
+        this.totalBondItems = data!.totalElements
+      }
+    )
+    .catch(error => {
         console.log(error)
       })
+  }
+
+  pageChanged(page : number){
+    this.page = page
+    this.reloadList()
+  }
+
+  searchList(){
+    // Search on the server once the user pauses typing, from the first page
+    clearTimeout(this.listSearchTimer)
+    this.listSearchTimer = setTimeout(() => {
+      this.page = 1
+      this.reloadList()
+    }, 300)
+  }
+
+  // The list on screen depends on the mode: checked out items, or pending and checked-in ones
+  reloadList(){
+    if(this.mode === 'released'){
+      this.getAllRecentCheckedOutBondItems()
+    }else{
+      this.getAllCheckedInAndPendingBondItems()
+    }
   }
 
   async getAllCheckedInBondItems() {
@@ -711,27 +754,39 @@ export class SelectBondZoneComponent {
       })
   }
 
-  async getAllRecentCheckedOutBondItems() {
+  async getAllRecentCheckedOutBondItems(){
     let options = {
-      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    this.bondItems = []
+    // One page at a time, searched on the server against the shown columns
+    var page = this.page
+    var request = ++this.bondItemsRequest
 
-    await this.http.get<IBondItem[]>(API_URL + '/bond_items/get_all_recent_checked_out_by_bond_zone?bond_zone_id=' + this.bondZoneId, options)
-      .toPromise()
-      .then(
-        data => {
-          data?.reverse()
-          var sn = 1
-          data?.forEach(element => {
-            element.sn = sn
-            this.bondItems.push(element)
-            sn = sn + 1
-          })
-          console.log(data)
+    await this.http.get<IPage<IBondItem>>(API_URL + '/bond_items/get_all_recent_checked_out_by_bond_zone_page?bond_zone_id=' + this.bondZoneId + '&' + pageParams(page, this.pageSize, this.filterRecords), options)
+    .toPromise()
+    .then(
+      data => {
+        // An answer to an older request (another page or search) is ignored
+        if(request != this.bondItemsRequest){
+          return
         }
-      )
-      .catch(error => {
+        // Past the last page (rows were removed meanwhile): show the last page instead
+        var lastPage = Math.max(1, Math.ceil(data!.totalElements / this.pageSize))
+        if(page > lastPage){
+          this.page = lastPage
+          this.getAllRecentCheckedOutBondItems()
+          return
+        }
+        var sn = (page - 1) * this.pageSize + 1
+        data!.content.forEach(element => {
+          element.sn = sn
+          sn = sn + 1
+        })
+        this.bondItems = data!.content
+        this.totalBondItems = data!.totalElements
+      }
+    )
+    .catch(error => {
         console.log(error)
       })
   }

@@ -16,6 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.api.commons.PayStatus;
@@ -37,6 +39,8 @@ import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.warehouse.RemovedGood;
 import com.orbix.api.modules.warehouse.Storage;
 import com.orbix.api.modules.warehouse.StorageBillReceivable;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.Data;
 import lombok.RequiredArgsConstructor;
@@ -233,6 +237,77 @@ public class ParkingServiceController implements ParkingService {
 		return parkingResponses;
 	}
 	
+	@Override
+	public PageResponseDTO<ParkingResponseDTO> getPendingOrCheckedInParkingPage(int page, int size, String search, HttpServletRequest request) {
+
+		List<String> statuses = new ArrayList<>();
+		statuses.add("PENDING");
+		statuses.add("CHECKED-IN");
+
+		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
+		Page<Parking> parkings = parkingRepository.getPageByStatusIn(statuses, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+
+		for(Parking parking : parkings) {
+			parkingResponses.add(parkingResponseDTOMapper(parking));
+		}
+		return new PageResponseDTO<>(parkingResponses, parkings.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<ParkingResponseDTO> getCheckedInParkingPage(int page, int size, String search, HttpServletRequest request) {
+
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+
+		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
+		Page<Parking> parkings = parkingRepository.getPageByStatusIn(statuses, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+
+		for(Parking parking : parkings) {
+			parkingResponses.add(parkingResponseDTOMapper(parking));
+		}
+		return new PageResponseDTO<>(parkingResponses, parkings.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<ParkingResponseDTO> getWithDiscountsParkingPage(int page, int size, String search, HttpServletRequest request) {
+
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-IN");
+
+		// Checked-in parkings with a requested discount; one page, newest first, searched on the shown columns
+		Page<Parking> parkings = parkingRepository.getPageByStatusInAndDiscountStatus(statuses, "Requested", PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+
+		for(Parking parking : parkings) {
+			parkingResponses.add(parkingResponseDTOMapper(parking));
+		}
+		return new PageResponseDTO<>(parkingResponses, parkings.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<ParkingResponseDTO> getRecentCheckedOutParkingPage(int page, int size, String search, HttpServletRequest request) {
+
+		List<String> statuses = new ArrayList<>();
+		statuses.add("CHECKED-OUT");
+
+		// Same 24 hour window as the full list
+		LocalDateTime now = dayService.getTimeStamp();
+		LocalDateTime before = now.minusHours(24);
+
+		// Cleared parkings only, filtered in the query so that paging counts the right rows; one page, searched on the shown columns
+		Page<Parking> parkings = parkingRepository.getClearedPageByStatusInAndCheckedOutDateTimeBetween(statuses, before, now, PayStatus.PAID, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+		Map<Long, List<ParkingBillReceivable>> parkingBillReceivablesByParking = getParkingBillReceivablesByParking(parkings.getContent());
+		Map<Long, List<ParkingServiceBillReceivable>> parkingServiceBillReceivablesByParking = getParkingServiceBillReceivablesByParking(parkings.getContent());
+		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
+
+		for(Parking parking : parkings) {
+			parkingResponses.add(parkingResponseDTOMapper(parking, parkingBillReceivablesByParking, parkingServiceBillReceivablesByParking));
+		}
+		return new PageResponseDTO<>(parkingResponses, parkings.getTotalElements());
+	}
+
 	@Override
 	public List<ParkingResponseDTO> getAllCheckedInParkings(HttpServletRequest request) {
 		

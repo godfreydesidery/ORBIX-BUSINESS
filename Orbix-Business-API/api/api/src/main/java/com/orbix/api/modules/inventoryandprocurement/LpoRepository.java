@@ -7,6 +7,8 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.orbix.api.api.commons.WorkFlowStatus;
 import com.orbix.api.modules.adminunits.Branch;
@@ -52,6 +54,18 @@ public interface LpoRepository extends JpaRepository<Lpo, Long> {
 		    @Param("endDateTime") LocalDateTime endDateTime
 		);
 
+	// Search on the columns the LPO lists show (sp is the LPO's supplier)
+	String LPO_SEARCH = "(:search = '%%' OR LOWER(l.no) LIKE :search OR LOWER(sp.name) LIKE :search OR LOWER(str(l.status)) LIKE :search)";
+
+	// Same rows as getVisibleLposByBranch, one page at a time
+	@Query("SELECT l FROM Lpo l LEFT JOIN l.supplier sp WHERE (l.branch = :branch OR (:branch IS NULL AND l.branch IS NULL))"
+			+ " AND (l.status IN :openStatuses OR (l.status IN :approvedStatuses AND l.approvedDateTime > :cutoffTime)) AND " + LPO_SEARCH)
+	Page<Lpo> getVisibleLpoPageByBranch(@Param("branch") Branch branch, @Param("openStatuses") List<WorkFlowStatus> openStatuses, @Param("approvedStatuses") List<WorkFlowStatus> approvedStatuses, @Param("cutoffTime") LocalDateTime cutoffTime, @Param("search") String search, Pageable pageable);
+
+	// Same rows as getVisibleLposByBranchAndShop, one page at a time
+	@Query("SELECT l FROM Lpo l LEFT JOIN l.supplier sp WHERE (l.branch = :branch OR (:branch IS NULL AND l.branch IS NULL)) AND l.shop = :shop"
+			+ " AND (l.status IN :openStatuses OR (l.status IN :approvedStatuses AND l.approvedDateTime > :cutoffTime)) AND " + LPO_SEARCH)
+	Page<Lpo> getVisibleLpoPageByBranchAndShop(@Param("branch") Branch branch, @Param("shop") Shop shop, @Param("openStatuses") List<WorkFlowStatus> openStatuses, @Param("approvedStatuses") List<WorkFlowStatus> approvedStatuses, @Param("cutoffTime") LocalDateTime cutoffTime, @Param("search") String search, Pageable pageable);
 }
 
 interface ILpoProjection {

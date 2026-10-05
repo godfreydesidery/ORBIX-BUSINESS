@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface ParkingService {
 	List<ParkingResponseDTO> getAllParkings(HttpServletRequest request);	
@@ -31,4 +32,9 @@ public interface ParkingService {
 	List<MonthlyParkingStatusResponseDTO> getMonthlyStats(int year, HttpServletRequest request);
 	
 	void removeVehicleEquipment(Long parkingId, String reason, HttpServletRequest request);
+
+	PageResponseDTO<ParkingResponseDTO> getPendingOrCheckedInParkingPage(int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<ParkingResponseDTO> getCheckedInParkingPage(int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<ParkingResponseDTO> getWithDiscountsParkingPage(int page, int size, String search, HttpServletRequest request);
+	PageResponseDTO<ParkingResponseDTO> getRecentCheckedOutParkingPage(int page, int size, String search, HttpServletRequest request);
 }

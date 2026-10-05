@@ -17,7 +17,7 @@
                             </div>
                             <div class="col-sm-4"></div>
                             <div class="col-sm-4">
-                                <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords"
+                                <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchList()"
                                     placeholder="Search..." style="max-width: 8cm;">
                             </div>
                         </div>
@@ -34,7 +34,7 @@
                             </thead>
                             <tbody>
                                 <tr
-                                    *ngFor="let restaurantDineable of restaurantDineables | searchFilter : filterRecords | paginate: { itemsPerPage: 10, currentPage: page }; trackBy: trackById">
+                                    *ngFor="let restaurantDineable of $any(restaurantDineables) | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalRestaurantDineables }; trackBy: trackById">
                                     <td>{{restaurantDineable.sn}}</td>
                                     <td>{{restaurantDineable.dineableCode}}</td>
                                     <td>{{restaurantDineable.dineableName}}</td>
@@ -48,7 +48,7 @@
                         <br>
                         <div class="row">
                             <div class="col-sm-12" style="text-align: right;">
-                                <pagination-controls (pageChange)="page = $event"></pagination-controls>
+                                <pagination-controls (pageChange)="pageChanged($event)"></pagination-controls>
                             </div>
                         </div>
                     </div>
