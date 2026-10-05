@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -31,6 +32,15 @@ public class DineableResource {
 	@GetMapping("/dineables")
 	public ResponseEntity<List<DineableResponseDTO>>getAll(HttpServletRequest request){
 		return ResponseEntity.ok().body(dineableService.getAllDineablees(request));
+	}
+	
+	@GetMapping("/dineables/get_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<DineableResponseDTO>>getPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(dineableService.getDineablePage(page, size, request));
 	}
 	@GetMapping("/dineables/get")
 	public ResponseEntity<DineableResponseDTO>get(

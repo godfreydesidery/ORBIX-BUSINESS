@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +34,15 @@ public class ProductResource {
 	@GetMapping("/products")
 	public ResponseEntity<List<ProductResponseDTO>>getAll(HttpServletRequest request){
 		return ResponseEntity.ok().body(productService.getAllProductes(request));
+	}
+	
+	@GetMapping("/products/get_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<ProductResponseDTO>>getPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(productService.getProductPage(page, size, request));
 	}
 	@GetMapping("/products/get")
 	public ResponseEntity<ProductResponseDTO>get(

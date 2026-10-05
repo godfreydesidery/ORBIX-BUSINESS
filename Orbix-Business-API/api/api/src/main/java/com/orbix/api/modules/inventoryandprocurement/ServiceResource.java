@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -32,6 +33,15 @@ public class ServiceResource {
 	@GetMapping("/services")
 	public ResponseEntity<List<ServiceResponseDTO>>getAll(HttpServletRequest request){
 		return ResponseEntity.ok().body(serviceService.getAllServicels(request));
+	}
+	
+	@GetMapping("/services/get_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<ServiceResponseDTO>>getPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(serviceService.getServicePage(page, size, request));
 	}
 	@GetMapping("/services/get")
 	public ResponseEntity<ServiceResponseDTO>get(
