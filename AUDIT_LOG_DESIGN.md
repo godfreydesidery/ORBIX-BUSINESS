@@ -236,17 +236,20 @@ Rules:
   - A row expands to show the details and before/after values.
   - CSV export of the filtered result.
 - **New screen: "Login history".** The same screen preset to `AUTH`, showing each user's last successful login and failed attempts.
-- **Access:** a new privilege object `AUDIT` with `ACCESS` and `READ`, added to `security/Object_.java` so the start-up seeding creates `AUDIT-ACCESS` and `AUDIT-READ`. Granted to ROOT, and to a dedicated auditor role (D3).
+- **Access:** a new privilege object `AUDIT` with `ACCESS`, `READ` and `UPDATE`, added to `security/Object_.java` so the start-up seeding creates `AUDIT-ACCESS`, `AUDIT-READ` and `AUDIT-UPDATE`. ROOT is granted `AUDIT-ACCESS` and `AUDIT-UPDATE`; a dedicated auditor role gets `AUDIT-READ` (D3). `AUDIT-UPDATE` turns recording on and off (D8).
 - **Endpoints:**
   - `GET /audit_logs/get_page?from=&to=&user_id=&category=&action=&outcome=&branch_id=&search=&page=&size=` (read-only transaction);
-  - `GET /audit_logs/get?id=`.
-  - Both require `AUDIT-READ`.
+  - `GET /audit_logs/get?id=`;
+  - `GET /audit_logs/get_setting` (whether recording is on, and who last changed it).
+  - These require `AUDIT-ACCESS`, `AUDIT-READ` or `AUDIT-UPDATE`.
+  - `POST /audit_logs/enable_recording` and `POST /audit_logs/disable_recording` require `AUDIT-UPDATE`.
 - **Times are shown in local business time** and stored in UTC (D7).
 
 ## 9. Protection and retention
 
-- **No edits:** the application has no update or delete path for `audit_logs`.
-- **Database account:** if the hosting allows separate accounts, the application's MySQL user gets only `INSERT, SELECT` on `audit_logs` (D6). Archiving then runs under a separate administrative account.
+- **No edits:** the application has no update path for `audit_logs`, and its only delete is the retention clean-up below.
+- **Database account:** if the hosting allows separate accounts, the application's MySQL user gets only `INSERT, SELECT, DELETE` on `audit_logs` (D6); the delete is needed by the clean-up.
+- **Turning recording off (D8):** recording is on by default. A user with `AUDIT-UPDATE` (ROOT has it) can turn it off and on again from the Audit Log screen, which asks for confirmation before turning it off. The setting is one row in the new table `audit_settings` (created automatically; no row means on) and applies to the whole system. While it is off, nothing new is recorded (no sign-ins, actions or access denials, and no extra reads of changed records); existing entries can still be viewed, and the retention clean-up still runs. Turning recording off or on is itself always recorded (`SECURITY` / `AUDIT_RECORDING_DISABLED` or `AUDIT_RECORDING_ENABLED`, with who and when), so the gap is explained. The setting is kept in memory after it is first read, so checking it costs no query; this assumes one application server, as today.
 - **Retention:** entries are kept for **90 days** (D2), then deleted; there is no archive. `AuditLogCleanup` runs in the background, 10 minutes after start-up and then every 6 hours (not at a fixed night-time hour, so a server switched off at night still clears its log). It deletes in batches of 1,000, each in a short transaction of its own, using the index on `occurredAt`, and records each clearing as a `SECURITY` / `AUDIT_LOG_CLEARED` entry with the number of entries removed, so the gap is explained. Anything older than 90 days can no longer be traced, including login history.
 
 ## 10. Performance
@@ -277,3 +280,4 @@ Each phase is independent and can ship on its own.
 | D5 | Record failed critical actions beyond logins and access denials | No |
 | D6 | Restrict the database account to INSERT/SELECT on the audit table | Yes, if the hosting allows separate accounts |
 | D7 | Time shown on screen | Local business time; stored in UTC |
+| D8 | Allow the client to turn recording off | Yes: on by default, switched from the Audit Log screen with `AUDIT-UPDATE`; the switching itself is always recorded |
