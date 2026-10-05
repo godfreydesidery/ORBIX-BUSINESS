@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.exceptions.InvalidOperationException;
 import com.orbix.api.exceptions.NotFoundException;
@@ -19,6 +21,8 @@ import com.orbix.api.modules.adminunits.Workshop;
 import com.orbix.api.modules.adminunits.WorkshopRepository;
 import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.warehouse.Warehouse;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -208,6 +212,26 @@ public class MachineServiceController implements MachineServiceInterface {
 		dto.setMachineServices(services);
 		
 		return dto;
+	}
+
+	@Override
+	public PageResponseDTO<MachineResponseDTO> getMachinePageByWorkshop(Long workshopId, int page, int size, String search, HttpServletRequest request) {
+		LocalDateTime twentyFourHoursAgo = LocalDateTime.now().minusHours(24);
+
+		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
+		Page<Machine> machines = machineRepository.getRecentPageByWorkshopId(workshopId, twentyFourHoursAgo, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		return new PageResponseDTO<>(machines.getContent().stream().map(this::toDto).toList(), machines.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<MachineResponseDTO> getMachinePageByBranch(int page, int size, String search, HttpServletRequest request) {
+		LocalDateTime twentyFourHoursAgo = LocalDateTime.now().minusHours(24);
+
+		Branch branch = userService.getUserBranch(request);
+
+		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
+		Page<Machine> machines = machineRepository.getRecentPageByBranch(branch, twentyFourHoursAgo, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
+		return new PageResponseDTO<>(machines.getContent().stream().map(this::toDto).toList(), machines.getTotalElements());
 	}
 
 	@Override

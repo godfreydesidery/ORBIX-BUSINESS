@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.modules.warehouse.WarehouseResponseDTO;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -41,6 +42,27 @@ public class MachineResource {
     		HttpServletRequest request) {
         return ResponseEntity.ok().body(machineService.getMachinesByBranch(request));
     }
+
+	@GetMapping("/machines/by_workshop_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<MachineResponseDTO>>getByWorkshopPage(
+			@RequestParam(name = "workshop_id") Long workshopId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(machineService.getMachinePageByWorkshop(workshopId, page, size, search, request));
+	}
+
+	@GetMapping("/machines/by_branch_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<MachineResponseDTO>>getByBranchPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(machineService.getMachinePageByBranch(page, size, search, request));
+	}
 
     @PostMapping("/machines/create")
     public ResponseEntity<MachineResponseDTO> create(

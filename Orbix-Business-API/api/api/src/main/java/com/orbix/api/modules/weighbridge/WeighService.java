@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface WeighService {
 	List<WeighResponseDTO> getAllWeighs(HttpServletRequest request);	
@@ -30,4 +31,6 @@ public interface WeighService {
 //	WeighCustomBillDetail showWeighCustomBillDetail(Long weighId, HttpServletRequest request);
 	
 //	List<MonthlyWeighStatusResponseDTO> getMonthlyStats(int year, HttpServletRequest request);
+
+	PageResponseDTO<WeighResponseDTO> getRecentWeighPage(int page, int size, String search, HttpServletRequest request);
 }
