@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -406,7 +407,8 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		double totalGenerated = 0;
 		double totalUngenerated = 0;
 		
-		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking_.get());
+		// One load (bill receivables fetched with it), shared with getUngeneratedBill
+		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking_.get()));
 		for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivables) {
 			if(parkingBillReceivable.getBillReceivable().getPayStatus().toString().equals("PAID")) {
 				totalPaid = totalPaid + parkingBillReceivable.getBillReceivable().getAmount();
@@ -414,8 +416,8 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 				totalGenerated = totalGenerated + parkingBillReceivable.getBillReceivable().getAmount();
 			}
 		}
-		
-		totalUngenerated = this.getUngeneratedBill(parking_.get());
+
+		totalUngenerated = this.getUngeneratedBill(parking_.get(), parkingBillReceivables);
 		
 		
 		billResponse.setBillPaid(String.valueOf(totalPaid));
@@ -427,12 +429,10 @@ public class ParkingBillReceivableServiceController implements ParkingBillReceiv
 		return billResponse;
 	}
 	
-	private double getUngeneratedBill(Parking parking) {
-		
+	private double getUngeneratedBill(Parking parking, List<ParkingBillReceivable> rcvs) {
+
 		double bill = 0;
-		
-		List<ParkingBillReceivable> rcvs = parkingBillReceivableRepository.findAllByParking(parking);
-		
+
 		LocalDateTime fromDate = null;
 		LocalDateTime toDate = null;
 		double qty = 0;

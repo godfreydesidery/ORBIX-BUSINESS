@@ -10,6 +10,9 @@ import org.springframework.data.repository.query.Param;
 import com.orbix.api.modules.adminunits.Restaurant;
 
 public interface RestaurantProductRepository extends JpaRepository<RestaurantProduct, Long> {
+
+	@Query("SELECT rp.product.id FROM RestaurantProduct rp WHERE rp.restaurant = :restaurant")
+	List<Long> getProductIdsByRestaurant(@Param("restaurant") Restaurant restaurant);
 	
 	List<RestaurantProduct> findAllByRestaurant(Object object);
 

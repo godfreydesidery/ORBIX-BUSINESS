@@ -1,7 +1,9 @@
 package com.orbix.api.modules.inventoryandprocurement;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -299,11 +301,23 @@ public class ProductServiceController implements ProductService {
 	    List<Product> products = productRepository.findAllByCompanyAndSellable(company, true);
 	    List<ProductResponseDTO> productResponses = new ArrayList<>();
 	    
+	    // How many times each product is already in the shop, loaded once instead of one look-up per product
+	    Map<Long, Integer> shopProductCounts = new HashMap<>();
+	    for(Long productId : shopProductRepository.getProductIdsByShop(shop)) {
+	    	shopProductCounts.merge(productId, 1, Integer::sum);
+	    }
+	    
 	    for(Product product : products) {
 	    	boolean imported = false;
-	    	Optional<ShopProduct> shopProduct_ = shopProductRepository.findByProductAndShop(product, shop);
-	    	if(shopProduct_.isPresent()) {
+	    	int shopProductCount = shopProductCounts.getOrDefault(product.getId(), 0);
+	    	if(shopProductCount == 1) {
 	    		imported = true;
+	    	}else if(shopProductCount > 1) {
+	    		// Not expected; keep the original look-up so the outcome stays the same
+	    		Optional<ShopProduct> shopProduct_ = shopProductRepository.findByProductAndShop(product, shop);
+	    		if(shopProduct_.isPresent()) {
+	    			imported = true;
+	    		}
 	    	}	    	
 	    	productResponses.add(productResponseDTOMapperWithImportedStatus(product, imported));
 	    	
@@ -329,11 +343,23 @@ public class ProductServiceController implements ProductService {
 	    List<Product> products = productRepository.findAllByCompanyAndSellable(company, true);
 	    List<ProductResponseDTO> productResponses = new ArrayList<>();
 	    
+	    // How many times each product is already in the restaurant, loaded once instead of one look-up per product
+	    Map<Long, Integer> restaurantProductCounts = new HashMap<>();
+	    for(Long productId : restaurantProductRepository.getProductIdsByRestaurant(restaurant)) {
+	    	restaurantProductCounts.merge(productId, 1, Integer::sum);
+	    }
+	    
 	    for(Product product : products) {
 	    	boolean imported = false;
-	    	Optional<RestaurantProduct> restaurantProduct_ = restaurantProductRepository.findByProductAndRestaurant(product, restaurant);
-	    	if(restaurantProduct_.isPresent()) {
+	    	int restaurantProductCount = restaurantProductCounts.getOrDefault(product.getId(), 0);
+	    	if(restaurantProductCount == 1) {
 	    		imported = true;
+	    	}else if(restaurantProductCount > 1) {
+	    		// Not expected; keep the original look-up so the outcome stays the same
+	    		Optional<RestaurantProduct> restaurantProduct_ = restaurantProductRepository.findByProductAndRestaurant(product, restaurant);
+	    		if(restaurantProduct_.isPresent()) {
+	    			imported = true;
+	    		}
 	    	}	    	
 	    	productResponses.add(productResponseDTOMapperWithImportedStatus(product, imported));
 	    	

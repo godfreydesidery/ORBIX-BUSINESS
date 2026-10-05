@@ -1,7 +1,10 @@
 package com.orbix.api.modules.vehicleandequipmentmaintenance;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -143,8 +146,15 @@ public class MaintenanceJobCardServiceController implements MaintenanceJobCardSe
 		
 		List<MaintenanceJobCardIssueResponseDTO> maintenanceJobCardIssues = new ArrayList<>();
 		if(maintenanceJobCard.getMaintenanceJobCardIssues() != null) {
+			// Bills of all the issues in one query instead of one query per issue (same id order per issue)
+			Map<Long, List<MaintenanceJobCardIssueBillReceivable>> blsByMaintenanceJobCardIssue = new HashMap<>();
+			if(!maintenanceJobCard.getMaintenanceJobCardIssues().isEmpty()) {
+				for(MaintenanceJobCardIssueBillReceivable bl : maintenanceJobCardIssueBillReceivableRepository.findAllByMaintenanceJobCardIssueIn(new ArrayList<>(maintenanceJobCard.getMaintenanceJobCardIssues()))) {
+					blsByMaintenanceJobCardIssue.computeIfAbsent(bl.getMaintenanceJobCardIssue().getId(), k -> new ArrayList<>()).add(bl);
+				}
+			}
 			for(MaintenanceJobCardIssue maintenanceJobCardIssue : maintenanceJobCard.getMaintenanceJobCardIssues()) {
-				List<MaintenanceJobCardIssueBillReceivable> bls = maintenanceJobCardIssueBillReceivableRepository.findAllByMaintenanceJobCardIssue(maintenanceJobCardIssue);
+				List<MaintenanceJobCardIssueBillReceivable> bls = blsByMaintenanceJobCardIssue.getOrDefault(maintenanceJobCardIssue.getId(), Collections.emptyList());
 				String payStatus = "NA";
 				for(MaintenanceJobCardIssueBillReceivable bl : bls) {
 					payStatus = bl.getBillReceivable().getPayStatus().toString();

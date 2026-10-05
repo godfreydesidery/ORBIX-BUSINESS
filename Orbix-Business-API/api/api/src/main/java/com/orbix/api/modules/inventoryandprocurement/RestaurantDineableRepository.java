@@ -4,6 +4,8 @@ import java.util.List;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 import com.orbix.api.modules.adminunits.Restaurant;
 
@@ -14,4 +16,6 @@ public interface RestaurantDineableRepository extends JpaRepository<RestaurantDi
 	boolean existsByRestaurantAndDineable(Restaurant restaurant, Dineable dineable);
 	List<RestaurantDineable> findAllByRestaurantAndDineable_NameContainingIgnoreCase(Restaurant restaurant, String name);
 	Optional<RestaurantDineable> findByDineableAndRestaurant(Dineable dineable, Restaurant restaurant);
+	@Query("SELECT rd.dineable.id FROM RestaurantDineable rd WHERE rd.restaurant = :restaurant")
+	List<Long> getDineableIdsByRestaurant(@Param("restaurant") Restaurant restaurant);
 }

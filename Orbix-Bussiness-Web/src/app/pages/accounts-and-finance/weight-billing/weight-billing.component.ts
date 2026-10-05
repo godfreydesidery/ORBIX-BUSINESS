@@ -131,7 +131,7 @@ export class WeightBillingComponent {
       this.weighId = params['weigh_id']
     })
     this.getWeighBillReceivables(this.weighId)
-    this.getWeighServiceBillReceivables(this.weighId)
+    //this.getWeighServiceBillReceivables(this.weighId) // not shown on this screen, its table is commented out
   }
 
 
@@ -543,7 +543,7 @@ export class WeightBillingComponent {
 
   refresh() {
     this.getWeighBillReceivables(this.weighId)
-    this.getWeighServiceBillReceivables(this.weighId)
+    //this.getWeighServiceBillReceivables(this.weighId) // not shown on this screen, its table is commented out
   }
 
 

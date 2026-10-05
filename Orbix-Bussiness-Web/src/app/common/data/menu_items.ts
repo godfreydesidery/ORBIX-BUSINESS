@@ -4,6 +4,10 @@ import { DataService } from "@services/custom/data.service";
 
 import { AuthService } from "src/app/auth.service";
 
+// Declared before menuItems, which calls grant() while this module loads
+let cachedAccessToken: string = '';
+let cachedDecodedToken: any = null;
+
 export const menuItems = [
     /*{
         title: 'Dashboard',
@@ -1119,6 +1123,15 @@ export const menuItems = [
 
 
 
+// The token is decoded only when it changes, instead of on every grant() call
+function decodeAccessToken(accessToken: string): any {
+    if (cachedDecodedToken === null || cachedAccessToken !== accessToken) {
+        cachedDecodedToken = new JwtHelperService().decodeToken(accessToken);
+        cachedAccessToken = accessToken;
+    }
+    return cachedDecodedToken;
+}
+
 export function grant(privileges: string[]): boolean {
     /** Allow user to perform an action if the user has that privilege */
 
@@ -1128,7 +1141,7 @@ export function grant(privileges: string[]): boolean {
         return false;
     }
 
-    const decodedToken = new JwtHelperService().decodeToken(currentUser.access_token);
+    const decodedToken = decodeAccessToken(currentUser.access_token);
     if (!decodedToken || !decodedToken.privileges) {
         console.error('No privileges found in the token.');
         return false;

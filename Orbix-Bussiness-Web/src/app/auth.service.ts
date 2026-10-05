@@ -212,6 +212,18 @@ export class AuthService {
     localStorage.removeItem('branch-name')
   }
 
+  private cachedAccessToken : string = ''
+  private cachedDecodedToken : { privileges : string[] } | null = null
+
+  // The token is decoded only when it changes, instead of on every privilege check
+  private decodeTokenPrivileges(accessToken : string) : { privileges : string[] } | null {
+    if(this.cachedDecodedToken === null || this.cachedAccessToken !== accessToken){
+      this.cachedDecodedToken = this.helper.decodeToken(accessToken)
+      this.cachedAccessToken = accessToken
+    }
+    return this.cachedDecodedToken
+  }
+
   public checkPrivilege(priv : string) : boolean{
     /**
      * Return true if a user has a certain privilege
@@ -224,7 +236,7 @@ export class AuthService {
     } = JSON.parse(localStorage.getItem('current-user')!)
     var privs : {
       privileges : string[]
-    } = this.helper.decodeToken(currentUser.access_token)! 
+    } = this.decodeTokenPrivileges(currentUser.access_token)!
 
     for(let i = 0; i < privs.privileges.length; i++){
       if(privs.privileges[i] === priv){

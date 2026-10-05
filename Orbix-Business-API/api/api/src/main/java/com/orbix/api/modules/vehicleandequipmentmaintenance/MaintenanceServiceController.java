@@ -3,7 +3,10 @@ package com.orbix.api.modules.vehicleandequipmentmaintenance;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -64,6 +67,34 @@ public class MaintenanceServiceController implements MaintenanceService {
 	
 	private final InvoiceReceivableRepository invoiceReceivableRepository;
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
+
+	private static final int IN_CLAUSE_CHUNK_SIZE = 1000;
+
+	// Bills of all the given maintenances in a few batched queries, grouped by maintenance id (used for the paid check only, where order does not matter)
+	private Map<Long, List<MaintenanceJobCardIssueBillReceivable>> getMaintenanceJobCardIssueBillReceivablesByMaintenance(List<Maintenance> maintenances) {
+		Map<Long, List<MaintenanceJobCardIssueBillReceivable>> maintenanceJobCardIssueBillReceivablesByMaintenance = new HashMap<>();
+		for(int i = 0; i < maintenances.size(); i += IN_CLAUSE_CHUNK_SIZE) {
+			List<Maintenance> chunk = maintenances.subList(i, Math.min(i + IN_CLAUSE_CHUNK_SIZE, maintenances.size()));
+			for(MaintenanceJobCardIssueBillReceivable maintenanceJobCardIssueBillReceivable : maintenanceJobCardIssueBillReceivableRepository.findAllByMaintenanceJobCardIssue_MaintenanceJobCard_MaintenanceIn(chunk)) {
+				maintenanceJobCardIssueBillReceivablesByMaintenance.computeIfAbsent(maintenanceJobCardIssueBillReceivable.getMaintenanceJobCardIssue().getMaintenanceJobCard().getMaintenance().getId(), k -> new ArrayList<>()).add(maintenanceJobCardIssueBillReceivable);
+			}
+		}
+		return maintenanceJobCardIssueBillReceivablesByMaintenance;
+	}
+
+	// Cleared when every bill of the maintenance is PAID (a maintenance without bills is cleared)
+	private boolean isCleared(List<MaintenanceJobCardIssueBillReceivable> maintenanceJobCardIssueBillReceivables) {
+		boolean cleared = true;
+		if(!maintenanceJobCardIssueBillReceivables.isEmpty() && cleared == true) {
+			for(MaintenanceJobCardIssueBillReceivable maintenanceJobCardIssueBillReceivable : maintenanceJobCardIssueBillReceivables) {
+				if(!maintenanceJobCardIssueBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
+					cleared = false;
+					break;
+				}
+			}
+		}
+		return cleared;
+	}
 
 	@Override
 	public List<MaintenanceResponseDTO> getAllMaintenances(HttpServletRequest request) {
@@ -157,25 +188,14 @@ public class MaintenanceServiceController implements MaintenanceService {
 		statuses.add("CHECKED-IN");
 		
 		List<Maintenance> maintenances = maintenanceRepository.findAllByStatusIn(statuses);
+		Map<Long, List<MaintenanceJobCardIssueBillReceivable>> maintenanceJobCardIssueBillReceivablesByMaintenance = getMaintenanceJobCardIssueBillReceivablesByMaintenance(maintenances);
 		List<MaintenanceResponseDTO> maintenanceResponses = new ArrayList<>();
 
 		for(Maintenance maintenance : maintenances) {
-			
-			boolean cleared = true;
-			
-			List<MaintenanceJobCardIssueBillReceivable> maintenanceJobCardIssueBillReceivables = maintenanceJobCardIssueBillReceivableRepository.findAllByMaintenanceJobCardIssue_MaintenanceJobCard_Maintenance(maintenance);
-			if(!maintenanceJobCardIssueBillReceivables.isEmpty() && cleared == true) {
-				for(MaintenanceJobCardIssueBillReceivable maintenanceJobCardIssueBillReceivable : maintenanceJobCardIssueBillReceivables) {
-					if(!maintenanceJobCardIssueBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
-						cleared = false;
-						break;
-					}
-				}
-			}
-			
-			if(cleared) maintenanceResponses.add(maintenanceResponseDTOMapper(maintenance));	
-							
-		}		
+			boolean cleared = isCleared(maintenanceJobCardIssueBillReceivablesByMaintenance.getOrDefault(maintenance.getId(), Collections.emptyList()));
+
+			if(cleared) maintenanceResponses.add(maintenanceResponseDTOMapper(maintenance));
+		}
 		return maintenanceResponses;
 	}
 
@@ -197,25 +217,14 @@ public class MaintenanceServiceController implements MaintenanceService {
 		List<Maintenance> maintenances = maintenanceRepository.findAllByStatusInAndCheckedOutDateTimeBetween(statuses, before, now);
 		
 		//List<Maintenance> maintenances = maintenanceRepository.findAllByStatusInAndCheckedOutBetween(statuses, LocalDateTime.now().);
+		Map<Long, List<MaintenanceJobCardIssueBillReceivable>> maintenanceJobCardIssueBillReceivablesByMaintenance = getMaintenanceJobCardIssueBillReceivablesByMaintenance(maintenances);
 		List<MaintenanceResponseDTO> maintenanceResponses = new ArrayList<>();
 
 		for(Maintenance maintenance : maintenances) {
-			
-			boolean cleared = true;
-			
-			List<MaintenanceJobCardIssueBillReceivable> maintenanceJobCardIssueBillReceivables = maintenanceJobCardIssueBillReceivableRepository.findAllByMaintenanceJobCardIssue_MaintenanceJobCard_Maintenance(maintenance);
-			if(!maintenanceJobCardIssueBillReceivables.isEmpty() && cleared == true) {
-				for(MaintenanceJobCardIssueBillReceivable maintenanceJobCardIssueBillReceivable : maintenanceJobCardIssueBillReceivables) {
-					if(!maintenanceJobCardIssueBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
-						cleared = false;
-						break;
-					}
-				}
-			}
-			
-			if(cleared) maintenanceResponses.add(maintenanceResponseDTOMapper(maintenance));	
-							
-		}		
+			boolean cleared = isCleared(maintenanceJobCardIssueBillReceivablesByMaintenance.getOrDefault(maintenance.getId(), Collections.emptyList()));
+
+			if(cleared) maintenanceResponses.add(maintenanceResponseDTOMapper(maintenance));
+		}
 		return maintenanceResponses;
 	}
 

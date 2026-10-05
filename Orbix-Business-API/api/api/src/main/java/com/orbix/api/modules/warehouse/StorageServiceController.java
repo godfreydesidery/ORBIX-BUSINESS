@@ -5,7 +5,11 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -69,14 +73,49 @@ public class StorageServiceController implements StorageService {
 		
 	
 
+	private static final int IN_CLAUSE_CHUNK_SIZE = 1000;
+
+	// Bills of all the given storages in a few batched queries, grouped by storage id (same id order as findAllByStorage)
+	private Map<Long, List<StorageBillReceivable>> getStorageBillReceivablesByStorage(List<Storage> storages) {
+		Map<Long, List<StorageBillReceivable>> storageBillReceivablesByStorage = new HashMap<>();
+		for(int i = 0; i < storages.size(); i += IN_CLAUSE_CHUNK_SIZE) {
+			List<Storage> chunk = storages.subList(i, Math.min(i + IN_CLAUSE_CHUNK_SIZE, storages.size()));
+			for(StorageBillReceivable storageBillReceivable : storageBillReceivableRepository.findAllByStorageIn(chunk)) {
+				storageBillReceivablesByStorage.computeIfAbsent(storageBillReceivable.getStorage().getId(), k -> new ArrayList<>()).add(storageBillReceivable);
+			}
+		}
+		return storageBillReceivablesByStorage;
+	}
+
+	// Cleared when every bill of the storage is PAID (a storage without bills is cleared)
+	private boolean isCleared(List<StorageBillReceivable> storageBillReceivables) {
+		boolean cleared = true;
+		if(!storageBillReceivables.isEmpty() && cleared == true) {
+			for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
+				if(!storageBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
+					cleared = false;
+					break;
+				}
+			}
+		}
+		return cleared;
+	}
+
 	@Override
 	public List<StorageResponseDTO> getAllStorages(HttpServletRequest request) {
 		List<Storage> storages = storageRepository.findAll();
-		List<StorageResponseDTO> storageResponses = new ArrayList<>();
 
+		// The mapper lists the bills of checked out storages; load them for all such storages at once
+		List<Storage> checkedOutStorages = new ArrayList<>();
 		for(Storage storage : storages) {
-			storageResponses.add(storageResponseDTOMapper(storage));					
-		}		
+			if("CHECKED-OUT".equals(storage.getStatus())) checkedOutStorages.add(storage);
+		}
+		Map<Long, List<StorageBillReceivable>> storageBillReceivablesByStorage = getStorageBillReceivablesByStorage(checkedOutStorages);
+
+		List<StorageResponseDTO> storageResponses = new ArrayList<>();
+		for(Storage storage : storages) {
+			storageResponses.add(storageResponseDTOMapper(storage, storageBillReceivablesByStorage));
+		}
 		return storageResponses;
 	}
 	
@@ -139,19 +178,19 @@ public class StorageServiceController implements StorageService {
 		List<String> statuses = new ArrayList<>();
 		statuses.add("CHECKED-IN");
 		
-		List<Storage> storages = storageRepository.findAllByStatusIn(statuses);
-		List<StorageResponseDTO> storageResponses = new ArrayList<>();
+		// Load only the bills with a requested discount, instead of every bill of every checked-in storage
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByDiscountStatusAndStorage_StatusIn("Requested", statuses);
+		Map<Long, Storage> storages = new LinkedHashMap<>();
+		for(StorageBillReceivable sbr : storageBillReceivables) {
+			if(sbr.getDiscountStatus() != null && sbr.getDiscountStatus().equals("Requested")) {
+				storages.putIfAbsent(sbr.getStorage().getId(), sbr.getStorage());
+			}
+		}
 
-		for(Storage storage : storages) {
-			
-			List<StorageBillReceivable> sbrs = storageBillReceivableRepository.findByStorage(storage);
-			for(StorageBillReceivable sbr : sbrs) {
-				if(sbr.getDiscountStatus() != null && sbr.getDiscountStatus().equals("Requested")) {
-					storageResponses.add(storageResponseDTOMapper(storage));
-					break;
-				}
-			}							
-		}		
+		List<StorageResponseDTO> storageResponses = new ArrayList<>();
+		for(Storage storage : storages.values()) {
+			storageResponses.add(storageResponseDTOMapper(storage));
+		}
 		return storageResponses;
 	}
 	
@@ -166,12 +205,13 @@ public class StorageServiceController implements StorageService {
 		
 		LocalDateTime yesterday = LocalDateTime.now().minusHours(24);
 		List<Storage> storages = storageRepository.findAllByWarehouseAndStatusInAndCheckedOutDateTimeAfter(warehouse, statuses, yesterday);
-		
+		Map<Long, List<StorageBillReceivable>> storageBillReceivablesByStorage = getStorageBillReceivablesByStorage(storages);
+
 		List<StorageResponseDTO> storageResponses = new ArrayList<>();
 
 		for(Storage storage : storages) {
-			storageResponses.add(storageResponseDTOMapper(storage));					
-		}		
+			storageResponses.add(storageResponseDTOMapper(storage, storageBillReceivablesByStorage));
+		}
 		return storageResponses;
 	}
 	
@@ -182,28 +222,17 @@ public class StorageServiceController implements StorageService {
 		statuses.add("CHECKED-IN");
 		
 		List<Storage> storages = storageRepository.findAllByStatusIn(statuses);
+		Map<Long, List<StorageBillReceivable>> storageBillReceivablesByStorage = getStorageBillReceivablesByStorage(storages);
 		List<StorageResponseDTO> storageResponses = new ArrayList<>();
 
 		for(Storage storage : storages) {
-			
-			boolean cleared = true;
-			
-			List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage);
-			if(!storageBillReceivables.isEmpty() && cleared == true) {
-				for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
-					if(!storageBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
-						cleared = false;
-						break;
-					}
-				}
-			}
-			
-			if(cleared) storageResponses.add(storageResponseDTOMapper(storage));	
-							
-		}		
+			boolean cleared = isCleared(storageBillReceivablesByStorage.getOrDefault(storage.getId(), Collections.emptyList()));
+
+			if(cleared) storageResponses.add(storageResponseDTOMapper(storage, storageBillReceivablesByStorage));
+		}
 		return storageResponses;
 	}
-	
+
 	@Override
 	public List<StorageResponseDTO> getTodayCheckedOut(HttpServletRequest request) {
 		
@@ -217,25 +246,14 @@ public class StorageServiceController implements StorageService {
 		List<Storage> storages = storageRepository.findAllByStatusInAndCheckedOutDateTimeBetween(statuses, startOfToday, endOfYesterday);
 		
 		//List<Storage> storages = storageRepository.findAllByStatusInAndCheckedOutBetween(statuses, LocalDateTime.now().);
+		Map<Long, List<StorageBillReceivable>> storageBillReceivablesByStorage = getStorageBillReceivablesByStorage(storages);
 		List<StorageResponseDTO> storageResponses = new ArrayList<>();
 
 		for(Storage storage : storages) {
-			
-			boolean cleared = true;
-			
-			List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage);
-			if(!storageBillReceivables.isEmpty() && cleared == true) {
-				for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
-					if(!storageBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
-						cleared = false;
-						break;
-					}
-				}
-			}
-			
-			if(cleared) storageResponses.add(storageResponseDTOMapper(storage));	
-							
-		}		
+			boolean cleared = isCleared(storageBillReceivablesByStorage.getOrDefault(storage.getId(), Collections.emptyList()));
+
+			if(cleared) storageResponses.add(storageResponseDTOMapper(storage, storageBillReceivablesByStorage));
+		}
 		return storageResponses;
 	}
 	
@@ -487,6 +505,11 @@ public class StorageServiceController implements StorageService {
 	}
 
 	private StorageResponseDTO storageResponseDTOMapper(Storage storage) {
+		return storageResponseDTOMapper(storage, null);
+	}
+
+	// Takes the bills from the preloaded map when given, otherwise queries them for this storage
+	private StorageResponseDTO storageResponseDTOMapper(Storage storage, Map<Long, List<StorageBillReceivable>> storageBillReceivablesByStorage) {
 		StorageResponseDTO storageResponse = new StorageResponseDTO();
 		
 		storageResponse.setId(String.valueOf(storage.getId()));
@@ -543,7 +566,9 @@ public class StorageServiceController implements StorageService {
 		if(storage.getStatus().equals("CHECKED-OUT")) {
 			List<ServiceBillItem> items = new ArrayList<>();
 		
-			List<StorageBillReceivable> pbs = storageBillReceivableRepository.findAllByStorage(storage);
+			List<StorageBillReceivable> pbs = storageBillReceivablesByStorage != null
+					? storageBillReceivablesByStorage.getOrDefault(storage.getId(), Collections.emptyList())
+					: storageBillReceivableRepository.findAllByStorage(storage);
 			int sn = 1;
 			for(StorageBillReceivable pbr : pbs) {
 				ServiceBillItem sbi = new ServiceBillItem();

@@ -4,7 +4,10 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -76,8 +79,9 @@ public class ParkingReportResource {
 		checkOutStatuses.add("CHECKED-OUT");
 		parkingTotalsResponse.setCheckedOut(String.valueOf(parkingRepository.countByDateRangeAndCheckedOut(dateRange.getFrom().atStartOfDay(), dateRange.getTo().atTime(LocalTime.MAX), checkOutStatuses)));
 		
-		parkingTotalsResponse.setCurrentUnpaid(String.valueOf(parkingRepository.countRegistered()));
-		parkingTotalsResponse.setCurrentTotalInYards(String.valueOf(parkingRepository.countRegistered()));
+		long registered = parkingRepository.countRegistered();
+		parkingTotalsResponse.setCurrentUnpaid(String.valueOf(registered));
+		parkingTotalsResponse.setCurrentTotalInYards(String.valueOf(registered));
 		
 		
 //		public long countPaidOrVerifiedBillsWithinDateRange(LocalDateTime startDate, LocalDateTime endDate) {
@@ -141,6 +145,8 @@ public class ParkingReportResource {
 		
 	}
 	
+	private static final int IN_CLAUSE_CHUNK_SIZE = 1000;
+	
 	@PostMapping("/parking_reports/get_parking_report")
 	public ResponseEntity<List<ParkingResponseDTO>>getParkingReportByDateAndReceptionist(
 			@RequestBody DateRange dateRange,
@@ -179,6 +185,15 @@ public class ParkingReportResource {
 			    );	
 		}
 		
+		// Bills of all the parkings in the report, loaded in a few batched queries instead of one query per parking
+		Map<Long, List<ParkingBillReceivable>> parkingBillReceivablesByParking = new HashMap<>();
+		for(int i = 0; i < parkings.size(); i += IN_CLAUSE_CHUNK_SIZE) {
+			List<Parking> chunk = parkings.subList(i, Math.min(i + IN_CLAUSE_CHUNK_SIZE, parkings.size()));
+			for(ParkingBillReceivable parkingBillReceivable : parkingBillReceivableRepository.findAllByParkingIn(chunk)) {
+				parkingBillReceivablesByParking.computeIfAbsent(parkingBillReceivable.getParking().getId(), k -> new ArrayList<>()).add(parkingBillReceivable);
+			}
+		}
+		
 		List<ParkingResponseDTO> parkingResponses = new ArrayList<>();
 		int sn = 1;
 		for(Parking parking : parkings) {
@@ -210,7 +225,7 @@ public class ParkingReportResource {
 			
 			
 			// Get pay status
-			List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParking(parking);
+			List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivablesByParking.getOrDefault(parking.getId(), Collections.emptyList());
 			
 			boolean inStartLimit = false;
 			boolean inEndLimit = false;

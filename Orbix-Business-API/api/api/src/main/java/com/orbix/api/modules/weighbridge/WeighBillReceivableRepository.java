@@ -15,4 +15,6 @@ public interface WeighBillReceivableRepository extends JpaRepository<WeighBillRe
 
 	Optional<WeighBillReceivable> findByBillReceivable(BillReceivable billReceivable);
 
+	List<WeighBillReceivable> findAllByBillReceivableIn(List<BillReceivable> billReceivables);
+
 }

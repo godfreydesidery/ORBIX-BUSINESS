@@ -236,17 +236,11 @@ export class RoleAccessComponent {
   }
 
   privilegeChecked(object_ : string, operation_ : string){
-    var present = false
-    for (const [key] of Object.entries(this.privileges)){
-      if(key === object_){
-        this.privileges[key].forEach(element => {
-          if(element === operation_){
-            present = true
-          }
-        })
-      }   
-    } 
-    return present 
+    // Direct look-up of the object's operations instead of scanning every entry (called for each checkbox on every refresh)
+    if(!Object.prototype.hasOwnProperty.call(this.privileges, object_)){
+      return false
+    }
+    return this.privileges[object_].includes(operation_)
   }
 
   async addPrivilegeToRole(role : string){

@@ -1,7 +1,9 @@
 package com.orbix.api.modules.inventoryandprocurement;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -295,11 +297,23 @@ public class DineableServiceController implements DineableService {
 	    List<Dineable> dineables = dineableRepository.findAllByCompanyAndSellable(company, true);
 	    List<DineableResponseDTO> dineableResponses = new ArrayList<>();
 	    
+	    // How many times each dineable is already in the restaurant, loaded once instead of one look-up per dineable
+	    Map<Long, Integer> restaurantDineableCounts = new HashMap<>();
+	    for(Long dineableId : restaurantDineableRepository.getDineableIdsByRestaurant(restaurant)) {
+	    	restaurantDineableCounts.merge(dineableId, 1, Integer::sum);
+	    }
+	    
 	    for(Dineable dineable : dineables) {
 	    	boolean imported = false;
-	    	Optional<RestaurantDineable> restaurantDineable_ = restaurantDineableRepository.findByDineableAndRestaurant(dineable, restaurant);
-	    	if(restaurantDineable_.isPresent()) {
+	    	int restaurantDineableCount = restaurantDineableCounts.getOrDefault(dineable.getId(), 0);
+	    	if(restaurantDineableCount == 1) {
 	    		imported = true;
+	    	}else if(restaurantDineableCount > 1) {
+	    		// Not expected; keep the original look-up so the outcome stays the same
+	    		Optional<RestaurantDineable> restaurantDineable_ = restaurantDineableRepository.findByDineableAndRestaurant(dineable, restaurant);
+	    		if(restaurantDineable_.isPresent()) {
+	    			imported = true;
+	    		}
 	    	}	    	
 	    	dineableResponses.add(dineableResponseDTOMapperWithImportedStatus(dineable, imported));
 	    	

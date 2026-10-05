@@ -79,18 +79,19 @@ public class LpoServiceController implements LpoService {
 	@Override
 	public List<LpoResponseDTO> getAllVisibleLposByBranch(HttpServletRequest request) {
 		
-		List<WorkFlowStatus> statuses = new ArrayList<>();
-		statuses.add(WorkFlowStatus.PENDING);
-		statuses.add(WorkFlowStatus.PROCESSING);
-		statuses.add(WorkFlowStatus.APPROVED);
+		// Pending and processing LPOs, plus those approved in the last 48 hours (filtered in the query, not after loading all history)
+		List<WorkFlowStatus> openStatuses = new ArrayList<>();
+		openStatuses.add(WorkFlowStatus.PENDING);
+		openStatuses.add(WorkFlowStatus.PROCESSING);
+		
+		List<WorkFlowStatus> approvedStatuses = new ArrayList<>();
+		approvedStatuses.add(WorkFlowStatus.APPROVED);
 		
 		LocalDateTime cutoffTime = LocalDateTime.now().minusHours(48);
 
-	    List<Lpo> lpos = lpoRepository.findAllByStatusInAndBranch(statuses, userService.getUserBranch(request));
+	    List<Lpo> lpos = lpoRepository.getVisibleLposByBranch(userService.getUserBranch(request), openStatuses, approvedStatuses, cutoffTime);
 
 	    return lpos.stream()
-	        .filter(lpo -> lpo.getStatus() != WorkFlowStatus.APPROVED || 
-	                       (lpo.getApprovedDateTime() != null && lpo.getApprovedDateTime().isAfter(cutoffTime)))
 	        .map(this::lpoResponseDTOMapper)
 	        .collect(Collectors.toList());
 	}
@@ -103,19 +104,20 @@ public class LpoServiceController implements LpoService {
 			throw new NotFoundException("Shop not found");
 		}
 		
-		List<WorkFlowStatus> statuses = new ArrayList<>();
-		statuses.add(WorkFlowStatus.PENDING);
-		statuses.add(WorkFlowStatus.PROCESSING);
-		statuses.add(WorkFlowStatus.APPROVED);
-		statuses.add(WorkFlowStatus.COMPLETED);
+		// Pending and processing LPOs, plus those approved or completed in the last 48 hours (filtered in the query, not after loading all history)
+		List<WorkFlowStatus> openStatuses = new ArrayList<>();
+		openStatuses.add(WorkFlowStatus.PENDING);
+		openStatuses.add(WorkFlowStatus.PROCESSING);
+		
+		List<WorkFlowStatus> approvedStatuses = new ArrayList<>();
+		approvedStatuses.add(WorkFlowStatus.APPROVED);
+		approvedStatuses.add(WorkFlowStatus.COMPLETED);
 		
 		LocalDateTime cutoffTime = LocalDateTime.now().minusHours(48);
 
-			List<Lpo> lpos = lpoRepository.findAllByStatusInAndBranchAndShop(statuses, userService.getUserBranch(request), shop_.get());
+			List<Lpo> lpos = lpoRepository.getVisibleLposByBranchAndShop(userService.getUserBranch(request), shop_.get(), openStatuses, approvedStatuses, cutoffTime);
 
 			return lpos.stream()
-			        .filter(lpo -> !(lpo.getStatus() == WorkFlowStatus.APPROVED || lpo.getStatus() == WorkFlowStatus.COMPLETED) ||
-			                       (lpo.getApprovedDateTime() != null && lpo.getApprovedDateTime().isAfter(cutoffTime)))
 			        .map(this::lpoResponseDTOMapper)
 			        .collect(Collectors.toList());
 	}

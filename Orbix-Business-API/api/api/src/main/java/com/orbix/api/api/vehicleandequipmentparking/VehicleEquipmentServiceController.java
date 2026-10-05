@@ -3,11 +3,11 @@ package com.orbix.api.api.vehicleandequipmentparking;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import com.orbix.api.exceptions.InvalidEntryException;
@@ -141,12 +141,8 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 	
 	@Override	
 	public List<String> getChasisNos(HttpServletRequest request) {
-		List<String> chasisNos = vehicleEquipmentRepository.findTop2000ByActiveTrue()
-			    .stream()
-			    .map(VehicleEquipment::getChasisNo)
-			    .collect(Collectors.toList());
-		
-			return chasisNos;		
+		// Read only the chassis numbers instead of loading 2000 full records with their related data
+		return vehicleEquipmentRepository.getActiveChasisNos(PageRequest.of(0, 2000));
 	}
 	
 	

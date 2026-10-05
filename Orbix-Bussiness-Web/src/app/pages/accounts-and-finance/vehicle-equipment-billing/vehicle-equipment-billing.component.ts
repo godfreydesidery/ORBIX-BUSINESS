@@ -172,7 +172,7 @@ export class VehicleEquipmentBillingComponent {
       this.parkingId = params['parking_id']
     })
     this.getParkingBillReceivables(this.parkingId)
-    this.getParkingServiceBillReceivables(this.parkingId)
+    //this.getParkingServiceBillReceivables(this.parkingId) // not shown on this screen, its table is commented out
   }
 
 
@@ -552,7 +552,7 @@ export class VehicleEquipmentBillingComponent {
 
   refresh() {
     this.getParkingBillReceivables(this.parkingId)
-    this.getParkingServiceBillReceivables(this.parkingId)
+    //this.getParkingServiceBillReceivables(this.parkingId) // not shown on this screen, its table is commented out
   }
 
 
@@ -615,7 +615,7 @@ export class VehicleEquipmentBillingComponent {
           this.printReceipt()
 
           this.getParkingBillReceivables(this.parkingId)
-          this.getParkingServiceBillReceivables(this.parkingId)
+          //this.getParkingServiceBillReceivables(this.parkingId) // not shown on this screen, its table is commented out
           this.refreshBillReceivables()
           this.toPrintReceipt = true
         }

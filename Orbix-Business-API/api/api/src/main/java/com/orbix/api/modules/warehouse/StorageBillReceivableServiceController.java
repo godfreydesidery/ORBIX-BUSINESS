@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -297,7 +298,8 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		double totalGenerated = 0;
 		double totalUngenerated = 0;
 		
-		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorage(storage_.get());
+		// One load (bill receivables fetched with it), shared with getUngeneratedBill
+		List<StorageBillReceivable> storageBillReceivables = storageBillReceivableRepository.findAllByStorageIn(Collections.singletonList(storage_.get()));
 		for(StorageBillReceivable storageBillReceivable : storageBillReceivables) {
 			if(storageBillReceivable.getBillReceivable().getPayStatus().toString().equals("PAID")) {
 				totalPaid = totalPaid + storageBillReceivable.getBillReceivable().getAmount();
@@ -305,8 +307,8 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 				totalGenerated = totalGenerated + storageBillReceivable.getBillReceivable().getAmount();
 			}
 		}
-		
-		totalUngenerated = this.getUngeneratedBill(storage_.get());
+
+		totalUngenerated = this.getUngeneratedBill(storage_.get(), storageBillReceivables);
 		
 		
 		billResponse.setBillPaid(String.valueOf(totalPaid));
@@ -318,12 +320,10 @@ public class StorageBillReceivableServiceController implements StorageBillReceiv
 		return billResponse;
 	}
 	
-	private double getUngeneratedBill(Storage storage) {
-		
+	private double getUngeneratedBill(Storage storage, List<StorageBillReceivable> rcvs) {
+
 		double bill = 0;
-		
-		List<StorageBillReceivable> rcvs = storageBillReceivableRepository.findAllByStorage(storage);
-		
+
 		LocalDateTime fromDate = null;
 		LocalDateTime toDate = null;
 		double qty = 0;

@@ -136,7 +136,7 @@ export class BondItemBillingComponent {
       this.bondItemId = params['bond_item_id']
     })
     await this.getBondItemBillReceivables(this.bondItemId)
-    await this.getBondItemServiceBillReceivables(this.bondItemId)
+    //await this.getBondItemServiceBillReceivables(this.bondItemId) // not shown on this screen, its table is commented out
   }
 
 
@@ -547,7 +547,7 @@ export class BondItemBillingComponent {
 
   refresh() {
     this.getBondItemBillReceivables(this.bondItemId)
-    this.getBondItemServiceBillReceivables(this.bondItemId)
+    //this.getBondItemServiceBillReceivables(this.bondItemId) // not shown on this screen, its table is commented out
   }
 
 

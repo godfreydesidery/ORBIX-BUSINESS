@@ -6,6 +6,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -390,7 +391,8 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 		double totalGenerated = 0;
 		double totalUngenerated = 0;
 		
-		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItem(bondItem_.get());
+		// One load (bill receivables fetched with it), shared with getUngeneratedBill
+		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByBondItemIn(Collections.singletonList(bondItem_.get()));
 		for(BondItemBillReceivable bondItemBillReceivable : bondItemBillReceivables) {
 			if(bondItemBillReceivable.getBillReceivable().getPayStatus().toString().equals("PAID")) {
 				totalPaid = totalPaid + bondItemBillReceivable.getBillReceivable().getAmount();
@@ -398,8 +400,8 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 				totalGenerated = totalGenerated + bondItemBillReceivable.getBillReceivable().getAmount();
 			}
 		}
-		
-		totalUngenerated = this.getUngeneratedBill(bondItem_.get());
+
+		totalUngenerated = this.getUngeneratedBill(bondItem_.get(), bondItemBillReceivables);
 		
 		
 		billResponse.setBillPaid(String.valueOf(totalPaid));
@@ -462,9 +464,7 @@ public class BondItemBillReceivableServiceController implements BondItemBillRece
 //		return bill;
 //	}
 	
-	private double getUngeneratedBill(BondItem bondItem) {
-
-	    List<BondItemBillReceivable> rcvs = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+	private double getUngeneratedBill(BondItem bondItem, List<BondItemBillReceivable> rcvs) {
 
 	    // 1. Determine start point (last billed + 1 day OR initial start)
 	    LocalDateTime fromDate;

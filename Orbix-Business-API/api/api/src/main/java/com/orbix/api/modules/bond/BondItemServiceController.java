@@ -6,8 +6,12 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -69,13 +73,48 @@ public class BondItemServiceController implements BondItemService {
 	
 	final int CHECKOUT_GRACE_DAYS = 2;
 
+	private static final int IN_CLAUSE_CHUNK_SIZE = 1000;
+
+	// Bills of all the given bond items in a few batched queries, grouped by bond item id (same id order as findAllByBondItem)
+	private Map<Long, List<BondItemBillReceivable>> getBondItemBillReceivablesByBondItem(List<BondItem> bondItems) {
+		Map<Long, List<BondItemBillReceivable>> bondItemBillReceivablesByBondItem = new HashMap<>();
+		for (int i = 0; i < bondItems.size(); i += IN_CLAUSE_CHUNK_SIZE) {
+			List<BondItem> chunk = bondItems.subList(i, Math.min(i + IN_CLAUSE_CHUNK_SIZE, bondItems.size()));
+			for (BondItemBillReceivable bondItemBillReceivable : bondItemBillReceivableRepository.findAllByBondItemIn(chunk)) {
+				bondItemBillReceivablesByBondItem.computeIfAbsent(bondItemBillReceivable.getBondItem().getId(), k -> new ArrayList<>()).add(bondItemBillReceivable);
+			}
+		}
+		return bondItemBillReceivablesByBondItem;
+	}
+
+	// Cleared when every bill of the bond item is PAID (a bond item without bills is cleared)
+	private boolean isCleared(List<BondItemBillReceivable> bondItemBillReceivables) {
+		boolean cleared = true;
+		if (!bondItemBillReceivables.isEmpty() && cleared == true) {
+			for (BondItemBillReceivable bondItemBillReceivable : bondItemBillReceivables) {
+				if (!bondItemBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
+					cleared = false;
+					break;
+				}
+			}
+		}
+		return cleared;
+	}
+
 	@Override
 	public List<BondItemResponseDTO> getAllBondItems(HttpServletRequest request) {
 		List<BondItem> bondItems = bondItemRepository.findAll();
-		List<BondItemResponseDTO> bondItemResponses = new ArrayList<>();
 
+		// The mapper lists the bills of checked out items; load them for all such items at once
+		List<BondItem> checkedOutBondItems = new ArrayList<>();
 		for (BondItem bondItem : bondItems) {
-			bondItemResponses.add(bondItemResponseDTOMapper(bondItem));
+			if ("CHECKED-OUT".equals(bondItem.getStatus())) checkedOutBondItems.add(bondItem);
+		}
+		Map<Long, List<BondItemBillReceivable>> bondItemBillReceivablesByBondItem = getBondItemBillReceivablesByBondItem(checkedOutBondItems);
+
+		List<BondItemResponseDTO> bondItemResponses = new ArrayList<>();
+		for (BondItem bondItem : bondItems) {
+			bondItemResponses.add(bondItemResponseDTOMapper(bondItem, bondItemBillReceivablesByBondItem));
 		}
 		return bondItemResponses;
 	}
@@ -140,18 +179,18 @@ public class BondItemServiceController implements BondItemService {
 		List<String> statuses = new ArrayList<>();
 		statuses.add("CHECKED-IN");
 
-		List<BondItem> bondItems = bondItemRepository.findAllByStatusIn(statuses);
-		List<BondItemResponseDTO> bondItemResponses = new ArrayList<>();
-
-		for (BondItem bondItem : bondItems) {
-
-			List<BondItemBillReceivable> sbrs = bondItemBillReceivableRepository.findByBondItem(bondItem);
-			for (BondItemBillReceivable sbr : sbrs) {
-				if (sbr.getDiscountStatus() != null && sbr.getDiscountStatus().equals("Requested")) {
-					bondItemResponses.add(bondItemResponseDTOMapper(bondItem));
-					break;
-				}
+		// Load only the bills with a requested discount, instead of every bill of every checked-in bond item
+		List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository.findAllByDiscountStatusAndBondItem_StatusIn("Requested", statuses);
+		Map<Long, BondItem> bondItems = new LinkedHashMap<>();
+		for (BondItemBillReceivable sbr : bondItemBillReceivables) {
+			if (sbr.getDiscountStatus() != null && sbr.getDiscountStatus().equals("Requested")) {
+				bondItems.putIfAbsent(sbr.getBondItem().getId(), sbr.getBondItem());
 			}
+		}
+
+		List<BondItemResponseDTO> bondItemResponses = new ArrayList<>();
+		for (BondItem bondItem : bondItems.values()) {
+			bondItemResponses.add(bondItemResponseDTOMapper(bondItem));
 		}
 		return bondItemResponses;
 	}
@@ -169,11 +208,12 @@ public class BondItemServiceController implements BondItemService {
 		LocalDateTime yesterday = LocalDateTime.now().minusHours(24);
 		List<BondItem> bondItems = bondItemRepository.findAllByBondZoneAndStatusInAndCheckedOutDateTimeAfter(bondZone,
 				statuses, yesterday);
+		Map<Long, List<BondItemBillReceivable>> bondItemBillReceivablesByBondItem = getBondItemBillReceivablesByBondItem(bondItems);
 
 		List<BondItemResponseDTO> bondItemResponses = new ArrayList<>();
 
 		for (BondItem bondItem : bondItems) {
-			bondItemResponses.add(bondItemResponseDTOMapper(bondItem));
+			bondItemResponses.add(bondItemResponseDTOMapper(bondItem, bondItemBillReceivablesByBondItem));
 		}
 		return bondItemResponses;
 	}
@@ -185,26 +225,14 @@ public class BondItemServiceController implements BondItemService {
 		statuses.add("CHECKED-IN");
 
 		List<BondItem> bondItems = bondItemRepository.findAllByStatusIn(statuses);
+		Map<Long, List<BondItemBillReceivable>> bondItemBillReceivablesByBondItem = getBondItemBillReceivablesByBondItem(bondItems);
 		List<BondItemResponseDTO> bondItemResponses = new ArrayList<>();
 
 		for (BondItem bondItem : bondItems) {
-
-			boolean cleared = true;
-
-			List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository
-					.findAllByBondItem(bondItem);
-			if (!bondItemBillReceivables.isEmpty() && cleared == true) {
-				for (BondItemBillReceivable bondItemBillReceivable : bondItemBillReceivables) {
-					if (!bondItemBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
-						cleared = false;
-						break;
-					}
-				}
-			}
+			boolean cleared = isCleared(bondItemBillReceivablesByBondItem.getOrDefault(bondItem.getId(), Collections.emptyList()));
 
 			if (cleared)
-				bondItemResponses.add(bondItemResponseDTOMapper(bondItem));
-
+				bondItemResponses.add(bondItemResponseDTOMapper(bondItem, bondItemBillReceivablesByBondItem));
 		}
 		return bondItemResponses;
 	}
@@ -225,26 +253,14 @@ public class BondItemServiceController implements BondItemService {
 		// List<BondItem> bondItems =
 		// bondItemRepository.findAllByStatusInAndCheckedOutBetween(statuses,
 		// LocalDateTime.now().);
+		Map<Long, List<BondItemBillReceivable>> bondItemBillReceivablesByBondItem = getBondItemBillReceivablesByBondItem(bondItems);
 		List<BondItemResponseDTO> bondItemResponses = new ArrayList<>();
 
 		for (BondItem bondItem : bondItems) {
-
-			boolean cleared = true;
-
-			List<BondItemBillReceivable> bondItemBillReceivables = bondItemBillReceivableRepository
-					.findAllByBondItem(bondItem);
-			if (!bondItemBillReceivables.isEmpty() && cleared == true) {
-				for (BondItemBillReceivable bondItemBillReceivable : bondItemBillReceivables) {
-					if (!bondItemBillReceivable.getBillReceivable().getPayStatus().equals(PayStatus.PAID)) {
-						cleared = false;
-						break;
-					}
-				}
-			}
+			boolean cleared = isCleared(bondItemBillReceivablesByBondItem.getOrDefault(bondItem.getId(), Collections.emptyList()));
 
 			if (cleared)
-				bondItemResponses.add(bondItemResponseDTOMapper(bondItem));
-
+				bondItemResponses.add(bondItemResponseDTOMapper(bondItem, bondItemBillReceivablesByBondItem));
 		}
 		return bondItemResponses;
 	}
@@ -587,6 +603,12 @@ public class BondItemServiceController implements BondItemService {
 	}
 
 	private BondItemResponseDTO bondItemResponseDTOMapper(BondItem bondItem) {
+		return bondItemResponseDTOMapper(bondItem, null);
+	}
+
+	// Takes the bills from the preloaded map when given, otherwise queries them for this bond item
+	private BondItemResponseDTO bondItemResponseDTOMapper(BondItem bondItem,
+			Map<Long, List<BondItemBillReceivable>> bondItemBillReceivablesByBondItem) {
 		BondItemResponseDTO bondItemResponse = new BondItemResponseDTO();
 
 		bondItemResponse.setId(String.valueOf(bondItem.getId()));
@@ -673,7 +695,9 @@ public class BondItemServiceController implements BondItemService {
 		if (bondItem.getStatus().equals("CHECKED-OUT")) {
 			List<ServiceBillItem> items = new ArrayList<>();
 
-			List<BondItemBillReceivable> pbs = bondItemBillReceivableRepository.findAllByBondItem(bondItem);
+			List<BondItemBillReceivable> pbs = bondItemBillReceivablesByBondItem != null
+					? bondItemBillReceivablesByBondItem.getOrDefault(bondItem.getId(), Collections.emptyList())
+					: bondItemBillReceivableRepository.findAllByBondItem(bondItem);
 			int sn = 1;
 			for (BondItemBillReceivable pbr : pbs) {
 				ServiceBillItem sbi = new ServiceBillItem();

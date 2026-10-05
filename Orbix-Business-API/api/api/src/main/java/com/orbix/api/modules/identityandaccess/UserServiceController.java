@@ -651,14 +651,28 @@ public class UserServiceController implements UserService, UserDetailsService {
 		}
 	}
 
+	private static final String CURRENT_USER_ATTRIBUTE = UserServiceController.class.getName() + ".currentUser";
+
+	// The logged in user is loaded once per request and reused by later calls in the same request
+	private User getCurrentUser(HttpServletRequest request) {
+		String username = request.getUserPrincipal().getName();
+		Object cached = request.getAttribute(CURRENT_USER_ATTRIBUTE);
+		if(cached instanceof User && username.equals(((User) cached).getUsername())) {
+			return (User) cached;
+		}
+		User user = userRepository.findByUsername(username).get();
+		request.setAttribute(CURRENT_USER_ATTRIBUTE, user);
+		return user;
+	}
+
 	@Override
 	public Long getUserId(HttpServletRequest request) {
-		return userRepository.findByUsername(request.getUserPrincipal().getName()).get().getId();
+		return getCurrentUser(request).getId();
 	}
-	
+
 	@Override
 	public User getUser(HttpServletRequest request) {
-		return userRepository.findByUsername(request.getUserPrincipal().getName()).get();
+		return getCurrentUser(request);
 	}
 	
 	
@@ -734,11 +748,11 @@ public class UserServiceController implements UserService, UserDetailsService {
 
 	@Override
 	public Company getUserCompany(HttpServletRequest request) {
-		return userRepository.findByUsername(request.getUserPrincipal().getName()).get().getCompany();
+		return getCurrentUser(request).getCompany();
 	}
 
 	@Override
 	public Branch getUserBranch(HttpServletRequest request) {
-		return userRepository.findByUsername(request.getUserPrincipal().getName()).get().getBranch();
+		return getCurrentUser(request).getBranch();
 	}
 }

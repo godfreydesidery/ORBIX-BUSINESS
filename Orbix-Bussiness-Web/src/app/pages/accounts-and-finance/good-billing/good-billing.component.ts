@@ -131,7 +131,7 @@ export class GoodBillingComponent {
       this.storageId = params['storage_id']
     })
     this.getStorageBillReceivables(this.storageId)
-    this.getStorageServiceBillReceivables(this.storageId)
+    //this.getStorageServiceBillReceivables(this.storageId) // not shown on this screen, its table is commented out
   }
 
 
@@ -543,7 +543,7 @@ export class GoodBillingComponent {
 
   refresh() {
     this.getStorageBillReceivables(this.storageId)
-    this.getStorageServiceBillReceivables(this.storageId)
+    //this.getStorageServiceBillReceivables(this.storageId) // not shown on this screen, its table is commented out
   }
 
 
