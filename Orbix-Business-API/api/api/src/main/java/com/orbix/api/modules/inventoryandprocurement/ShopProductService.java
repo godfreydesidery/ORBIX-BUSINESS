@@ -6,6 +6,7 @@ import javax.servlet.http.HttpServletRequest;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.modules.adminunits.Shop;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 public interface ShopProductService {
 	List<ShopProductResponseDTO> getAllShopProducts(Long shopId, HttpServletRequest request);
@@ -23,4 +24,6 @@ public interface ShopProductService {
 	
 	long checkUnderstockByShop(Long shopId, HttpServletRequest request);
 	long checkOutofstockByShop(Long shopId, HttpServletRequest request);
+
+	PageResponseDTO<ShopProductResponseDTO> getShopProductStockPage(Long shopId, String stock, int page, int size, String search, HttpServletRequest request);
 }

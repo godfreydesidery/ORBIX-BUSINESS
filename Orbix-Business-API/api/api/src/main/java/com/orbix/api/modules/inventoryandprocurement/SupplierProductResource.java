@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -111,6 +112,18 @@ private final SupplierProductRepository supplierProductRepository;
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(supplierProductService.getAllSupplierProductsByBranch(supplierId, request));
 	}
+
+	@GetMapping("/supplier_products/get_all_by_supplier_and_branch_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<SupplierProductResponseDTO>>getAllSupplierProductsBySupplierPage(
+			@RequestParam(name = "supplier_id") Long supplierId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(supplierProductService.getSupplierProductPageByBranch(supplierId, page, size, search, request));
+	}
+
 	
 	
 	@GetMapping("/supplier_products/get_products_by_supplier_containing")

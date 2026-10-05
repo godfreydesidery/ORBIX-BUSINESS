@@ -23,4 +23,6 @@ public interface DineableService {
 	List<DineableResponseDTO> getCompanySellableDineablesByRestaurant(Long restaurantId, HttpServletRequest request);
 	
 	List<DineableResponseDTO> getDineablesByCompanyAndName(String dineableName, HttpServletRequest request);
+
+	PageResponseDTO<DineableResponseDTO> getCompanySellableDineablePageByRestaurant(Long restaurantId, int page, int size, String search, HttpServletRequest request);
 }

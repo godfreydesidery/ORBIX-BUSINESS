@@ -10,6 +10,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.stereotype.Service;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Sort;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
 import com.orbix.api.exceptions.InvalidOperationException;
@@ -21,6 +23,8 @@ import com.orbix.api.modules.adminunits.Shop;
 import com.orbix.api.modules.adminunits.ShopRepository;
 import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserService;
+import com.orbix.api.api.commons.PageRequests;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -38,6 +42,16 @@ public class ShopProductServiceController implements ShopProductService {
 	private final ShopProductLogRepository shopProductLogRepository;
 	private final UserService userService;
 	private final DayService dayService;
+
+	@Override
+	public PageResponseDTO<ShopProductResponseDTO> getShopProductStockPage(Long shopId, String stock, int page, int size, String search, HttpServletRequest request) {
+	    Shop shop = shopRepository.findById(shopId)
+	                              .orElseThrow(() -> new NotFoundException("Shop not found"));
+
+	    // One page, by id, filtered by stock and searched on the shown columns
+	    Page<ShopProduct> shopProducts = shopProductRepository.getStockPageByShop(shop, stock == null ? "" : stock, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+	    return new PageResponseDTO<>(shopProducts.getContent().stream().map(this::shopProductResponseDTOMapper).collect(Collectors.toList()), shopProducts.getTotalElements());
+	}
 
 	@Override
 	public List<ShopProductResponseDTO> getAllShopProducts(Long shopId, HttpServletRequest request) {

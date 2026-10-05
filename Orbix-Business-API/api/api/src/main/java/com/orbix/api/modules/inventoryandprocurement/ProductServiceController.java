@@ -304,6 +304,46 @@ public class ProductServiceController implements ProductService {
 	}
 	
 	@Override
+	public PageResponseDTO<ProductResponseDTO> getCompanySellableProductPageByShop(Long shopId, int page, int size, String search, HttpServletRequest request) {
+	    Company company = userService.getUserCompany(request);
+	    if (company == null) {
+	        throw new NotFoundException("Company not found for the user");
+	    }
+	    Shop shop = shopRepository.findById(shopId)
+	    	    .orElseThrow(() -> new NotFoundException("Shop not found"));
+
+	    // One page, by id, searched on the shown columns
+	    Page<Product> products = productRepository.getPageByCompanyAndSellable(company, true, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+	    return new PageResponseDTO<>(productResponsesWithShopImportedStatus(products.getContent(), shop), products.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<ProductResponseDTO> getCompanySellableProductPageByRestaurant(Long restaurantId, int page, int size, String search, HttpServletRequest request) {
+	    Company company = userService.getUserCompany(request);
+	    if (company == null) {
+	        throw new NotFoundException("Company not found for the user");
+	    }
+	    Restaurant restaurant = restaurantRepository.findById(restaurantId)
+	    	    .orElseThrow(() -> new NotFoundException("Restaurant not found"));
+
+	    // One page, by id, searched on the shown columns
+	    Page<Product> products = productRepository.getPageByCompanyAndSellable(company, true, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+	    return new PageResponseDTO<>(productResponsesWithRestaurantImportedStatus(products.getContent(), restaurant), products.getTotalElements());
+	}
+
+	@Override
+	public PageResponseDTO<ProductResponseDTO> getCompanyProductPage(int page, int size, String search, HttpServletRequest request) {
+	    Company company = userService.getUserCompany(request);
+	    if (company == null) {
+	        throw new NotFoundException("Company not found for the user");
+	    }
+
+	    // One page, by id, searched on the shown columns
+	    Page<Product> products = productRepository.getPageByCompany(company, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+	    return new PageResponseDTO<>(products.getContent().stream().map(this::productResponseDTOMapper).collect(Collectors.toList()), products.getTotalElements());
+	}
+
+	@Override
 	public List<ProductResponseDTO> getCompanySellableProductsByShop(Long shopId, HttpServletRequest request) {
 	    
 
@@ -317,6 +357,11 @@ public class ProductServiceController implements ProductService {
 
 	    // Fetch products
 	    List<Product> products = productRepository.findAllByCompanyAndSellable(company, true);
+	    return productResponsesWithShopImportedStatus(products, shop);
+	}
+
+	// The products as response DTOs, each marked imported if it is already in the shop
+	private List<ProductResponseDTO> productResponsesWithShopImportedStatus(List<Product> products, Shop shop) {
 	    List<ProductResponseDTO> productResponses = new ArrayList<>();
 	    
 	    // How many times each product is already in the shop, loaded once instead of one look-up per product
@@ -344,6 +389,7 @@ public class ProductServiceController implements ProductService {
 	    // Map to DTOs
 	    return productResponses;
 	}
+
 	
 	@Override
 	public List<ProductResponseDTO> getCompanySellableProductsByRestaurant(Long restaurantId, HttpServletRequest request) {
@@ -359,6 +405,11 @@ public class ProductServiceController implements ProductService {
 
 	    // Fetch products
 	    List<Product> products = productRepository.findAllByCompanyAndSellable(company, true);
+	    return productResponsesWithRestaurantImportedStatus(products, restaurant);
+	}
+
+	// The products as response DTOs, each marked imported if it is already in the restaurant
+	private List<ProductResponseDTO> productResponsesWithRestaurantImportedStatus(List<Product> products, Restaurant restaurant) {
 	    List<ProductResponseDTO> productResponses = new ArrayList<>();
 	    
 	    // How many times each product is already in the restaurant, loaded once instead of one look-up per product
@@ -386,6 +437,7 @@ public class ProductServiceController implements ProductService {
 	    // Map to DTOs
 	    return productResponses;
 	}
+
 	
 	@Override
 	public List<ProductResponseDTO> getProductsByCompanyAndName(String productName, HttpServletRequest request) {

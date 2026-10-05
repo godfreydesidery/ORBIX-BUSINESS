@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.orbix.api.api.commons.ApiCustomResponse;
+import com.orbix.api.api.commons.PageResponseDTO;
 
 import lombok.RequiredArgsConstructor;
 
@@ -104,6 +105,19 @@ public class ShopProductResource {
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(shopProductService.getAllShopProducts(shopId, request));
 	}
+
+	@GetMapping("/shop_products/get_stock_by_shop_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<ShopProductResponseDTO>>getStockByShopPage(
+			@RequestParam(name = "shop_id") Long shopId,
+			@RequestParam(name = "stock", defaultValue = "") String stock,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(shopProductService.getShopProductStockPage(shopId, stock, page, size, search, request));
+	}
+
 	
 	@GetMapping("/shop_products/get_under_stock_by_shop")
 	public ResponseEntity<List<ShopProductResponseDTO>>getUnderstockShopProductsByShop(

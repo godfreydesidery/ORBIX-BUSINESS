@@ -127,6 +127,38 @@ public class ProductResource {
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(productService.getCompanySellableProductsByRestaurant(restaurantId, request));
 	}
+
+	@GetMapping("/products/get_company_sellable_products_by_shop_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<ProductResponseDTO>>getCompanySellableProductsByShopPage(
+			@RequestParam(name = "shop_id") Long shopId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(productService.getCompanySellableProductPageByShop(shopId, page, size, search, request));
+	}
+
+	@GetMapping("/products/get_company_sellable_products_by_restaurant_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<ProductResponseDTO>>getCompanySellableProductsByRestaurantPage(
+			@RequestParam(name = "restaurant_id") Long restaurantId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(productService.getCompanySellableProductPageByRestaurant(restaurantId, page, size, search, request));
+	}
+
+	@GetMapping("/products/get_company_products_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<ProductResponseDTO>>getCompanyProductsPage(
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(productService.getCompanyProductPage(page, size, search, request));
+	}
 	
 	@GetMapping("/products/get_products_by_company_containing")
 	public ResponseEntity<List<ProductResponseDTO>>getAllProductsByCompanyContaining( 

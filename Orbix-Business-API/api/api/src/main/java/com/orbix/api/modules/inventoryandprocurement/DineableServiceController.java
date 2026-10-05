@@ -300,6 +300,20 @@ public class DineableServiceController implements DineableService {
 	}
 	
 	@Override
+	public PageResponseDTO<DineableResponseDTO> getCompanySellableDineablePageByRestaurant(Long restaurantId, int page, int size, String search, HttpServletRequest request) {
+	    Company company = userService.getUserCompany(request);
+	    if (company == null) {
+	        throw new NotFoundException("Company not found for the user");
+	    }
+	    Restaurant restaurant = restaurantRepository.findById(restaurantId)
+	    	    .orElseThrow(() -> new NotFoundException("Restaurant not found"));
+
+	    // One page, by id, searched on the shown columns
+	    Page<Dineable> dineables = dineableRepository.getPageByCompanyAndSellable(company, true, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by("id")));
+	    return new PageResponseDTO<>(dineableResponsesWithRestaurantImportedStatus(dineables.getContent(), restaurant), dineables.getTotalElements());
+	}
+
+	@Override
 	public List<DineableResponseDTO> getCompanySellableDineablesByRestaurant(Long restaurantId, HttpServletRequest request) {
 	    
 
@@ -313,6 +327,11 @@ public class DineableServiceController implements DineableService {
 
 	    // Fetch dineables
 	    List<Dineable> dineables = dineableRepository.findAllByCompanyAndSellable(company, true);
+	    return dineableResponsesWithRestaurantImportedStatus(dineables, restaurant);
+	}
+
+	// The dineables as response DTOs, each marked imported if it is already in the restaurant
+	private List<DineableResponseDTO> dineableResponsesWithRestaurantImportedStatus(List<Dineable> dineables, Restaurant restaurant) {
 	    List<DineableResponseDTO> dineableResponses = new ArrayList<>();
 	    
 	    // How many times each dineable is already in the restaurant, loaded once instead of one look-up per dineable
@@ -340,6 +359,7 @@ public class DineableServiceController implements DineableService {
 	    // Map to DTOs
 	    return dineableResponses;
 	}
+
 	
 	@Override
 	public List<DineableResponseDTO> getDineablesByCompanyAndName(String dineableName, HttpServletRequest request) {

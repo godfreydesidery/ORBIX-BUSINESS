@@ -24,4 +24,10 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 	// One page of the list, searched on the columns the list screen shows
 	@Query("SELECT p FROM Product p WHERE :search = '%%' OR LOWER(p.code) LIKE :search OR LOWER(p.name) LIKE :search OR LOWER(p.description) LIKE :search OR LOWER(p.baseUom) LIKE :search")
 	Page<Product> getPageBySearch(@Param("search") String search, Pageable pageable);
+
+	@Query("SELECT p FROM Product p WHERE p.company = :company AND p.sellable = :sellable AND (:search = '%%' OR LOWER(p.code) LIKE :search OR LOWER(p.name) LIKE :search OR LOWER(p.description) LIKE :search OR LOWER(p.baseUom) LIKE :search)")
+	Page<Product> getPageByCompanyAndSellable(@Param("company") Company company, @Param("sellable") boolean sellable, @Param("search") String search, Pageable pageable);
+
+	@Query("SELECT p FROM Product p WHERE p.company = :company AND (:search = '%%' OR LOWER(p.code) LIKE :search OR LOWER(p.name) LIKE :search OR LOWER(p.description) LIKE :search OR LOWER(p.baseUom) LIKE :search)")
+	Page<Product> getPageByCompany(@Param("company") Company company, @Param("search") String search, Pageable pageable);
 }

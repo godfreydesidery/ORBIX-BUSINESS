@@ -118,6 +118,17 @@ public class DineableResource {
 			HttpServletRequest request){
 		return ResponseEntity.ok().body(dineableService.getCompanySellableDineablesByRestaurant(restaurantId, request));
 	}
+
+	@GetMapping("/dineables/get_company_sellable_dineables_by_restaurant_page")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<PageResponseDTO<DineableResponseDTO>>getCompanySellableDineablesByRestaurantPage(
+			@RequestParam(name = "restaurant_id") Long restaurantId,
+			@RequestParam(name = "page") int page,
+			@RequestParam(name = "size") int size,
+			@RequestParam(name = "search", defaultValue = "") String search,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(dineableService.getCompanySellableDineablePageByRestaurant(restaurantId, page, size, search, request));
+	}
 	
 	@GetMapping("/dineables/get_dineables_by_company_containing")
 	public ResponseEntity<List<DineableResponseDTO>>getAllDineablesByCompanyContaining( 

@@ -23,4 +23,7 @@ public interface DineableRepository extends JpaRepository<Dineable, Long> {
 	// One page of the list, searched on the columns the list screen shows
 	@Query("SELECT d FROM Dineable d WHERE :search = '%%' OR LOWER(d.code) LIKE :search OR LOWER(d.name) LIKE :search OR LOWER(d.description) LIKE :search OR LOWER(d.baseUom) LIKE :search")
 	Page<Dineable> getPageBySearch(@Param("search") String search, Pageable pageable);
+
+	@Query("SELECT d FROM Dineable d WHERE d.company = :company AND d.sellable = :sellable AND (:search = '%%' OR LOWER(d.code) LIKE :search OR LOWER(d.name) LIKE :search OR LOWER(d.description) LIKE :search OR LOWER(d.baseUom) LIKE :search)")
+	Page<Dineable> getPageByCompanyAndSellable(@Param("company") Company company, @Param("sellable") boolean sellable, @Param("search") String search, Pageable pageable);
 }
