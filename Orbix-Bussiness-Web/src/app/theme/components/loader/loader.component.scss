@@ -7,48 +7,71 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    background: rgba(255, 255, 255, 0.7);
+    background: rgba(248, 249, 250, 0.75);
     cursor: wait;
     animation: az-loader-fade-in 0.15s ease-out;
 }
 
-// Four dots on a circle, turning together
+// Four dots in a diamond, turning together while they meet and overlap in the centre, then spread back out
 .az-loader-dots {
     position: relative;
-    width: 96px;
-    height: 96px;
-    animation: az-loader-spin 1.4s linear infinite;
+    width: 80px;
+    height: 80px;
+    animation: az-loader-rotate 2s linear infinite;
 }
 
+// Each dot sits 28px from the centre; --dx/--dy carry it 24px in, so the four overlap with a small offset
 .az-loader-dot {
     position: absolute;
-    width: 20px;
-    height: 20px;
-    margin: -10px 0 0 -10px;
+    width: 24px;
+    height: 24px;
+    margin: -12px 0 0 -12px;
     border-radius: 50%;
-    animation: az-loader-pulse 1.4s ease-in-out infinite;
+    // Where the dots overlap their colours blend, as in the reference design
+    mix-blend-mode: multiply;
+    animation: az-loader-collide 1.2s infinite;
 
-    &.dot-top    { top: 0;    left: 50%; background: #3fd0e8; }
-    &.dot-right  { top: 50%;  left: 100%; background: #a6d22e; animation-delay: -1.05s; }
-    &.dot-bottom { top: 100%; left: 50%; background: #f2a900; animation-delay: -0.7s; }
-    &.dot-left   { top: 50%;  left: 0;    background: #e2496d; animation-delay: -0.35s; }
+    &.dot-top    { top: 12px; left: 50%;  background: #f5a623; --dx: 0;     --dy: 24px; }
+    &.dot-right  { top: 50%;  left: 68px; background: #e94b6f; --dx: -24px; --dy: 0; }
+    &.dot-bottom { top: 68px; left: 50%;  background: #3fd0e8; --dx: 0;     --dy: -24px; }
+    &.dot-left   { top: 50%;  left: 12px; background: #9ccc3c; --dx: 24px;  --dy: 0; }
 }
 
 .az-loader-text {
     margin-top: 28px;
-    font-size: 13px;
-    font-weight: 600;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    font-size: 15px;
+    font-weight: 500;
     letter-spacing: 2px;
-    color: #555;
+    // Darker than the design's #718096 so the text stays readable on the light overlay
+    color: #4a5568;
+    animation: az-loader-text-fade 1.5s ease-in-out infinite alternate;
 }
 
-@keyframes az-loader-spin {
+.az-loader-slow {
+    margin-top: 8px;
+    padding: 0 16px;
+    max-width: 320px;
+    text-align: center;
+    font-size: 13px;
+    color: #4a5568;
+    animation: az-loader-fade-in 0.3s ease-out;
+}
+
+@keyframes az-loader-rotate {
     to { transform: rotate(360deg); }
 }
 
-@keyframes az-loader-pulse {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(0.6); }
+// Speeds up into the hit, then slows as it springs back to its corner
+@keyframes az-loader-collide {
+    0%, 100% { transform: translate(0, 0); animation-timing-function: ease-in; }
+    45% { transform: translate(var(--dx), var(--dy)); animation-timing-function: linear; }
+    55% { transform: translate(var(--dx), var(--dy)); animation-timing-function: ease-out; }
+}
+
+@keyframes az-loader-text-fade {
+    from { opacity: 0.6; }
+    to { opacity: 1; }
 }
 
 @keyframes az-loader-fade-in {
@@ -57,6 +80,6 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-    .az-loader-dots { animation-duration: 4s; }
-    .az-loader-dot { animation: none; }
+    .az-loader-dots { animation-duration: 6s; }
+    .az-loader-dot, .az-loader-text { animation: none; }
 }
