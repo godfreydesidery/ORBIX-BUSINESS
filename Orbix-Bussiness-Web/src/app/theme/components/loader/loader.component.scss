@@ -1,0 +1,62 @@
+// Above modals (1050) and ng-select (1060), below SweetAlert2 (2000) and toasts
+.az-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 1900;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(255, 255, 255, 0.7);
+    cursor: wait;
+    animation: az-loader-fade-in 0.15s ease-out;
+}
+
+// Four dots on a circle, turning together
+.az-loader-dots {
+    position: relative;
+    width: 96px;
+    height: 96px;
+    animation: az-loader-spin 1.4s linear infinite;
+}
+
+.az-loader-dot {
+    position: absolute;
+    width: 20px;
+    height: 20px;
+    margin: -10px 0 0 -10px;
+    border-radius: 50%;
+    animation: az-loader-pulse 1.4s ease-in-out infinite;
+
+    &.dot-top    { top: 0;    left: 50%; background: #3fd0e8; }
+    &.dot-right  { top: 50%;  left: 100%; background: #a6d22e; animation-delay: -1.05s; }
+    &.dot-bottom { top: 100%; left: 50%; background: #f2a900; animation-delay: -0.7s; }
+    &.dot-left   { top: 50%;  left: 0;    background: #e2496d; animation-delay: -0.35s; }
+}
+
+.az-loader-text {
+    margin-top: 28px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    color: #555;
+}
+
+@keyframes az-loader-spin {
+    to { transform: rotate(360deg); }
+}
+
+@keyframes az-loader-pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(0.6); }
+}
+
+@keyframes az-loader-fade-in {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .az-loader-dots { animation-duration: 4s; }
+    .az-loader-dot { animation: none; }
+}

@@ -5,15 +5,16 @@ import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 import { ToastrModule } from 'ngx-toastr';
 
 import { routes } from './app.routes';
-import { provideHttpClient } from '@angular/common/http';
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
 import { CommonModule, DatePipe } from '@angular/common';
+import { loaderInterceptor } from '@services/loader.interceptor';
 
 export const appConfig: ApplicationConfig = {
   providers: [
     DatePipe,
     NgModule,
     CommonModule,
-    provideHttpClient(),
+    provideHttpClient(withInterceptors([loaderInterceptor])),
     provideZoneChangeDetection({ eventCoalescing: true }), 
     provideRouter(
       routes,

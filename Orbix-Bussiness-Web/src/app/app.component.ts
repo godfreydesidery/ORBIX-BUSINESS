@@ -1,12 +1,13 @@
 import { NgClass } from '@angular/common';
 import { Component } from '@angular/core';
 import { NavigationStart, Router, RouterOutlet } from '@angular/router';
+import { LoaderComponent } from '@components/loader/loader.component';
 
 @Component({
   selector: 'az-root',
   standalone: true,
-  imports: [RouterOutlet, NgClass],
-  template:`<router-outlet />`,
+  imports: [RouterOutlet, NgClass, LoaderComponent],
+  template:`<router-outlet /><az-loader />`,
 })
 export class AppComponent {
 
