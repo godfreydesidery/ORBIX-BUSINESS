@@ -16,6 +16,9 @@ import { LoaderService } from '@services/loader.service';
           <span class="az-loader-dot dot-left"></span>
         </div>
         <div class="az-loader-text">LOADING...</div>
+        @if (loader.slow()) {
+          <div class="az-loader-slow">This is taking longer than usual. Please keep this page open.</div>
+        }
       </div>
     }
   `
