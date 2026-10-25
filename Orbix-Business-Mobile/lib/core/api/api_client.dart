@@ -12,14 +12,19 @@ import 'api_exception.dart';
 /// [onSessionLost] routes the manager back to sign-in — the same thing the web
 /// app ends up doing.
 class ApiClient {
-  ApiClient({required String apiBase, required String accessToken})
-      : _dio = Dio(BaseOptions(
+  ApiClient({
+    required String apiBase,
+    required String accessToken,
+    HttpClientAdapter? adapter,
+  }) : _dio = Dio(BaseOptions(
           baseUrl: apiBase,
           contentType: Headers.jsonContentType,
           connectTimeout: const Duration(seconds: 15),
           receiveTimeout: const Duration(seconds: 45),
           headers: {'Authorization': 'Bearer $accessToken'},
-        ));
+        )) {
+    if (adapter != null) _dio.httpClientAdapter = adapter;
+  }
 
   final Dio _dio;
 

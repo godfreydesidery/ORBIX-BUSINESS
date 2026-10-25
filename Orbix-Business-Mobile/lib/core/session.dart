@@ -1,3 +1,4 @@
+import 'package:dio/dio.dart' show HttpClientAdapter;
 import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
@@ -12,17 +13,24 @@ import 'json.dart';
 /// Every screen reads this. Switching account swaps the client, and the
 /// dependents rebuild against the new branch.
 class Session extends ChangeNotifier {
-  Session._(this._config, this._store, this._accounts, this._activeId);
+  Session._(this._config, this._store, this._accounts, this._activeId,
+      this._httpAdapter);
 
-  static Future<Session> create({AccountStore? store}) async {
+  static Future<Session> create({
+    AccountStore? store,
+    @visibleForTesting HttpClientAdapter? httpAdapter,
+  }) async {
     final s = store ?? AccountStore();
     final config = await ServerConfig.load();
     final accounts = await s.readAll();
     final activeId = await s.readActiveId();
-    final session = Session._(config, s, accounts, activeId);
+    final session = Session._(config, s, accounts, activeId, httpAdapter);
     session._buildClient();
     return session;
   }
+
+  /// Stands in for the network in tests; null in the app.
+  final HttpClientAdapter? _httpAdapter;
 
   ServerConfig _config;
   final AccountStore _store;
@@ -67,8 +75,11 @@ class Session extends ChangeNotifier {
       _api = null;
       return;
     }
-    _api = ApiClient(apiBase: a.apiBase, accessToken: a.accessToken)
-      ..onSessionLost = () => _endSession(a.id);
+    _api = ApiClient(
+      apiBase: a.apiBase,
+      accessToken: a.accessToken,
+      adapter: _httpAdapter,
+    )..onSessionLost = () => _endSession(a.id);
   }
 
   Future<void> setHost(String host) async {
