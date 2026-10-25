@@ -1,9 +1,22 @@
+import java.util.Properties
+
 plugins {
     id("com.android.application")
     id("kotlin-android")
     // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id("dev.flutter.flutter-gradle-plugin")
 }
+
+// Release signing comes from android/key.properties, which points at a
+// keystore kept OUTSIDE the repo. Both are git-ignored (android/.gitignore).
+// The same key must sign every release: an APK signed with another key will
+// not install over an existing one.
+val keyProperties = Properties().apply {
+    val f = rootProject.file("key.properties")
+    if (f.isFile) f.inputStream().use { load(it) }
+}
+val hasReleaseKey = keyProperties.getProperty("storeFile")
+    ?.let { file(it).isFile } == true
 
 android {
     namespace = "net.otapp.orbix.manager"
@@ -54,14 +67,34 @@ android {
         }
     }
 
+    signingConfigs {
+        if (hasReleaseKey) {
+            create("release") {
+                storeFile = file(keyProperties.getProperty("storeFile"))
+                storePassword = keyProperties.getProperty("storePassword")
+                keyAlias = keyProperties.getProperty("keyAlias")
+                keyPassword = keyProperties.getProperty("keyPassword")
+            }
+        }
+    }
+
     buildTypes {
         release {
-            // DEMO BUILD ONLY. A real release keystore (and a signingConfig that
-            // reads it from a secret store, never from git) is REQUIRED before
-            // any non-demo distribution — Play Store, client handover, or QA
-            // sideload. Signing with the debug keys for now.
-            signingConfig = signingConfigs.getByName("debug")
+            // Never falls back to the debug key: a release without the real
+            // key fails below instead of shipping something that cannot be
+            // updated later.
+            if (hasReleaseKey) signingConfig = signingConfigs.getByName("release")
         }
+    }
+}
+
+gradle.taskGraph.whenReady {
+    if (!hasReleaseKey && allTasks.any { it.name.contains("Release") }) {
+        throw GradleException(
+            "No release signing key. Create android/key.properties " +
+                "(storeFile, storePassword, keyAlias, keyPassword) pointing at " +
+                "the Orbix Manager keystore, or build a debug APK instead."
+        )
     }
 }
 

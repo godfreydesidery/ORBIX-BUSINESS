@@ -44,5 +44,8 @@ app.*.map.json
 /android/app/profile
 /android/app/release
 
-# Built APKs and their records (dist/build.ps1)
+# dist/ holds the build scripts, which belong in git; the repo root ignores
+# every dist/ (the web build output), so take this one back. Only the built
+# APKs and their records stay out.
+!/dist/
 /dist/apk/
