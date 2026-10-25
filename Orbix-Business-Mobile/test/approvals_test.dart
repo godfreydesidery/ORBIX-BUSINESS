@@ -106,6 +106,22 @@ Map<String, Reply Function(SeenRequest)> _routes({
       '/lpos/get_all_pending': (_) => Reply(lpos),
       '/grns/get_all_pending': (_) => const Reply(<Object>[]),
       '/lpos/approve': (_) => const Reply(true),
+      '/parkings/get_parking_bill_receivables': (_) => const Reply([
+            {'id': '5', 'startedAt': '2025-02-08T00:00', 'endedAt': '2025-02-10T00:00', 'qty': '1.0', 'price': '5000.0', 'discount': '0.0', 'discountStatus': null, 'amount': '5000.0', 'parkingId': '22', 'payStatus': 'PAID'},
+            {'id': '75896', 'startedAt': '2025-02-11T00:00', 'endedAt': '2026-10-06T00:00', 'qty': '602.0', 'price': '5000.0', 'discount': '0.0', 'discountStatus': 'Requested', 'amount': '3010000.0', 'parkingId': '22', 'payStatus': 'UNPAID'},
+          ]),
+      '/parkings/get': (_) => const Reply({
+            'id': '22',
+            'ownerPhoneNo': '0684342214',
+            'agentName': 'GRAND MOVERS',
+            'agentPhoneNo': '',
+            'parkingZoneName': 'TAMBAZA',
+            'vehicleEquipmentCategory': 'IN-TRANSIT',
+            'tformNumber': 'TZDL20250070119',
+            'billingType': 'DAILY',
+            'billingAmount': '5000.0',
+            'billingStartAt': '2025-02-08T00:00',
+          }),
     };
 
 Future<FakeServer> _pump(
@@ -301,5 +317,49 @@ void main() {
     expect(find.text('DISCOUNT REQUESTS'), findsNothing);
     expect(find.text('LPO/7'), findsOneWidget);
     expect(server.seen.where((r) => r.path.contains('discount')), isEmpty);
+  });
+
+  testWidgets('the bill: the item, every bill, the one under request',
+      (tester) async {
+    final server = await _pump(tester);
+    await tester.tap(find.text('View bill'));
+    await tester.pumpAndSettle();
+
+    expect(find.text('Bill · PKN/22'), findsOneWidget);
+    expect(find.text('0684342214'), findsOneWidget);
+    expect(find.text('TAMBAZA'), findsOneWidget);
+    expect(find.text('daily at TZS 5,000'), findsOneWidget);
+    expect(find.text('8 Feb 2025'), findsOneWidget);
+    // Both bills, the requested one marked.
+    expect(find.text('8 Feb 2025 – 10 Feb 2025'), findsOneWidget);
+    expect(find.text('11 Feb 2025 – 6 Oct 2026'), findsOneWidget);
+    expect(find.text('DISCOUNT REQUESTED ON THIS BILL'), findsOneWidget);
+    expect(find.text('602 days × TZS 5,000'), findsOneWidget);
+    expect(find.text('PAID'), findsOneWidget);
+    expect(find.text('UNPAID'), findsOneWidget);
+    // Paid and owing.
+    expect(find.text('TZS 3,015,000'), findsOneWidget);
+    expect(find.text('TZS 3,010,000'), findsWidgets);
+
+    final bills = server.seen
+        .singleWhere((r) => r.path == '/parkings/get_parking_bill_receivables');
+    expect(bills.query, {'parking_id': '22'});
+  });
+
+  testWidgets('deciding from the bill goes back to the queue', (tester) async {
+    final server = await _pump(tester);
+    await tester.tap(find.text('View bill'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(FilledButton, 'Approve'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(TextButton, 'Approve'));
+    await tester.pumpAndSettle();
+
+    expect(
+      server.seen.singleWhere((r) => r.path == '/discount_requests/approve').body,
+      {'id': 1901, 'comments': ''},
+    );
+    expect(find.text('Bill · PKN/22'), findsNothing);
+    expect(find.text('Approvals'), findsOneWidget);
   });
 }

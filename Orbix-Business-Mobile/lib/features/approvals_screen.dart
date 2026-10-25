@@ -10,6 +10,7 @@ import '../services/approvals_service.dart';
 import '../widgets/async_view.dart';
 import '../widgets/common.dart';
 import '../widgets/kit.dart';
+import 'discount_bill_screen.dart';
 import 'order_detail_screen.dart';
 
 /// Everything waiting for the manager's decision: discount requests, LPOs and
@@ -21,14 +22,17 @@ class ApprovalsScreen extends StatefulWidget {
   final ValueChanged<int>? onCount;
 
   @override
-  State<ApprovalsScreen> createState() => _ApprovalsScreenState();
+  State<ApprovalsScreen> createState() => ApprovalsScreenState();
 }
 
-class _ApprovalsScreenState extends State<ApprovalsScreen> {
+class ApprovalsScreenState extends State<ApprovalsScreen> {
   var _view = GlobalKey<AsyncViewState<ApprovalsData>>();
   String? _accountId;
 
-  void _reload() => _view.currentState?.reload();
+  /// Fetches the queue again, keeping the current one on screen meanwhile.
+  /// Called whenever the tab is opened or the app comes back, and after
+  /// every decision.
+  void refresh() => _view.currentState?.refresh();
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +57,7 @@ class _ApprovalsScreenState extends State<ApprovalsScreen> {
           key: _view,
           load: load,
           builder: (context, data) =>
-              _ApprovalsBody(data: data, onChanged: _reload),
+              _ApprovalsBody(data: data, onChanged: refresh),
         ),
       ),
     );
@@ -155,36 +159,24 @@ class _DiscountCardState extends State<_DiscountCard> {
   bool _busy = false;
 
   Future<void> _decide({required bool approve}) async {
-    final d = widget.discount;
-    final comments = await showDialog<String>(
-      context: context,
-      builder: (_) => _DecisionDialog(discount: d, approve: approve),
+    final decided = await decideDiscount(
+      context,
+      widget.discount,
+      approve: approve,
+      onStart: () => setState(() => _busy = true),
+      onFailed: () {
+        if (mounted) setState(() => _busy = false);
+      },
     );
-    if (comments == null || !mounted) return;
+    // Decided, the buttons stay off until the queue drops the card.
+    if (decided != null) widget.onDecided();
+  }
 
-    setState(() => _busy = true);
-    final service = ApprovalsService(AppScope.of(context).session);
-    final messenger = ScaffoldMessenger.of(context);
-    try {
-      if (approve) {
-        await service.approveDiscount(d.id, comments: comments);
-      } else {
-        await service.rejectDiscount(d.id, comments: comments);
-      }
-      messenger.showSnackBar(SnackBar(
-        content: Text(approve
-            ? 'Discount of ${tzs(d.discountAmount)} approved for ${d.item.no}.'
-            : 'Discount request for ${d.item.no} rejected.'),
-      ));
-      widget.onDecided();
-    } on ApiException catch (e) {
-      if (!mounted) return;
-      setState(() => _busy = false);
-      await showDecisionFailed(context, e);
-      // The request may have changed on the server (decided by someone
-      // else, or partly saved); show the queue as it now is.
-      widget.onDecided();
-    }
+  Future<void> _viewBill() async {
+    final decided = await Navigator.of(context).push<bool>(MaterialPageRoute(
+      builder: (_) => DiscountBillScreen(discount: widget.discount),
+    ));
+    if (decided == true) widget.onDecided();
   }
 
   @override
@@ -247,7 +239,20 @@ class _DiscountCardState extends State<_DiscountCard> {
             const SizedBox(height: 6),
             Text(d.description, style: HqText.tiny),
           ],
-          const SizedBox(height: 14),
+          const SizedBox(height: 4),
+          Align(
+            alignment: Alignment.centerLeft,
+            child: TextButton.icon(
+              onPressed: _busy ? null : _viewBill,
+              icon: const Icon(Icons.receipt_long_outlined, size: 18),
+              label: const Text('View bill'),
+              style: TextButton.styleFrom(
+                foregroundColor: HqColors.brand,
+                padding: EdgeInsets.zero,
+              ),
+            ),
+          ),
+          const SizedBox(height: 6),
           Row(
             children: [
               Expanded(
@@ -350,6 +355,46 @@ class _DecisionDialogState extends State<_DecisionDialog> {
         ),
       ],
     );
+  }
+}
+
+/// Confirms, sends and reports a decision on a discount request — from its
+/// card or from its bill. Returns null when the manager cancels, true once
+/// the server accepted it, false when it refused (the queue should still be
+/// reloaded: the request may have changed meanwhile).
+Future<bool?> decideDiscount(
+  BuildContext context,
+  PendingDiscount d, {
+  required bool approve,
+  VoidCallback? onStart,
+  VoidCallback? onFailed,
+}) async {
+  final comments = await showDialog<String>(
+    context: context,
+    builder: (_) => _DecisionDialog(discount: d, approve: approve),
+  );
+  if (comments == null || !context.mounted) return null;
+
+  onStart?.call();
+  final service = ApprovalsService(AppScope.of(context).session);
+  final messenger = ScaffoldMessenger.of(context);
+  try {
+    if (approve) {
+      await service.approveDiscount(d.id, comments: comments);
+    } else {
+      await service.rejectDiscount(d.id, comments: comments);
+    }
+    messenger.showSnackBar(SnackBar(
+      content: Text(approve
+          ? 'Discount of ${tzs(d.discountAmount)} approved for ${d.item.no}.'
+          : 'Discount request for ${d.item.no} rejected.'),
+    ));
+    return true;
+  } on ApiException catch (e) {
+    // The spinner stops before the explanation appears, not after.
+    onFailed?.call();
+    if (context.mounted) await showDecisionFailed(context, e);
+    return false;
   }
 }
 

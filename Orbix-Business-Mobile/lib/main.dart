@@ -98,17 +98,53 @@ class _Shell extends StatefulWidget {
   State<_Shell> createState() => _ShellState();
 }
 
-class _ShellState extends State<_Shell> {
+class _ShellState extends State<_Shell> with WidgetsBindingObserver {
   int _tab = 0;
 
   /// Items waiting for a decision, once the approvals tab has loaded.
   int _waiting = 0;
 
+  // The tabs are all built up front (IndexedStack), so each would otherwise
+  // show what it loaded at sign-in until pulled down. These reach the live
+  // tabs to bring them up to date.
+  final _dashboard = GlobalKey<DashboardScreenState>();
+  final _approvals = GlobalKey<ApprovalsScreenState>();
+
+  static const _dashboardTab = 0;
+  static const _approvalsTab = 1;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  /// Back in the app: the queue (and its badge) and the open tab are stale.
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed) return;
+    _approvals.currentState?.refresh();
+    if (_tab == _dashboardTab) _dashboard.currentState?.refresh();
+  }
+
+  void _select(int i) {
+    setState(() => _tab = i);
+    if (i == _approvalsTab) _approvals.currentState?.refresh();
+    if (i == _dashboardTab) _dashboard.currentState?.refresh();
+  }
+
   @override
   Widget build(BuildContext context) {
     final pages = <Widget>[
-      const DashboardScreen(),
+      DashboardScreen(key: _dashboard),
       ApprovalsScreen(
+        key: _approvals,
         onCount: (n) {
           if (mounted && n != _waiting) setState(() => _waiting = n);
         },
@@ -127,7 +163,7 @@ class _ShellState extends State<_Shell> {
         ),
         child: NavigationBar(
           selectedIndex: _tab,
-          onDestinationSelected: (i) => setState(() => _tab = i),
+          onDestinationSelected: _select,
           backgroundColor: HqColors.panel,
           surfaceTintColor: Colors.transparent,
           indicatorColor: HqColors.brandSoft,

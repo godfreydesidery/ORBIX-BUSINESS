@@ -127,4 +127,20 @@ void main() {
       );
     });
   });
+
+  group('greeting', () {
+    test('follows the clock', () {
+      expect(greeting(DateTime(2026, 10, 25, 8), 'Zakaria Batista', 'z'),
+          'Good morning, Zakaria');
+      expect(greeting(DateTime(2026, 10, 25, 14), 'Zakaria Batista', 'z'),
+          'Good afternoon, Zakaria');
+      expect(greeting(DateTime(2026, 10, 25, 19), 'Zakaria Batista', 'z'),
+          'Good evening, Zakaria');
+    });
+
+    test('falls back to the username, without its domain', () {
+      expect(greeting(DateTime(2026, 10, 25, 8), '', 'dava@sighman.com'),
+          'Good morning, dava');
+    });
+  });
 }

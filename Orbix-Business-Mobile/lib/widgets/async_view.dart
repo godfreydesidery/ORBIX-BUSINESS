@@ -49,11 +49,26 @@ class AsyncViewState<T> extends State<AsyncView<T>> {
   /// user is looking at, without the screen keeping a second copy of it.
   T? get data => _data;
 
+  /// Keeps what is on screen while a [refresh] runs, instead of a spinner.
+  bool _quiet = false;
+
   /// Re-run the load — used by the retry button and pull-to-refresh.
   void reload() => setState(() {
+        _quiet = false;
         _data = null;
         _future = widget.load();
       });
+
+  /// Re-run the load without blanking the screen: the current data stays,
+  /// with a thin bar across the top until the new data replaces it. For
+  /// reloads the user did not ask for — coming back to a tab, or to the app.
+  void refresh() {
+    if (_data == null) return reload();
+    setState(() {
+      _quiet = true;
+      _future = widget.load();
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -61,7 +76,23 @@ class AsyncViewState<T> extends State<AsyncView<T>> {
       future: _future,
       builder: (context, snap) {
         if (snap.connectionState == ConnectionState.waiting) {
-          return const _Loading();
+          final shown = _data;
+          if (!_quiet || shown == null) return const _Loading();
+          return Stack(
+            children: [
+              widget.builder(context, shown),
+              const Positioned(
+                top: 0,
+                left: 0,
+                right: 0,
+                child: LinearProgressIndicator(
+                  minHeight: 2,
+                  color: HqColors.brand,
+                  backgroundColor: Colors.transparent,
+                ),
+              ),
+            ],
+          );
         }
         if (snap.hasError) {
           return _ErrorState(error: snap.error!, onRetry: reload);

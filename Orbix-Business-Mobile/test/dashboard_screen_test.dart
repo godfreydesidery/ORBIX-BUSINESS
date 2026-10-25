@@ -225,6 +225,7 @@ void main() {
 
   testWidgets('shows the branch and the business day', (tester) async {
     await _pump(tester);
+    expect(find.text('Good afternoon, mgr'), findsOneWidget);
     expect(find.text('Dar es Salaam'), findsOneWidget);
     expect(
       find.text('Sighman Safari Haulage · Business day 25 Oct 2026'),

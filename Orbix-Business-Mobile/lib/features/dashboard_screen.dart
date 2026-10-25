@@ -24,12 +24,21 @@ class DashboardScreen extends StatefulWidget {
   final DateTime Function()? now;
 
   @override
-  State<DashboardScreen> createState() => _DashboardScreenState();
+  State<DashboardScreen> createState() => DashboardScreenState();
 }
 
-class _DashboardScreenState extends State<DashboardScreen> {
+class DashboardScreenState extends State<DashboardScreen> {
   PeriodKind _kind = PeriodKind.today;
   DateTimeRange? _custom;
+
+  /// What the figures on screen were loaded for, and the handle to reload
+  /// them. A new account or period gets a new key, so it loads afresh.
+  String? _loadedFor;
+  var _view = GlobalKey<AsyncViewState<DashboardData>>();
+
+  /// Fetches the figures again, keeping the current ones on screen meanwhile.
+  /// Called when the tab is opened again or the app comes back.
+  void refresh() => _view.currentState?.refresh();
 
   DateTime _now() => widget.now?.call() ?? DateTime.now();
 
@@ -41,6 +50,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
     final account = session.active;
     final period = _period;
     final allowed = session.canAny(Privileges.dashboard);
+    final loadFor = '${account?.id}|${apiDate(period.range.start)}'
+        '|${apiDate(period.range.end)}|$_kind';
+    if (loadFor != _loadedFor) {
+      _loadedFor = loadFor;
+      _view = GlobalKey<AsyncViewState<DashboardData>>();
+    }
 
     return Scaffold(
       backgroundColor: HqColors.bg,
@@ -52,6 +67,8 @@ class _DashboardScreenState extends State<DashboardScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               child: _BranchHeader(
+                greeting: greeting(_now(), account?.displayName ?? '',
+                    account?.username ?? ''),
                 title: account?.title ?? '',
                 subtitle: account?.companyName ?? '',
               ),
@@ -72,11 +89,7 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 4),
               Expanded(
                 child: AsyncView<DashboardData>(
-                  // A new account or period is a new load.
-                  key: ValueKey(
-                    '${account?.id}|${apiDate(period.range.start)}'
-                    '|${apiDate(period.range.end)}|$_kind',
-                  ),
+                  key: _view,
                   load: () =>
                       DashboardService(session).load(period, now: _now()),
                   builder: (context, data) =>
@@ -354,8 +367,14 @@ class _TileGrid extends StatelessWidget {
 /// The active branch, tappable to switch account, with the server's
 /// business day underneath.
 class _BranchHeader extends StatelessWidget {
-  const _BranchHeader({required this.title, required this.subtitle});
+  const _BranchHeader({
+    required this.greeting,
+    required this.title,
+    required this.subtitle,
+  });
 
+  /// "Good morning, Zakaria".
+  final String greeting;
   final String title;
   final String subtitle;
 
@@ -373,6 +392,14 @@ class _BranchHeader extends StatelessWidget {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  Text(
+                    greeting,
+                    style: HqText.label.copyWith(
+                      color: HqColors.brand,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
                   Text(title, style: HqText.title),
                   const SizedBox(height: 2),
                   _BusinessDay(
@@ -395,6 +422,19 @@ class _BranchHeader extends StatelessWidget {
       ),
     );
   }
+}
+
+/// "Good morning, Zakaria" — by the phone's clock, with the first name the
+/// server holds for the user, else their username.
+String greeting(DateTime now, String displayName, String username) {
+  final part = now.hour < 12
+      ? 'morning'
+      : now.hour < 17
+          ? 'afternoon'
+          : 'evening';
+  final first = displayName.trim().split(RegExp(r'\s+')).first;
+  final name = first.isNotEmpty ? first : username.split('@').first;
+  return name.isEmpty ? 'Good $part' : 'Good $part, $name';
 }
 
 /// "Sighman Safari Haulage · Business day 25 Oct 2026". The business day is

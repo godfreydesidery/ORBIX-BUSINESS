@@ -110,6 +110,26 @@ class ApprovalsService {
     return PendingOrder.fromJson(kind, j);
   }
 
+  /// Every bill on the item a discount is requested for. The server sends
+  /// nothing at all (not an empty list) for an item without bills.
+  Future<List<BillLine>> bills(DiscountItem item) async {
+    final rows = await _session.api.get(
+      item.kind.billsPath,
+      query: {item.kind.billsParam: item.id},
+    );
+    return asList(rows, BillLine.fromJson);
+  }
+
+  /// What the gate recorded about the item: phone, agent, where it is, the
+  /// billing rate. Shown above its bills.
+  Future<List<(String, String)>> itemFacts(DiscountItem item) async {
+    final j = asMap(await _session.api.get(
+      '/${item.kind.path}/get',
+      query: {'id': item.id},
+    ));
+    return discountItemFacts(item.kind, j);
+  }
+
   Future<void> approveDiscount(int id, {String comments = ''}) =>
       _session.api.post('/discount_requests/approve',
           body: {'id': id, 'comments': comments});

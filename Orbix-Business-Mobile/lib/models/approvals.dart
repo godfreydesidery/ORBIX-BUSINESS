@@ -1,14 +1,19 @@
+import '../app/format.dart';
 import '../core/json.dart';
 import '../core/privileges.dart';
 
 /// What a discount is requested on. The server names it in
 /// `serviceBillName` and lists the waiting items per kind.
 enum DiscountKind {
-  parking('Parking', 'parkings', 'Parking', Privileges.parkingDiscounts),
-  storage('Storage', 'storages', 'Storage', Privileges.storageDiscounts),
-  bond('Bond', 'bond_items', 'Bonded item', Privileges.bondDiscounts);
+  parking('Parking', 'parkings', 'Parking', Privileges.parkingDiscounts,
+      'get_parking_bill_receivables', 'parking_id'),
+  storage('Storage', 'storages', 'Storage', Privileges.storageDiscounts,
+      'get_storage_bill_receivables', 'storage_id'),
+  bond('Bond', 'bond_items', 'Bonded item', Privileges.bondDiscounts,
+      'get_bond_item_bill_receivables', 'bond_item_id');
 
-  const DiscountKind(this.serviceName, this.path, this.label, this.privileges);
+  const DiscountKind(this.serviceName, this.path, this.label, this.privileges,
+      this._billsEndpoint, this.billsParam);
 
   /// `service_name` on `/discount_requests`.
   final String serviceName;
@@ -17,6 +22,136 @@ enum DiscountKind {
   final String path;
   final String label;
   final List<String> privileges;
+  final String _billsEndpoint;
+
+  /// The query parameter naming the item on [billsPath].
+  final String billsParam;
+
+  /// Every bill raised on one item.
+  String get billsPath => '/$path/$_billsEndpoint';
+}
+
+/// One bill raised on a vehicle, consignment or bonded item.
+class BillLine {
+  const BillLine({
+    required this.id,
+    required this.from,
+    required this.to,
+    required this.days,
+    required this.price,
+    required this.discount,
+    required this.amount,
+    required this.paid,
+    required this.discountStatus,
+    required this.description,
+  });
+
+  final String id;
+
+  /// The span billed, as the server wrote it ("2025-02-11T00:00").
+  final String from;
+  final String to;
+
+  /// Days (or units) billed.
+  final double days;
+  final double price;
+  final double discount;
+  final double amount;
+  final bool paid;
+
+  /// "Requested", "Approved", "Rejected", or empty.
+  final String discountStatus;
+  final String description;
+
+  factory BillLine.fromJson(Map<String, dynamic> j) {
+    String s(String k) => asStrOr(j[k]).trim();
+    // Storage and bond bills count days apart from quantity; parking does not.
+    final days = asNum(j['noOfDays']);
+    return BillLine(
+      id: s('id'),
+      from: s('startedAt'),
+      to: s('endedAt'),
+      days: (days == null || days == 0) ? asNumOr(j['qty']) : days,
+      price: asNumOr(j['price']),
+      discount: asNumOr(j['discount']),
+      amount: asNumOr(j['amount']),
+      paid: s('payStatus').toUpperCase() == 'PAID',
+      discountStatus: s('discountStatus'),
+      description: s('description'),
+    );
+  }
+
+  /// Whether [request] is for this bill. The request names the bill only in
+  /// its description ("Parking Bill 2025-02-11T00:00 2026-10-06T00:00"), so
+  /// the span is matched; failing that, an unpaid bill of the same amount.
+  bool isFor(PendingDiscount request) {
+    if (from.isNotEmpty &&
+        to.isNotEmpty &&
+        request.description.contains(from) &&
+        request.description.contains(to)) {
+      return true;
+    }
+    return false;
+  }
+}
+
+/// Label/value pairs worth reading before deciding, from `/<kind>/get`.
+/// Placeholders the gate types for "none" ("-", "NA") are left out.
+List<(String, String)> discountItemFacts(
+    DiscountKind kind, Map<String, dynamic> j) {
+  String s(String k) {
+    final v = asStrOr(j[k]).trim();
+    return (v == '-' || v.toUpperCase() == 'NA' || v == 'null') ? '' : v;
+  }
+
+  final facts = <(String, String)>[
+    ('Phone', s('ownerPhoneNo')),
+    ('Agent', [s('agentName'), s('agentPhoneNo')].where((v) => v.isNotEmpty).join(' · ')),
+    ...switch (kind) {
+      DiscountKind.parking => [
+          ('Zone', s('parkingZoneName')),
+          ('Category', s('vehicleEquipmentCategory')),
+          ('T-form', s('tformNumber')),
+          ('Billed', [
+            s('billingType').toLowerCase(),
+            if (asNumOr(j['billingAmount']) > 0) tzs(asNumOr(j['billingAmount'])),
+          ].where((v) => v.isNotEmpty).join(' at ')),
+          ('Billing since', _day(s('billingStartAt'))),
+        ],
+      DiscountKind.storage => [
+          ('Warehouse', s('warehouseName')),
+          ('Goods', [s('goodTypeName'), s('goodDescription')]
+              .where((v) => v.isNotEmpty)
+              .join(' · ')),
+          ('Checked in', _day(s('checkedInAt'))),
+        ],
+      DiscountKind.bond => [
+          ('Bond zone', s('bondZoneName')),
+          ('Type', s('bondItemTypeName')),
+          ('Checked in', _day(s('checkedInAt'))),
+        ],
+    },
+  ];
+  return facts.where((f) => f.$2.isNotEmpty).toList();
+}
+
+String _day(String s) {
+  final d = DateTime.tryParse(s);
+  if (d == null) return s;
+  const m = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun',
+      'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  return '${d.day} ${m[d.month - 1]} ${d.year}';
+}
+
+/// Picks the bill a discount request is for, if it can be told.
+BillLine? billFor(PendingDiscount request, List<BillLine> bills) {
+  for (final b in bills) {
+    if (b.isFor(request)) return b;
+  }
+  final sameAmount = bills
+      .where((b) => !b.paid && b.amount == request.billAmount)
+      .toList();
+  return sameAmount.length == 1 ? sameAmount.single : null;
 }
 
 /// A checked-in vehicle, consignment or bonded item awaiting a discount
