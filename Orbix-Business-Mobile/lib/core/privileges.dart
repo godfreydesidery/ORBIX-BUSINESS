@@ -17,4 +17,16 @@ class Privileges {
   /// Who sees the dashboard: whoever the web app shows the Management Board
   /// or the finance reports to.
   static const dashboard = [management, financeReports, admin];
+
+  /// Finance › Parking Discounts.
+  static const parkingDiscounts = ['FINCDISC-ACCESS', 'PKNGDISC-ACCESS'];
+
+  /// Finance › Storage Discounts.
+  static const storageDiscounts = ['FINCDISC-ACCESS', 'STRGDISC-ACCESS'];
+
+  /// Finance › Bond Discounts.
+  static const bondDiscounts = ['BNDDISC-ACCESS'];
+
+  /// The Procurement menu: LPOs and GRNs.
+  static const procurement = 'PRCMT-ACCESS';
 }

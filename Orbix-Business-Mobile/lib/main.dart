@@ -5,6 +5,7 @@ import 'app/brand.dart';
 import 'app/theme.dart';
 import 'core/session.dart';
 import 'features/account_screen.dart';
+import 'features/approvals_screen.dart';
 import 'features/dashboard_screen.dart';
 import 'features/sign_in_screen.dart';
 
@@ -99,20 +100,25 @@ class _Shell extends StatefulWidget {
 class _ShellState extends State<_Shell> {
   int _tab = 0;
 
+  /// Items waiting for a decision, once the approvals tab has loaded.
+  int _waiting = 0;
+
   @override
   Widget build(BuildContext context) {
-    const pages = <Widget>[
-      DashboardScreen(),
-      _ComingNext(
-        title: 'Approvals',
-        detail: 'LPOs, GRNs and discount requests waiting for you.',
+    final pages = <Widget>[
+      const DashboardScreen(),
+      ApprovalsScreen(
+        onCount: (n) {
+          if (mounted && n != _waiting) setState(() => _waiting = n);
+        },
       ),
-      _ComingNext(
+      const _ComingNext(
         title: 'Reports',
         detail: 'Collections and sales reports for any dates.',
       ),
-      AccountScreen(),
+      const AccountScreen(),
     ];
+    final badge = _waiting > 99 ? '99+' : '$_waiting';
 
     return Scaffold(
       body: IndexedStack(index: _tab, children: pages),
@@ -129,23 +135,31 @@ class _ShellState extends State<_Shell> {
           indicatorColor: HqColors.brandSoft,
           height: 66,
           labelBehavior: NavigationDestinationLabelBehavior.alwaysShow,
-          destinations: const [
-            NavigationDestination(
+          destinations: [
+            const NavigationDestination(
               icon: Icon(Icons.space_dashboard_outlined),
               selectedIcon: Icon(Icons.space_dashboard, color: HqColors.brand),
               label: 'Dashboard',
             ),
             NavigationDestination(
-              icon: Icon(Icons.fact_check_outlined),
-              selectedIcon: Icon(Icons.fact_check, color: HqColors.brand),
+              icon: Badge(
+                isLabelVisible: _waiting > 0,
+                label: Text(badge),
+                child: const Icon(Icons.fact_check_outlined),
+              ),
+              selectedIcon: Badge(
+                isLabelVisible: _waiting > 0,
+                label: Text(badge),
+                child: const Icon(Icons.fact_check, color: HqColors.brand),
+              ),
               label: 'Approvals',
             ),
-            NavigationDestination(
+            const NavigationDestination(
               icon: Icon(Icons.assessment_outlined),
               selectedIcon: Icon(Icons.assessment, color: HqColors.brand),
               label: 'Reports',
             ),
-            NavigationDestination(
+            const NavigationDestination(
               icon: Icon(Icons.person_outline),
               selectedIcon: Icon(Icons.person, color: HqColors.brand),
               label: 'Account',
