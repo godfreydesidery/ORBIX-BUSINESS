@@ -7,6 +7,7 @@ import 'core/session.dart';
 import 'features/account_screen.dart';
 import 'features/approvals_screen.dart';
 import 'features/dashboard_screen.dart';
+import 'features/reports_screen.dart';
 import 'features/sign_in_screen.dart';
 
 Future<void> main() async {
@@ -112,10 +113,7 @@ class _ShellState extends State<_Shell> {
           if (mounted && n != _waiting) setState(() => _waiting = n);
         },
       ),
-      const _ComingNext(
-        title: 'Reports',
-        detail: 'Collections and sales reports for any dates.',
-      ),
+      const ReportsScreen(),
       const AccountScreen(),
     ];
     final badge = _waiting > 99 ? '99+' : '$_waiting';
@@ -165,36 +163,6 @@ class _ShellState extends State<_Shell> {
               label: 'Account',
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-/// Stands in for a tab that is built in a later step.
-class _ComingNext extends StatelessWidget {
-  const _ComingNext({required this.title, required this.detail});
-
-  final String title;
-  final String detail;
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: HqColors.bg,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.fromLTRB(20, 22, 20, 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(title, style: HqText.title),
-              const SizedBox(height: 6),
-              Text(detail, style: HqText.body),
-              const SizedBox(height: 4),
-              const Text('Coming in the next update.', style: HqText.tiny),
-            ],
-          ),
         ),
       ),
     );

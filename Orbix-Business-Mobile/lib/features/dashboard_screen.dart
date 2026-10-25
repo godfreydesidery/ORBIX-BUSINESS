@@ -12,6 +12,7 @@ import '../widgets/async_view.dart';
 import '../widgets/charts.dart';
 import '../widgets/common.dart';
 import '../widgets/kit.dart';
+import '../widgets/period_chips.dart';
 import 'account_screen.dart';
 
 /// How the business is doing: what was collected, from where, how it was
@@ -34,45 +35,12 @@ class _DashboardScreenState extends State<DashboardScreen> {
 
   Period get _period => Period.of(_kind, now: _now(), custom: _custom);
 
-  static const _presets = [
-    (PeriodKind.today, 'Today'),
-    (PeriodKind.yesterday, 'Yesterday'),
-    (PeriodKind.thisWeek, 'This week'),
-    (PeriodKind.thisMonth, 'This month'),
-  ];
-
-  Future<void> _pickDates() async {
-    final now = _now();
-    final picked = await showDateRangePicker(
-      context: context,
-      initialDateRange: _custom ?? _period.range,
-      firstDate: DateTime(2020),
-      lastDate: DateTime(now.year, now.month, now.day),
-      helpText: 'Choose the period',
-      saveText: 'Apply',
-    );
-    if (picked != null) {
-      setState(() {
-        _custom = picked;
-        _kind = PeriodKind.custom;
-      });
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final session = AppScope.of(context).session;
     final account = session.active;
     final period = _period;
     final allowed = session.canAny(Privileges.dashboard);
-
-    final chips = [
-      for (final p in _presets) p.$2,
-      _kind == PeriodKind.custom ? formatRange(period.range) : 'Pick dates',
-    ];
-    final selected = _kind == PeriodKind.custom
-        ? chips.length - 1
-        : _presets.indexWhere((p) => p.$1 == _kind);
 
     return Scaffold(
       backgroundColor: HqColors.bg,
@@ -92,16 +60,13 @@ class _DashboardScreenState extends State<DashboardScreen> {
               const SizedBox(height: 12),
               Padding(
                 padding: const EdgeInsets.only(left: 20),
-                child: FilterChipsRow(
-                  options: chips,
-                  selected: selected,
-                  onSelected: (i) {
-                    if (i == chips.length - 1) {
-                      _pickDates();
-                    } else {
-                      setState(() => _kind = _presets[i].$1);
-                    }
-                  },
+                child: PeriodChips(
+                  period: period,
+                  now: _now,
+                  onChanged: (p) => setState(() {
+                    _kind = p.kind;
+                    _custom = p.kind == PeriodKind.custom ? p.range : null;
+                  }),
                 ),
               ),
               const SizedBox(height: 4),

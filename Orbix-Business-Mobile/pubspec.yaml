@@ -3,7 +3,7 @@ description: "Orbix Manager — reports and approvals for managers, on the Orbix
 publish_to: 'none'
 
 # Bump with lib/app/version.dart (test/version_test.dart checks they match).
-version: 1.2.0+3
+version: 1.3.0+4
 
 environment:
   sdk: ^3.11.5
