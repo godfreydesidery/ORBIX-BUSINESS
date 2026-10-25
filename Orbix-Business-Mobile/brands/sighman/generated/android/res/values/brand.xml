@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- GENERATED from brands/sighman/brand.json by tool/brand.py. -->
+<resources>
+    <string name="app_name">Sighman Haulage</string>
+    <color name="brand_color">#1E3A5F</color>
+</resources>

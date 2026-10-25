@@ -1,0 +1,42 @@
+name: orbix_manager
+description: "Orbix Manager — reports and approvals for managers, on the Orbix Business API."
+publish_to: 'none'
+
+# Bump with lib/app/version.dart (test/version_test.dart checks they match).
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.11.5
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  cupertino_icons: ^1.0.8
+  dio: ^5.9.2
+  uuid: ^4.5.1
+  shared_preferences: ^2.5.5
+  flutter_secure_storage: ^11.2.0
+  intl: ^0.20.2
+  share_plus: ^13.3.0
+  path_provider: ^2.1.6
+  pdf: ^3.12.0
+  printing: ^5.14.3
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+
+dependency_overrides:
+  # image 4.10+ calls ZLibDecoder.decodeLazy, which only exists in archive 4.1,
+  # yet still declares archive ^4.0.9 — and pdf caps archive below 4.1. The
+  # resolver picks image 4.11 and the build fails. 4.9.2 is what OrbixHQ ships.
+  image: 4.9.2
+
+flutter:
+  # Android builds per brand (android/app/build.gradle.kts). A plain
+  # `flutter run` gets the generic Orbix app.
+  default-flavor: orbix
+
+  uses-material-design: true
