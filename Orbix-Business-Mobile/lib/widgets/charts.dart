@@ -430,6 +430,238 @@ class _ColumnTrendPainter extends CustomPainter {
 }
 
 // ---------------------------------------------------------------------------
+// 2b. CurveTrend
+// ---------------------------------------------------------------------------
+
+/// A trend over periods as a smooth curve with a soft fill beneath — the
+/// managers' choice over columns. The curve is monotone between points, so
+/// it never dips below zero or bulges past a peak that did not happen. The
+/// last stretch is dashed and its point hollow: a part-period must never
+/// read as a full one. The highest and the latest values are labelled.
+class CurveTrend extends StatelessWidget {
+  const CurveTrend({
+    super.key,
+    required this.values,
+    required this.labels,
+    this.height = 150,
+    this.partialLast = true,
+    this.color = HqColors.brand,
+  });
+
+  final List<double> values;
+  final List<String> labels;
+  final double height;
+  final bool partialLast;
+  final Color color;
+
+  @override
+  Widget build(BuildContext context) {
+    if (values.isEmpty) return SizedBox(height: height);
+    return SizedBox(
+      height: height,
+      width: double.infinity,
+      child: CustomPaint(
+        painter: _CurveTrendPainter(values, labels, partialLast, color),
+      ),
+    );
+  }
+}
+
+class _CurveTrendPainter extends CustomPainter {
+  _CurveTrendPainter(this.values, this.labels, this.partialLast, this.color);
+
+  final List<double> values;
+  final List<String> labels;
+  final bool partialLast;
+  final Color color;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final n = values.length;
+    if (n == 0 || size.width <= 0 || size.height <= 0) return;
+
+    const labelH = 18.0;
+    const topPad = 16.0; // room for the value labels above the curve
+    const sidePad = 6.0;
+    final chartW = math.max(1.0, size.width - sidePad * 2);
+    final chartH = math.max(1.0, size.height - labelH - topPad);
+
+    var hi = _maxOf(values, 0);
+    if (hi <= 0) hi = 1;
+    hi *= 1.08;
+
+    double x(int i) => sidePad + (n == 1 ? chartW / 2 : chartW * i / (n - 1));
+    double y(double v) => topPad + chartH - (math.max(0, v) / hi) * chartH;
+    final pts = [for (var i = 0; i < n; i++) Offset(x(i), y(values[i]))];
+    final baseY = topPad + chartH;
+
+    canvas.drawLine(
+      Offset(sidePad, baseY),
+      Offset(sidePad + chartW, baseY),
+      Paint()
+        ..color = HqColors.line
+        ..strokeWidth = 1,
+    );
+
+    if (n > 1) {
+      final curve = _monotone(pts);
+
+      // The fill: the curve closed down to the baseline, fading out.
+      final fill = Path.from(curve)
+        ..lineTo(pts.last.dx, baseY)
+        ..lineTo(pts.first.dx, baseY)
+        ..close();
+      canvas.drawPath(
+        fill,
+        Paint()
+          ..shader = LinearGradient(
+            begin: Alignment.topCenter,
+            end: Alignment.bottomCenter,
+            colors: [
+              color.withValues(alpha: 0.26),
+              color.withValues(alpha: 0.02),
+            ],
+          ).createShader(Rect.fromLTRB(0, topPad, size.width, baseY)),
+      );
+
+      final stroke = Paint()
+        ..color = color
+        ..strokeWidth = 2.6
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeJoin = StrokeJoin.round;
+      if (partialLast) {
+        canvas.drawPath(_monotone(pts, to: n - 2), stroke);
+        _dashPath(
+          canvas,
+          _monotone(pts, from: n - 2),
+          stroke..color = color.withValues(alpha: 0.7),
+        );
+        stroke.color = color;
+      } else {
+        canvas.drawPath(curve, stroke);
+      }
+    }
+
+    // Points: small and quiet, the latest one stressed.
+    for (var i = 0; i < n; i++) {
+      final isLast = i == n - 1;
+      canvas.drawCircle(
+        pts[i],
+        isLast ? 4.5 : 2.6,
+        Paint()..color = isLast && partialLast ? HqColors.panel : color,
+      );
+      if (isLast) {
+        canvas.drawCircle(
+          pts[i],
+          4.5,
+          Paint()
+            ..color = color
+            ..style = PaintingStyle.stroke
+            ..strokeWidth = 2,
+        );
+      }
+    }
+
+    // Values: the peak and the latest, never more — a label per point is
+    // unreadable at phone width.
+    var peak = 0;
+    for (var i = 1; i < n; i++) {
+      if (values[i] > values[peak]) peak = i;
+    }
+    final labelled = {peak, n - 1};
+    for (final i in labelled) {
+      if (values[i] <= 0 && i != n - 1) continue;
+      _text(
+        canvas,
+        qty(values[i]),
+        Offset(
+          (pts[i].dx).clamp(14.0, size.width - 14.0),
+          pts[i].dy - 17,
+        ),
+        HqText.tiny.copyWith(
+          fontSize: 10.5,
+          fontWeight: FontWeight.w700,
+          color: i == n - 1 ? HqColors.ink : HqColors.ink2,
+        ),
+        align: TextAlign.center,
+        maxW: 64,
+      );
+    }
+
+    for (var i = 0; i < n && i < labels.length; i++) {
+      final isLast = i == n - 1;
+      _text(
+        canvas,
+        labels[i],
+        Offset(pts[i].dx, baseY + 4),
+        HqText.tiny.copyWith(
+          fontSize: 10.5,
+          fontWeight: isLast ? FontWeight.w700 : FontWeight.w400,
+          color: isLast ? HqColors.ink2 : HqColors.ink3,
+        ),
+        align: TextAlign.center,
+        maxW: math.max(14, chartW / math.max(1, n - 1)),
+      );
+    }
+  }
+
+  /// A monotone cubic through [p] (Fritsch–Carlson): smooth, and never
+  /// overshooting between two points. With [from] and [to], only the stretch
+  /// between those points — slopes still come from the whole series, so the
+  /// pieces join without a kink.
+  static Path _monotone(List<Offset> p, {int from = 0, int? to}) {
+    final n = p.length;
+    final path = Path()..moveTo(p[from].dx, p[from].dy);
+    if (n < 2) return path;
+    final d = [
+      for (var i = 0; i < n - 1; i++)
+        (p[i + 1].dy - p[i].dy) / math.max(1e-6, p[i + 1].dx - p[i].dx),
+    ];
+    final m = List<double>.filled(n, 0);
+    m[0] = d.first;
+    m[n - 1] = d.last;
+    for (var i = 1; i < n - 1; i++) {
+      m[i] = (d[i - 1] * d[i] <= 0) ? 0 : (d[i - 1] + d[i]) / 2;
+    }
+    for (var i = 0; i < n - 1; i++) {
+      if (d[i] == 0) {
+        m[i] = 0;
+        m[i + 1] = 0;
+        continue;
+      }
+      final a = m[i] / d[i], b = m[i + 1] / d[i];
+      final s = a * a + b * b;
+      if (s > 9) {
+        final t = 3 / math.sqrt(s);
+        m[i] = t * a * d[i];
+        m[i + 1] = t * b * d[i];
+      }
+    }
+    final last = to ?? n - 1;
+    for (var i = from; i < last; i++) {
+      final dx = (p[i + 1].dx - p[i].dx) / 3;
+      path.cubicTo(
+        p[i].dx + dx,
+        p[i].dy + m[i] * dx,
+        p[i + 1].dx - dx,
+        p[i + 1].dy - m[i + 1] * dx,
+        p[i + 1].dx,
+        p[i + 1].dy,
+      );
+    }
+    return path;
+  }
+
+  @override
+  bool shouldRepaint(covariant _CurveTrendPainter o) =>
+      o.values != values ||
+      o.labels != labels ||
+      o.partialLast != partialLast ||
+      o.color != color;
+}
+
+// ---------------------------------------------------------------------------
 // 3. RankedBars
 // ---------------------------------------------------------------------------
 

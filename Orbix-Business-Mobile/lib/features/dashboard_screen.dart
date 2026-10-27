@@ -202,7 +202,7 @@ class _DashboardBody extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 12),
-                ColumnTrend(
+                CurveTrend(
                   values: [for (final m in months) m.checkedIn.toDouble()],
                   labels: [for (final m in months) _monthShort[m.month - 1]],
                   height: 130,
