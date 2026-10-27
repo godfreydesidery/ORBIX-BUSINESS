@@ -49,47 +49,47 @@ class Brand {
   /// Manager" so support can still tell what product is on the phone.
   static const bool isOrbix = id == 'orbix';
 
-  // Palette, as 0xAARRGGBB. Defaults are the Orbix deep teal.
+  // Palette, as 0xAARRGGBB. Defaults are the Orbix green.
   static const int primary = int.fromEnvironment(
     'BRAND_PRIMARY',
-    defaultValue: 0xFF0F766E,
+    defaultValue: 0xFF17892C,
   );
   static const int primaryDark = int.fromEnvironment(
     'BRAND_PRIMARY_DARK',
-    defaultValue: 0xFF0B5A54,
+    defaultValue: 0xFF116821,
   );
   static const int primarySoft = int.fromEnvironment(
     'BRAND_PRIMARY_SOFT',
-    defaultValue: 0xFFE6F4F1,
+    defaultValue: 0xFFE7F4E9,
   );
 
   /// The dark hero field: primary into [heroMid] into [heroEnd].
   static const int heroMid = int.fromEnvironment(
     'BRAND_HERO_MID',
-    defaultValue: 0xFF0B3B39,
+    defaultValue: 0xFF0D3915,
   );
   static const int heroEnd = int.fromEnvironment(
     'BRAND_HERO_END',
-    defaultValue: 0xFF08201F,
+    defaultValue: 0xFF091F0D,
   );
 
   static const int gradientStart = int.fromEnvironment(
     'BRAND_GRADIENT_START',
-    defaultValue: 0xFF12897F,
+    defaultValue: 0xFF1BA033,
   );
   static const int gradientEnd = int.fromEnvironment(
     'BRAND_GRADIENT_END',
-    defaultValue: 0xFF0C5F58,
+    defaultValue: 0xFF136E23,
   );
 
   /// Secondary and tertiary text ON the hero field — tinted towards the brand
   /// so they read as part of it, but light enough to stay legible.
   static const int onDarkSecondary = int.fromEnvironment(
     'BRAND_ON_DARK_2',
-    defaultValue: 0xFFB9D6D2,
+    defaultValue: 0xFFB9D4BE,
   );
   static const int onDarkTertiary = int.fromEnvironment(
     'BRAND_ON_DARK_3',
-    defaultValue: 0xFF7FA9A4,
+    defaultValue: 0xFF87AB8E,
   );
 }

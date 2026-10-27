@@ -13,7 +13,7 @@ import 'brand.dart';
 class HqColors {
   HqColors._();
 
-  // brand - the executive field (Orbix: deep teal)
+  // brand - the executive field (per brand; Orbix and Sighman: green)
   static const brand = Color(Brand.primary);
   static const brandD = Color(Brand.primaryDark);
   static const brandSoft = Color(Brand.primarySoft);

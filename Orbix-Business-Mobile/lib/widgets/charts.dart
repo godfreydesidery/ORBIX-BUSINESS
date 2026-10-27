@@ -3,6 +3,7 @@ import 'dart:ui' show FontFeature, PathMetric;
 
 import 'package:flutter/material.dart';
 
+import '../app/brand.dart';
 import '../app/format.dart';
 import '../app/theme.dart';
 
@@ -37,18 +38,20 @@ class VizColors {
   static const emphasis = HqColors.brand;
   static const muted = Color(0xFFCBD5E1);
 
-  /// Sequential teal ramp, light to dark.
-  static const seq = <Color>[
-    Color(0xFFCCE7E4),
-    Color(0xFF99CFC9),
-    Color(0xFF66B7AE),
-    Color(0xFF339F93),
-    Color(0xFF0F766E),
-    Color(0xFF0B5A54),
+  /// Sequential ramp in the brand's own hue, light to dark: six steps from
+  /// its soft tint to its dark shade, so every brand gets its own.
+  static final seq = <Color>[
+    for (var i = 0; i < 6; i++)
+      Color.lerp(
+        const Color(Brand.primarySoft),
+        const Color(Brand.primaryDark),
+        0.18 + i * 0.164,
+      )!,
   ];
 
-  /// The one series colour that survives the dark hero field.
-  static const mint = Color(0xFF5EEAD4);
+  /// The one series colour that survives the dark hero field: the brand's
+  /// light tint, made for text on that field.
+  static const mint = Color(Brand.onDarkSecondary);
 
   static const _cats = <Color>[cat1, cat2, cat3, cat4];
 
