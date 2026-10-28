@@ -197,6 +197,10 @@ class _TrendsSectionState extends State<_TrendsSection> {
   late int _year = widget.initial.year;
   Future<YearTrends>? _other;
 
+  /// Numbers on every bar and point. Off by default: the charts are for the
+  /// shape; the legend carries the totals.
+  bool _values = false;
+
   /// This year and the four before it.
   List<int> get _years => [
     for (var y = widget.now.year; y > widget.now.year - 5; y--) y,
@@ -226,6 +230,14 @@ class _TrendsSectionState extends State<_TrendsSection> {
               child: SectionLabel(text: 'In and out', trailing: 'BY MONTH'),
             ),
             const SizedBox(width: 10),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _ValuesToggle(
+                on: _values,
+                onChanged: (v) => setState(() => _values = v),
+              ),
+            ),
+            const SizedBox(width: 8),
             Padding(
               padding: const EdgeInsets.only(bottom: 8),
               child: _YearPicker(year: _year, years: _years, onPick: _pick),
@@ -316,6 +328,7 @@ class _TrendsSectionState extends State<_TrendsSection> {
                     labels: [for (final m in months) _monthShort[m.month - 1]],
                     // Only the current month of the current year is unfinished.
                     partialLast: running,
+                    showValues: _values,
                     height: 140,
                   )
                 else
@@ -324,6 +337,7 @@ class _TrendsSectionState extends State<_TrendsSection> {
                     compare: [for (final m in months) m.checkedOut.toDouble()],
                     labels: [for (final m in months) _monthShort[m.month - 1]],
                     partialLast: running,
+                    showValues: _values,
                     height: 140,
                   ),
               ],
@@ -331,6 +345,53 @@ class _TrendsSectionState extends State<_TrendsSection> {
           ),
         ),
   ];
+}
+
+/// "Values" chip: shows or hides the numbers on the charts.
+class _ValuesToggle extends StatelessWidget {
+  const _ValuesToggle({required this.on, required this.onChanged});
+
+  final bool on;
+  final ValueChanged<bool> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      toggled: on,
+      label: 'Show values on the charts',
+      child: InkWell(
+        borderRadius: BorderRadius.circular(20),
+        onTap: () => onChanged(!on),
+        child: Container(
+          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
+          decoration: BoxDecoration(
+            color: on ? HqColors.brand : HqColors.panel,
+            borderRadius: BorderRadius.circular(20),
+            border: Border.all(color: on ? HqColors.brand : HqColors.line2),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Icon(
+                on ? Icons.visibility_rounded : Icons.visibility_off_outlined,
+                size: 15,
+                color: on ? Colors.white : HqColors.ink3,
+              ),
+              const SizedBox(width: 5),
+              Text(
+                'Values',
+                style: TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w700,
+                  color: on ? Colors.white : HqColors.ink2,
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 /// The year chip: "2026 ▾", opening the years to choose from.

@@ -146,6 +146,13 @@ Path _smoothPath(List<Offset> pts) {
   return path;
 }
 
+/// A count short enough to sit on a chart: "769", "4.4k", "12k".
+String _compact(double v) {
+  if (v < 1000) return v.toStringAsFixed(0);
+  if (v < 10000) return '${(v / 1000).toStringAsFixed(1)}k';
+  return '${(v / 1000).round()}k';
+}
+
 double _maxOf(List<double> v, [double seed = 0]) =>
     v.fold<double>(seed, (a, b) => math.max(a, b));
 
@@ -462,6 +469,7 @@ class CurveTrend extends StatelessWidget {
     this.compare,
     this.height = 150,
     this.partialLast = true,
+    this.showValues = false,
     this.color = HqColors.brand,
     this.compareColor = VizColors.cat2,
   });
@@ -469,6 +477,11 @@ class CurveTrend extends StatelessWidget {
   final List<double> values;
   final List<String> labels;
   final List<double>? compare;
+
+  /// Every point labelled with its value. With two series, the higher of
+  /// the pair is labelled above its point and the lower below, so the
+  /// labels part instead of colliding where the lines run close.
+  final bool showValues;
   final double height;
   final bool partialLast;
   final Color color;
@@ -488,6 +501,7 @@ class CurveTrend extends StatelessWidget {
           partialLast,
           color,
           compareColor,
+          showValues,
         ),
       ),
     );
@@ -502,6 +516,7 @@ class _CurveTrendPainter extends CustomPainter {
     this.partialLast,
     this.color,
     this.compareColor,
+    this.showValues,
   );
 
   final List<double> values;
@@ -510,6 +525,7 @@ class _CurveTrendPainter extends CustomPainter {
   final bool partialLast;
   final Color color;
   final Color compareColor;
+  final bool showValues;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -520,7 +536,7 @@ class _CurveTrendPainter extends CustomPainter {
     const labelH = 18.0;
     const sidePad = 6.0;
     // Room above the curve for value labels, when there are any.
-    final topPad = second == null ? 16.0 : 6.0;
+    final topPad = (second == null || showValues) ? 16.0 : 6.0;
     final chartW = math.max(1.0, size.width - sidePad * 2);
     final chartH = math.max(1.0, size.height - labelH - topPad);
 
@@ -560,9 +576,61 @@ class _CurveTrendPainter extends CustomPainter {
       width: 2.6,
     );
 
-    // Values: the peak and the latest, never more — a label per point is
+    if (showValues) {
+      final valueStyle = HqText.tiny.copyWith(
+        fontSize: 9.5,
+        fontWeight: FontWeight.w700,
+      );
+      final mainStyle = valueStyle.copyWith(color: color);
+      final cmpStyle = valueStyle.copyWith(color: _darker(compareColor));
+      const lineH = 12.0;
+      final pairs = second != null && second.length == n;
+      for (var i = 0; i < n; i++) {
+        final main = pts[i];
+        if (!pairs || values[i] == second[i]) {
+          // One series, or both equal: one number says it.
+          _pointLabel(
+            canvas,
+            size,
+            values[i],
+            main.dx,
+            main.dy - 15,
+            style: mainStyle,
+          );
+          continue;
+        }
+        final cmp = Offset(x(i), y(second[i]));
+        final mainHigher = values[i] > second[i];
+        final upper = mainHigher ? main : cmp;
+        final lower = mainHigher ? cmp : main;
+        final upperY = upper.dy - 15;
+        // The lower value goes under its point when there is room above the
+        // month names; otherwise it stacks above the upper value's label.
+        final lowerY = lower.dy + 5 + lineH <= baseY
+            ? lower.dy + 5
+            : upperY - lineH;
+        _pointLabel(
+          canvas,
+          size,
+          values[i],
+          main.dx,
+          mainHigher ? upperY : lowerY,
+          style: mainStyle,
+        );
+        _pointLabel(
+          canvas,
+          size,
+          second[i],
+          cmp.dx,
+          mainHigher ? lowerY : upperY,
+          style: cmpStyle,
+        );
+      }
+    }
+
+    // Otherwise: the peak and the latest, never more - a label per point is
     // unreadable at phone width. Two series would collide: no labels then.
-    if (second == null) {
+    if (!showValues && second == null) {
       var peak = 0;
       for (var i = 1; i < n; i++) {
         if (values[i] > values[peak]) peak = i;
@@ -599,6 +667,25 @@ class _CurveTrendPainter extends CustomPainter {
         maxW: math.max(14, chartW / math.max(1, n - 1)),
       );
     }
+  }
+
+  /// A value centred at [x], its top at [top], kept inside the chart.
+  void _pointLabel(
+    Canvas canvas,
+    Size size,
+    double v,
+    double x,
+    double top, {
+    required TextStyle style,
+  }) {
+    _text(
+      canvas,
+      _compact(v),
+      Offset(x.clamp(12.0, size.width - 12.0), math.max(0, top)),
+      style,
+      align: TextAlign.center,
+      maxW: 40,
+    );
   }
 
   /// One series: the curve (its last stretch dashed while the period runs),
@@ -725,7 +812,8 @@ class _CurveTrendPainter extends CustomPainter {
       o.labels != labels ||
       o.partialLast != partialLast ||
       o.color != color ||
-      o.compareColor != compareColor;
+      o.compareColor != compareColor ||
+      o.showValues != showValues;
 }
 
 // ---------------------------------------------------------------------------
@@ -744,12 +832,17 @@ class PairedBars extends StatelessWidget {
     required this.labels,
     this.height = 150,
     this.partialLast = true,
+    this.showValues = false,
     this.color = HqColors.brand,
     this.compareColor = VizColors.cat2,
   });
 
   final List<double> values;
   final List<double> compare;
+
+  /// Each bar's value written upright above it - side by side they would
+  /// collide at phone width.
+  final bool showValues;
   final List<String> labels;
   final double height;
   final bool partialLast;
@@ -770,6 +863,7 @@ class PairedBars extends StatelessWidget {
           partialLast,
           color,
           compareColor,
+          showValues,
         ),
       ),
     );
@@ -784,6 +878,7 @@ class _PairedBarsPainter extends CustomPainter {
     this.partialLast,
     this.color,
     this.compareColor,
+    this.showValues,
   );
 
   final List<double> values;
@@ -792,6 +887,7 @@ class _PairedBarsPainter extends CustomPainter {
   final bool partialLast;
   final Color color;
   final Color compareColor;
+  final bool showValues;
 
   @override
   void paint(Canvas canvas, Size size) {
@@ -799,7 +895,8 @@ class _PairedBarsPainter extends CustomPainter {
     if (n == 0 || size.width <= 0 || size.height <= 0) return;
 
     const labelH = 18.0;
-    const topPad = 6.0;
+    // Room above the tallest bar for its upright value.
+    final topPad = showValues ? 36.0 : 6.0;
     final chartH = math.max(1.0, size.height - labelH - topPad);
     final baseY = topPad + chartH;
 
@@ -824,6 +921,7 @@ class _PairedBarsPainter extends CustomPainter {
 
     void bar(double left, double v, Color c, bool partial) {
       final h = (math.max(0, v) / hi) * chartH;
+      if (showValues) _uprightValue(canvas, v, left + barW / 2, baseY - h, c);
       if (h <= 0) return;
       final rect = Rect.fromLTRB(
         left,
@@ -883,6 +981,32 @@ class _PairedBarsPainter extends CustomPainter {
     }
   }
 
+  /// A bar's value written upright (reading upwards) just above its top.
+  static void _uprightValue(
+    Canvas canvas,
+    double v,
+    double centreX,
+    double top,
+    Color color,
+  ) {
+    final tp = TextPainter(
+      text: TextSpan(
+        text: _compact(v),
+        style: HqText.tiny.copyWith(
+          fontSize: 9.5,
+          fontWeight: FontWeight.w700,
+          color: _darker(color),
+        ),
+      ),
+      textDirection: TextDirection.ltr,
+    )..layout();
+    canvas.save();
+    canvas.translate(centreX + tp.height / 2, top - 3);
+    canvas.rotate(-math.pi / 2);
+    tp.paint(canvas, Offset.zero);
+    canvas.restore();
+  }
+
   @override
   bool shouldRepaint(covariant _PairedBarsPainter o) =>
       o.values != values ||
@@ -890,8 +1014,13 @@ class _PairedBarsPainter extends CustomPainter {
       o.labels != labels ||
       o.partialLast != partialLast ||
       o.color != color ||
-      o.compareColor != compareColor;
+      o.compareColor != compareColor ||
+      o.showValues != showValues;
 }
+
+/// A series colour deepened for text, so a bright line still reads as a
+/// label on white.
+Color _darker(Color c) => Color.lerp(c, HqColors.ink, 0.25)!;
 
 // ---------------------------------------------------------------------------
 // 3. RankedBars

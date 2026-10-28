@@ -14,6 +14,7 @@ import 'package:orbix_manager/core/accounts.dart';
 import 'package:orbix_manager/core/session.dart';
 import 'package:orbix_manager/features/dashboard_screen.dart';
 import 'package:orbix_manager/widgets/common.dart';
+import 'package:orbix_manager/widgets/charts.dart';
 import 'package:orbix_manager/widgets/kit.dart';
 
 import 'support/fake_server.dart';
@@ -285,5 +286,28 @@ void main() {
     expect(find.text('2025'), findsOneWidget);
     // A finished year runs to December.
     expect(find.text('Checked in'), findsOneWidget);
+  });
+
+  testWidgets('chart values: off by default, on with the switch',
+      (tester) async {
+    await _pump(tester);
+    bool showing() =>
+        tester.widgetList<PairedBars>(find.byType(PairedBars)).every((c) => c.showValues);
+    expect(find.byType(PairedBars), findsWidgets);
+    expect(
+      tester.widgetList<PairedBars>(find.byType(PairedBars)).any((c) => c.showValues),
+      isFalse,
+    );
+
+    await tester.tap(find.text('Values'));
+    await tester.pumpAndSettle();
+    expect(showing(), isTrue);
+
+    await tester.tap(find.text('Values'));
+    await tester.pumpAndSettle();
+    expect(
+      tester.widgetList<PairedBars>(find.byType(PairedBars)).any((c) => c.showValues),
+      isFalse,
+    );
   });
 }
