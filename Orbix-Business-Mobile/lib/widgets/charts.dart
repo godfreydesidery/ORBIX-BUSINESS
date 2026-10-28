@@ -212,7 +212,9 @@ class _SparkPainter extends CustomPainter {
     double y(double v) =>
         size.height - padY - ((v - lo) / span) * (size.height - padY * 2);
 
-    final pts = <Offset>[for (var i = 0; i < n; i++) Offset(x(i), y(values[i]))];
+    final pts = <Offset>[
+      for (var i = 0; i < n; i++) Offset(x(i), y(values[i])),
+    ];
     final line = _smoothPath(pts);
 
     // area fill, fading out downwards
@@ -294,8 +296,13 @@ class ColumnTrend extends StatelessWidget {
       height: height,
       width: double.infinity,
       child: CustomPaint(
-        painter:
-            _ColumnTrendPainter(values, labels, target, hatchLast, barColor),
+        painter: _ColumnTrendPainter(
+          values,
+          labels,
+          target,
+          hatchLast,
+          barColor,
+        ),
       ),
     );
   }
@@ -349,8 +356,12 @@ class _ColumnTrendPainter extends CustomPainter {
       final isLast = i == n - 1;
       final partial = hatchLast && isLast;
       final top = y(math.max(0, values[i]));
-      final rect =
-          Rect.fromLTRB(left, math.min(top, chartH - 1), left + barW, chartH);
+      final rect = Rect.fromLTRB(
+        left,
+        math.min(top, chartH - 1),
+        left + barW,
+        chartH,
+      );
       final r = math.min(4.0, barW / 2);
       final rrect = RRect.fromRectAndCorners(
         rect,
@@ -561,10 +572,7 @@ class _CurveTrendPainter extends CustomPainter {
         _text(
           canvas,
           qty(values[i]),
-          Offset(
-            (pts[i].dx).clamp(14.0, size.width - 14.0),
-            pts[i].dy - 17,
-          ),
+          Offset((pts[i].dx).clamp(14.0, size.width - 14.0), pts[i].dy - 17),
           HqText.tiny.copyWith(
             fontSize: 10.5,
             fontWeight: FontWeight.w700,
@@ -721,6 +729,171 @@ class _CurveTrendPainter extends CustomPainter {
 }
 
 // ---------------------------------------------------------------------------
+// 2c. PairedBars
+// ---------------------------------------------------------------------------
+
+/// Two series as bars side by side per period — checked in beside checked
+/// out — on one scale. The last pair is lighter and hatched while
+/// [partialLast]: a part-period must never read as a full one. No value
+/// labels: with two bars a period they collide; the caller shows a legend.
+class PairedBars extends StatelessWidget {
+  const PairedBars({
+    super.key,
+    required this.values,
+    required this.compare,
+    required this.labels,
+    this.height = 150,
+    this.partialLast = true,
+    this.color = HqColors.brand,
+    this.compareColor = VizColors.cat2,
+  });
+
+  final List<double> values;
+  final List<double> compare;
+  final List<String> labels;
+  final double height;
+  final bool partialLast;
+  final Color color;
+  final Color compareColor;
+
+  @override
+  Widget build(BuildContext context) {
+    if (values.isEmpty) return SizedBox(height: height);
+    return SizedBox(
+      height: height,
+      width: double.infinity,
+      child: CustomPaint(
+        painter: _PairedBarsPainter(
+          values,
+          compare,
+          labels,
+          partialLast,
+          color,
+          compareColor,
+        ),
+      ),
+    );
+  }
+}
+
+class _PairedBarsPainter extends CustomPainter {
+  _PairedBarsPainter(
+    this.values,
+    this.compare,
+    this.labels,
+    this.partialLast,
+    this.color,
+    this.compareColor,
+  );
+
+  final List<double> values;
+  final List<double> compare;
+  final List<String> labels;
+  final bool partialLast;
+  final Color color;
+  final Color compareColor;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final n = values.length;
+    if (n == 0 || size.width <= 0 || size.height <= 0) return;
+
+    const labelH = 18.0;
+    const topPad = 6.0;
+    final chartH = math.max(1.0, size.height - labelH - topPad);
+    final baseY = topPad + chartH;
+
+    var hi = _maxOf(values, 0);
+    hi = _maxOf(compare, hi);
+    if (hi <= 0) hi = 1;
+    hi *= 1.08;
+
+    // Each period gets an equal slot; its two bars sit in the middle with a
+    // hairline between them and room either side.
+    final slot = size.width / n;
+    final pairGap = math.max(1.0, slot * 0.06);
+    final barW = math.max(2.0, (slot * 0.72 - pairGap) / 2);
+
+    canvas.drawLine(
+      Offset(0, baseY),
+      Offset(size.width, baseY),
+      Paint()
+        ..color = HqColors.line
+        ..strokeWidth = 1,
+    );
+
+    void bar(double left, double v, Color c, bool partial) {
+      final h = (math.max(0, v) / hi) * chartH;
+      if (h <= 0) return;
+      final rect = Rect.fromLTRB(
+        left,
+        baseY - math.max(h, 1.5),
+        left + barW,
+        baseY,
+      );
+      final r = math.min(3.0, barW / 2);
+      final rrect = RRect.fromRectAndCorners(
+        rect,
+        topLeft: Radius.circular(r),
+        topRight: Radius.circular(r),
+      );
+      canvas.drawRRect(
+        rrect,
+        Paint()..color = partial ? c.withValues(alpha: 0.45) : c,
+      );
+      if (partial) {
+        canvas.save();
+        canvas.clipRRect(rrect);
+        final hatch = Paint()
+          ..color = Colors.white.withValues(alpha: 0.6)
+          ..strokeWidth = 1.2;
+        for (var d = -rect.height; d < barW + rect.height; d += 5) {
+          canvas.drawLine(
+            Offset(rect.left + d, rect.bottom),
+            Offset(rect.left + d + rect.height, rect.top),
+            hatch,
+          );
+        }
+        canvas.restore();
+      }
+    }
+
+    for (var i = 0; i < n; i++) {
+      final isLast = i == n - 1;
+      final partial = partialLast && isLast;
+      final mid = slot * i + slot / 2;
+      bar(mid - pairGap / 2 - barW, values[i], color, partial);
+      if (i < compare.length) {
+        bar(mid + pairGap / 2, compare[i], compareColor, partial);
+      }
+      if (i < labels.length) {
+        _text(
+          canvas,
+          labels[i],
+          Offset(mid, baseY + 4),
+          HqText.tiny.copyWith(
+            fontSize: 10.5,
+            fontWeight: isLast ? FontWeight.w700 : FontWeight.w400,
+            color: isLast ? HqColors.ink2 : HqColors.ink3,
+          ),
+          align: TextAlign.center,
+          maxW: slot,
+        );
+      }
+    }
+  }
+
+  @override
+  bool shouldRepaint(covariant _PairedBarsPainter o) =>
+      o.values != values ||
+      o.compare != compare ||
+      o.labels != labels ||
+      o.partialLast != partialLast ||
+      o.color != color ||
+      o.compareColor != compareColor;
+}
+
+// ---------------------------------------------------------------------------
 // 3. RankedBars
 // ---------------------------------------------------------------------------
 
@@ -749,11 +922,11 @@ class RankedBars extends StatelessWidget {
   final List<RankRow> rows;
 
   static Color _colorFor(RankStatus s) => switch (s) {
-        RankStatus.bad => HqColors.bad,
-        RankStatus.good => HqColors.good,
-        RankStatus.best => HqColors.brand,
-        RankStatus.normal => VizColors.muted,
-      };
+    RankStatus.bad => HqColors.bad,
+    RankStatus.good => HqColors.good,
+    RankStatus.best => HqColors.brand,
+    RankStatus.normal => VizColors.muted,
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -944,8 +1117,12 @@ class _BridgePainter extends CustomPainter {
       final yB = y(to[i]);
       final top = math.min(yA, yB);
       final bottom = math.max(yA, yB);
-      final rect =
-          Rect.fromLTRB(left, top, left + barW, math.max(top + 2, bottom));
+      final rect = Rect.fromLTRB(
+        left,
+        top,
+        left + barW,
+        math.max(top + 2, bottom),
+      );
 
       final color = s.isTotal
           ? HqColors.brand
@@ -1138,7 +1315,10 @@ class DonutMeter extends StatelessWidget {
       child: Stack(
         alignment: Alignment.center,
         children: [
-          CustomPaint(size: Size.square(size), painter: _DonutPainter(f, color)),
+          CustomPaint(
+            size: Size.square(size),
+            painter: _DonutPainter(f, color),
+          ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: size * 0.20),
             child: Column(
@@ -1181,8 +1361,12 @@ class _DonutPainter extends CustomPainter {
   void paint(Canvas canvas, Size size) {
     if (size.width <= 0 || size.height <= 0) return;
     const stroke = 11.0;
-    final rect =
-        Rect.fromLTWH(0, 0, size.width, size.height).deflate(stroke / 2 + 1);
+    final rect = Rect.fromLTWH(
+      0,
+      0,
+      size.width,
+      size.height,
+    ).deflate(stroke / 2 + 1);
     if (rect.width <= 0 || rect.height <= 0) return;
 
     canvas.drawArc(
@@ -1233,9 +1417,8 @@ class ShareBar extends StatelessWidget {
 
   final List<SharePart> parts;
 
-  static Color _colorAt(int i, int n) => n <= 4
-      ? VizColors.cat(i)
-      : VizColors.shade(VizColors.seq.length - 1 - i);
+  static Color _colorAt(int i, int n) =>
+      n <= 4 ? VizColors.cat(i) : VizColors.shade(VizColors.seq.length - 1 - i);
 
   @override
   Widget build(BuildContext context) {
@@ -1256,7 +1439,10 @@ class ShareBar extends StatelessWidget {
                 for (var i = 0; i < visible.length; i++) ...[
                   if (i > 0) const SizedBox(width: 2),
                   Expanded(
-                    flex: math.max(1, (visible[i].value / total * 1000).round()),
+                    flex: math.max(
+                      1,
+                      (visible[i].value / total * 1000).round(),
+                    ),
                     child: ColoredBox(color: _colorAt(i, visible.length)),
                   ),
                 ],

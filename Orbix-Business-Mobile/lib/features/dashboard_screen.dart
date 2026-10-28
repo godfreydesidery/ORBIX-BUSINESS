@@ -276,10 +276,12 @@ class _TrendsSectionState extends State<_TrendsSection> {
   }
 
   List<Widget> _trendCards(YearTrends t, {required bool running}) => [
-    for (final (title, months) in [
-      ('Vehicles & equipment', t.parking),
-      ('Goods storage', t.storage),
-      ('Bonded items', t.bond),
+    // Parking and storage read as bars, month against month; bonded items,
+    // with its rare spikes, as a curve.
+    for (final (title, months, bars) in [
+      ('Vehicles & equipment', t.parking, true),
+      ('Goods storage', t.storage, true),
+      ('Bonded items', t.bond, false),
     ])
       if (months.any((m) => m.checkedIn > 0 || m.checkedOut > 0))
         Padding(
@@ -307,14 +309,23 @@ class _TrendsSectionState extends State<_TrendsSection> {
                   ],
                 ),
                 const SizedBox(height: 12),
-                CurveTrend(
-                  values: [for (final m in months) m.checkedIn.toDouble()],
-                  compare: [for (final m in months) m.checkedOut.toDouble()],
-                  labels: [for (final m in months) _monthShort[m.month - 1]],
-                  // Only the current month of the current year is unfinished.
-                  partialLast: running,
-                  height: 140,
-                ),
+                if (bars)
+                  PairedBars(
+                    values: [for (final m in months) m.checkedIn.toDouble()],
+                    compare: [for (final m in months) m.checkedOut.toDouble()],
+                    labels: [for (final m in months) _monthShort[m.month - 1]],
+                    // Only the current month of the current year is unfinished.
+                    partialLast: running,
+                    height: 140,
+                  )
+                else
+                  CurveTrend(
+                    values: [for (final m in months) m.checkedIn.toDouble()],
+                    compare: [for (final m in months) m.checkedOut.toDouble()],
+                    labels: [for (final m in months) _monthShort[m.month - 1]],
+                    partialLast: running,
+                    height: 140,
+                  ),
               ],
             ),
           ),

@@ -26,5 +26,18 @@ void main() {
       expect(tester.takeException(), isNull);
       expect(find.byType(CurveTrend), findsOneWidget);
     });
+
+    testWidgets('bars draw: ${e.key}', (tester) async {
+      await tester.pumpWidget(MaterialApp(
+        home: Scaffold(
+          body: PairedBars(
+            values: e.value,
+            compare: [for (final v in e.value) v / 2],
+            labels: [for (var i = 0; i < e.value.length; i++) 'M$i'],
+          ),
+        ),
+      ));
+      expect(tester.takeException(), isNull);
+    });
   }
 }
