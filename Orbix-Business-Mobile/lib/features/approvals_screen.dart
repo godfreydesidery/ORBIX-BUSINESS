@@ -29,6 +29,17 @@ class ApprovalsScreenState extends State<ApprovalsScreen> {
   var _view = GlobalKey<AsyncViewState<ApprovalsData>>();
   String? _accountId;
 
+  /// The discount request open for reading, if any. One at a time: opening
+  /// another closes it. Kept here, above the list, so a quiet refresh does
+  /// not snap it shut.
+  final _openDiscount = ValueNotifier<int?>(null);
+
+  @override
+  void dispose() {
+    _openDiscount.dispose();
+    super.dispose();
+  }
+
   /// Fetches the queue again, keeping the current one on screen meanwhile.
   /// Called whenever the tab is opened or the app comes back, and after
   /// every decision.
@@ -56,8 +67,11 @@ class ApprovalsScreenState extends State<ApprovalsScreen> {
         child: AsyncView<ApprovalsData>(
           key: _view,
           load: load,
-          builder: (context, data) =>
-              _ApprovalsBody(data: data, onChanged: refresh),
+          builder: (context, data) => _ApprovalsBody(
+            data: data,
+            onChanged: refresh,
+            openDiscount: _openDiscount,
+          ),
         ),
       ),
     );
@@ -65,10 +79,15 @@ class ApprovalsScreenState extends State<ApprovalsScreen> {
 }
 
 class _ApprovalsBody extends StatelessWidget {
-  const _ApprovalsBody({required this.data, required this.onChanged});
+  const _ApprovalsBody({
+    required this.data,
+    required this.onChanged,
+    required this.openDiscount,
+  });
 
   final ApprovalsData data;
   final VoidCallback onChanged;
+  final ValueNotifier<int?> openDiscount;
 
   @override
   Widget build(BuildContext context) {
@@ -120,6 +139,7 @@ class _ApprovalsBody extends StatelessWidget {
                     ],
                     // A lone request has nothing to summarise: open it.
                     expandOnly: discounts.length == 1,
+                    openDiscount: openDiscount,
                     onDecided: onChanged,
                   ),
                 ),
@@ -163,12 +183,14 @@ class _DiscountGroup extends StatefulWidget {
     required this.kind,
     required this.discounts,
     required this.expandOnly,
+    required this.openDiscount,
     required this.onDecided,
   });
 
   final DiscountKind kind;
   final List<PendingDiscount> discounts;
   final bool expandOnly;
+  final ValueNotifier<int?> openDiscount;
   final VoidCallback onDecided;
 
   @override
@@ -184,49 +206,65 @@ class _DiscountGroupState extends State<_DiscountGroup> {
     final asked = list.fold<double>(0, (a, d) => a + d.discountAmount);
     return HqCard(
       padding: EdgeInsets.zero,
-      child: Column(
-        children: [
-          InkWell(
-            borderRadius: BorderRadius.circular(16),
-            onTap: () => setState(() => _open = !_open),
-            child: Padding(
-              padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
-              child: Row(
-                children: [
-                  _Tag(widget.kind.label),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: Text(
-                      '${list.length} '
-                      '${list.length == 1 ? 'request' : 'requests'} · '
-                      '${tzs(asked)} asked',
-                      style: HqText.label.copyWith(
-                        color: HqColors.ink,
-                        fontWeight: FontWeight.w600,
+      // Clipped, so the tinted header follows the card's rounded corners.
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(16),
+        child: Column(
+          children: [
+            // The header is tinted, so it reads apart from the requests below.
+            Material(
+              color: HqColors.brandSoft,
+              child: InkWell(
+                onTap: () => setState(() => _open = !_open),
+                child: Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+                  child: Row(
+                    children: [
+                      Text(
+                        widget.kind.label.toUpperCase(),
+                        style: const TextStyle(
+                          fontSize: 11.5,
+                          fontWeight: FontWeight.w800,
+                          letterSpacing: 0.6,
+                          color: HqColors.brandD,
+                        ),
                       ),
-                    ),
+                      const SizedBox(width: 10),
+                      Expanded(
+                        child: Text(
+                          '${list.length} '
+                          '${list.length == 1 ? 'request' : 'requests'} · '
+                          '${tzs(asked)} asked',
+                          style: HqText.label.copyWith(
+                            color: HqColors.ink,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                      Icon(
+                        _open
+                            ? Icons.expand_less_rounded
+                            : Icons.expand_more_rounded,
+                        color: HqColors.brandD,
+                      ),
+                    ],
                   ),
-                  Icon(
-                    _open
-                        ? Icons.expand_less_rounded
-                        : Icons.expand_more_rounded,
-                    color: HqColors.ink3,
-                  ),
-                ],
+                ),
               ),
             ),
-          ),
-          if (_open)
-            for (final d in list) ...[
-              const Divider(height: 1),
-              _DiscountCard(
-                key: ValueKey(d.id),
-                discount: d,
-                initiallyExpanded: widget.expandOnly,
-                onDecided: widget.onDecided,
-              ),
-            ],
-        ],
+            if (_open)
+              for (final d in list) ...[
+                const Divider(height: 1),
+                _DiscountCard(
+                  key: ValueKey(d.id),
+                  discount: d,
+                  alwaysOpen: widget.expandOnly,
+                  openDiscount: widget.openDiscount,
+                  onDecided: widget.onDecided,
+                ),
+              ],
+          ],
+        ),
       ),
     );
   }
@@ -239,12 +277,18 @@ class _DiscountCard extends StatefulWidget {
     super.key,
     required this.discount,
     required this.onDecided,
-    this.initiallyExpanded = false,
+    required this.openDiscount,
+    this.alwaysOpen = false,
   });
 
   final PendingDiscount discount;
   final VoidCallback onDecided;
-  final bool initiallyExpanded;
+
+  /// Which request is open, shared by all of them.
+  final ValueNotifier<int?> openDiscount;
+
+  /// A lone request has nothing to summarise, and stays open.
+  final bool alwaysOpen;
 
   @override
   State<_DiscountCard> createState() => _DiscountCardState();
@@ -252,7 +296,38 @@ class _DiscountCard extends StatefulWidget {
 
 class _DiscountCardState extends State<_DiscountCard> {
   bool _busy = false;
-  late bool _open = widget.initiallyExpanded;
+
+  bool get _open =>
+      widget.alwaysOpen || widget.openDiscount.value == widget.discount.id;
+
+  /// Opens this request, closing whichever was open; or closes it.
+  void _toggle() =>
+      widget.openDiscount.value = _open ? null : widget.discount.id;
+
+  @override
+  void initState() {
+    super.initState();
+    widget.openDiscount.addListener(_changed);
+  }
+
+  @override
+  void didUpdateWidget(_DiscountCard old) {
+    super.didUpdateWidget(old);
+    if (old.openDiscount != widget.openDiscount) {
+      old.openDiscount.removeListener(_changed);
+      widget.openDiscount.addListener(_changed);
+    }
+  }
+
+  @override
+  void dispose() {
+    widget.openDiscount.removeListener(_changed);
+    super.dispose();
+  }
+
+  void _changed() {
+    if (mounted) setState(() {});
+  }
 
   Future<void> _decide({required bool approve}) async {
     final decided = await decideDiscount(
@@ -283,7 +358,7 @@ class _DiscountCardState extends State<_DiscountCard> {
     final item = d.item;
     final who = [item.title, item.owner].where((s) => s.isNotEmpty).join(' · ');
     return InkWell(
-      onTap: () => setState(() => _open = !_open),
+      onTap: widget.alwaysOpen ? null : _toggle,
       child: Padding(
         padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
         child: Row(
@@ -656,32 +731,6 @@ class _OrderTile extends StatelessWidget {
         );
         if (decided == true) onDecided();
       },
-    );
-  }
-}
-
-class _Tag extends StatelessWidget {
-  const _Tag(this.text);
-
-  final String text;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
-      decoration: BoxDecoration(
-        color: HqColors.brandSoft,
-        borderRadius: BorderRadius.circular(999),
-      ),
-      child: Text(
-        text.toUpperCase(),
-        style: const TextStyle(
-          fontSize: 10.5,
-          fontWeight: FontWeight.w700,
-          letterSpacing: 0.6,
-          color: HqColors.brandD,
-        ),
-      ),
     );
   }
 }

@@ -429,6 +429,22 @@ void main() {
     expect(find.text('Reason: Reason 1901'), findsNothing);
     expect(find.text('Approve'), findsOneWidget);
 
+    // Opening another closes it - within a kind and across kinds.
+    await tester.tap(find.text('PKN/22'));
+    await tester.pumpAndSettle();
+    expect(find.text('Reason: Reason 1901'), findsOneWidget);
+    expect(find.text('Reason: Reason 1902'), findsNothing);
+    await tester.tap(find.text('STG/5000'));
+    await tester.pumpAndSettle();
+    expect(find.text('Reason: Reason 1950'), findsOneWidget);
+    expect(find.text('Reason: Reason 1901'), findsNothing);
+    expect(find.text('Approve'), findsOneWidget);
+
+    // Tapping the open one closes it.
+    await tester.tap(find.text('STG/5000'));
+    await tester.pumpAndSettle();
+    expect(find.text('Approve'), findsNothing);
+
     // Folding a kind hides its requests.
     await tester.tap(find.text('2 requests · TZS 520,000 asked'));
     await tester.pumpAndSettle();
