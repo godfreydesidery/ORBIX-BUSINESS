@@ -1000,8 +1000,10 @@ class _PairedBarsPainter extends CustomPainter {
       ),
       textDirection: TextDirection.ltr,
     )..layout();
+    // Turned a quarter anticlockwise, the text's own "down" points right, so
+    // it is moved left by half its line height to sit centred on the bar.
     canvas.save();
-    canvas.translate(centreX + tp.height / 2, top - 3);
+    canvas.translate(centreX - tp.height / 2, top - 3);
     canvas.rotate(-math.pi / 2);
     tp.paint(canvas, Offset.zero);
     canvas.restore();

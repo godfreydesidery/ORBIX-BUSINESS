@@ -224,25 +224,22 @@ class _TrendsSectionState extends State<_TrendsSection> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Row(
-          children: [
-            const Expanded(
-              child: SectionLabel(text: 'In and out', trailing: 'BY MONTH'),
-            ),
-            const SizedBox(width: 10),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: _ValuesToggle(
+        // The heading gets its own line; on a phone the chips beside it
+        // squeezed it into two.
+        const SectionLabel(text: 'In and out', trailing: 'BY MONTH'),
+        Padding(
+          padding: const EdgeInsets.only(bottom: 10),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.end,
+            children: [
+              _ValuesToggle(
                 on: _values,
                 onChanged: (v) => setState(() => _values = v),
               ),
-            ),
-            const SizedBox(width: 8),
-            Padding(
-              padding: const EdgeInsets.only(bottom: 8),
-              child: _YearPicker(year: _year, years: _years, onPick: _pick),
-            ),
-          ],
+              const SizedBox(width: 8),
+              _YearPicker(year: _year, years: _years, onPick: _pick),
+            ],
+          ),
         ),
         if (other == null)
           ..._cards(widget.initial)
