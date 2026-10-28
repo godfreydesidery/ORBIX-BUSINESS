@@ -180,7 +180,9 @@ void main() {
     expect(find.text('18'), findsOneWidget);
     // No bonded items on site, and none this year: no empty tile or chart.
     expect(find.text('BONDED ITEMS'), findsNothing);
-    expect(find.text('IN AND OUT, 2026'), findsOneWidget);
+    expect(find.text('IN AND OUT'), findsOneWidget);
+    // The year chip, on the current year.
+    expect(find.text('2026'), findsOneWidget);
     // Both lines, each with its total for the year.
     expect(find.text('Checked in'), findsOneWidget);
     expect(find.text('215'), findsOneWidget);
@@ -265,5 +267,23 @@ void main() {
     );
     await tester.pumpAndSettle();
     expect(find.text('How much did we collect this month?'), findsOneWidget);
+  });
+
+  testWidgets('another year is fetched when picked', (tester) async {
+    final (_, server) = await _pump(tester);
+    bool summary(SeenRequest r) => r.path == '/parkings/get_parking_summary';
+    expect(server.seen.where(summary).map((r) => r.query), [
+      {'year': 2026},
+    ]);
+
+    await tester.tap(find.text('2026'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('2025').last);
+    await tester.pumpAndSettle();
+
+    expect(server.seen.where(summary).last.query, {'year': 2025});
+    expect(find.text('2025'), findsOneWidget);
+    // A finished year runs to December.
+    expect(find.text('Checked in'), findsOneWidget);
   });
 }

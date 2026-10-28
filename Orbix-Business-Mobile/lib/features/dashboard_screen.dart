@@ -50,7 +50,8 @@ class DashboardScreenState extends State<DashboardScreen> {
     final account = session.active;
     final period = _period;
     final allowed = session.canAny(Privileges.dashboard);
-    final loadFor = '${account?.id}|${apiDate(period.range.start)}'
+    final loadFor =
+        '${account?.id}|${apiDate(period.range.start)}'
         '|${apiDate(period.range.end)}|$_kind';
     if (loadFor != _loadedFor) {
       _loadedFor = loadFor;
@@ -67,8 +68,11 @@ class DashboardScreenState extends State<DashboardScreen> {
             Padding(
               padding: const EdgeInsets.fromLTRB(20, 12, 20, 0),
               child: _BranchHeader(
-                greeting: greeting(_now(), account?.displayName ?? '',
-                    account?.username ?? ''),
+                greeting: greeting(
+                  _now(),
+                  account?.displayName ?? '',
+                  account?.username ?? '',
+                ),
                 title: account?.title ?? '',
                 subtitle: account?.companyName ?? '',
               ),
@@ -145,13 +149,9 @@ class _DashboardBody extends StatelessWidget {
           const SectionLabel(text: 'On site now'),
           _TileGrid(tiles: _yardTiles(yard)),
         ],
-        if (trends != null && _trendCards(trends).isNotEmpty) ...[
+        if (trends != null) ...[
           const SizedBox(height: 22),
-          SectionLabel(
-            text: 'In and out, ${trends.year}',
-            trailing: 'BY MONTH',
-          ),
-          ..._trendCards(trends),
+          _TrendsSection(initial: trends, now: now),
         ],
         if (yard == null || trends == null) ...[
           const SizedBox(height: 18),
@@ -178,8 +178,104 @@ class _DashboardBody extends StatelessWidget {
     if (y.bondedItems > 0)
       StatTile(label: 'Bonded items', value: qty(y.bondedItems)),
   ];
+}
 
-  List<Widget> _trendCards(YearTrends t) => [
+/// "In and out, by month" with a year to choose — the current one by
+/// default. The dashboard loads the current year; another year is fetched
+/// when picked.
+class _TrendsSection extends StatefulWidget {
+  const _TrendsSection({required this.initial, required this.now});
+
+  final YearTrends initial;
+  final DateTime now;
+
+  @override
+  State<_TrendsSection> createState() => _TrendsSectionState();
+}
+
+class _TrendsSectionState extends State<_TrendsSection> {
+  late int _year = widget.initial.year;
+  Future<YearTrends>? _other;
+
+  /// This year and the four before it.
+  List<int> get _years => [
+    for (var y = widget.now.year; y > widget.now.year - 5; y--) y,
+  ];
+
+  void _pick(int year) {
+    if (year == _year) return;
+    setState(() {
+      _year = year;
+      _other = year == widget.initial.year
+          ? null
+          : DashboardService(
+              AppScope.of(context).session,
+            ).yearTrends(year, now: widget.now);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final other = _other;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Row(
+          children: [
+            const Expanded(
+              child: SectionLabel(text: 'In and out', trailing: 'BY MONTH'),
+            ),
+            const SizedBox(width: 10),
+            Padding(
+              padding: const EdgeInsets.only(bottom: 8),
+              child: _YearPicker(year: _year, years: _years, onPick: _pick),
+            ),
+          ],
+        ),
+        if (other == null)
+          ..._cards(widget.initial)
+        else
+          FutureBuilder<YearTrends>(
+            future: other,
+            builder: (context, snap) {
+              if (snap.connectionState != ConnectionState.done) {
+                return const Padding(
+                  padding: EdgeInsets.symmetric(vertical: 40),
+                  child: Center(
+                    child: CircularProgressIndicator(color: HqColors.brand),
+                  ),
+                );
+              }
+              final t = snap.data;
+              if (t == null) {
+                return HqCard(
+                  child: Text(
+                    'Could not load $_year. Pick it again to retry.',
+                    style: HqText.body,
+                  ),
+                );
+              }
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: _cards(t),
+              );
+            },
+          ),
+      ],
+    );
+  }
+
+  List<Widget> _cards(YearTrends t) {
+    final cards = _trendCards(t, running: t.year == widget.now.year);
+    if (cards.isNotEmpty) return cards;
+    return [
+      HqCard(
+        child: Text('Nothing went in or out in ${t.year}.', style: HqText.body),
+      ),
+    ];
+  }
+
+  List<Widget> _trendCards(YearTrends t, {required bool running}) => [
     for (final (title, months) in [
       ('Vehicles & equipment', t.parking),
       ('Goods storage', t.storage),
@@ -215,6 +311,8 @@ class _DashboardBody extends StatelessWidget {
                   values: [for (final m in months) m.checkedIn.toDouble()],
                   compare: [for (final m in months) m.checkedOut.toDouble()],
                   labels: [for (final m in months) _monthShort[m.month - 1]],
+                  // Only the current month of the current year is unfinished.
+                  partialLast: running,
                   height: 140,
                 ),
               ],
@@ -222,6 +320,57 @@ class _DashboardBody extends StatelessWidget {
           ),
         ),
   ];
+}
+
+/// The year chip: "2026 ▾", opening the years to choose from.
+class _YearPicker extends StatelessWidget {
+  const _YearPicker({
+    required this.year,
+    required this.years,
+    required this.onPick,
+  });
+
+  final int year;
+  final List<int> years;
+  final ValueChanged<int> onPick;
+
+  @override
+  Widget build(BuildContext context) {
+    return PopupMenuButton<int>(
+      tooltip: 'Choose the year',
+      initialValue: year,
+      onSelected: onPick,
+      itemBuilder: (_) => [
+        for (final y in years) PopupMenuItem(value: y, child: Text('$y')),
+      ],
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+        decoration: BoxDecoration(
+          color: HqColors.panel,
+          borderRadius: BorderRadius.circular(20),
+          border: Border.all(color: HqColors.line2),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            Text(
+              '$year',
+              style: const TextStyle(
+                fontSize: 13,
+                fontWeight: FontWeight.w700,
+                color: HqColors.ink,
+              ),
+            ),
+            const Icon(
+              Icons.expand_more_rounded,
+              size: 18,
+              color: HqColors.ink3,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }
 
 /// "● Checked in 48,857" — names a line on the chart and gives its total.
@@ -477,8 +626,8 @@ String greeting(DateTime now, String displayName, String username) {
   final part = now.hour < 12
       ? 'morning'
       : now.hour < 17
-          ? 'afternoon'
-          : 'evening';
+      ? 'afternoon'
+      : 'evening';
   final first = displayName.trim().split(RegExp(r'\s+')).first;
   final name = first.isNotEmpty ? first : username.split('@').first;
   return name.isEmpty ? 'Good $part' : 'Good $part, $name';

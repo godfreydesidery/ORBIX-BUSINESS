@@ -21,7 +21,7 @@ class DashboardService {
       collections(period),
       _optional(collections(period.previous)),
       _optional(yardCounts(period)),
-      _optional(yearTrends(today)),
+      _optional(yearTrends(today.year, now: today)),
     ]);
 
     return DashboardData(
@@ -59,17 +59,20 @@ class DashboardService {
     );
   }
 
-  Future<YearTrends> yearTrends(DateTime today) async {
-    final query = {'year': today.year};
+  /// Check-ins and check-outs per month of [year]: up to this month for the
+  /// current year, all twelve for a past one.
+  Future<YearTrends> yearTrends(int year, {required DateTime now}) async {
+    final query = {'year': year};
     final results = await Future.wait([
       _session.api.get('/parkings/get_parking_summary', query: query),
       _session.api.get('/storages/get_storage_summary', query: query),
       _session.api.get('/bond_items/get_bond_item_summary', query: query),
     ]);
+    final through = year < now.year ? 12 : now.month;
     List<MonthMovement> months(dynamic rows) =>
-        monthsSoFar(asList(rows, MonthMovement.fromJson), today.month);
+        monthsSoFar(asList(rows, MonthMovement.fromJson), through);
     return YearTrends(
-      year: today.year,
+      year: year,
       parking: months(results[0]),
       storage: months(results[1]),
       bond: months(results[2]),
