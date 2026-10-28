@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <!-- Fallback only: every brand's flavor overrides this (tool/brand.py). -->
-    <color name="brand_color">#17892C</color>
+    <color name="brand_color">#13421C</color>
 </resources>

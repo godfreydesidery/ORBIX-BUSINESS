@@ -2,5 +2,5 @@
 <!-- GENERATED from brands/orbix/brand.json by tool/brand.py. -->
 <resources>
     <string name="app_name">Orbix Manager</string>
-    <color name="brand_color">#17892C</color>
+    <color name="brand_color">#13421C</color>
 </resources>

@@ -52,44 +52,44 @@ class Brand {
   // Palette, as 0xAARRGGBB. Defaults are the Orbix green.
   static const int primary = int.fromEnvironment(
     'BRAND_PRIMARY',
-    defaultValue: 0xFF17892C,
+    defaultValue: 0xFF13421C,
   );
   static const int primaryDark = int.fromEnvironment(
     'BRAND_PRIMARY_DARK',
-    defaultValue: 0xFF116821,
+    defaultValue: 0xFF0E3215,
   );
   static const int primarySoft = int.fromEnvironment(
     'BRAND_PRIMARY_SOFT',
-    defaultValue: 0xFFE7F4E9,
+    defaultValue: 0xFFE8F2EA,
   );
 
   /// The dark hero field: primary into [heroMid] into [heroEnd].
   static const int heroMid = int.fromEnvironment(
     'BRAND_HERO_MID',
-    defaultValue: 0xFF0D3915,
+    defaultValue: 0xFF123418,
   );
   static const int heroEnd = int.fromEnvironment(
     'BRAND_HERO_END',
-    defaultValue: 0xFF091F0D,
+    defaultValue: 0xFF0B1C0F,
   );
 
   static const int gradientStart = int.fromEnvironment(
     'BRAND_GRADIENT_START',
-    defaultValue: 0xFF1BA033,
+    defaultValue: 0xFF164D21,
   );
   static const int gradientEnd = int.fromEnvironment(
     'BRAND_GRADIENT_END',
-    defaultValue: 0xFF136E23,
+    defaultValue: 0xFF0F3517,
   );
 
   /// Secondary and tertiary text ON the hero field — tinted towards the brand
   /// so they read as part of it, but light enough to stay legible.
   static const int onDarkSecondary = int.fromEnvironment(
     'BRAND_ON_DARK_2',
-    defaultValue: 0xFFB9D4BE,
+    defaultValue: 0xFFBCD1C0,
   );
   static const int onDarkTertiary = int.fromEnvironment(
     'BRAND_ON_DARK_3',
-    defaultValue: 0xFF87AB8E,
+    defaultValue: 0xFF8BA790,
   );
 }
