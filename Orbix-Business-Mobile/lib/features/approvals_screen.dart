@@ -88,7 +88,7 @@ class _ApprovalsBody extends StatelessWidget {
           data.count == 0
               ? 'Nothing is waiting for you.'
               : '${data.count} waiting for your decision · all branches on '
-                  'this server',
+                    'this server',
           style: HqText.label,
         ),
         if (data.failed.isNotEmpty) ...[
@@ -107,11 +107,22 @@ class _ApprovalsBody extends StatelessWidget {
           if (discounts.isEmpty)
             const _Empty('No discount requests waiting.')
           else
-            for (final d in discounts)
-              Padding(
-                padding: const EdgeInsets.only(bottom: 12),
-                child: _DiscountCard(discount: d, onDecided: onChanged),
-              ),
+            for (final kind in DiscountKind.values)
+              if (discounts.any((d) => d.item.kind == kind))
+                Padding(
+                  padding: const EdgeInsets.only(bottom: 12),
+                  child: _DiscountGroup(
+                    key: ValueKey(kind),
+                    kind: kind,
+                    discounts: [
+                      for (final d in discounts)
+                        if (d.item.kind == kind) d,
+                    ],
+                    // A lone request has nothing to summarise: open it.
+                    expandOnly: discounts.length == 1,
+                    onDecided: onChanged,
+                  ),
+                ),
         ],
         if (lpos != null) ...[
           const SizedBox(height: 22),
@@ -144,12 +155,96 @@ class _ApprovalsBody extends StatelessWidget {
   static String _waiting(int n) => '$n WAITING';
 }
 
-/// One discount request, decided in place.
+/// The discount requests of one kind - parking, storage or bonded items -
+/// under a header that says how many and how much, and folds them away.
+class _DiscountGroup extends StatefulWidget {
+  const _DiscountGroup({
+    super.key,
+    required this.kind,
+    required this.discounts,
+    required this.expandOnly,
+    required this.onDecided,
+  });
+
+  final DiscountKind kind;
+  final List<PendingDiscount> discounts;
+  final bool expandOnly;
+  final VoidCallback onDecided;
+
+  @override
+  State<_DiscountGroup> createState() => _DiscountGroupState();
+}
+
+class _DiscountGroupState extends State<_DiscountGroup> {
+  bool _open = true;
+
+  @override
+  Widget build(BuildContext context) {
+    final list = widget.discounts;
+    final asked = list.fold<double>(0, (a, d) => a + d.discountAmount);
+    return HqCard(
+      padding: EdgeInsets.zero,
+      child: Column(
+        children: [
+          InkWell(
+            borderRadius: BorderRadius.circular(16),
+            onTap: () => setState(() => _open = !_open),
+            child: Padding(
+              padding: const EdgeInsets.fromLTRB(16, 14, 12, 14),
+              child: Row(
+                children: [
+                  _Tag(widget.kind.label),
+                  const SizedBox(width: 10),
+                  Expanded(
+                    child: Text(
+                      '${list.length} '
+                      '${list.length == 1 ? 'request' : 'requests'} · '
+                      '${tzs(asked)} asked',
+                      style: HqText.label.copyWith(
+                        color: HqColors.ink,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Icon(
+                    _open
+                        ? Icons.expand_less_rounded
+                        : Icons.expand_more_rounded,
+                    color: HqColors.ink3,
+                  ),
+                ],
+              ),
+            ),
+          ),
+          if (_open)
+            for (final d in list) ...[
+              const Divider(height: 1),
+              _DiscountCard(
+                key: ValueKey(d.id),
+                discount: d,
+                initiallyExpanded: widget.expandOnly,
+                onDecided: widget.onDecided,
+              ),
+            ],
+        ],
+      ),
+    );
+  }
+}
+
+/// One discount request: a one-line summary, and - tapped open - everything
+/// needed to decide it in place.
 class _DiscountCard extends StatefulWidget {
-  const _DiscountCard({required this.discount, required this.onDecided});
+  const _DiscountCard({
+    super.key,
+    required this.discount,
+    required this.onDecided,
+    this.initiallyExpanded = false,
+  });
 
   final PendingDiscount discount;
   final VoidCallback onDecided;
+  final bool initiallyExpanded;
 
   @override
   State<_DiscountCard> createState() => _DiscountCardState();
@@ -157,6 +252,7 @@ class _DiscountCard extends StatefulWidget {
 
 class _DiscountCardState extends State<_DiscountCard> {
   bool _busy = false;
+  late bool _open = widget.initiallyExpanded;
 
   Future<void> _decide({required bool approve}) async {
     final decided = await decideDiscount(
@@ -173,121 +269,189 @@ class _DiscountCardState extends State<_DiscountCard> {
   }
 
   Future<void> _viewBill() async {
-    final decided = await Navigator.of(context).push<bool>(MaterialPageRoute(
-      builder: (_) => DiscountBillScreen(discount: widget.discount),
-    ));
+    final decided = await Navigator.of(context).push<bool>(
+      MaterialPageRoute(
+        builder: (_) => DiscountBillScreen(discount: widget.discount),
+      ),
+    );
     if (decided == true) widget.onDecided();
   }
 
-  @override
-  Widget build(BuildContext context) {
+  /// The line a manager scans: which item, whose, and how much is asked.
+  Widget _summary() {
     final d = widget.discount;
     final item = d.item;
-    return HqCard(
+    final who = [item.title, item.owner].where((s) => s.isNotEmpty).join(' · ');
+    return InkWell(
+      onTap: () => setState(() => _open = !_open),
+      child: Padding(
+        padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
+        child: Row(
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    item.no,
+                    style: const TextStyle(
+                      fontSize: 14.5,
+                      fontWeight: FontWeight.w700,
+                      color: HqColors.ink,
+                    ),
+                  ),
+                  if (who.isNotEmpty)
+                    Text(
+                      who,
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                      style: HqText.tiny,
+                    ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 10),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  '− ${tzs(d.discountAmount)}',
+                  style: const TextStyle(
+                    fontSize: 14,
+                    fontWeight: FontWeight.w700,
+                    color: HqColors.warn,
+                  ),
+                ),
+                Text(
+                  '${_pct(d.percent)} of ${tzs(d.billAmount)}',
+                  style: HqText.tiny,
+                ),
+              ],
+            ),
+            Icon(
+              _open ? Icons.expand_less_rounded : Icons.expand_more_rounded,
+              color: HqColors.ink3,
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  static String _pct(double p) => '${p.toStringAsFixed(p < 10 ? 1 : 0)}%';
+
+  @override
+  Widget build(BuildContext context) {
+    return AnimatedSize(
+      duration: const Duration(milliseconds: 180),
+      alignment: Alignment.topCenter,
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
         children: [
-          Row(
-            children: [
-              _Tag(item.kind.label),
-              const SizedBox(width: 8),
-              Expanded(
-                child: Text(
-                  item.no,
-                  style: HqText.label.copyWith(fontWeight: FontWeight.w700),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 10),
-          if (item.title.isNotEmpty) Text(item.title, style: HqText.verdict),
-          if (item.owner.isNotEmpty) ...[
-            const SizedBox(height: 2),
-            Text(item.owner, style: HqText.body),
-          ],
-          if (item.detail.isNotEmpty) ...[
-            const SizedBox(height: 2),
-            Text(item.detail, style: HqText.tiny),
-          ],
-          const SizedBox(height: 10),
-          const Divider(height: 1),
-          FigureRow(label: 'Bill', value: tzs(d.billAmount)),
-          FigureRow(
-            label: 'Discount asked (${d.percent.toStringAsFixed(d.percent < 10 ? 1 : 0)}%)',
-            value: '− ${tzs(d.discountAmount)}',
-            valueColor: HqColors.warn,
-          ),
-          FigureRow(
-            label: 'To pay after discount',
-            value: tzs(d.afterDiscount),
-            emphasise: true,
-          ),
-          if (d.reason.isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Container(
-              width: double.infinity,
-              padding: const EdgeInsets.all(12),
-              decoration: BoxDecoration(
-                color: HqColors.panel2,
-                borderRadius: BorderRadius.circular(HqRadii.sm),
-                border: Border.all(color: HqColors.line),
-              ),
-              child: Text('Reason: ${d.reason}', style: HqText.body),
+          _summary(),
+          if (_open)
+            Padding(
+              padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+              child: _details(),
             ),
-          ],
-          if (d.description.isNotEmpty) ...[
-            const SizedBox(height: 6),
-            Text(d.description, style: HqText.tiny),
-          ],
-          const SizedBox(height: 4),
-          Align(
-            alignment: Alignment.centerLeft,
-            child: TextButton.icon(
-              onPressed: _busy ? null : _viewBill,
-              icon: const Icon(Icons.receipt_long_outlined, size: 18),
-              label: const Text('View bill'),
-              style: TextButton.styleFrom(
-                foregroundColor: HqColors.brand,
-                padding: EdgeInsets.zero,
-              ),
-            ),
-          ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Expanded(
-                child: OutlinedButton(
-                  onPressed: _busy ? null : () => _decide(approve: false),
-                  style: OutlinedButton.styleFrom(
-                    foregroundColor: HqColors.bad,
-                    minimumSize: const Size.fromHeight(46),
-                  ),
-                  child: const Text('Reject'),
-                ),
-              ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton(
-                  onPressed: _busy ? null : () => _decide(approve: true),
-                  style: FilledButton.styleFrom(
-                    minimumSize: const Size.fromHeight(46),
-                  ),
-                  child: _busy
-                      ? const SizedBox(
-                          width: 18,
-                          height: 18,
-                          child: CircularProgressIndicator(
-                            strokeWidth: 2.2,
-                            color: Colors.white,
-                          ),
-                        )
-                      : const Text('Approve'),
-                ),
-              ),
-            ],
-          ),
         ],
       ),
+    );
+  }
+
+  Widget _details() {
+    final d = widget.discount;
+    final item = d.item;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        if (item.title.isNotEmpty) Text(item.title, style: HqText.verdict),
+        if (item.owner.isNotEmpty) ...[
+          const SizedBox(height: 2),
+          Text(item.owner, style: HqText.body),
+        ],
+        if (item.detail.isNotEmpty) ...[
+          const SizedBox(height: 2),
+          Text(item.detail, style: HqText.tiny),
+        ],
+        const SizedBox(height: 10),
+        const Divider(height: 1),
+        FigureRow(label: 'Bill', value: tzs(d.billAmount)),
+        FigureRow(
+          label: 'Discount asked (${_pct(d.percent)})',
+          value: '− ${tzs(d.discountAmount)}',
+          valueColor: HqColors.warn,
+        ),
+        FigureRow(
+          label: 'To pay after discount',
+          value: tzs(d.afterDiscount),
+          emphasise: true,
+        ),
+        if (d.reason.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.all(12),
+            decoration: BoxDecoration(
+              color: HqColors.panel2,
+              borderRadius: BorderRadius.circular(HqRadii.sm),
+              border: Border.all(color: HqColors.line),
+            ),
+            child: Text('Reason: ${d.reason}', style: HqText.body),
+          ),
+        ],
+        if (d.description.isNotEmpty) ...[
+          const SizedBox(height: 6),
+          Text(d.description, style: HqText.tiny),
+        ],
+        const SizedBox(height: 4),
+        Align(
+          alignment: Alignment.centerLeft,
+          child: TextButton.icon(
+            onPressed: _busy ? null : _viewBill,
+            icon: const Icon(Icons.receipt_long_outlined, size: 18),
+            label: const Text('View bill'),
+            style: TextButton.styleFrom(
+              foregroundColor: HqColors.brand,
+              padding: EdgeInsets.zero,
+            ),
+          ),
+        ),
+        const SizedBox(height: 6),
+        Row(
+          children: [
+            Expanded(
+              child: OutlinedButton(
+                onPressed: _busy ? null : () => _decide(approve: false),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: HqColors.bad,
+                  minimumSize: const Size.fromHeight(46),
+                ),
+                child: const Text('Reject'),
+              ),
+            ),
+            const SizedBox(width: 12),
+            Expanded(
+              child: FilledButton(
+                onPressed: _busy ? null : () => _decide(approve: true),
+                style: FilledButton.styleFrom(
+                  minimumSize: const Size.fromHeight(46),
+                ),
+                child: _busy
+                    ? const SizedBox(
+                        width: 18,
+                        height: 18,
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2.2,
+                          color: Colors.white,
+                        ),
+                      )
+                    : const Text('Approve'),
+              ),
+            ),
+          ],
+        ),
+      ],
     );
   }
 }
@@ -326,7 +490,7 @@ class _DecisionDialogState extends State<_DecisionDialog> {
           Text(
             approve
                 ? '${d.item.no}: the bill drops from ${tzs(d.billAmount)} to '
-                    '${tzs(d.afterDiscount)}.'
+                      '${tzs(d.afterDiscount)}.'
                 : '${d.item.no}: the bill stays at ${tzs(d.billAmount)}.',
             style: HqText.body,
           ),
@@ -384,11 +548,15 @@ Future<bool?> decideDiscount(
     } else {
       await service.rejectDiscount(d.id, comments: comments);
     }
-    messenger.showSnackBar(SnackBar(
-      content: Text(approve
-          ? 'Discount of ${tzs(d.discountAmount)} approved for ${d.item.no}.'
-          : 'Discount request for ${d.item.no} rejected.'),
-    ));
+    messenger.showSnackBar(
+      SnackBar(
+        content: Text(
+          approve
+              ? 'Discount of ${tzs(d.discountAmount)} approved for ${d.item.no}.'
+              : 'Discount request for ${d.item.no} rejected.',
+        ),
+      ),
+    );
     return true;
   } on ApiException catch (e) {
     // The spinner stops before the explanation appears, not after.
@@ -528,8 +696,11 @@ class _Empty extends StatelessWidget {
     return HqCard(
       child: Row(
         children: [
-          const Icon(Icons.check_circle_outline_rounded,
-              color: HqColors.good, size: 20),
+          const Icon(
+            Icons.check_circle_outline_rounded,
+            color: HqColors.good,
+            size: 20,
+          ),
           const SizedBox(width: 10),
           Expanded(child: Text(text, style: HqText.body)),
         ],

@@ -129,6 +129,7 @@ Future<FakeServer> _pump(
   List<String> privileges = const ['FINCDISC-ACCESS', 'PRCMT-ACCESS'],
   Reply? approveReply,
   ValueChanged<int>? onCount,
+  Map<String, Reply Function(SeenRequest)> extraRoutes = const {},
 }) async {
   tester.view.physicalSize = const Size(412, 2000);
   tester.view.devicePixelRatio = 1.0;
@@ -144,7 +145,10 @@ Future<FakeServer> _pump(
       accessToken: fakeToken(privileges: privileges),
     ),
   ], 'a');
-  final server = FakeServer(_routes(approveReply: approveReply));
+  final server = FakeServer({
+    ..._routes(approveReply: approveReply),
+    ...extraRoutes,
+  });
   final session = await Session.create(httpAdapter: server);
   await tester.pumpWidget(AppScope(
     session: session,
@@ -200,7 +204,7 @@ void main() {
     expect(find.text('PKN/22'), findsOneWidget);
     expect(find.text('NISSAN CARAVAN'), findsOneWidget);
     expect(find.text('TZS 3,010,000'), findsOneWidget);
-    expect(find.text('− TZS 500,000'), findsOneWidget);
+    expect(find.text('− TZS 500,000'), findsWidgets);
     expect(find.text('TZS 2,510,000'), findsOneWidget);
     expect(find.text('Reason: Long-standing customer'), findsOneWidget);
     expect(find.text('LPO/7'), findsOneWidget);
@@ -361,5 +365,75 @@ void main() {
     );
     expect(find.text('Bill · PKN/22'), findsNothing);
     expect(find.text('Approvals'), findsOneWidget);
+  });
+
+  testWidgets('many requests: grouped by kind, each a summary to open',
+      (tester) async {
+    Map<String, Object?> parking(String id, String no, String type) =>
+        {..._parking, 'id': id, 'no': no, 'vehicleEquipmentTypeName': type};
+    Map<String, Object?> request(String id, String bill, String discount) => {
+          'id': id,
+          'serviceBillName': 'Parking',
+          'billAmount': bill,
+          'discountAmount': discount,
+          'status': 'PENDING',
+          'reason': 'Reason $id',
+          'description': '',
+        };
+    final server = await _pump(tester, extraRoutes: {
+      '/parkings/get_all_with_discounts_page': (_) => Reply({
+            'content': [
+              parking('22', 'PKN/22', 'NISSAN CARAVAN'),
+              parking('23', 'PKN/23', 'TOYOTA HIACE'),
+            ],
+            'totalElements': 2,
+          }),
+      '/storages/get_all_with_discounts_page': (_) => const Reply({
+            'content': [
+              {
+                'id': '5000',
+                'no': 'STG/5000',
+                'ownerFirstName': 'KODZA',
+                'goodName': 'BALO',
+                'warehouseName': 'KEKO',
+              },
+            ],
+            'totalElements': 1,
+          }),
+      '/discount_requests': (r) => Reply([
+            switch (r.query['service_id']) {
+              '22' => request('1901', '3010000.0', '500000.0'),
+              '23' => request('1902', '100000.0', '20000.0'),
+              _ => {
+                  ...request('1950', '80000.0', '10000.0'),
+                  'serviceBillName': 'Storage',
+                },
+            },
+          ]),
+    });
+
+    // One header per kind, saying how many and how much is asked.
+    expect(find.text('2 requests · TZS 520,000 asked'), findsOneWidget);
+    expect(find.text('1 request · TZS 10,000 asked'), findsOneWidget);
+    // Summaries, not full cards: no Approve buttons yet.
+    expect(find.text('PKN/22'), findsOneWidget);
+    expect(find.text('PKN/23'), findsOneWidget);
+    expect(find.text('STG/5000'), findsOneWidget);
+    expect(find.text('17% of TZS 3,010,000'), findsOneWidget);
+    expect(find.text('Approve'), findsNothing);
+
+    // Opening one shows its details and decisions, and only its.
+    await tester.tap(find.text('PKN/23'));
+    await tester.pumpAndSettle();
+    expect(find.text('Reason: Reason 1902'), findsOneWidget);
+    expect(find.text('Reason: Reason 1901'), findsNothing);
+    expect(find.text('Approve'), findsOneWidget);
+
+    // Folding a kind hides its requests.
+    await tester.tap(find.text('2 requests · TZS 520,000 asked'));
+    await tester.pumpAndSettle();
+    expect(find.text('PKN/22'), findsNothing);
+    expect(find.text('STG/5000'), findsOneWidget);
+    expect(server.seen.where((r) => r.path.contains('/approve')), isEmpty);
   });
 }
