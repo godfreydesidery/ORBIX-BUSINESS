@@ -148,7 +148,7 @@ class _DashboardBody extends StatelessWidget {
         if (trends != null && _trendCards(trends).isNotEmpty) ...[
           const SizedBox(height: 22),
           SectionLabel(
-            text: 'Checked in, ${trends.year}',
+            text: 'In and out, ${trends.year}',
             trailing: 'BY MONTH',
           ),
           ..._trendCards(trends),
@@ -185,33 +185,80 @@ class _DashboardBody extends StatelessWidget {
       ('Goods storage', t.storage),
       ('Bonded items', t.bond),
     ])
-      if (months.any((m) => m.checkedIn > 0))
+      if (months.any((m) => m.checkedIn > 0 || m.checkedOut > 0))
         Padding(
           padding: const EdgeInsets.only(bottom: 12),
           child: HqCard(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Row(
+                Text(title, style: HqText.verdict),
+                const SizedBox(height: 8),
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 4,
                   children: [
-                    Expanded(child: Text(title, style: HqText.verdict)),
-                    Text(
-                      qty(months.fold<int>(0, (a, m) => a + m.checkedIn)),
-                      style: HqText.tileValue,
+                    _LegendItem(
+                      color: HqColors.brand,
+                      label: 'Checked in',
+                      value: months.fold<int>(0, (a, m) => a + m.checkedIn),
+                    ),
+                    _LegendItem(
+                      color: VizColors.cat2,
+                      label: 'Checked out',
+                      value: months.fold<int>(0, (a, m) => a + m.checkedOut),
                     ),
                   ],
                 ),
                 const SizedBox(height: 12),
                 CurveTrend(
                   values: [for (final m in months) m.checkedIn.toDouble()],
+                  compare: [for (final m in months) m.checkedOut.toDouble()],
                   labels: [for (final m in months) _monthShort[m.month - 1]],
-                  height: 130,
+                  height: 140,
                 ),
               ],
             ),
           ),
         ),
   ];
+}
+
+/// "● Checked in 48,857" — names a line on the chart and gives its total.
+class _LegendItem extends StatelessWidget {
+  const _LegendItem({
+    required this.color,
+    required this.label,
+    required this.value,
+  });
+
+  final Color color;
+  final String label;
+  final int value;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Container(
+          width: 10,
+          height: 10,
+          decoration: BoxDecoration(color: color, shape: BoxShape.circle),
+        ),
+        const SizedBox(width: 6),
+        Text(label, style: HqText.label),
+        const SizedBox(width: 6),
+        Text(
+          qty(value),
+          style: HqText.label.copyWith(
+            color: HqColors.ink,
+            fontWeight: FontWeight.w700,
+          ),
+        ),
+      ],
+    );
+  }
 }
 
 /// The one number: what was collected, against the matching period before.

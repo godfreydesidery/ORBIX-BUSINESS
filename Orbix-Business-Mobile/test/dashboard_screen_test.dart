@@ -180,8 +180,12 @@ void main() {
     expect(find.text('18'), findsOneWidget);
     // No bonded items on site, and none this year: no empty tile or chart.
     expect(find.text('BONDED ITEMS'), findsNothing);
-    expect(find.text('Checked in, 2026'.toUpperCase()), findsOneWidget);
+    expect(find.text('IN AND OUT, 2026'), findsOneWidget);
+    // Both lines, each with its total for the year.
+    expect(find.text('Checked in'), findsOneWidget);
     expect(find.text('215'), findsOneWidget);
+    expect(find.text('Checked out'), findsOneWidget);
+    expect(find.text('180'), findsOneWidget);
   });
 
   testWidgets('a finished day is compared, with the change', (tester) async {

@@ -437,22 +437,31 @@ class _ColumnTrendPainter extends CustomPainter {
 /// managers' choice over columns. The curve is monotone between points, so
 /// it never dips below zero or bulges past a peak that did not happen. The
 /// last stretch is dashed and its point hollow: a part-period must never
-/// read as a full one. The highest and the latest values are labelled.
+/// read as a full one.
+///
+/// [compare] adds a second series on the same scale (checked out beside
+/// checked in), drawn behind the first in [compareColor] without a fill. With
+/// one series the highest and latest values are labelled on the chart; with
+/// two the labels would collide, so the caller shows a legend instead.
 class CurveTrend extends StatelessWidget {
   const CurveTrend({
     super.key,
     required this.values,
     required this.labels,
+    this.compare,
     this.height = 150,
     this.partialLast = true,
     this.color = HqColors.brand,
+    this.compareColor = VizColors.cat2,
   });
 
   final List<double> values;
   final List<String> labels;
+  final List<double>? compare;
   final double height;
   final bool partialLast;
   final Color color;
+  final Color compareColor;
 
   @override
   Widget build(BuildContext context) {
@@ -461,32 +470,51 @@ class CurveTrend extends StatelessWidget {
       height: height,
       width: double.infinity,
       child: CustomPaint(
-        painter: _CurveTrendPainter(values, labels, partialLast, color),
+        painter: _CurveTrendPainter(
+          values,
+          compare,
+          labels,
+          partialLast,
+          color,
+          compareColor,
+        ),
       ),
     );
   }
 }
 
 class _CurveTrendPainter extends CustomPainter {
-  _CurveTrendPainter(this.values, this.labels, this.partialLast, this.color);
+  _CurveTrendPainter(
+    this.values,
+    this.compare,
+    this.labels,
+    this.partialLast,
+    this.color,
+    this.compareColor,
+  );
 
   final List<double> values;
+  final List<double>? compare;
   final List<String> labels;
   final bool partialLast;
   final Color color;
+  final Color compareColor;
 
   @override
   void paint(Canvas canvas, Size size) {
     final n = values.length;
     if (n == 0 || size.width <= 0 || size.height <= 0) return;
+    final second = compare;
 
     const labelH = 18.0;
-    const topPad = 16.0; // room for the value labels above the curve
     const sidePad = 6.0;
+    // Room above the curve for value labels, when there are any.
+    final topPad = second == null ? 16.0 : 6.0;
     final chartW = math.max(1.0, size.width - sidePad * 2);
     final chartH = math.max(1.0, size.height - labelH - topPad);
 
     var hi = _maxOf(values, 0);
+    if (second != null) hi = _maxOf(second, hi);
     if (hi <= 0) hi = 1;
     hi *= 1.08;
 
@@ -503,30 +531,103 @@ class _CurveTrendPainter extends CustomPainter {
         ..strokeWidth = 1,
     );
 
+    // The comparison first, so the main series reads on top of it.
+    if (second != null && second.length == n) {
+      _series(
+        canvas,
+        [for (var i = 0; i < n; i++) Offset(x(i), y(second[i]))],
+        compareColor,
+        fillTo: null,
+        width: 2.2,
+      );
+    }
+    _series(
+      canvas,
+      pts,
+      color,
+      fillTo: Rect.fromLTRB(0, topPad, size.width, baseY),
+      width: 2.6,
+    );
+
+    // Values: the peak and the latest, never more — a label per point is
+    // unreadable at phone width. Two series would collide: no labels then.
+    if (second == null) {
+      var peak = 0;
+      for (var i = 1; i < n; i++) {
+        if (values[i] > values[peak]) peak = i;
+      }
+      for (final i in {peak, n - 1}) {
+        if (values[i] <= 0 && i != n - 1) continue;
+        _text(
+          canvas,
+          qty(values[i]),
+          Offset(
+            (pts[i].dx).clamp(14.0, size.width - 14.0),
+            pts[i].dy - 17,
+          ),
+          HqText.tiny.copyWith(
+            fontSize: 10.5,
+            fontWeight: FontWeight.w700,
+            color: i == n - 1 ? HqColors.ink : HqColors.ink2,
+          ),
+          align: TextAlign.center,
+          maxW: 64,
+        );
+      }
+    }
+
+    for (var i = 0; i < n && i < labels.length; i++) {
+      final isLast = i == n - 1;
+      _text(
+        canvas,
+        labels[i],
+        Offset(pts[i].dx, baseY + 4),
+        HqText.tiny.copyWith(
+          fontSize: 10.5,
+          fontWeight: isLast ? FontWeight.w700 : FontWeight.w400,
+          color: isLast ? HqColors.ink2 : HqColors.ink3,
+        ),
+        align: TextAlign.center,
+        maxW: math.max(14, chartW / math.max(1, n - 1)),
+      );
+    }
+  }
+
+  /// One series: the curve (its last stretch dashed while the period runs),
+  /// a fading fill down to the baseline when [fillTo] is given, and points —
+  /// small and quiet, the latest one stressed.
+  void _series(
+    Canvas canvas,
+    List<Offset> pts,
+    Color color, {
+    required Rect? fillTo,
+    required double width,
+  }) {
+    final n = pts.length;
     if (n > 1) {
       final curve = _monotone(pts);
-
-      // The fill: the curve closed down to the baseline, fading out.
-      final fill = Path.from(curve)
-        ..lineTo(pts.last.dx, baseY)
-        ..lineTo(pts.first.dx, baseY)
-        ..close();
-      canvas.drawPath(
-        fill,
-        Paint()
-          ..shader = LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              color.withValues(alpha: 0.26),
-              color.withValues(alpha: 0.02),
-            ],
-          ).createShader(Rect.fromLTRB(0, topPad, size.width, baseY)),
-      );
+      if (fillTo != null) {
+        final fill = Path.from(curve)
+          ..lineTo(pts.last.dx, fillTo.bottom)
+          ..lineTo(pts.first.dx, fillTo.bottom)
+          ..close();
+        canvas.drawPath(
+          fill,
+          Paint()
+            ..shader = LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                color.withValues(alpha: 0.26),
+                color.withValues(alpha: 0.02),
+              ],
+            ).createShader(fillTo),
+        );
+      }
 
       final stroke = Paint()
         ..color = color
-        ..strokeWidth = 2.6
+        ..strokeWidth = width
         ..style = PaintingStyle.stroke
         ..strokeCap = StrokeCap.round
         ..strokeJoin = StrokeJoin.round;
@@ -537,13 +638,11 @@ class _CurveTrendPainter extends CustomPainter {
           _monotone(pts, from: n - 2),
           stroke..color = color.withValues(alpha: 0.7),
         );
-        stroke.color = color;
       } else {
         canvas.drawPath(curve, stroke);
       }
     }
 
-    // Points: small and quiet, the latest one stressed.
     for (var i = 0; i < n; i++) {
       final isLast = i == n - 1;
       canvas.drawCircle(
@@ -561,48 +660,6 @@ class _CurveTrendPainter extends CustomPainter {
             ..strokeWidth = 2,
         );
       }
-    }
-
-    // Values: the peak and the latest, never more — a label per point is
-    // unreadable at phone width.
-    var peak = 0;
-    for (var i = 1; i < n; i++) {
-      if (values[i] > values[peak]) peak = i;
-    }
-    final labelled = {peak, n - 1};
-    for (final i in labelled) {
-      if (values[i] <= 0 && i != n - 1) continue;
-      _text(
-        canvas,
-        qty(values[i]),
-        Offset(
-          (pts[i].dx).clamp(14.0, size.width - 14.0),
-          pts[i].dy - 17,
-        ),
-        HqText.tiny.copyWith(
-          fontSize: 10.5,
-          fontWeight: FontWeight.w700,
-          color: i == n - 1 ? HqColors.ink : HqColors.ink2,
-        ),
-        align: TextAlign.center,
-        maxW: 64,
-      );
-    }
-
-    for (var i = 0; i < n && i < labels.length; i++) {
-      final isLast = i == n - 1;
-      _text(
-        canvas,
-        labels[i],
-        Offset(pts[i].dx, baseY + 4),
-        HqText.tiny.copyWith(
-          fontSize: 10.5,
-          fontWeight: isLast ? FontWeight.w700 : FontWeight.w400,
-          color: isLast ? HqColors.ink2 : HqColors.ink3,
-        ),
-        align: TextAlign.center,
-        maxW: math.max(14, chartW / math.max(1, n - 1)),
-      );
     }
   }
 
@@ -656,9 +713,11 @@ class _CurveTrendPainter extends CustomPainter {
   @override
   bool shouldRepaint(covariant _CurveTrendPainter o) =>
       o.values != values ||
+      o.compare != compare ||
       o.labels != labels ||
       o.partialLast != partialLast ||
-      o.color != color;
+      o.color != color ||
+      o.compareColor != compareColor;
 }
 
 // ---------------------------------------------------------------------------
