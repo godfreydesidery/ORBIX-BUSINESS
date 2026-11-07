@@ -101,7 +101,21 @@ public class Parking {
 	
 	@NotBlank
 	private String status = "PENDING";
-	
+
+	public static final String INSIDE = "INSIDE";
+	public static final String OUTSIDE = "OUTSIDE";
+
+	/**
+	 * Where a checked-in vehicle physically is: INSIDE the yard, or OUTSIDE on a temporary trip (see ParkingTrip).
+	 * Declared with a database default so the column is added filled in for existing parkings.
+	 */
+	@Column(columnDefinition = "VARCHAR(10) NOT NULL DEFAULT 'INSIDE'")
+	private String custody = INSIDE;
+
+	public boolean isOutside() {
+		return OUTSIDE.equals(custody);
+	}
+
 	/**Billing*/
 	private String billingType;
 	private double billingAmount;

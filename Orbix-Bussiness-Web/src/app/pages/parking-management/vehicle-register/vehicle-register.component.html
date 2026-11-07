@@ -9,6 +9,7 @@
                 <div class="row">
                     <div class="col-sm-12">
                         <!-- <button type="button" class="btn btn-outline-success btn-round-custom" (click)="clearParkingData()" data-toggle="modal" data-target="#parkingZone-modal">New Vehicle</button> -->
+                        <a class="btn btn-outline-danger btn-round-custom" routerLink="/app/parking-management/outside-yard"><i class="fa fa-sign-out"></i> Vehicles Outside Yard</a>
                         <br><br>
                     </div>
                 </div>
@@ -56,6 +57,7 @@
                                     <td>
                                         <span class="badge badge-warning" *ngIf="p.status === 'PENDING'">{{p.status}}</span>
                                         <span class="badge badge-success" *ngIf="p.status === 'CHECKED-IN'">{{p.status}}</span>
+                                        <span class="badge badge-danger" *ngIf="p.status === 'CHECKED-IN' && p.custody === 'OUTSIDE'" style="margin-left: 3px;">OUTSIDE YARD</span>
                                         <span class="badge badge-danger" *ngIf="p.status === 'CHECKED-OUT'">{{p.status}}</span>
                                     </td>                                    
                                     <td>

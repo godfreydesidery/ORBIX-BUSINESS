@@ -21,7 +21,7 @@ public class Object_ {
 	public static String ROLE = "ROLE-ALL CREATE READ UPDATE";
 	
 	public static String RCPTN = "RCPTN-ACCESS";
-	public static String PKNG = "PKNG-ACCESS MODIFY ARCHIVE";
+	public static String PKNG = "PKNG-ACCESS MODIFY ARCHIVE SENDOUT SENDIN TRIPS"; // SENDOUT/SENDIN: temporary trips out of the yard; TRIPS: trip report
 	public static String BND = "BND-MODIFY ARCHIVE";
 	public static String MTNC = "MTNC-ACCESS";
 	public static String TCHN = "TCHN-ACCESS";

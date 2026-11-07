@@ -63,6 +63,8 @@ public class ParkingResponseDTO {
 	String vehicleEquipmentCategory;
 
 	String status;
+	/** INSIDE the yard, or OUTSIDE on a temporary trip */
+	String custody;
 
     String parkingZoneId;
     String parkingZoneName;

@@ -2,8 +2,12 @@ package com.orbix.api.api.vehicleandequipmentparking;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
+
+import javax.persistence.LockModeType;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.data.domain.Page;
@@ -15,6 +19,11 @@ import com.orbix.api.api.commons.PayStatus;
 public interface ParkingRepository extends JpaRepository<Parking, Long> {
 
 	List<Parking> findAllByStatusIn(List<String> statuses);
+
+	/** The parking, locked until the transaction ends, for changes that must not run twice at once */
+	@Lock(LockModeType.PESSIMISTIC_WRITE)
+	@Query("SELECT p FROM Parking p WHERE p.id = :id")
+	Optional<Parking> findByIdForUpdate(@Param("id") Long id);
 
 	List<Parking> findAllByVehicleEquipmentAndStatusIn(VehicleEquipment vehicleEquipment, List<String> statuses);
 

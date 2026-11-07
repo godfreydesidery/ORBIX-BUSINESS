@@ -74,7 +74,9 @@ public class ParkingServiceController implements ParkingService {
 	private final InvoiceReceivableDetailRepository invoiceReceivableDetailRepository;
 	
 	private final RemovedVehicleEquipmentRepository removedVehicleEquipmentRepository;
-	
+
+	private final ParkingTripRepository parkingTripRepository;
+
 		
 	
 
@@ -753,6 +755,7 @@ public class ParkingServiceController implements ParkingService {
 		parkingResponse.setComments(parking.getComments());
 		//parking.setImage(parkingRequest.getImage());
 		parkingResponse.setStatus(parking.getStatus());
+		parkingResponse.setCustody(parking.isOutside() ? Parking.OUTSIDE : Parking.INSIDE);
 		//parkingResponse.setCompanyId(parking.getCompany().getId().toString());
 		parkingResponse.setBranchId(parking.getBranch().getId().toString());
 		
@@ -970,9 +973,21 @@ public class ParkingServiceController implements ParkingService {
 		parking.setStatus("CHECKED-OUT");
 		parking.setCheckedOutByUser(userService.getUser(request));
 		parking.setCheckedOutDateTime(dayService.getTimeStamp());
-		
+
 		parking = parkingRepository.save(parking);
-		
+
+		// Checked out while away on a trip: the vehicle is not coming back, so its trip is closed as not returned
+		if(parking.isOutside()) {
+			Optional<ParkingTrip> trip_ = parkingTripRepository.findFirstByParkingAndStatusOrderByIdDesc(parking, ParkingTrip.OUT);
+			if(trip_.isPresent()) {
+				ParkingTrip trip = trip_.get();
+				trip.setStatus(ParkingTrip.NOT_RETURNED);
+				trip.setReceivedByUser(parking.getCheckedOutByUser());
+				trip.setReceivedAt(parking.getCheckedOutDateTime());
+				parkingTripRepository.save(trip);
+			}
+		}
+
 		return parkingResponseDTOMapper(parking);
 	}
 	
@@ -1132,7 +1147,8 @@ public class ParkingServiceController implements ParkingService {
 		if(parking_.isEmpty()) throw new NotFoundException("Parking not found in database");
 		
 		if(!parking_.get().getStatus().equals("CHECKED-IN")) throw new NotFoundException("Can only archive vehicles/equipments from checked in parkings");
-		
+		if(parking_.get().isOutside()) throw new InvalidOperationException("Can not archive. The vehicle is outside the yard; send it in first.");
+
 			
 		Optional<Company> company_ = companyRepository.findById(userService.getUserCompany(request).getId());
 		if(company_.isEmpty()) throw new NotFoundException("Company not found");

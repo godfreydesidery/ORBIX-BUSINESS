@@ -29,6 +29,7 @@
                                  <th>Card No</th>
                                 <th>Billing Type</th>
                                 <th>Price</th>
+                                <th>Status</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
@@ -45,6 +46,10 @@
                                 <td class="text-danger"><b>{{p.cardNo}}</b></td>
                                 <td><span class="badge badge-primary">{{p.billingType}}</span></td>
                                 <td class="text-danger" style="text-align: right; font-weight: bold;">{{p.billingAmount | currency:'':''}}</td>
+                                <td class="text-nowrap">
+                                    <span class="badge badge-danger" *ngIf="p.custody === 'OUTSIDE'">Checked-in &middot; Outside yard</span>
+                                    <span class="badge badge-success" *ngIf="p.custody !== 'OUTSIDE'">Checked-in &middot; Inside yard</span>
+                                </td>
                                 
                                 <td>
                                     <table>
@@ -54,6 +59,8 @@
                                             <td><button class="btn btn-warning btn-round-custom btn-sm" (click)="getBillView(p.id)" data-toggle="modal" data-target="#bill-view-modal"><i class="fa fa-eye-slash"></i> View Bill</button></td>
                                             <td><button class="btn btn-primary btn-round-custom btn-sm" (click)="get(p.id)" data-toggle="modal" data-target="#view-modal"><i class="fa fa-eye"></i> View</button></td>
                                             <td><button class="btn btn-success btn-round-custom btn-sm" (click)="vehicleEquipmentBilling(p.id)" ><i class="fa fa-money"></i> Billing</button></td>
+                                            <td *ngIf="p.custody !== 'OUTSIDE' && grant(['PKNG-SENDOUT'])"><button class="btn btn-danger btn-round-custom btn-sm text-nowrap" (click)="openSendOut(p)" data-toggle="modal" data-target="#send-out-modal"><i class="fa fa-sign-out"></i> Send Out</button></td>
+                                            <td *ngIf="p.custody === 'OUTSIDE'"><button class="btn btn-secondary btn-round-custom btn-sm text-nowrap" (click)="reprintGatePass(p.id)"><i class="fa fa-print"></i> Gate Pass</button></td>
                                         </tr>
                                     </table>
                                 </td>
@@ -66,6 +73,86 @@
                         </div>
                     </div>
                 </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="modal fade" id="send-out-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="send-out-modal-label" style="top: 0;">
+    <div class="modal-dialog modal-lg" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">
+                <h4 class="modal-title" id="send-out-modal-label">Send Out (Temporary Exit)</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="row" *ngIf="sendOutParking">
+                    <div class="col-sm-12">
+                        <p>
+                            <b style="color: rgb(228, 85, 8);">{{sendOutParking.chasisNo}}</b> &middot; {{sendOutParking.vehicleEquipmentTypeName}}
+                            &middot; Card <b>{{sendOutParking.cardNo}}</b> &middot; Owner {{sendOutParking.ownerFirstName}} {{sendOutParking.ownerLastName}}
+                        </p>
+                        <p class="text-muted small">Parking charges continue while the vehicle is outside, and its slot is kept.</p>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Driver Name <span class="text-danger">*</span></label>
+                            <input class="form-control" type="text" [(ngModel)]="driverName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Driver Phone No <span class="text-danger">*</span></label>
+                            <input class="form-control" type="text" [(ngModel)]="driverPhoneNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>ID Type <span class="text-danger">*</span></label>
+                            <select class="form-control" [(ngModel)]="driverIdType">
+                                <option value="" disabled>-- Select --</option>
+                                <option *ngFor="let t of driverIdTypes" [value]="t">{{t}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>ID Number <span class="text-danger">*</span></label>
+                            <input class="form-control" type="text" [(ngModel)]="driverIdNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Reason <span class="text-danger">*</span></label>
+                            <select class="form-control" [(ngModel)]="tripReason">
+                                <option value="" disabled>-- Select --</option>
+                                <option *ngFor="let r of tripReasons" [value]="r.value">{{r.label}}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label>Expected Return <span class="text-danger">*</span></label>
+                            <input class="form-control" type="datetime-local" [(ngModel)]="expectedReturnAt" [min]="nowLocal()">
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-group">
+                            <label>Reason Details</label>
+                            <input class="form-control" type="text" [(ngModel)]="tripReasonDetails" autocomplete="nope" placeholder="e.g. garage name, what is being done">
+                        </div>
+                    </div>
+                    <div class="col-sm-12">
+                        <div class="form-check">
+                            <input class="form-check-input" type="checkbox" id="documents-left" [(ngModel)]="documentsLeft">
+                            <label class="form-check-label" for="documents-left">Driver has left the required documents</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-primary" [disabled]="!sendOutReady()" (click)="sendOut()" data-dismiss="modal"><i class="fa fa-print"></i> Send Out &amp; Print Gate Pass</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Cancel</button>
             </div>
         </div>
     </div>

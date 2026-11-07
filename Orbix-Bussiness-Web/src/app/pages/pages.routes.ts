@@ -377,6 +377,18 @@ export const routes: Routes = [
         data : { breadcrumb : 'Parking Management/Reports/Vehicle Archived Report'},
         canActivate : [AuthGuard]
       },
+      {
+        path : 'parking-management/outside-yard',
+        loadComponent: () => import('./parking-management/outside-yard/outside-yard.component').then(c => c.OutsideYardComponent),
+        data : { breadcrumb : 'Parking Management/Outside Yard'},
+        canActivate : [AuthGuard]
+      },
+      {
+        path : 'parking-management/reports/vehicle-trip-report',
+        loadComponent: () => import('./parking-management/reports/vehicle-trip-report/vehicle-trip-report.component').then(c => c.VehicleTripReportComponent),
+        data : { breadcrumb : 'Parking Management/Reports/Vehicle Trips Report'},
+        canActivate : [AuthGuard]
+      },
 
       /**End of Parking Management */
 

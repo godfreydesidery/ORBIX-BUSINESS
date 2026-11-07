@@ -17,6 +17,9 @@ import { IBillView } from 'src/app/domain/bill-view';
 import { trackById } from 'src/app/common/utils/track-by-id';
 import { IPage } from 'src/app/domain/page';
 import { pageParams } from 'src/app/common/utils/page-params';
+import { DataService } from '@services/custom/data.service';
+import { DRIVER_ID_TYPES, IParkingTrip, TRIP_REASONS } from 'src/app/domain/parking-trip';
+import { printTripGatePass } from 'src/app/common/utils/trip-gate-pass';
 
 const API_URL = environment.apiUrl;
 
@@ -184,8 +187,112 @@ export class ParkingBillingComponent {
     private http :HttpClient,
     private auth : AuthService,
     private router : Router,
-    private msg : MsgBoxService
+    private msg : MsgBoxService,
+    private data : DataService
   ) {}
+
+  grant(privileges: string[]): boolean {
+    return this.auth.grant(privileges)
+  }
+
+  /** Send out: a checked-in vehicle leaves the yard temporarily on a temporary gate pass */
+  tripReasons = TRIP_REASONS
+  driverIdTypes = DRIVER_ID_TYPES
+
+  sendOutParking : IParking | null = null
+  tripReason : string = ''
+  tripReasonDetails : string = ''
+  driverName : string = ''
+  driverPhoneNo : string = ''
+  driverIdType : string = ''
+  driverIdNo : string = ''
+  documentsLeft : boolean = false
+  expectedReturnAt : string = ''
+  sendingOut : boolean = false
+
+  openSendOut(p : IParking){
+    this.sendOutParking = p
+    this.tripReason = ''
+    this.tripReasonDetails = ''
+    this.driverName = ''
+    this.driverPhoneNo = ''
+    this.driverIdType = ''
+    this.driverIdNo = ''
+    this.documentsLeft = false
+    this.expectedReturnAt = ''
+  }
+
+  // Now, as a datetime-local value (yyyy-MM-ddTHH:mm) in the user's time
+  nowLocal() : string {
+    const d = new Date()
+    d.setMinutes(d.getMinutes() - d.getTimezoneOffset())
+    return d.toISOString().substring(0, 16)
+  }
+
+  sendOutReady() : boolean {
+    return !!this.sendOutParking && !!this.tripReason && !!this.driverName.trim() && !!this.driverPhoneNo.trim()
+      && !!this.driverIdType && !!this.driverIdNo.trim() && !!this.expectedReturnAt && !this.sendingOut
+  }
+
+  async sendOut(){
+    if(!this.sendOutReady()){
+      return
+    }
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    var trip = {
+      parkingId : this.sendOutParking!.id,
+      reason : this.tripReason,
+      reasonDetails : this.tripReasonDetails,
+      driverName : this.driverName,
+      driverPhoneNo : this.driverPhoneNo,
+      driverIdType : this.driverIdType,
+      driverIdNo : this.driverIdNo,
+      documentsLeft : this.documentsLeft,
+      expectedReturnAt : this.expectedReturnAt
+    }
+    this.sendingOut = true
+    await this.http.post<IParkingTrip>(API_URL+'/parkings/send_out', trip, options)
+    .toPromise()
+    .then(
+      async data => {
+        this.msg.showSuccessMessage('Vehicle sent out. Gate pass ' + data!.no)
+        this.getAllCheckedInParkings()
+        await this.printTripPass(data!)
+      }
+    )
+    .catch(
+      error => {
+        this.msg.showErrorMessage(error, 'Could not send out')
+      }
+    )
+    this.sendingOut = false
+  }
+
+  /** Prints again the temporary gate pass of a vehicle that is outside */
+  async reprintGatePass(parkingId : any){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    await this.http.get<IParkingTrip>(API_URL+'/parkings/get_open_trip?parking_id=' + parkingId, options)
+    .toPromise()
+    .then(
+      async data => {
+        await this.printTripPass(data!)
+      }
+    )
+    .catch(
+      error => {
+        this.msg.showErrorMessage(error, 'Could not load the gate pass')
+      }
+    )
+  }
+
+  private async printTripPass(trip : IParkingTrip){
+    var header : any = await this.data.getBranchReceiptHeaderWithNoTinAndVrn(trip.no)
+    printTripGatePass(trip, header)
+  }
 
 
   ngOnInit(){

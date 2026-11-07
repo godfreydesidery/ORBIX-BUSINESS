@@ -57,6 +57,9 @@ export interface IParking {
 
     status: "PENDING",
 
+    // INSIDE the yard, or OUTSIDE on a temporary trip
+    custody: 'INSIDE' | 'OUTSIDE'
+
     
 
     // Foreign keys

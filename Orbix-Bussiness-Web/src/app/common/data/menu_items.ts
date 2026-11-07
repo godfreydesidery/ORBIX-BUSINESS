@@ -297,6 +297,11 @@ export const menuItems = [
                 routerLink: '/app/parking-management/parking'
             },
             {
+                title: 'Outside Yard',
+                show: true,
+                routerLink: '/app/parking-management/outside-yard'
+            },
+            {
                 title: 'Reports',
                 url: '#',
                 show: true,
@@ -306,6 +311,12 @@ export const menuItems = [
                         routerLink: '/app/management/vehicle-registration-report'
                     }
                 ],
+            },
+            {
+                // A direct entry, not under Reports: the menu applies "show" only one level down
+                title: 'Vehicle Trips Report',
+                show: grant(['PKNG-TRIPS']),
+                routerLink: '/app/parking-management/reports/vehicle-trip-report'
             },
             {
                 title: 'Archives',
@@ -807,6 +818,10 @@ export const menuItems = [
                     {
                         title: 'Vehicle Archive Report',
                         routerLink: '/app/parking-management/reports/vehicle-removed-report'
+                    },
+                    {
+                        title: 'Vehicle Trips Report',
+                        routerLink: '/app/parking-management/reports/vehicle-trip-report'
                     }
                 ]
             }
