@@ -39,6 +39,10 @@ public class Operation {
 	 //public static String DENY = "DENY";
 	 public static String SALE = "SALE";
 	 public static String ADMIN = "ADMIN";
+	 // Parking: temporary trips of a checked-in vehicle out of the yard (PKNG-SENDOUT, PKNG-SENDIN) and their report (PKNG-TRIPS)
+	 public static String SENDOUT = "SENDOUT";
+	 public static String SENDIN = "SENDIN";
+	 public static String TRIPS = "TRIPS";
 			 
 	 
 	 
