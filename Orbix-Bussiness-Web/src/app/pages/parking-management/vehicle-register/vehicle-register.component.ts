@@ -17,7 +17,6 @@ import { MsgBoxService } from '@services/custom/msg-box.service';
 import { trackById } from 'src/app/common/utils/track-by-id';
 import { IPage } from 'src/app/domain/page';
 import { pageParams } from 'src/app/common/utils/page-params';
-import { RouterModule } from '@angular/router';
 
 
 const API_URL = environment.apiUrl;
@@ -28,8 +27,7 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    NgxPaginationModule,
-    RouterModule
+    NgxPaginationModule
   ],
   templateUrl: './vehicle-register.component.html',
   styleUrl: './vehicle-register.component.scss'

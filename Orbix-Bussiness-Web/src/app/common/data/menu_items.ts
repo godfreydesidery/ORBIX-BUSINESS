@@ -297,7 +297,7 @@ export const menuItems = [
                 routerLink: '/app/parking-management/parking'
             },
             {
-                title: 'Outside Yard',
+                title: 'Vehicle Outside Yard',
                 show: true,
                 routerLink: '/app/parking-management/outside-yard'
             },
