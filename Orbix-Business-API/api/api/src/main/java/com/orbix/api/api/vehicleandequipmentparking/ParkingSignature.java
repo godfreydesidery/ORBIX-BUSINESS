@@ -50,11 +50,14 @@ public class ParkingSignature {
 	public static final String INSPECTION = "INSPECTION";
 	public static final String REGISTRATION = "REGISTRATION";
 	public static final String MODIFICATION = "MODIFICATION";
+	/** Optional: whoever checks the vehicle in may sign */
+	public static final String CHECK_IN = "CHECK_IN";
 
 	public static final String INSPECTOR = "INSPECTOR";
 	public static final String DRIVER = "DRIVER";
 	public static final String REGISTRAR = "REGISTRAR";
 	public static final String MODIFIER = "MODIFIER";
+	public static final String CHECK_IN_OFFICER = "CHECK_IN_OFFICER";
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)

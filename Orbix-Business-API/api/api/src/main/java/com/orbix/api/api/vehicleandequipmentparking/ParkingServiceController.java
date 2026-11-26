@@ -929,7 +929,7 @@ public class ParkingServiceController implements ParkingService {
 		if(!parkingZone.isActive()) throw new InvalidOperationException("Parking Zone " + parkingZone.getName() + " is not active");
 		if(parkingZone.getNoOfSlots() <= 0) return parkingZone;
 		boolean alreadyInZone = moving != null && moving.getParkingZone() != null && Objects.equals(moving.getParkingZone().getId(), parkingZone.getId());
-		if(!alreadyInZone && parkingRepository.countByParkingZoneAndStatus(parkingZone, "CHECKED-IN") >= parkingZone.getNoOfSlots())
+		if(!alreadyInZone && parkingRepository.countByParkingZoneAndStatusIn(parkingZone, List.of("REGISTERED", "CHECKED-IN")) >= parkingZone.getNoOfSlots())
 			throw new InvalidOperationException("Parking Zone " + parkingZone.getName() + " is full, select another zone");
 		if(slotNo == null || slotNo < 1 || slotNo > parkingZone.getNoOfSlots())
 			throw new InvalidEntryException("Select a slot in Parking Zone " + parkingZone.getName() + " (1 to " + parkingZone.getNoOfSlots() + ")");
@@ -1082,8 +1082,9 @@ public class ParkingServiceController implements ParkingService {
 	}
 
 	/**
-	 * Registers an inspected (PENDING) vehicle: the owner, agent, Sub T1 and driver, signed by the registrar. The vehicle
-	 * then waits to be checked in (REGISTERED); the parking zone, slot, card and keys are taken at check-in.
+	 * Registers an inspected (PENDING) vehicle: the owner, agent, Sub T1, driver, parking zone and slot, signed by the
+	 * registrar. The vehicle then waits to be checked in (REGISTERED), holding its slot; card, keys and the day billing
+	 * starts are taken at check-in.
 	 */
 	@Override
 	public ParkingResponseDTO registerParking(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
@@ -1105,6 +1106,13 @@ public class ParkingServiceController implements ParkingService {
 		if(Parking.isOwnerPending(ownerFirstName, ownerLastName)) throw new InvalidEntryException("Enter the owner's name");
 		String driverName = required(parkingRequest.getDriverName(), "Driver name is required");
 		byte[] registrarSignature = SignatureImages.decode(parkingRequest.getRegistrarSignature(), "Registrar");
+
+		// The parking zone and slot are chosen at registration and held until check-out
+		ParkingZone requestedZone = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), parking.getBranch())
+				.orElseThrow(() -> new NotFoundException("Parking Zone not found"));
+		ParkingZone parkingZone = zoneWithSpace(requestedZone, parkingRequest.getParkingSlotNo(), null);
+		parking.setParkingZone(parkingZone);
+		parking.setParkingSlotNo(parkingZone.getNoOfSlots() > 0 ? parkingRequest.getParkingSlotNo() : null);
 
 		parking.setOwnerFirstName(ownerFirstName);
 		parking.setOwnerMiddleName(text(parkingRequest.getOwnerMiddleName()));
@@ -1166,18 +1174,17 @@ public class ParkingServiceController implements ParkingService {
 		if(!"REGISTERED".equals(parking_.get().getStatus()))
 			throw new InvalidOperationException("Can not check in, only a registered vehicle can be checked in");
 
-		// Check-in: the parking zone and slot, the card and keys, and the day billing starts
+		// Check-in: the card and keys, and the day billing starts; the parking zone and slot were chosen at registration
 		Parking parking = parking_.get();
-
-		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), parking_.get().getBranch());
-		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
-		ParkingZone parkingZone = zoneWithSpace(parkingZone_.get(), parkingRequest.getParkingSlotNo(), null);
+		// The check-in signature is optional; when given it must be a proper (small) image
+		byte[] checkInSignature = SignatureImages.isPresent(parkingRequest.getCheckInSignature())
+				? SignatureImages.decode(parkingRequest.getCheckInSignature(), "Check-in") : null;
+		if(parking.getParkingZone() == null)
+			throw new InvalidOperationException("The parking zone is missing: it is chosen at registration");
 
 		// The vehicle type and category were set at inspection; the daily price follows the type
 		parking.setBillingAmount(parking.getVehicleEquipmentType().getDailyPrice());
 
-		parking.setParkingZone(parkingZone);
-		parking.setParkingSlotNo(parkingZone.getNoOfSlots() > 0 ? parkingRequest.getParkingSlotNo() : null);
 		parking.setStatus("CHECKED-IN");
 		parking.setCardNo(parkingRequest.getCardNo());
 		parking.setHasKeys(parkingRequest.isHasKeys());
@@ -1195,6 +1202,9 @@ public class ParkingServiceController implements ParkingService {
 			parking.setStartBillingAt(dateTime);
 		}
 		parking = parkingRepository.save(parking);
+		if(checkInSignature != null) {
+			sign(parking, ParkingSignature.CHECK_IN, ParkingSignature.CHECK_IN_OFFICER, user, nameOf(user), checkInSignature, null);
+		}
 		
 //		//generate bill, for day 1 depending on billing type
 //		

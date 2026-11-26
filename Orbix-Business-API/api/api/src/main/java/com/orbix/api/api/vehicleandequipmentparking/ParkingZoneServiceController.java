@@ -69,7 +69,8 @@ public class ParkingZoneServiceController implements ParkingZoneService {
 
 	/**
 	 * The branch's active zones that still have space, each with its free count (no of slots less the vehicles
-	 * checked in there) and its free slot numbers (1 to no of slots, less those held by checked-in vehicles).
+	 * registered or checked in there) and its free slot numbers (1 to no of slots, less those held by registered or
+	 * checked-in vehicles).
 	 * A zone with no of slots 0 has no limit and no slots. Space frees itself when a vehicle is checked out.
 	 */
 	@Override

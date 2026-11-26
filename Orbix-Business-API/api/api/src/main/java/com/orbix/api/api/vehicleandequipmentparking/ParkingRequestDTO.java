@@ -116,4 +116,6 @@ public class ParkingRequestDTO {
     String driverSignature;
     String registrarSignature;
     String modifierSignature;
+    /** Optional at check-in */
+    String checkInSignature;
 }

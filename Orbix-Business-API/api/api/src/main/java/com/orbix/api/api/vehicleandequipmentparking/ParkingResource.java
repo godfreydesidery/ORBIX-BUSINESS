@@ -198,9 +198,9 @@ public class ParkingResource {
 		return ResponseEntity.created(uri).body(parkingService.modifyParking(parkingRequest, request));
 	}
 	
-	/** Registers an inspected vehicle: owner, agent, Sub T1 and driver, signed by the registrar; it then waits for check-in */
+	/** Registers an inspected vehicle: owner, agent, Sub T1, driver, parking zone and slot, signed by the registrar; it then waits for check-in */
 	@PostMapping("/parkings/register")
-	@Audited(category = "OPERATIONS", action = "VEHICLE_REGISTERED", entityType = "Parking", entityRef = "result.no", summary = "Registered parking {result.no} ({result.chasisNo}), owner {result.ownerFirstName} {result.ownerLastName}", details = {"result.chasisNo", "result.driverName", "result.tformNumber"})
+	@Audited(category = "OPERATIONS", action = "VEHICLE_REGISTERED", entityType = "Parking", entityRef = "result.no", summary = "Registered parking {result.no} ({result.chasisNo}) in zone {result.parkingZoneName}, slot {result.parkingSlotNo}", details = {"result.chasisNo", "result.driverName", "result.tformNumber", "result.parkingZoneName", "result.parkingSlotNo"})
 	@PreAuthorize("hasAnyAuthority('PKNG-REGISTER')")
 	public ResponseEntity<ParkingResponseDTO>register(
 			@RequestBody ParkingRequestDTO parkingRequest,
@@ -208,9 +208,9 @@ public class ParkingResource {
 		return ResponseEntity.ok().body(parkingService.registerParking(parkingRequest, request));
 	}
 
-	/** Checks a registered vehicle in: parking zone and slot, card, keys and the day billing starts */
+	/** Checks a registered vehicle in: card, keys and the day billing starts (the zone and slot come from registration) */
 	@PostMapping("/parkings/check_in")
-	@Audited(category = "OPERATIONS", action = "CHECKED_IN", entityType = "Parking", entityRef = "result.no", summary = "Checked in parking {result.no} ({result.chasisNo}) in zone {result.parkingZoneName}, slot {result.parkingSlotNo}", details = {"result.chasisNo", "result.parkingZoneName", "result.parkingSlotNo", "result.cardNo"})
+	@Audited(category = "OPERATIONS", action = "CHECKED_IN", entityType = "Parking", entityRef = "result.no", summary = "Checked in parking {result.no} ({result.chasisNo}), card {result.cardNo}", details = {"result.chasisNo", "result.parkingZoneName", "result.parkingSlotNo", "result.cardNo"})
 	@PreAuthorize("hasAnyAuthority('PKNG-REGISTER')")
 	public ResponseEntity<ParkingResponseDTO>checkIn(
 			@RequestBody ParkingRequestDTO parkingRequest,

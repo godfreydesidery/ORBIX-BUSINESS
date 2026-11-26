@@ -25,18 +25,21 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
 	@Query("SELECT p FROM Parking p WHERE p.id = :id")
 	Optional<Parking> findByIdForUpdate(@Param("id") Long id);
 
-	/** Checked-in parkings per zone, as [zone id, count], for the zones' free space; a vehicle out on a trip keeps its space */
-	@Query("SELECT p.parkingZone.id, COUNT(p) FROM Parking p WHERE p.status = 'CHECKED-IN' AND p.parkingZone IN :zones GROUP BY p.parkingZone.id")
+	/** Registered and checked-in parkings per zone, as [zone id, count], for the zones' free space (a slot is held from
+	 * registration until check-out; a vehicle out on a trip keeps its space) */
+	@Query("SELECT p.parkingZone.id, COUNT(p) FROM Parking p WHERE p.status IN ('REGISTERED', 'CHECKED-IN') AND p.parkingZone IN :zones GROUP BY p.parkingZone.id")
 	List<Object[]> countCheckedInByZone(@Param("zones") List<ParkingZone> zones);
 
 	long countByParkingZoneAndStatus(ParkingZone parkingZone, String status);
 
-	/** Slots taken by checked-in vehicles, as [zone id, slot no] */
-	@Query("SELECT p.parkingZone.id, p.parkingSlotNo FROM Parking p WHERE p.status = 'CHECKED-IN' AND p.parkingZone IN :zones AND p.parkingSlotNo IS NOT NULL")
+	long countByParkingZoneAndStatusIn(ParkingZone parkingZone, List<String> statuses);
+
+	/** Slots taken by registered and checked-in vehicles, as [zone id, slot no] */
+	@Query("SELECT p.parkingZone.id, p.parkingSlotNo FROM Parking p WHERE p.status IN ('REGISTERED', 'CHECKED-IN') AND p.parkingZone IN :zones AND p.parkingSlotNo IS NOT NULL")
 	List<Object[]> getTakenSlots(@Param("zones") List<ParkingZone> zones);
 
-	/** Whether another checked-in vehicle holds this slot (excluding the given parking, which may already hold it) */
-	@Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM Parking p WHERE p.status = 'CHECKED-IN' AND p.parkingZone = :zone AND p.parkingSlotNo = :slotNo AND p.id <> :excludeId")
+	/** Whether another registered or checked-in vehicle holds this slot (excluding the given parking, which may already hold it) */
+	@Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM Parking p WHERE p.status IN ('REGISTERED', 'CHECKED-IN') AND p.parkingZone = :zone AND p.parkingSlotNo = :slotNo AND p.id <> :excludeId")
 	boolean isSlotTaken(@Param("zone") ParkingZone zone, @Param("slotNo") Integer slotNo, @Param("excludeId") Long excludeId);
 
 	List<Parking> findAllByVehicleEquipmentAndStatusIn(VehicleEquipment vehicleEquipment, List<String> statuses);
