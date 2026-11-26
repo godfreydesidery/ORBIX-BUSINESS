@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/auth.service';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { IParking, IParkingInspection, IParkingSignature } from 'src/app/domain/parking';
+import { IParking, IParkingInspection, IParkingSignature, isOwnerPending } from 'src/app/domain/parking';
 import { SignaturePadComponent } from 'src/app/common/components/signature-pad/signature-pad.component';
 import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
@@ -269,6 +269,10 @@ export class VehicleRegisterComponent {
     .catch(error => console.log(error))
   }
 
+  ownerPending(parking : IParking) : boolean {
+    return isOwnerPending(parking.ownerFirstName, parking.ownerLastName)
+  }
+
   signaturesOf(stage : string) : IParkingSignature[] {
     return this.signatures.filter(s => s.stage === stage)
   }
@@ -335,6 +339,7 @@ export class VehicleRegisterComponent {
 
   // What registration still lacks, or '' when the vehicle can be checked in
   registrationProblem() : string {
+    if(!this.ownerFirstName?.trim() || !this.ownerLastName?.trim()) return "Owner's first and last name are required"
     if(!this.driverName?.trim()) return 'Driver name is required'
     if(!this.vehicleEquipmentTypeName) return 'Vehicle type is required'
     if(this.vehicleEquipmentCategory !== 'IN-TRANSIT' && this.vehicleEquipmentCategory !== 'LOCAL') return 'Select the category'
@@ -346,7 +351,6 @@ export class VehicleRegisterComponent {
 
   // Editing an inspection that is waiting for registration
   inspectionEditProblem() : string {
-    if(!this.ownerFirstName?.trim() || !this.ownerLastName?.trim()) return 'Owner first and last name are required'
     if(!this.chasisNo?.trim()) return 'Chassis number is required'
     if(!this.bodyCondition?.trim()) return 'Body condition is required'
     if(this.deviceStatus === 'ATTACHED' && this.deviceCount !== null && this.deviceCount < 1) return 'The number of devices must be at least 1'
@@ -711,6 +715,15 @@ export class VehicleRegisterComponent {
       parkingZoneName : this.parkingZoneName,
       startBillingAt : this.startBillingAt,
 
+      // The owner and agent, entered at registration
+      ownerFirstName : this.ownerFirstName,
+      ownerLastName : this.ownerLastName,
+      ownerIdType : this.ownerIdType,
+      ownerIdNo : this.ownerIdNo,
+      ownerPhoneNo : this.ownerPhoneNo,
+      agentName : this.agentName,
+      agentPhoneNo : this.agentPhoneNo,
+
       vehicleEquipmentTypeName : this.vehicleEquipmentTypeName,
       vehicleEquipmentCategory : this.vehicleEquipmentCategory,
       driverName : this.driverName,
@@ -816,9 +829,11 @@ export class VehicleRegisterComponent {
   showParkingData(data : IParking){
     this.parkingId = data?.id;
     this.parkingNo = data!.no;
-    this.ownerFirstName = data?.ownerFirstName;
+    // The placeholder owner ("PENDING REGISTRATION") is shown as empty, for the registrar to fill in
+    const pending = isOwnerPending(data?.ownerFirstName, data?.ownerLastName)
+    this.ownerFirstName = pending ? '' : data?.ownerFirstName;
     this.ownerMiddleName = data?.ownerMiddleName;
-    this.ownerLastName = data?.ownerLastName;
+    this.ownerLastName = pending ? '' : data?.ownerLastName;
     this.ownerCompanyName = data?.ownerCompanyName;
     this.ownerIdNo = data?.ownerIdNo;
     this.ownerIdType = data?.ownerIdType;

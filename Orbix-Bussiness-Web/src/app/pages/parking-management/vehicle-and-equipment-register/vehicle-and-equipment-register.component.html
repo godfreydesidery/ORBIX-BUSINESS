@@ -76,7 +76,6 @@
                                             <th>No</th>
                                             <th>Chassis No</th>
                                             <th>Vehicle Type</th>
-                                            <th>Owner</th>
                                             <th>Inspected</th>
                                             <th></th>
                                         </tr>
@@ -86,7 +85,6 @@
                                             <td>{{ p.no }}</td>
                                             <td><b style="color: rgb(228, 85, 8);">{{ p.chasisNo }}</b></td>
                                             <td>{{ p.vehicleEquipmentTypeName }}</td>
-                                            <td>{{ p.ownerFirstName }} {{ p.ownerLastName }}</td>
                                             <td><span class="badge badge-warning">AWAITING REGISTRATION</span></td>
                                             <td class="text-right">
                                                 <button type="button" class="btn btn-sm btn-primary btn-round-custom text-nowrap" (click)="openFromVehicleList(p)">
@@ -94,7 +92,7 @@
                                             </td>
                                         </tr>
                                         <tr *ngIf="vehicleList.length === 0">
-                                            <td colspan="6" class="text-muted">No inspected vehicles are waiting for registration.</td>
+                                            <td colspan="5" class="text-muted">No inspected vehicles are waiting for registration.</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -110,8 +108,8 @@
                 <!-- Start ofContent header for new vehicle -->
                 <div class="row" *ngIf="mode === 'new'">
                     <div class="col-sm-12">
-                        <p><b>Owner Information</b></p><br>
-                        <div class="row">
+                        <p *ngIf="currentService !== 'Parking'"><b>Owner Information</b></p><br *ngIf="currentService !== 'Parking'">
+                        <div class="row" *ngIf="currentService !== 'Parking'">
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>First Name*</label>
@@ -174,9 +172,9 @@
                                 </div>
                             </div> -->
                         </div>
-                        <h6 *ngIf="currentService === 'Parking'"><b>Agent Information</b></h6>
-                        <hr *ngIf="currentService === 'Parking'">
-                        <div class="row" *ngIf="currentService === 'Parking'">
+                        <!-- The agent is entered at registration -->
+                        <h6 *ngIf="false"><b>Agent Information</b></h6>
+                        <div class="row" *ngIf="false">
                             <input type="hidden" [(ngModel)]="id">
                             <div class="col-lg-3">
                                 <div class="form-group">
@@ -382,11 +380,11 @@
                 <div class="row" *ngIf="id != null">
                     <div class="col-sm-12">
                         <hr>
-                        <h6 *ngIf="currentService === 'Parking'">Owner Information</h6>
+                        <!-- Parking: the owner is entered by the registrar -->
                         <h6 *ngIf="currentService !== 'Parking'">Driver/Owner Information</h6>
-                        <hr>
-                        <div class="row">
-                            <input type="hidden" [(ngModel)]="parkingId">
+                        <hr *ngIf="currentService !== 'Parking'">
+                        <input type="hidden" [(ngModel)]="parkingId">
+                        <div class="row" *ngIf="currentService !== 'Parking'">
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>First Name</label>
@@ -452,11 +450,12 @@
                             </div>                      -->
                         </div>
 
-                        <h6 *ngIf="currentService === 'Parking'">Agent Information</h6>
+                        <h6 *ngIf="currentService === 'Parking'">Transit Document</h6>
                         <hr *ngIf="currentService === 'Parking'">
                         <div class="row" *ngIf="currentService === 'Parking'">
                             <input type="hidden" [(ngModel)]="id">
-                            <div class="col-lg-6">
+                            <!-- The agent is entered by the registrar -->
+                            <div class="col-lg-6" *ngIf="false">
                                 <div class="form-group">
                                     <label>Agent Name</label>
                                     <input class="form-control" type="text" [(ngModel)]="agentName" autocomplete="nope">
@@ -468,7 +467,7 @@
                                     <input class="form-control" type="text" [(ngModel)]="agentAddress" autocomplete="nope">
                                 </div>
                             </div>  -->
-                            <div class="col-lg-3">
+                            <div class="col-lg-3" *ngIf="false">
                                 <div class="form-group">
                                     <label>Agent Phone</label>
                                     <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo"

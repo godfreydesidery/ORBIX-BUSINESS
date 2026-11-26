@@ -201,9 +201,11 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		
 		VehicleEquipment vehicleEquipment = new VehicleEquipment();
 		vehicleEquipment.setNo(String.valueOf(Math.random()));
-		vehicleEquipment.setOwnerFirstName(vehicleEquipmentRequest.getOwnerFirstName());
+		boolean parking = vehicleEquipmentRequest.getService().equals("PARKING");
+		// For parking the registrar enters the owner later; until then the owner is the placeholder
+		vehicleEquipment.setOwnerFirstName(parking ? Parking.ownerFirstNameOrPending(vehicleEquipmentRequest.getOwnerFirstName()) : vehicleEquipmentRequest.getOwnerFirstName());
 		vehicleEquipment.setOwnerMiddleName(vehicleEquipmentRequest.getOwnerMiddleName());
-		vehicleEquipment.setOwnerLastName(vehicleEquipmentRequest.getOwnerLastName());
+		vehicleEquipment.setOwnerLastName(parking ? Parking.ownerLastNameOrPending(vehicleEquipmentRequest.getOwnerLastName()) : vehicleEquipmentRequest.getOwnerLastName());
 		vehicleEquipment.setOwnerCompanyName(vehicleEquipmentRequest.getOwnerCompanyName());
 		vehicleEquipment.setOwnerIdNo(vehicleEquipmentRequest.getOwnerIdNo());
 		vehicleEquipment.setOwnerIdType(vehicleEquipmentRequest.getOwnerIdType());

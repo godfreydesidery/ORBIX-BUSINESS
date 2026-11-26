@@ -425,8 +425,6 @@ public class ParkingServiceController implements ParkingService {
 		}
 		// What the inspection must have; the database itself requires none of the new values
 		required(parkingRequest.getChasisNo(), "Chassis number is required");
-		required(parkingRequest.getOwnerFirstName(), "Owner first name is required");
-		required(parkingRequest.getOwnerLastName(), "Owner last name is required");
 		required(parkingRequest.getBodyCondition(), "Body condition is required");
 		byte[] inspectorSignature = SignatureImages.decode(parkingRequest.getInspectorSignature(), "Inspector");
 		byte[] driverSignature = SignatureImages.decode(parkingRequest.getDriverSignature(), "Driver");
@@ -456,9 +454,10 @@ public class ParkingServiceController implements ParkingService {
 
 		Parking parking = new Parking();
 		parking.setNo(String.valueOf(Math.random()));
-		parking.setOwnerFirstName(parkingRequest.getOwnerFirstName());
+		// The registrar enters the owner; until then the owner is the placeholder
+		parking.setOwnerFirstName(Parking.ownerFirstNameOrPending(parkingRequest.getOwnerFirstName()));
 		parking.setOwnerMiddleName(parkingRequest.getOwnerMiddleName());
-		parking.setOwnerLastName(parkingRequest.getOwnerLastName());
+		parking.setOwnerLastName(Parking.ownerLastNameOrPending(parkingRequest.getOwnerLastName()));
 		parking.setOwnerCompanyName(parkingRequest.getOwnerCompanyName());
 		parking.setOwnerIdNo(parkingRequest.getOwnerIdNo());
 		parking.setOwnerIdType(parkingRequest.getOwnerIdType());
@@ -573,11 +572,11 @@ public class ParkingServiceController implements ParkingService {
 			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
 		
 		// The parking zone and category belong to registration: editing an inspection leaves them as they are
-
+		
 		Parking parking = parking_.get();
-		parking.setOwnerFirstName(parkingRequest.getOwnerFirstName());
+		parking.setOwnerFirstName(Parking.ownerFirstNameOrPending(parkingRequest.getOwnerFirstName()));
 		parking.setOwnerMiddleName(parkingRequest.getOwnerMiddleName());
-		parking.setOwnerLastName(parkingRequest.getOwnerLastName());
+		parking.setOwnerLastName(Parking.ownerLastNameOrPending(parkingRequest.getOwnerLastName()));
 		parking.setOwnerCompanyName(parkingRequest.getOwnerCompanyName());
 		parking.setOwnerIdNo(parkingRequest.getOwnerIdNo());
 		parking.setOwnerIdType(parkingRequest.getOwnerIdType());
@@ -661,6 +660,10 @@ public class ParkingServiceController implements ParkingService {
 			throw new InvalidOperationException("Cannot proceed with modification as there are already existing bills.");
 		}
 
+		// After registration the owner is a real name: no blank, and not the placeholder
+		String modifiedOwnerFirstName = required(parkingRequest.getOwnerFirstName(), "Owner first name is required");
+		String modifiedOwnerLastName = required(parkingRequest.getOwnerLastName(), "Owner last name is required");
+		if(Parking.isOwnerPending(modifiedOwnerFirstName, modifiedOwnerLastName)) throw new InvalidEntryException("Enter the owner's name");
 		byte[] modifierSignature = SignatureImages.decode(parkingRequest.getModifierSignature(), "Your");
 
 		// Moving the vehicle to another zone or slot takes a space there, so it must be free
@@ -1049,6 +1052,9 @@ public class ParkingServiceController implements ParkingService {
 		// What registration must have; the database itself requires none of the new values
 		String category = required(parkingRequest.getVehicleEquipmentCategory(), "Select the category").toUpperCase();
 		if(!CATEGORIES.contains(category)) throw new InvalidEntryException("Select the category: In-transit or Local");
+		String ownerFirstName = required(parkingRequest.getOwnerFirstName(), "Owner first name is required");
+		String ownerLastName = required(parkingRequest.getOwnerLastName(), "Owner last name is required");
+		if(Parking.isOwnerPending(ownerFirstName, ownerLastName)) throw new InvalidEntryException("Enter the owner's name");
 		String driverName = required(parkingRequest.getDriverName(), "Driver name is required");
 		byte[] registrarSignature = SignatureImages.decode(parkingRequest.getRegistrarSignature(), "Registrar");
 
@@ -1065,6 +1071,37 @@ public class ParkingServiceController implements ParkingService {
 			parking.setVehicleEquipmentName(vehicleEquipmentType.getName());
 		}
 		parking.setVehicleEquipmentCategory(category);
+		parking.setOwnerFirstName(ownerFirstName);
+		parking.setOwnerMiddleName(text(parkingRequest.getOwnerMiddleName()));
+		parking.setOwnerLastName(ownerLastName);
+		parking.setOwnerCompanyName(text(parkingRequest.getOwnerCompanyName()));
+		parking.setOwnerIdType(text(parkingRequest.getOwnerIdType()));
+		parking.setOwnerIdNo(text(parkingRequest.getOwnerIdNo()));
+		parking.setOwnerPhoneNo(text(parkingRequest.getOwnerPhoneNo()));
+		parking.setOwnerEmail(text(parkingRequest.getOwnerEmail()));
+		parking.setOwnerAddress(text(parkingRequest.getOwnerAddress()));
+		parking.setAgentName(text(parkingRequest.getAgentName()));
+		parking.setAgentPhoneNo(text(parkingRequest.getAgentPhoneNo()));
+		parking.setAgentAddress(text(parkingRequest.getAgentAddress()));
+		parking.setAgentEmail(text(parkingRequest.getAgentEmail()));
+		// The vehicle keeps its owner too, so "Existing Vehicle" fills it in next time
+		VehicleEquipment vehicleEquipment = parking.getVehicleEquipment();
+		if(vehicleEquipment != null) {
+			vehicleEquipment.setOwnerFirstName(parking.getOwnerFirstName());
+			vehicleEquipment.setOwnerMiddleName(parking.getOwnerMiddleName());
+			vehicleEquipment.setOwnerLastName(parking.getOwnerLastName());
+			vehicleEquipment.setOwnerCompanyName(parking.getOwnerCompanyName());
+			vehicleEquipment.setOwnerIdType(parking.getOwnerIdType());
+			vehicleEquipment.setOwnerIdNo(parking.getOwnerIdNo());
+			vehicleEquipment.setOwnerPhoneNo(parking.getOwnerPhoneNo());
+			vehicleEquipment.setOwnerEmail(parking.getOwnerEmail());
+			vehicleEquipment.setOwnerAddress(parking.getOwnerAddress());
+			vehicleEquipment.setAgentName(parking.getAgentName());
+			vehicleEquipment.setAgentPhoneNo(parking.getAgentPhoneNo());
+			vehicleEquipment.setAgentAddress(parking.getAgentAddress());
+			vehicleEquipment.setAgentEmail(parking.getAgentEmail());
+			vehicleEquipmentRepository.save(vehicleEquipment);
+		}
 		parking.setDriverName(driverName);
 		parking.setDriverPhoneNo(text(parkingRequest.getDriverPhoneNo()));
 		parking.setDriverIdType(text(parkingRequest.getDriverIdType()));

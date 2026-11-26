@@ -55,7 +55,7 @@
                                 <tr *ngFor="let p of $any(parkings) | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalParkings }; trackBy: trackById">
                                     <td>{{p.sn}}</td>
                                     <td>{{p.no}}</td>
-                                    <td>{{p.ownerFirstName}} {{p.ownerLastName}}</td>
+                                    <td><span *ngIf="!ownerPending(p)">{{p.ownerFirstName}} {{p.ownerLastName}}</span></td>
                                     <td><b style="color: rgb(228, 85, 8);">{{p.chasisNo}}</b></td>
                                     <td><b class="text-primary">{{p.vehicleEquipmentTypeName}}</b></td>
                                     <td>{{p.ownerPhoneNo}}</td>
@@ -105,8 +105,8 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
             </div>
             <div class="modal-body">
-                <h6>Driver/Owner Information</h6><hr>
-                <div class="row">
+                <!-- The owner and agent are entered at registration -->
+                <div class="row" *ngIf="false">
                     <!-- <input type="hidden" [(ngModel)]="parkingId"> -->
                     <div class="col-lg-3">
                         <div class="form-group">
@@ -148,22 +148,22 @@
                     </div> 
                 </div>
 
-                <h6>Agent Information</h6><hr>
+                <h6>Transit Document</h6><hr>
                 <div class="row">
                     <input type="hidden" [(ngModel)]="parkingId">
-                    <div class="col-lg-6">
+                    <div class="col-lg-6" *ngIf="false">
                         <div class="form-group">
                             <label>Agent Name</label>
                             <input class="form-control" type="text" [(ngModel)]="agentName" autocomplete="nope">
                         </div>
                     </div>     
-                    <div class="col-lg-3">
+                    <div class="col-lg-3" *ngIf="false">
                         <div class="form-group">
                             <label>Agent Address</label>
                             <input class="form-control" type="text" [(ngModel)]="agentAddress" autocomplete="nope">
                         </div>
                     </div> 
-                    <div class="col-lg-3">
+                    <div class="col-lg-3" *ngIf="false">
                         <div class="form-group">
                             <label>Agent Phone</label>
                             <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo" autocomplete="nope">
@@ -520,10 +520,10 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <table class="table table-striped table-sm">
-                            <thead>
+                            <thead *ngIf="status !== 'PENDING'">
                                 <p><b>Driver/Owner Information</b></p>
                             </thead>
-                            <tbody>
+                            <tbody *ngIf="status !== 'PENDING'">
                                 <tr><td><b>First Name</b></td><td>{{ownerFirstName}}</td></tr>
                                 <tr><td><b>Last Name</b></td><td>{{ownerLastName}}</td></tr> 
                                 <tr><td><b>ID Type</b></td><td>{{ownerIdType}}</td></tr>
@@ -531,10 +531,10 @@
                                 <tr><td><b>Phone No</b></td><td>{{ownerPhoneNo}}</td></tr>   
                                 <tr><td><b>Email</b></td><td>{{ownerEmail}}</td></tr>    
                             </tbody>
-                            <thead>
+                            <thead *ngIf="status !== 'PENDING'">
                                 <p><b>Agent Information</b></p>
                             </thead>
-                            <tbody>
+                            <tbody *ngIf="status !== 'PENDING'">
                                 <tr><td><b>Name</b></td><td>{{agentName}}</td></tr>
                                 <tr><td><b>Phone No</b></td><td>{{agentPhoneNo}}</td></tr>
                                 <tr><td><b>Email</b></td><td>{{agentEmail}}</td></tr> 
@@ -770,6 +770,60 @@
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
             </div>
             <div class="modal-body">
+                <h6>Owner Details</h6><hr>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Owner First Name*</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerFirstName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Owner Last Name*</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerLastName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Owner ID Type</label>
+                            <select class="form-control" [(ngModel)]="ownerIdType">
+                                <option></option>
+                                <option>NATIONAL ID</option>
+                                <option>VOTER ID</option>
+                                <option>PASSPORT</option>
+                                <option>DRIVING LICENCE</option>
+                                <option>LETTER</option>
+                                <option>VISA</option>
+                                <option>NONE</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Owner ID No</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Owner Phone No</label>
+                            <input class="form-control" type="tel" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Agent Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="agentName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Agent Phone</label>
+                            <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo" autocomplete="nope">
+                        </div>
+                    </div>
+                </div>
                 <h6>Driver Details</h6><hr>
                 <div class="row">
                     <div class="col-lg-3">
@@ -872,10 +926,10 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <table class="table table-striped table-sm">
-                            <thead>
+                            <thead *ngIf="false">
                                 <p><b>Driver/Owner Information</b></p>
                             </thead>
-                            <tbody>
+                            <tbody *ngIf="false">
                                 <tr><td><b>First Name</b></td><td>{{ownerFirstName}}</td></tr>
                                 <!-- <tr><td><b>Middle Name</b></td><td>{{ownerMiddleName}}</td></tr> -->
                                 <tr><td><b>Last Name</b></td><td>{{ownerLastName}}</td></tr> 
@@ -884,10 +938,10 @@
                                 <tr><td><b>Phone No</b></td><td>{{ownerPhoneNo}}</td></tr>   
                                 <!-- <tr><td><b>Email</b></td><td>{{ownerEmail}}</td></tr>     -->
                             </tbody>
-                            <thead>
+                            <thead *ngIf="false">
                                 <p><b>Agent Information</b></p>
                             </thead>
-                            <tbody>
+                            <tbody *ngIf="false">
                                 <tr><td><b>Name</b></td><td>{{agentName}}</td></tr>
                                 <tr><td><b>Phone No</b></td><td>{{agentPhoneNo}}</td></tr>
                                 <tr><td><b>Email</b></td><td>{{agentEmail}}</td></tr> 

@@ -116,6 +116,27 @@ public class Parking {
 	@NotBlank
 	private String status = "PENDING";
 
+	/**
+	 * The owner's names are entered by the registrar, but the owner name columns are required (NOT NULL) and the
+	 * record is created at inspection. Until registration the owner is therefore "PENDING REGISTRATION".
+	 */
+	public static final String OWNER_PENDING_FIRST_NAME = "PENDING";
+	public static final String OWNER_PENDING_LAST_NAME = "REGISTRATION";
+
+	/** The given name, or the placeholder when it is empty */
+	public static String ownerFirstNameOrPending(String name) {
+		return name == null || name.trim().isEmpty() ? OWNER_PENDING_FIRST_NAME : name.trim();
+	}
+
+	public static String ownerLastNameOrPending(String name) {
+		return name == null || name.trim().isEmpty() ? OWNER_PENDING_LAST_NAME : name.trim();
+	}
+
+	/** Whether the owner is still the placeholder, waiting for the registrar */
+	public static boolean isOwnerPending(String firstName, String lastName) {
+		return OWNER_PENDING_FIRST_NAME.equals(firstName) && OWNER_PENDING_LAST_NAME.equals(lastName);
+	}
+
 	public static final String INSIDE = "INSIDE";
 	public static final String OUTSIDE = "OUTSIDE";
 

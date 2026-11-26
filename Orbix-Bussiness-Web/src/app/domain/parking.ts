@@ -112,3 +112,11 @@ export interface IServiceBillItem{
     payStatus : string
     amount : number
 }
+
+// The owner is entered by the registrar; until then the API keeps the placeholder "PENDING REGISTRATION"
+export const OWNER_PENDING_FIRST_NAME = 'PENDING'
+export const OWNER_PENDING_LAST_NAME = 'REGISTRATION'
+
+export function isOwnerPending(firstName : string | null | undefined, lastName : string | null | undefined) : boolean {
+    return firstName === OWNER_PENDING_FIRST_NAME && lastName === OWNER_PENDING_LAST_NAME
+}

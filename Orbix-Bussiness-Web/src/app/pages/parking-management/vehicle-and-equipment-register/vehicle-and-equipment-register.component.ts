@@ -8,7 +8,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { AuthService } from 'src/app/auth.service';
 import { IMaintenance } from 'src/app/domain/maintenance';
-import { IParking, IParkingInspection, IParkingSignature } from 'src/app/domain/parking';
+import { IParking, IParkingInspection, IParkingSignature, isOwnerPending } from 'src/app/domain/parking';
 import { SignaturePadComponent } from 'src/app/common/components/signature-pad/signature-pad.component';
 import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleEquipment } from 'src/app/domain/vehicle-equipment';
@@ -412,10 +412,11 @@ export class VehicleEquipmentRegisterComponent {
     }
 
 
-    if (this.ownerIdType != 'NONE' && this.ownerIdType === '') {
+    // For parking the owner is entered at registration
+    if (service !== 'PARKING' && this.ownerIdType != 'NONE' && this.ownerIdType === '') {
       this.msg.showErrorMessage3('ID No is required')
     }
-    if (this.ownerPhoneNo === '') {
+    if (service !== 'PARKING' && this.ownerPhoneNo === '') {
       this.msg.showErrorMessage3('Phone No is required')
     }
 
@@ -636,9 +637,11 @@ export class VehicleEquipmentRegisterComponent {
   showParkingData(data: IParking) {
     this.parkingId = data?.id;
     this.parkingNo = data!.no;
-    this.ownerFirstName = data?.ownerFirstName;
+    // The placeholder owner is shown as empty
+    const pending = isOwnerPending(data?.ownerFirstName, data?.ownerLastName)
+    this.ownerFirstName = pending ? '' : data?.ownerFirstName;
     this.ownerMiddleName = data?.ownerMiddleName;
-    this.ownerLastName = data?.ownerLastName;
+    this.ownerLastName = pending ? '' : data?.ownerLastName;
     this.ownerCompanyName = data?.ownerCompanyName;
     this.ownerIdNo = data?.ownerIdNo;
     this.ownerIdType = data?.ownerIdType;
@@ -720,7 +723,6 @@ export class VehicleEquipmentRegisterComponent {
 
   // What the inspection still lacks, or '' when it can be submitted
   inspectionProblem(): string {
-    if (!this.ownerFirstName?.trim() || !this.ownerLastName?.trim()) return 'Owner first and last name are required'
     if (!this.chasisNo?.trim()) return 'Chassis number is required'
     if (!this.vehicleEquipmentTypeName) return 'Vehicle type is required'
     if (!this.bodyCondition?.trim()) return 'Body condition is required'
@@ -777,6 +779,10 @@ export class VehicleEquipmentRegisterComponent {
     if (page < 1 || page > this.vehicleListPages()) return
     this.vehicleListPage = page
     this.loadVehicleList()
+  }
+
+  ownerPending(parking: IParking): boolean {
+    return isOwnerPending(parking.ownerFirstName, parking.ownerLastName)
   }
 
   // Opens an inspected vehicle in the form below, to view or edit its inspection
