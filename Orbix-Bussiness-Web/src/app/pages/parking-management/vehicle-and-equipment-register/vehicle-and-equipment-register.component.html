@@ -106,7 +106,8 @@
                     </div>
                 </div>
                 <!-- Start ofContent header for new vehicle -->
-                <div class="row" *ngIf="mode === 'new'">
+                <!-- New vehicle for maintenance; for parking, New Vehicle opens the whole inspection below in one step -->
+                <div class="row" *ngIf="mode === 'new' && currentService !== 'Parking'">
                     <div class="col-sm-12">
                         <p *ngIf="currentService !== 'Parking'"><b>Owner Information</b></p><br *ngIf="currentService !== 'Parking'">
                         <div class="row" *ngIf="currentService !== 'Parking'">
@@ -377,7 +378,7 @@
                 <!-- End of content header for existing vehicle -->
 
                 <!-- Start of main page content, to be displayed only if a vehicle is registered and a parking is selected -->
-                <div class="row" *ngIf="id != null">
+                <div class="row" *ngIf="id != null || (mode === 'new' && currentService === 'Parking')">
                     <div class="col-sm-12">
                         <hr>
                         <!-- Parking: the owner is entered by the registrar -->
@@ -900,6 +901,12 @@
                                         <label>Body Condition*</label>
                                         <textarea class="form-control" rows="3" [(ngModel)]="bodyCondition"
                                             placeholder="Scratches, dents, cracks and where they are" autocomplete="nope"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Comments</label>
+                                        <textarea class="form-control" rows="2" [(ngModel)]="comments" autocomplete="nope"></textarea>
                                     </div>
                                 </div>
                             </div>

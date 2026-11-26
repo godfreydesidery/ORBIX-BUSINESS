@@ -532,7 +532,8 @@ export class VehicleEquipmentRegisterComponent {
     this.agentEmail = data.agentEmail
     this.agentAddress = data.agentAddress
 
-    this.deviceStatus = data.deviceStatus
+    // The vehicle record gives '1' or '0'; the form uses ATTACHED / NOT-ATTACHED
+    this.deviceStatus = (data.deviceStatus as any) == '1' || (data.deviceStatus as any) === true ? 'ATTACHED' : 'NOT-ATTACHED'
     this.active = data.active
     this.companyId = data.companyId
     this.companyName = data.companyName

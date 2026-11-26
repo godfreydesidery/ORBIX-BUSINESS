@@ -447,8 +447,10 @@ public class ParkingServiceController implements ParkingService {
 			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
 		}
 		
-		Optional<VehicleEquipment> vehicleEquipment_ = vehicleEquipmentRepository.findById(parkingRequest.getVehicleEquipmentId());
-		if(vehicleEquipment_.isEmpty()) throw new NotFoundException("Vehicle and equipment not found");
+		// An existing vehicle (Existing Vehicle), or a new one registered with this inspection, in the same transaction
+		VehicleEquipment vehicleEquipment = parkingRequest.getVehicleEquipmentId() != null
+				? vehicleEquipmentRepository.findById(parkingRequest.getVehicleEquipmentId()).orElseThrow(() -> new NotFoundException("Vehicle and equipment not found"))
+				: vehicleForInspection(parkingRequest, vehicleEquipmentType_.get(), branch_.get(), request);
 		
 		// The parking zone and category are chosen at registration, not at inspection
 
@@ -503,7 +505,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setVehicleEquipmentName(vehicleEquipmentType_.get().getName()); // Look here later
 		parking.setVehicleEquipmentColor(parkingRequest.getVehicleEquipmentColor());
 		
-		parking.setVehicleEquipment(vehicleEquipment_.get());
+		parking.setVehicleEquipment(vehicleEquipment);
 
 		parking.setInteriorDetails(text(parkingRequest.getInteriorDetails()));
 		parking.setBodyCondition(text(parkingRequest.getBodyCondition()));
@@ -924,6 +926,37 @@ public class ParkingServiceController implements ParkingService {
 		if(parkingRepository.isSlotTaken(parkingZone, slotNo, moving == null ? -1L : moving.getId()))
 			throw new InvalidOperationException("Slot " + slotNo + " in Parking Zone " + parkingZone.getName() + " is taken, select another slot");
 		return parkingZone;
+	}
+
+	/**
+	 * The vehicle of a new inspection submitted in one step: one already registered with this chassis and still
+	 * waiting for its inspection, or else a new one. Its owner is the placeholder until registration.
+	 */
+	private VehicleEquipment vehicleForInspection(ParkingRequestDTO parkingRequest, VehicleEquipmentType vehicleEquipmentType, Branch branch, HttpServletRequest request) {
+		String chasisNo = required(parkingRequest.getChasisNo(), "Chassis number is required");
+		List<VehicleEquipment> waiting = vehicleEquipmentRepository.findAwaitingInspection(chasisNo, branch);
+		VehicleEquipment vehicleEquipment = waiting.isEmpty() ? new VehicleEquipment() : waiting.get(0);
+		if(vehicleEquipment.getId() == null) {
+			vehicleEquipment.setNo(String.valueOf(Math.random()));
+			vehicleEquipment.setOwnerFirstName(Parking.OWNER_PENDING_FIRST_NAME);
+			vehicleEquipment.setOwnerLastName(Parking.OWNER_PENDING_LAST_NAME);
+			vehicleEquipment.setActive(true);
+			vehicleEquipment.setBranch(branch);
+			vehicleEquipment.setCreatedByUser(userService.getUser(request));
+			vehicleEquipment.setCreatedDateTime(dayService.getTimeStamp());
+		}
+		vehicleEquipment.setChasisNo(chasisNo);
+		vehicleEquipment.setRegistrationNo(text(parkingRequest.getRegistrationNo()));
+		vehicleEquipment.setTformNumber(text(parkingRequest.getTformNumber()));
+		vehicleEquipment.setVehicleEquipmentColor(parkingRequest.getVehicleEquipmentColor());
+		vehicleEquipment.setVehicleEquipmentType(vehicleEquipmentType);
+		vehicleEquipment.setDeviceStatus(parkingRequest.isDeviceStatus());
+		vehicleEquipment = vehicleEquipmentRepository.save(vehicleEquipment);
+		if(vehicleEquipment.getNo() == null || !vehicleEquipment.getNo().startsWith("PKN/")) {
+			vehicleEquipment.setNo("PKN/" + vehicleEquipment.getId());
+			vehicleEquipment = vehicleEquipmentRepository.save(vehicleEquipment);
+		}
+		return vehicleEquipment;
 	}
 
 	/** Keeps a signature given at one step of the parking; signatures are never changed afterwards */

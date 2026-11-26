@@ -28,6 +28,11 @@ public interface VehicleEquipmentRepository extends JpaRepository<VehicleEquipme
 			+ " AND NOT EXISTS (SELECT p.id FROM Parking p WHERE p.vehicleEquipment = v)")
 	boolean existsAwaitingInspection(@Param("chasisNo") String chasisNo, @Param("branch") Branch branch);
 
+	/** Vehicles with this chassis in the branch that have never had a parking, newest first */
+	@Query("SELECT v FROM VehicleEquipment v WHERE v.chasisNo = :chasisNo AND v.branch = :branch"
+			+ " AND NOT EXISTS (SELECT p.id FROM Parking p WHERE p.vehicleEquipment = v) ORDER BY v.id DESC")
+	List<VehicleEquipment> findAwaitingInspection(@Param("chasisNo") String chasisNo, @Param("branch") Branch branch);
+
 	List<VehicleEquipment> findAllByBranchAndChasisNoContainingIgnoreCase(Branch userBranch, String chasisNoLike);
 
 }
