@@ -774,8 +774,8 @@ export class VehicleEquipmentRegisterComponent {
   vehicleListSize: number = 10
   vehicleListSearch: string = ''
   vehicleListTimer: any = null
-  // '' for every inspected vehicle (Vehicle List), PENDING for those awaiting registration
-  vehicleListStatus: string = ''
+  // REGISTERED for the vehicles awaiting check-in (Vehicle List), PENDING for those awaiting registration
+  vehicleListStatus: string = 'REGISTERED'
 
   setListMode(status: string) {
     this.clearParkingData()

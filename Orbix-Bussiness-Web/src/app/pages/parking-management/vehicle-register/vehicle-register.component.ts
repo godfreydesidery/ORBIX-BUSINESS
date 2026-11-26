@@ -309,10 +309,17 @@ export class VehicleRegisterComponent {
     await this.getAvailableZones()
   }
 
-  // Opens a registered vehicle for check-in: keys, card and the day billing starts (zone and slot come from registration)
+  // Opens a registered vehicle for check-in: keys, card and the day billing starts. The zone and slot come from
+  // registration; a vehicle registered without them (before they moved to registration) picks them here
   async openCheckIn(id : any){
     this.checkInSignature = null
+    this.availableZones = []
     await this.get(id)
+    this.checkInNeedsZone = !this.parkingZoneName
+    if(this.checkInNeedsZone){
+      this.parkingSlotNo = null
+      await this.getAvailableZones()
+    }
     this.hasKeys = 'YES'
     // Billing starts today unless another date is picked (the API takes a plain yyyy-MM-dd date)
     const today = new Date()
@@ -321,9 +328,13 @@ export class VehicleRegisterComponent {
 
   // What check-in still lacks, or '' when the vehicle can be checked in
   checkInProblem() : string {
-    if(!this.parkingZoneName) return 'The parking zone is missing: it is chosen at registration'
+    if(!this.parkingZoneName) return 'Select the parking zone'
+    if(this.checkInNeedsZone && this.slotOptions().length > 0 && !this.parkingSlotNo) return 'Select the parking slot'
     return ''
   }
+
+  // Whether the vehicle being checked in was registered without a zone, so Check In asks for it
+  checkInNeedsZone : boolean = false
 
   async getAvailableZones(){
     let options = {
@@ -775,7 +786,10 @@ export class VehicleRegisterComponent {
       cardNo : this.cardNo,
       hasKeys : this.hasKeys === 'YES' ? 1 : 0,
       startBillingAt : this.startBillingAt,
-      checkInSignature : this.checkInSignature
+      checkInSignature : this.checkInSignature,
+      // Only used for a vehicle registered without a zone
+      parkingZoneName : this.checkInNeedsZone ? this.parkingZoneName : null,
+      parkingSlotNo : this.checkInNeedsZone ? this.parkingSlotNo : null
     }
 
     await this.http.post<IParking>(API_URL+'/parkings/check_in', parking, options)

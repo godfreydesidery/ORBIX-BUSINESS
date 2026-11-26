@@ -1044,9 +1044,33 @@
                         <tr><td><b>Chassis No</b></td><td><b style="color: rgb(228, 85, 8);">{{chasisNo}}</b></td><td><b>Vehicle Type</b></td><td>{{vehicleEquipmentTypeName}}</td></tr>
                         <tr><td><b>Category</b></td><td>{{vehicleEquipmentCategory}}</td><td><b>Owner</b></td><td>{{ownerFirstName}} {{ownerLastName}}</td></tr>
                         <tr><td><b>Driver</b></td><td>{{driverName}}</td><td><b>Sub T1 Number</b></td><td>{{tformNumber}}</td></tr>
-                        <tr><td><b>Parking Zone</b></td><td colspan="3"><b>{{parkingZoneName}}</b><span *ngIf="parkingSlotNo"> · Slot {{parkingSlotNo}}</span></td></tr>
+                        <tr *ngIf="!checkInNeedsZone"><td><b>Parking Zone</b></td><td colspan="3"><b>{{parkingZoneName}}</b><span *ngIf="parkingSlotNo"> · Slot {{parkingSlotNo}}</span></td></tr>
                     </tbody>
                 </table>
+                <!-- Only for a vehicle registered without a zone (before zone and slot moved to registration) -->
+                <div class="row" *ngIf="checkInNeedsZone">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Parking Zone*</label>
+                            <select class="form-control" [(ngModel)]="parkingZoneName" (ngModelChange)="parkingSlotNo = null">
+                                <option></option>
+                                <option *ngFor="let zone of availableZones; trackBy: trackById" [value]="zone.name">{{ zoneLabel(zone) }}</option>
+                            </select>
+                            <small class="text-muted">This vehicle was registered without a parking zone, so choose it here.</small>
+                            <small class="text-danger d-block" *ngIf="availableZones.length === 0">No parking zone has space</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" *ngIf="parkingZoneName">
+                        <div class="form-group">
+                            <label>Parking Slot<span *ngIf="slotOptions().length > 0">*</span></label>
+                            <select class="form-control" [(ngModel)]="parkingSlotNo" *ngIf="slotOptions().length > 0">
+                                <option [ngValue]="null"></option>
+                                <option *ngFor="let slot of slotOptions()" [ngValue]="slot">Slot {{ slot }}</option>
+                            </select>
+                            <select class="form-control" disabled *ngIf="slotOptions().length === 0"><option>No slots set for this zone</option></select>
+                        </div>
+                    </div>
+                </div>
                 <div class="row">
                     <div class="col-lg-4">
                         <div class="form-group">

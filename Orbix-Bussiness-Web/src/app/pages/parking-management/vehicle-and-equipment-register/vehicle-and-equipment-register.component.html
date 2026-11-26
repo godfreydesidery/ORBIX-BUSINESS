@@ -50,21 +50,21 @@
                             (click)="setExistingMode()" (click)="getAllVehicleEquipmentChasisNos()">
                             <i class="fa fa-search"></i> Existing Vehicle</button>
                         <button type="button" class="btn btn-round-custom action-button" *ngIf="currentService === 'Parking'"
-                            [ngClass]="mode === 'list' && vehicleListStatus === '' ? 'btn-primary' : 'btn-outline-primary'" (click)="setListMode('')">
+                            [ngClass]="mode === 'list' && vehicleListStatus === 'REGISTERED' ? 'btn-primary' : 'btn-outline-primary'" (click)="setListMode('REGISTERED')">
                             <i class="fa fa-list-alt"></i> Vehicle List</button>
                         <button type="button" class="btn btn-round-custom action-button" *ngIf="currentService === 'Parking'"
                             [ngClass]="mode === 'list' && vehicleListStatus === 'PENDING' ? 'btn-warning' : 'btn-outline-warning'" (click)="setListMode('PENDING')">
                             <i class="fa fa-hourglass-half"></i> Awaiting Registration</button>
-                        <hr>
+                        <hr *ngIf="mode !== 'new'">
                     </div>
                 </div>
-                <!-- Vehicle List: inspected vehicles waiting for registration, which the inspector can still edit -->
+                <!-- Vehicle List: registered vehicles awaiting check-in; Awaiting Registration: inspected vehicles not yet registered. Both can still be edited -->
                 <div class="row" *ngIf="mode === 'list'">
                     <div class="col-sm-12">
                         <div class="vehicle-list-card">
                             <div class="row">
                                 <div class="col-sm-8">
-                                    <h6 *ngIf="vehicleListStatus === ''"><i class="fa fa-list-alt text-primary"></i> <b>Inspected vehicles</b></h6>
+                                    <h6 *ngIf="vehicleListStatus === 'REGISTERED'"><i class="fa fa-list-alt text-primary"></i> <b>Registered vehicles awaiting check-in</b></h6>
                                     <h6 *ngIf="vehicleListStatus === 'PENDING'"><i class="fa fa-hourglass-half text-warning"></i> <b>Inspected vehicles awaiting registration</b></h6>
                                     <small class="text-muted">Open a vehicle to view or edit its inspection. Once it is checked in, changes go through Modify on the Parking page.</small>
                                 </div>
@@ -103,7 +103,7 @@
                                             </td>
                                         </tr>
                                         <tr *ngIf="vehicleList.length === 0">
-                                            <td colspan="5" class="text-muted">{{ vehicleListStatus === 'PENDING' ? 'No inspected vehicles are waiting for registration.' : 'No inspected vehicles.' }}</td>
+                                            <td colspan="5" class="text-muted">{{ vehicleListStatus === 'PENDING' ? 'No inspected vehicles are waiting for registration.' : 'No registered vehicles are waiting for check-in.' }}</td>
                                         </tr>
                                     </tbody>
                                 </table>
@@ -391,7 +391,7 @@
                 <!-- Start of main page content, to be displayed only if a vehicle is registered and a parking is selected -->
                 <div class="row" *ngIf="id != null || (mode === 'new' && currentService === 'Parking')">
                     <div class="col-sm-12">
-                        <hr>
+                        <hr *ngIf="currentService !== 'Parking'">
                         <!-- Parking: the owner is entered by the registrar -->
                         <h6 *ngIf="currentService !== 'Parking'">Driver/Owner Information</h6>
                         <hr *ngIf="currentService !== 'Parking'">
