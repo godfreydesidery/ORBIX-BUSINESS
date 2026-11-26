@@ -102,6 +102,15 @@ saved as the placeholder **PENDING REGISTRATION** (first name `PENDING`, last na
   fills them in next time.
 - Modify refuses a blank or placeholder owner.
 
+## One-step inspection
+
+For parking, **New Vehicle** opens the whole inspection on one screen: Sub T1, the condition checklist, Device Status
+and Number of Devices, vehicle type / chassis / colour, interior details, body condition, comments and both
+signatures, then **Submit Inspection** once. There is no separate "Register Vehicle" step. The API registers the
+vehicle with the inspection in the same transaction (`/parkings/create` without a vehicle id), reusing a vehicle
+already registered with that chassis and still waiting for its inspection rather than duplicating it. Existing
+Vehicle still opens a known vehicle and inspects it.
+
 ## Found while building
 
 - "Register Parking" (`/vehicle_equipments/create` with service PARKING) used to create a PENDING parking straight
