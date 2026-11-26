@@ -121,6 +121,27 @@ Vehicle still opens a known vehicle and inspects it.
   before it can be registered.
 - The Parking page no longer has the All / List of Vehicles / Checked In buttons: one list, searched by chassis.
 
+## Check-in is a separate step (latest flow)
+
+The client separated check-in from registration, which adds one parking status, **REGISTERED** (awaiting
+check-in), between PENDING (awaiting registration) and CHECKED-IN.
+
+```
+Inspector   Vehicle Register › New Vehicle: one-screen inspection, signed     -> PENDING
+Inspector   Vehicle Register › Vehicle List (every inspected vehicle, with its status) and
+            Awaiting Registration (PENDING only); Open / Edit until check-in
+Registrar   Awaiting Registration › Register (opens on the Parking page): owner, agent, Sub T1, driver,
+            registrar signature                                                -> REGISTERED
+Reception   Parking (awaiting check-in + checked in; never awaiting registration) › Check In:
+            parking zone and slot, keys, card no, billing start date (no signature)  -> CHECKED-IN
+```
+
+- API: `POST /parkings/register` (PKNG-REGISTER) and `POST /parkings/check_in` (PKNG-REGISTER, only for REGISTERED).
+  The page list accepts `status` as a comma list of PENDING, REGISTERED, CHECKED-IN.
+- REGISTERED counts as active in the duplicate-chassis checks and Existing Vehicle. The inspection can still be edited
+  while REGISTERED. Reports that count CHECKED-IN vehicles do not count REGISTERED ones.
+- View shows 1. Inspection, 2. Registration, 3. Check-in, 4. Modifications.
+
 ## Found while building
 
 - "Register Parking" (`/vehicle_equipments/create` with service PARKING) used to create a PENDING parking straight
