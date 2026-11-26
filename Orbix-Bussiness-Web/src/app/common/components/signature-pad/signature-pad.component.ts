@@ -1,47 +1,64 @@
 import { CommonModule } from '@angular/common';
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, OnChanges, Output, SimpleChanges, ViewChild } from '@angular/core';
-import { FormsModule } from '@angular/forms';
 
 /**
- * A box to sign in with the mouse, a finger or a pen.
+ * A box to sign in with the mouse, a touchpad, a finger or a pen.
  *
  * The signature is kept deliberately tiny: it is cropped to the ink, fitted into OUTPUT_WIDTH × OUTPUT_HEIGHT and
- * reduced to pure black and white before it becomes a PNG, usually well under 1 KB. That is enough to show that
- * someone signed, not a faithful copy, which is all the yard needs and keeps the database small.
+ * reduced to pure black and white before it becomes a PNG (about 2 KB). That is enough to show that someone signed,
+ * not a faithful copy, which is all the yard needs and keeps the database small.
  *
  * [(signature)] is the PNG as a data URL, or null while nothing is signed.
- * With askName, [(signerName)] is the name typed beside it (for the driver, who is not a system user).
+ * Once signed, the box shows 'caption' (the signer's name) with the date and time under the signature; without a
+ * caption it shows 'pendingNote' instead (the driver's name, for one, is only added at registration).
  */
 @Component({
   selector: 'az-signature-pad',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule],
   template: `
-    <div class="signature-pad">
-      <label class="signature-label">{{ label }}<span *ngIf="required">*</span></label>
-      <input *ngIf="askName" class="form-control form-control-sm signature-name" type="text"
-        [placeholder]="namePlaceholder" [ngModel]="signerName" (ngModelChange)="signerNameChange.emit($event)"
-        autocomplete="nope">
-      <div class="signature-box" [class.signed]="signature">
+    <div class="signature-card" [class.signed]="signature">
+      <div class="signature-header">
+        <span class="signature-title"><i class="fa fa-pencil"></i> {{ label }}<span class="signature-required" *ngIf="required">*</span></span>
+        <span class="signature-badge" *ngIf="signature"><i class="fa fa-check-circle"></i> Signed</span>
+      </div>
+      <div class="signature-box">
         <canvas #canvas width="600" height="200"
           (pointerdown)="start($event)" (pointermove)="move($event)"
-          (pointerup)="end($event)" (pointerleave)="end($event)" (pointercancel)="end($event)"></canvas>
+          (pointerup)="end()" (pointerleave)="end()" (pointercancel)="end()"></canvas>
+        <div class="signature-line"><span>✕</span></div>
         <span class="signature-hint" *ngIf="!signature && !drawing">Sign here</span>
       </div>
-      <button type="button" class="btn btn-sm btn-outline-secondary signature-clear" (click)="clear()">
-        <i class="fa fa-eraser"></i> Clear
-      </button>
+      <div class="signature-footer">
+        <div class="signature-caption">
+          <ng-container *ngIf="signature && signedAt">
+            <span *ngIf="caption"><b>{{ caption }}</b> · {{ signedAt | date:'dd-MM-yyyy HH:mm' }}</span>
+            <span *ngIf="!caption" class="signature-pending">{{ pendingNote }} · {{ signedAt | date:'dd-MM-yyyy HH:mm' }}</span>
+          </ng-container>
+        </div>
+        <button type="button" class="btn btn-sm btn-outline-danger signature-clear" (click)="clear()" [disabled]="!signature && !drawing">
+          <i class="fa fa-eraser"></i> Clear
+        </button>
+      </div>
     </div>
   `,
   styles: [`
-    .signature-pad { margin-bottom: 10px; }
-    .signature-label { display: block; font-weight: 600; }
-    .signature-name { margin-bottom: 4px; }
-    .signature-box { position: relative; border: 1px dashed #999; border-radius: 4px; background: #fff; }
-    .signature-box.signed { border-style: solid; border-color: #28a745; }
-    .signature-box canvas { display: block; width: 100%; height: auto; aspect-ratio: 3 / 1; touch-action: none; cursor: crosshair; }
-    .signature-hint { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); color: #bbb; pointer-events: none; }
-    .signature-clear { margin-top: 4px; }
+    .signature-card { border: 1px solid #d6dbe1; border-radius: 8px; background: #fff; box-shadow: 0 1px 4px rgba(0,0,0,.06); margin-bottom: 12px; overflow: hidden; transition: border-color .2s; }
+    .signature-card.signed { border-color: #28a745; }
+    .signature-header { display: flex; justify-content: space-between; align-items: center; padding: 8px 12px; background: #f5f7fa; border-bottom: 1px solid #e3e7ec; }
+    .signature-title { font-weight: 600; color: #2c3e50; }
+    .signature-title .fa { color: #1f7a4d; margin-right: 4px; }
+    .signature-required { color: #dc3545; margin-left: 2px; }
+    .signature-badge { font-size: 12px; color: #28a745; font-weight: 600; }
+    .signature-box { position: relative; background: #fcfdfe; }
+    .signature-box canvas { position: relative; z-index: 1; display: block; width: 100%; height: auto; aspect-ratio: 3 / 1; touch-action: none; cursor: crosshair; background: transparent; }
+    .signature-line { position: absolute; left: 6%; right: 6%; bottom: 22%; border-bottom: 1px dashed #b8c2cc; pointer-events: none; }
+    .signature-line span { position: absolute; left: -4px; bottom: 2px; color: #b8c2cc; font-size: 13px; }
+    .signature-hint { position: absolute; left: 50%; top: 42%; transform: translate(-50%, -50%); color: #c3cad3; font-style: italic; pointer-events: none; }
+    .signature-footer { display: flex; justify-content: space-between; align-items: center; gap: 8px; padding: 6px 12px; border-top: 1px solid #eef1f4; min-height: 40px; }
+    .signature-caption { font-size: 12px; color: #4a5560; }
+    .signature-pending { color: #8a96a3; font-style: italic; }
+    .signature-clear { white-space: nowrap; }
   `]
 })
 export class SignaturePadComponent implements AfterViewInit, OnChanges {
@@ -51,18 +68,18 @@ export class SignaturePadComponent implements AfterViewInit, OnChanges {
 
   @Input() label: string = 'Signature'
   @Input() required: boolean = true
-  @Input() askName: boolean = false
-  @Input() namePlaceholder: string = 'Full name'
+  /** The signer's name, shown with the date and time once signed */
+  @Input() caption: string = ''
+  /** Shown instead of a name when the signer's name is not known yet */
+  @Input() pendingNote: string = ''
 
   @Input() signature: string | null = null
   @Output() signatureChange = new EventEmitter<string | null>()
 
-  @Input() signerName: string = ''
-  @Output() signerNameChange = new EventEmitter<string>()
-
   @ViewChild('canvas') canvasRef!: ElementRef<HTMLCanvasElement>
 
   drawing: boolean = false
+  signedAt: Date | null = null
   private inked: boolean = false
   private last: { x: number, y: number } | null = null
 
@@ -81,16 +98,17 @@ export class SignaturePadComponent implements AfterViewInit, OnChanges {
     return this.canvasRef.nativeElement.getContext('2d')!
   }
 
+  // A transparent canvas (the box behind it shows through); the export puts the ink on white
   private reset(): void {
     const canvas = this.canvasRef.nativeElement
     const ctx = this.context()
-    ctx.fillStyle = '#fff'
-    ctx.fillRect(0, 0, canvas.width, canvas.height)
+    ctx.clearRect(0, 0, canvas.width, canvas.height)
     ctx.strokeStyle = '#000'
     ctx.lineWidth = 4
     ctx.lineCap = 'round'
     ctx.lineJoin = 'round'
     this.inked = false
+    this.signedAt = null
   }
 
   // The pointer's position in the canvas's own pixels, whatever size the box is shown at
@@ -129,11 +147,13 @@ export class SignaturePadComponent implements AfterViewInit, OnChanges {
     this.inked = true
   }
 
-  end(event: PointerEvent): void {
+  end(): void {
     if (!this.drawing) return
     this.drawing = false
     this.last = null
-    this.signatureChange.emit(this.inked ? this.export() : null)
+    const signature = this.inked ? this.export() : null
+    this.signedAt = signature ? new Date() : null
+    this.signatureChange.emit(signature)
   }
 
   clear(): void {
@@ -146,11 +166,11 @@ export class SignaturePadComponent implements AfterViewInit, OnChanges {
     const canvas = this.canvasRef.nativeElement
     const source = this.context().getImageData(0, 0, canvas.width, canvas.height)
 
-    // The ink's bounding box
+    // The ink's bounding box (the canvas is transparent where nothing is drawn)
     let minX = canvas.width, minY = canvas.height, maxX = -1, maxY = -1
     for (let y = 0; y < canvas.height; y++) {
       for (let x = 0; x < canvas.width; x++) {
-        if (source.data[(y * canvas.width + x) * 4] < 128) {
+        if (source.data[(y * canvas.width + x) * 4 + 3] > 64) {
           if (x < minX) minX = x
           if (x > maxX) maxX = x
           if (y < minY) minY = y
@@ -177,7 +197,7 @@ export class SignaturePadComponent implements AfterViewInit, OnChanges {
     out.drawImage(canvas, minX, minY, width, height,
       Math.round((outWidth - drawWidth) / 2), Math.round((outHeight - drawHeight) / 2), drawWidth, drawHeight)
 
-    // Pure black and white: no greys from smoothing, so the PNG compresses to almost nothing
+    // Pure black and white: no greys from smoothing, so the PNG compresses well
     const pixels = out.getImageData(0, 0, outWidth, outHeight)
     for (let i = 0; i < pixels.data.length; i += 4) {
       const value = pixels.data[i] < 200 ? 0 : 255

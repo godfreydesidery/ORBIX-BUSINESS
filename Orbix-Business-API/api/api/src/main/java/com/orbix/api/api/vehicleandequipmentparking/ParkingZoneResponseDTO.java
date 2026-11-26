@@ -20,4 +20,6 @@ public class ParkingZoneResponseDTO {
 
 	/** Free spaces, in /parking_zones/get_all_branch_available only; empty for a zone without a limit (no of slots 0) */
 	String freeSlots;
+	/** The free slot numbers, in /parking_zones/get_all_branch_available only; empty for a zone without a limit */
+	java.util.List<Integer> freeSlotNos;
 }

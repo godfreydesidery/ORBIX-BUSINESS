@@ -16,6 +16,8 @@ import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 const API_URL = environment.apiUrl;
 
@@ -199,7 +201,8 @@ export class VehicleEquipmentRegisterComponent {
   deviceCount: number | null = null
   inspectorSignature: string | null = null
   driverSignature: string | null = null
-  driverSignerName: string = ''
+  // Shown under the inspector's signature once signed; the driver's name comes later, from the registrar
+  userName: string = localStorage.getItem('user-name') ?? ''
   // The signatures already given, shown when an inspection is opened again
   inspectionSignatures: IParkingSignature[] = []
 
@@ -694,7 +697,6 @@ export class VehicleEquipmentRegisterComponent {
     this.bodyCondition = data!.bodyCondition ?? ''
     this.inspectorSignature = null
     this.driverSignature = null
-    this.driverSignerName = ''
     this.deviceCount = data!.deviceCount ? Number(data!.deviceCount) : null
     this.getInspection(data!.id)
   }
@@ -725,10 +727,65 @@ export class VehicleEquipmentRegisterComponent {
     if (this.deviceStatus === 'ATTACHED' && !(this.deviceCount && this.deviceCount >= 1)) return 'Enter the number of tracking devices attached'
     if (this.isNewInspection()) {
       if (!this.inspectorSignature) return 'Inspector signature is required'
-      if (!this.driverSignerName?.trim()) return 'Driver name is required beside the driver signature'
       if (!this.driverSignature) return 'Driver signature is required'
     }
     return ''
+  }
+
+  vehicleList: IParking[] = []
+  vehicleListTotal: number = 0
+  vehicleListPage: number = 1
+  vehicleListSize: number = 10
+  vehicleListSearch: string = ''
+  vehicleListTimer: any = null
+
+  setListMode() {
+    this.clearParkingData()
+    this.clear()
+    this.mode = 'list'
+    this.vehicleListPage = 1
+    this.loadVehicleList()
+  }
+
+  async loadVehicleList() {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.get<IPage<IParking>>(API_URL + '/parkings/get_all_pending_or_checked_in_page?'
+        + pageParams(this.vehicleListPage, this.vehicleListSize, this.vehicleListSearch) + '&status=PENDING', options)
+      .toPromise()
+      .then(data => {
+        this.vehicleList = data?.content ?? []
+        this.vehicleListTotal = data?.totalElements ?? 0
+      })
+      .catch(error => this.msg.showErrorMessage(error, 'Error'))
+  }
+
+  searchVehicleList() {
+    clearTimeout(this.vehicleListTimer)
+    this.vehicleListTimer = setTimeout(() => {
+      this.vehicleListPage = 1
+      this.loadVehicleList()
+    }, 300)
+  }
+
+  vehicleListPages(): number {
+    return Math.max(1, Math.ceil(this.vehicleListTotal / this.vehicleListSize))
+  }
+
+  goToVehicleListPage(page: number) {
+    if (page < 1 || page > this.vehicleListPages()) return
+    this.vehicleListPage = page
+    this.loadVehicleList()
+  }
+
+  // Opens an inspected vehicle in the form below, to view or edit its inspection
+  async openFromVehicleList(parking: IParking) {
+    this.clearParkingData()
+    this.clear()
+    this.mode = ''
+    await this.getParking(parking.id)
+    this.id = parking.vehicleEquipmentId
   }
 
   // No parking yet: submitting creates it with its signatures
@@ -803,7 +860,6 @@ export class VehicleEquipmentRegisterComponent {
     this.deviceCount = null
     this.inspectorSignature = null
     this.driverSignature = null
-    this.driverSignerName = ''
     this.inspectionSignatures = []
   }
 
@@ -981,8 +1037,7 @@ export class VehicleEquipmentRegisterComponent {
       deviceCount: this.deviceStatus === 'ATTACHED' ? this.deviceCount : null,
       // Signatures are given once, when the inspection is first submitted
       inspectorSignature: this.isNewInspection() ? this.inspectorSignature : null,
-      driverSignature: this.isNewInspection() ? this.driverSignature : null,
-      driverSignerName: this.isNewInspection() ? this.driverSignerName : null
+      driverSignature: this.isNewInspection() ? this.driverSignature : null
     }
 
     const problem = this.inspectionProblem()

@@ -44,12 +44,67 @@
                 </div>
                 <div class="row" *ngIf="currentServiceSelected === true">
                     <div class="col-sm-12">
-                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="setNewMode()"
-                            style="margin: 3px;"><i class="fa fa-file"></i> New Vehicle</button>
-                        <button type="button" class="btn btn-outline-success btn-round-custom"
-                            (click)="setExistingMode()" (click)="getAllVehicleEquipmentChasisNos()"
-                            style="margin: 3px;"><i class="fa fa-file-text"></i> Existing Vehicle</button>
+                        <button type="button" class="btn btn-round-custom action-button" [ngClass]="mode === 'new' ? 'btn-success' : 'btn-outline-success'" (click)="setNewMode()">
+                            <i class="fa fa-plus-circle"></i> New Vehicle</button>
+                        <button type="button" class="btn btn-round-custom action-button" [ngClass]="mode === 'existing' ? 'btn-info' : 'btn-outline-info'"
+                            (click)="setExistingMode()" (click)="getAllVehicleEquipmentChasisNos()">
+                            <i class="fa fa-search"></i> Existing Vehicle</button>
+                        <button type="button" class="btn btn-round-custom action-button" *ngIf="currentService === 'Parking'"
+                            [ngClass]="mode === 'list' ? 'btn-primary' : 'btn-outline-primary'" (click)="setListMode()">
+                            <i class="fa fa-list-alt"></i> Vehicle List</button>
                         <hr>
+                    </div>
+                </div>
+                <!-- Vehicle List: inspected vehicles waiting for registration, which the inspector can still edit -->
+                <div class="row" *ngIf="mode === 'list'">
+                    <div class="col-sm-12">
+                        <div class="vehicle-list-card">
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <h6><i class="fa fa-list-alt text-primary"></i> <b>Inspected vehicles awaiting registration</b></h6>
+                                    <small class="text-muted">Open a vehicle to view or edit its inspection. Once it is checked in, changes go through Modify on the Parking page.</small>
+                                </div>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" [(ngModel)]="vehicleListSearch" (ngModelChange)="searchVehicleList()" placeholder="Search by chassis no...">
+                                </div>
+                            </div>
+                            <br>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Chassis No</th>
+                                            <th>Vehicle Type</th>
+                                            <th>Owner</th>
+                                            <th>Inspected</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let p of vehicleList; trackBy: trackById">
+                                            <td>{{ p.no }}</td>
+                                            <td><b style="color: rgb(228, 85, 8);">{{ p.chasisNo }}</b></td>
+                                            <td>{{ p.vehicleEquipmentTypeName }}</td>
+                                            <td>{{ p.ownerFirstName }} {{ p.ownerLastName }}</td>
+                                            <td><span class="badge badge-warning">AWAITING REGISTRATION</span></td>
+                                            <td class="text-right">
+                                                <button type="button" class="btn btn-sm btn-primary btn-round-custom text-nowrap" (click)="openFromVehicleList(p)">
+                                                    <i class="fa fa-folder-open"></i> {{ grant(['PKNG-INSPECT']) ? 'Open / Edit' : 'Open' }}</button>
+                                            </td>
+                                        </tr>
+                                        <tr *ngIf="vehicleList.length === 0">
+                                            <td colspan="6" class="text-muted">No inspected vehicles are waiting for registration.</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="text-right" *ngIf="vehicleListTotal > vehicleListSize">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="vehicleListPage <= 1" (click)="goToVehicleListPage(vehicleListPage - 1)"><i class="fa fa-chevron-left"></i></button>
+                                <span style="margin: 0 8px;">Page {{ vehicleListPage }} of {{ vehicleListPages() }}</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="vehicleListPage >= vehicleListPages()" (click)="goToVehicleListPage(vehicleListPage + 1)"><i class="fa fa-chevron-right"></i></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- Start ofContent header for new vehicle -->
@@ -856,11 +911,10 @@
                             <!-- New inspection: the inspector and the driver sign once, when it is submitted -->
                             <div class="row" *ngIf="isNewInspection()">
                                 <div class="col-lg-4">
-                                    <az-signature-pad label="Inspector Signature" [(signature)]="inspectorSignature"></az-signature-pad>
+                                    <az-signature-pad label="Inspector Signature" [caption]="userName" pendingNote="Your name is added when saved" [(signature)]="inspectorSignature"></az-signature-pad>
                                 </div>
                                 <div class="col-lg-4">
-                                    <az-signature-pad label="Driver Signature" [askName]="true" namePlaceholder="Driver's full name"
-                                        [(signerName)]="driverSignerName" [(signature)]="driverSignature"></az-signature-pad>
+                                    <az-signature-pad label="Driver Signature" pendingNote="Driver's name is added at registration" [(signature)]="driverSignature"></az-signature-pad>
                                 </div>
                             </div>
                             <!-- Inspection opened again: the signatures already given -->
@@ -868,7 +922,7 @@
                                 <div class="col-lg-4" *ngFor="let signature of inspectionSignatures">
                                     <label><b>{{ signature.role === 'INSPECTOR' ? 'Inspector' : 'Driver' }}</b></label>
                                     <div><img [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"></div>
-                                    <small>{{ signature.signerName }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
+                                    <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
                                 </div>
                                 <div class="col-sm-12 text-muted" *ngIf="inspectionSignatures.length === 0">
                                     No signatures: inspected before electronic signatures were introduced.

@@ -28,8 +28,10 @@ import lombok.ToString;
  * An electronic signature given at one step of a parking: the inspector and the driver at INSPECTION, the registrar
  * at REGISTRATION (which checks the vehicle in), and whoever modifies the record afterwards at MODIFICATION.
  *
- * Rows are only ever inserted, never updated or deleted, so earlier signatures always survive. The image is a tiny
- * black and white PNG (a few hundred bytes): enough to show that someone signed, not a faithful copy.
+ * Rows are never deleted and their images never change, so earlier signatures always survive. The one later write
+ * is the driver's name: the driver signs at inspection, and the name the registrar enters is put under that signature
+ * (and follows a correction made with Modify). The image is a tiny
+ * black and white PNG (about 2 KB): enough to show that someone signed, not a faithful copy.
  *
  * A MODIFICATION row also keeps what changed, because audit log entries are cleared after 90 days while this
  * history must last as long as the record.
@@ -79,7 +81,7 @@ public class ParkingSignature {
 	@EqualsAndHashCode.Exclude
 	private User user;
 
-	/** The user's name, or the name the driver typed */
+	/** The user's name, or the driver's name as entered by the registrar (empty until then) */
 	private String signerName;
 
 	/** PNG, at most SignatureImages.MAX_BYTES. Signatures are read only for one vehicle's details, never in lists. */

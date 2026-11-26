@@ -70,6 +70,10 @@ public class ParkingResponseDTO {
 
     String parkingZoneId;
     String parkingZoneName;
+    /** The slot within the zone; empty when the zone has no slots or none was recorded */
+    String parkingSlotNo;
+    /** The registered vehicle, so its inspection can be opened again */
+    String vehicleEquipmentId;
     
     String vehicleEquipmentName;
 	String vehicleEquipmentColor;

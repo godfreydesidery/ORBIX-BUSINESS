@@ -134,6 +134,9 @@ public class Parking {
 	private String billingType;
 	private double billingAmount;
 	
+	/** The slot within the parking zone, numbered 1 to the zone's no of slots; empty for zones without a limit and older records */
+	private Integer parkingSlotNo;
+
 	@ManyToOne(targetEntity = ParkingZone.class, fetch = FetchType.EAGER,  optional = true)
     @JoinColumn(name = "parking_zone_id", nullable = true , updatable = true)
     @OnDelete(action = OnDeleteAction.NO_ACTION)

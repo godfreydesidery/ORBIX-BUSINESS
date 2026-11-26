@@ -81,6 +81,8 @@ public class ParkingRequestDTO {
 
     Long parkingZoneId;
     String parkingZoneName;
+    /** The slot within the zone, 1 to its no of slots */
+    Integer parkingSlotNo;
 	
     Long vehicleEquipmentTypeId;	
     Long branchId;
@@ -112,8 +114,6 @@ public class ParkingRequestDTO {
     /**Signatures: base64 PNGs, optionally with their data: prefix*/
     String inspectorSignature;
     String driverSignature;
-    /** The name the driver typed beside the signature */
-    String driverSignerName;
     String registrarSignature;
     String modifierSignature;
 }

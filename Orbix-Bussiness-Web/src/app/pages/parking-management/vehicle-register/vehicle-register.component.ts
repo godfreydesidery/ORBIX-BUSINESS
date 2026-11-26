@@ -22,6 +22,9 @@ import { pageParams } from 'src/app/common/utils/page-params';
 
 const API_URL = environment.apiUrl;
 
+// An active zone with space, with its free slot numbers (none for a zone without a limit)
+type IAvailableZone = IParkingZone & { freeSlots : string, freeSlotNos : number[] | null }
+
 @Component({
   selector: 'az-vehicle-register',
   standalone: true,
@@ -148,10 +151,18 @@ export class VehicleRegisterComponent {
   driverIdNo : string = ''
 
   registrarSignature : string | null = null
+  // Shown under the registrar's or modifier's signature once signed
+  userName : string = localStorage.getItem('user-name') ?? ''
+
+  // The slot within the chosen zone
+  parkingSlotNo : number | null = null
+  // The zone and slot the vehicle had when Modify was opened
+  originalZoneName : string = ''
+  originalSlotNo : number | null = null
   modifierSignature : string | null = null
 
   // Active zones that still have space, for registration
-  availableZones : (IParkingZone & { freeSlots : string })[] = []
+  availableZones : IAvailableZone[] = []
 
 
   constructor(
@@ -287,6 +298,7 @@ export class VehicleRegisterComponent {
       this.vehicleEquipmentCategory = ''
     }
     this.parkingZoneName = ''
+    this.parkingSlotNo = null
     // Billing starts today unless the registrar picks another date (the API takes a plain yyyy-MM-dd date)
     const today = new Date()
     this.startBillingAt = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0')
@@ -297,14 +309,28 @@ export class VehicleRegisterComponent {
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
-    await this.http.get<(IParkingZone & { freeSlots : string })[]>(API_URL+'/parking_zones/get_all_branch_available', options)
+    await this.http.get<IAvailableZone[]>(API_URL+'/parking_zones/get_all_branch_available', options)
     .toPromise()
     .then(data => this.availableZones = data ?? [])
     .catch(error => console.log(error))
   }
 
-  zoneLabel(zone : IParkingZone & { freeSlots : string }) : string {
+  zoneLabel(zone : IAvailableZone) : string {
     return zone.freeSlots ? zone.name + ' (' + zone.freeSlots + ' free)' : zone.name
+  }
+
+  // The free slots of the chosen zone, for registration; none for a zone without a limit
+  slotOptions() : number[] {
+    return this.availableZones.find(zone => zone.name === this.parkingZoneName)?.freeSlotNos ?? []
+  }
+
+  // Modify: the free slots of the chosen zone, plus the vehicle's own slot while it stays in its zone
+  modifySlotOptions() : number[] {
+    const slots = [...(this.availableZones.find(zone => zone.name === this.parkingZoneName)?.freeSlotNos ?? [])]
+    if(this.parkingZoneName === this.originalZoneName && this.originalSlotNo && !slots.includes(this.originalSlotNo)){
+      slots.push(this.originalSlotNo)
+    }
+    return slots.sort((a, b) => a - b)
   }
 
   // What registration still lacks, or '' when the vehicle can be checked in
@@ -313,6 +339,7 @@ export class VehicleRegisterComponent {
     if(!this.vehicleEquipmentTypeName) return 'Vehicle type is required'
     if(this.vehicleEquipmentCategory !== 'IN-TRANSIT' && this.vehicleEquipmentCategory !== 'LOCAL') return 'Select the category'
     if(!this.parkingZoneName) return 'Select the parking zone'
+    if(this.slotOptions().length > 0 && !this.parkingSlotNo) return 'Select the parking slot'
     if(!this.registrarSignature) return 'Registrar signature is required'
     return ''
   }
@@ -326,11 +353,13 @@ export class VehicleRegisterComponent {
     return ''
   }
 
-  openModify(id : any){
+  async openModify(id : any){
     this.modifierSignature = null
     this.availableZones = []
-    this.get(id)
     this.getAvailableZones()
+    await this.get(id)
+    this.originalZoneName = this.parkingZoneName
+    this.originalSlotNo = this.parkingSlotNo
   }
 
   // Modify may keep the vehicle's zone, or move it to one that still has space
@@ -344,6 +373,8 @@ export class VehicleRegisterComponent {
 
   modifyProblem() : string {
     if(this.deviceStatus === 'ATTACHED' && this.deviceCount !== null && this.deviceCount < 1) return 'The number of devices must be at least 1'
+    const moved = this.parkingZoneName !== this.originalZoneName || this.parkingSlotNo !== this.originalSlotNo
+    if(moved && this.modifySlotOptions().length > 0 && !this.parkingSlotNo) return 'Select the parking slot'
     if(!this.modifierSignature) return 'Your signature is required to modify'
     return ''
   }
@@ -603,7 +634,8 @@ export class VehicleRegisterComponent {
       driverIdType : this.driverIdType,
       driverIdNo : this.driverIdNo,
 
-      modifierSignature : this.modifierSignature
+      modifierSignature : this.modifierSignature,
+      parkingSlotNo : this.parkingSlotNo
     }
 
     console.log(parking)
@@ -686,7 +718,8 @@ export class VehicleRegisterComponent {
       driverIdType : this.driverIdType,
       driverIdNo : this.driverIdNo,
 
-      registrarSignature : this.registrarSignature
+      registrarSignature : this.registrarSignature,
+      parkingSlotNo : this.parkingSlotNo
     }
 
     await this.http.post<IParking>(API_URL+'/parkings/check_in', parking, options)
@@ -843,6 +876,7 @@ export class VehicleRegisterComponent {
 
     this.status = data!.status
     this.deviceCount = data!.deviceCount ? Number(data!.deviceCount) : null
+    this.parkingSlotNo = data!.parkingSlotNo ? Number(data!.parkingSlotNo) : null
     this.interiorDetails = data!.interiorDetails ?? ''
     this.bodyCondition = data!.bodyCondition ?? ''
     this.driverName = data!.driverName ?? ''

@@ -428,7 +428,6 @@ public class ParkingServiceController implements ParkingService {
 		required(parkingRequest.getOwnerFirstName(), "Owner first name is required");
 		required(parkingRequest.getOwnerLastName(), "Owner last name is required");
 		required(parkingRequest.getBodyCondition(), "Body condition is required");
-		String driverSignerName = required(parkingRequest.getDriverSignerName(), "Driver name is required beside the driver signature");
 		byte[] inspectorSignature = SignatureImages.decode(parkingRequest.getInspectorSignature(), "Inspector");
 		byte[] driverSignature = SignatureImages.decode(parkingRequest.getDriverSignature(), "Driver");
 		Integer deviceCount = deviceCount(parkingRequest, true);
@@ -509,8 +508,6 @@ public class ParkingServiceController implements ParkingService {
 
 		parking.setInteriorDetails(text(parkingRequest.getInteriorDetails()));
 		parking.setBodyCondition(text(parkingRequest.getBodyCondition()));
-		// The registrar completes the driver's details; the name is already known from the driver's signature
-		parking.setDriverName(driverSignerName);
 
 		parking.setBranch(branch_.get());
 
@@ -525,7 +522,8 @@ public class ParkingServiceController implements ParkingService {
 		parking = parkingRepository.save(parking);
 
 		sign(parking, ParkingSignature.INSPECTION, ParkingSignature.INSPECTOR, user, nameOf(user), inspectorSignature, null);
-		sign(parking, ParkingSignature.INSPECTION, ParkingSignature.DRIVER, null, driverSignerName, driverSignature, null);
+		// The driver's name is put under this signature when the registrar enters the driver's details
+		sign(parking, ParkingSignature.INSPECTION, ParkingSignature.DRIVER, null, null, driverSignature, null);
 		
 		
 		//parking.setParkingStatus(parkingRequest.getParkingStatus() != null ? parkingRequest.getParkingStatus() : "PENDING");
@@ -665,10 +663,12 @@ public class ParkingServiceController implements ParkingService {
 
 		byte[] modifierSignature = SignatureImages.decode(parkingRequest.getModifierSignature(), "Your");
 
-		// Moving the vehicle to another zone takes a space there, so that zone must have one
+		// Moving the vehicle to another zone or slot takes a space there, so it must be free
 		ParkingZone currentZone = parking_.get().getParkingZone();
-		if(currentZone == null || !Objects.equals(currentZone.getId(), parkingZone_.get().getId())) {
-			zoneWithSpace(parkingZone_.get());
+		Integer slotNo = parkingZone_.get().getNoOfSlots() > 0 ? parkingRequest.getParkingSlotNo() : null;
+		boolean zoneChanged = currentZone == null || !Objects.equals(currentZone.getId(), parkingZone_.get().getId());
+		if(zoneChanged || !Objects.equals(parking_.get().getParkingSlotNo(), slotNo)) {
+			zoneWithSpace(parkingZone_.get(), slotNo, parking_.get());
 		}
 
 		Parking parking = parking_.get();
@@ -732,9 +732,10 @@ public class ParkingServiceController implements ParkingService {
 		
 		
 		parking.setParkingZone(parkingZone_.get());
-		
+		parking.setParkingSlotNo(slotNo);
+
 		parking.setBillingType(parkingRequest.getBillingType());
-		
+
 		parking.setBillingAmount(parking.getVehicleEquipmentType().getDailyPrice());
 
 		parking.setInteriorDetails(text(parkingRequest.getInteriorDetails()));
@@ -749,6 +750,7 @@ public class ParkingServiceController implements ParkingService {
 
 		User user = userService.getUser(request);
 		String changes = changes(before, snapshot(parking));
+		if(parking.getDriverName() != null) parkingSignatureRepository.nameDriver(parking, parking.getDriverName());
 		sign(parking, ParkingSignature.MODIFICATION, ParkingSignature.MODIFIER, user, nameOf(user), modifierSignature, changes.isEmpty() ? "No changes" : changes);
 
 		return parkingResponseDTOMapper(parking);
@@ -803,6 +805,8 @@ public class ParkingServiceController implements ParkingService {
 		parkingResponse.setHasKeys(parking.isHasKeys() ? "1" : "0");
 		parkingResponse.setDeviceStatus(parking.isDeviceStatus() ? "1" : "0");
 		parkingResponse.setDeviceCount(parking.getDeviceCount() == null ? "" : String.valueOf(parking.getDeviceCount()));
+		parkingResponse.setParkingSlotNo(parking.getParkingSlotNo() == null ? "" : String.valueOf(parking.getParkingSlotNo()));
+		parkingResponse.setVehicleEquipmentId(parking.getVehicleEquipment() == null ? "" : String.valueOf(parking.getVehicleEquipment().getId()));
 		parkingResponse.setVehicleEquipmentCategory(parking.getVehicleEquipmentCategory());
 		parkingResponse.setVehicleEquipmentName(parking.getVehicleEquipmentName());
 		parkingResponse.setVehicleEquipmentColor(parking.getVehicleEquipmentColor());
@@ -900,14 +904,22 @@ public class ParkingServiceController implements ParkingService {
 	}
 
 	/**
-	 * The zone, locked until the transaction ends so two vehicles cannot both take its last space, once it is known
-	 * to be active and to have a free space. No of slots 0 means no limit.
+	 * The zone, locked until the transaction ends so two vehicles cannot both take its last space or the same slot,
+	 * once it is known to be active and to have room: a free space and, in a zone with slots, the chosen slot free.
+	 * No of slots 0 means no limit and no slots. 'moving' is a checked-in vehicle changing zone or slot (Modify),
+	 * which already counts towards the zone it is in and may keep its own slot.
 	 */
-	private ParkingZone zoneWithSpace(ParkingZone zone) {
+	private ParkingZone zoneWithSpace(ParkingZone zone, Integer slotNo, Parking moving) {
 		ParkingZone parkingZone = parkingZoneRepository.findByIdForUpdate(zone.getId()).orElseThrow(() -> new NotFoundException("Parking Zone not found"));
 		if(!parkingZone.isActive()) throw new InvalidOperationException("Parking Zone " + parkingZone.getName() + " is not active");
-		if(parkingZone.getNoOfSlots() > 0 && parkingRepository.countByParkingZoneAndStatus(parkingZone, "CHECKED-IN") >= parkingZone.getNoOfSlots())
+		if(parkingZone.getNoOfSlots() <= 0) return parkingZone;
+		boolean alreadyInZone = moving != null && moving.getParkingZone() != null && Objects.equals(moving.getParkingZone().getId(), parkingZone.getId());
+		if(!alreadyInZone && parkingRepository.countByParkingZoneAndStatus(parkingZone, "CHECKED-IN") >= parkingZone.getNoOfSlots())
 			throw new InvalidOperationException("Parking Zone " + parkingZone.getName() + " is full, select another zone");
+		if(slotNo == null || slotNo < 1 || slotNo > parkingZone.getNoOfSlots())
+			throw new InvalidEntryException("Select a slot in Parking Zone " + parkingZone.getName() + " (1 to " + parkingZone.getNoOfSlots() + ")");
+		if(parkingRepository.isSlotTaken(parkingZone, slotNo, moving == null ? -1L : moving.getId()))
+			throw new InvalidOperationException("Slot " + slotNo + " in Parking Zone " + parkingZone.getName() + " is taken, select another slot");
 		return parkingZone;
 	}
 
@@ -961,6 +973,7 @@ public class ParkingServiceController implements ParkingService {
 		values.put("Category", parking.getVehicleEquipmentCategory());
 		values.put("Colour", parking.getVehicleEquipmentColor());
 		values.put("Parking zone", parking.getParkingZone() == null ? null : parking.getParkingZone().getName());
+		values.put("Parking slot", parking.getParkingSlotNo() == null ? null : String.valueOf(parking.getParkingSlotNo()));
 		values.put("Billing starts", parking.getStartBillingAt() == null ? null : parking.getStartBillingAt().toLocalDate().toString());
 		values.put("Left front lamp", yesNo(parking.isLeftFrontLamp()));
 		values.put("Right front lamp", yesNo(parking.isRightFrontLamp()));
@@ -1041,7 +1054,7 @@ public class ParkingServiceController implements ParkingService {
 
 		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), parking_.get().getBranch());
 		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
-		ParkingZone parkingZone = zoneWithSpace(parkingZone_.get());
+		ParkingZone parkingZone = zoneWithSpace(parkingZone_.get(), parkingRequest.getParkingSlotNo(), null);
 
 		// The registrar confirms the vehicle type, and may correct it; the daily price follows the final type
 		if(text(parkingRequest.getVehicleEquipmentTypeName()) != null) {
@@ -1060,6 +1073,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setBillingAmount(parking.getVehicleEquipmentType().getDailyPrice());
 
 		parking.setParkingZone(parkingZone);
+		parking.setParkingSlotNo(parkingZone.getNoOfSlots() > 0 ? parkingRequest.getParkingSlotNo() : null);
 		parking.setStatus("CHECKED-IN");
 		parking.setCardNo(parkingRequest.getCardNo());
 		parking.setHasKeys(parkingRequest.isHasKeys());
@@ -1079,6 +1093,7 @@ public class ParkingServiceController implements ParkingService {
 		parking = parkingRepository.save(parking);
 
 		sign(parking, ParkingSignature.REGISTRATION, ParkingSignature.REGISTRAR, user, nameOf(user), registrarSignature, null);
+		parkingSignatureRepository.nameDriver(parking, driverName);
 		
 //		//generate bill, for day 1 depending on billing type
 //		

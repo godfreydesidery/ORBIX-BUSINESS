@@ -74,6 +74,8 @@ export interface IParking {
 
 
     parkingZoneName : string
+    parkingSlotNo : string // the slot within the zone; '' when the zone has no slots
+    vehicleEquipmentId : any // the registered vehicle, to open its inspection again
 
     cardNo : string
 

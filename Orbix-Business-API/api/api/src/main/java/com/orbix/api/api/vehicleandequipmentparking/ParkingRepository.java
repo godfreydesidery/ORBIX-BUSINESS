@@ -31,6 +31,14 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
 
 	long countByParkingZoneAndStatus(ParkingZone parkingZone, String status);
 
+	/** Slots taken by checked-in vehicles, as [zone id, slot no] */
+	@Query("SELECT p.parkingZone.id, p.parkingSlotNo FROM Parking p WHERE p.status = 'CHECKED-IN' AND p.parkingZone IN :zones AND p.parkingSlotNo IS NOT NULL")
+	List<Object[]> getTakenSlots(@Param("zones") List<ParkingZone> zones);
+
+	/** Whether another checked-in vehicle holds this slot (excluding the given parking, which may already hold it) */
+	@Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END FROM Parking p WHERE p.status = 'CHECKED-IN' AND p.parkingZone = :zone AND p.parkingSlotNo = :slotNo AND p.id <> :excludeId")
+	boolean isSlotTaken(@Param("zone") ParkingZone zone, @Param("slotNo") Integer slotNo, @Param("excludeId") Long excludeId);
+
 	List<Parking> findAllByVehicleEquipmentAndStatusIn(VehicleEquipment vehicleEquipment, List<String> statuses);
 
 	@Query("SELECT p.id FROM Parking p WHERE p.vehicleEquipment = :vehicleEquipment AND p.status IN :statuses ORDER BY p.id")

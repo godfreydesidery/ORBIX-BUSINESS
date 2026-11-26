@@ -21,13 +21,13 @@
                 <div class="row">
                     <div class="col-sm-8">
                         <div class="btn-group" role="group">
-                            <button type="button" class="btn btn-sm" [ngClass]="statusFilter === '' ? 'btn-primary' : 'btn-outline-primary'" (click)="setStatusFilter('')">All</button>
-                            <button type="button" class="btn btn-sm" [ngClass]="statusFilter === 'PENDING' ? 'btn-warning' : 'btn-outline-warning'" (click)="setStatusFilter('PENDING')">Awaiting Registration</button>
-                            <button type="button" class="btn btn-sm" [ngClass]="statusFilter === 'CHECKED-IN' ? 'btn-success' : 'btn-outline-success'" (click)="setStatusFilter('CHECKED-IN')">Checked In</button>
+                            <button type="button" class="btn tab-button" [ngClass]="statusFilter === '' ? 'btn-primary' : 'btn-outline-primary'" (click)="setStatusFilter('')"><i class="fa fa-th-list"></i> All</button>
+                            <button type="button" class="btn tab-button" [ngClass]="statusFilter === 'PENDING' ? 'btn-warning' : 'btn-outline-warning'" (click)="setStatusFilter('PENDING')"><i class="fa fa-list-alt"></i> List of Vehicles (Awaiting Registration)</button>
+                            <button type="button" class="btn tab-button" [ngClass]="statusFilter === 'CHECKED-IN' ? 'btn-success' : 'btn-outline-success'" (click)="setStatusFilter('CHECKED-IN')"><i class="fa fa-check-circle"></i> Checked In</button>
                         </div>
                     </div>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchList()" placeholder="Search..." style="max-width: 8cm;">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchList()" placeholder="Search by chassis no..." style="max-width: 8cm;">
                     </div>
                 </div>
 
@@ -489,7 +489,7 @@
                         <label>Signatures</label>
                         <div *ngFor="let signature of signaturesOf('INSPECTION')" style="margin-bottom: 6px;">
                             <img [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"><br>
-                            <small><b>{{ roleLabel(signature.role) }}:</b> {{ signature.signerName }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
+                            <small><b>{{ roleLabel(signature.role) }}:</b> {{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
                         </div>
                         <div class="text-muted" *ngIf="inspectionLoaded && signaturesOf('INSPECTION').length === 0">No signature (inspected before electronic signatures)</div>
                         <small class="text-muted">Editing does not need new signatures.</small>
@@ -559,7 +559,7 @@
                                 <tr><td><b>Chassis No</b></td><td style="color: red;"><b>{{chasisNo}}</b></td></tr>
                                 <tr><td><b>Billing Type</b></td><td>{{billingType}}</td></tr>
                                 <tr><td><b>Billing Start Date</b></td><td style="color: red;"><b>{{startBillingAt}}</b></td></tr> 
-                                <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}</td></tr>   
+                                <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}<span *ngIf="parkingSlotNo"> · Slot {{parkingSlotNo}}</span></td></tr>   
                                 <tr><td><b>Parking No</b></td><td>{{parkingNo}}</td></tr>   
                                 <tr><td><b>Vhc/Eq Category</b></td><td>{{vehicleEquipmentCategory}}</td></tr>
                                 <tr><td><b>Keys</b></td><td>{{hasKeys}}</td></tr>
@@ -611,7 +611,7 @@
                     <div class="col-lg-4" *ngFor="let signature of signaturesOf('INSPECTION')">
                         <label><b>{{ roleLabel(signature.role) }}</b></label>
                         <div><img [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"></div>
-                        <small>{{ signature.signerName }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
+                        <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
                     </div>
                     <div class="col-lg-8 text-muted" *ngIf="inspectionLoaded && signaturesOf('INSPECTION').length === 0">No signature: inspected before electronic signatures were introduced.</div>
 
@@ -623,14 +623,14 @@
                                 <tr><td><b>Driver Phone</b></td><td>{{driverPhoneNo}}</td></tr>
                                 <tr><td><b>Driver ID</b></td><td>{{driverIdType}} {{driverIdNo}}</td></tr>
                                 <tr><td><b>Category</b></td><td>{{vehicleEquipmentCategory}}</td></tr>
-                                <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}</td></tr>
+                                <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}<span *ngIf="parkingSlotNo"> · Slot {{parkingSlotNo}}</span></td></tr>
                             </tbody>
                         </table>
                     </div>
                     <div class="col-lg-4" *ngFor="let signature of signaturesOf('REGISTRATION')">
                         <label><b>{{ roleLabel(signature.role) }}</b></label>
                         <div><img [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"></div>
-                        <small>{{ signature.signerName }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
+                        <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
                     </div>
                     <div class="col-lg-8 text-muted" *ngIf="inspectionLoaded && status === 'CHECKED-IN' && signaturesOf('REGISTRATION').length === 0">No signature: checked in before electronic signatures were introduced.</div>
                     <div class="col-lg-8 text-muted" *ngIf="status === 'PENDING'">Waiting for registration.</div>
@@ -643,7 +643,7 @@
                                     <tr>
                                         <td style="width: 220px;">
                                             <img [src]="signature.image" alt="Signature" style="max-width: 200px;"><br>
-                                            <small>{{ signature.signerName }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
+                                            <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
                                         </td>
                                         <td style="white-space: pre-wrap;">{{ signature.changes }}</td>
                                     </tr>
@@ -829,11 +829,20 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Parking Zone*</label>
-                            <select class="form-control" [(ngModel)]="parkingZoneName">
+                            <select class="form-control" [(ngModel)]="parkingZoneName" (ngModelChange)="parkingSlotNo = null">
                                 <option></option>
                                 <option *ngFor="let zone of availableZones; trackBy: trackById" [value]="zone.name">{{ zoneLabel(zone) }}</option>
                             </select>
                             <small class="text-danger" *ngIf="availableZones.length === 0">No parking zone has space</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-3" *ngIf="slotOptions().length > 0">
+                        <div class="form-group">
+                            <label>Parking Slot*</label>
+                            <select class="form-control" [(ngModel)]="parkingSlotNo">
+                                <option [ngValue]="null"></option>
+                                <option *ngFor="let slot of slotOptions()" [ngValue]="slot">Slot {{ slot }}</option>
+                            </select>
                         </div>
                     </div>
                     <div class="col-lg-3">
@@ -902,7 +911,7 @@
                                 <tr><td><b>Color</b></td><td>{{vehicleEquipmentColor}}</td></tr>
                                 <tr><td><b>Billing Type</b></td><td>{{billingType}}</td></tr>
                                 <tr><td><b>Billing Amount</b></td><td style="text-align: right;">{{billingAmount}}</td></tr> 
-                                <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}</td></tr>   
+                                <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}<span *ngIf="parkingSlotNo"> · Slot {{parkingSlotNo}}</span></td></tr>   
                                 <tr><td><b>Parking No</b></td><td>{{parkingNo}}</td></tr>   
                                 <tr><td><b>Vhc/Eq Category</b></td><td>{{vehicleEquipmentCategory}}</td></tr>   
                                 <tr><td><b>Keys</b></td><td>{{hasKeys}}</td></tr>  
@@ -951,14 +960,14 @@
                     <div class="col-lg-4" *ngFor="let signature of signaturesOf('INSPECTION')">
                         <label><b>{{ roleLabel(signature.role) }}</b></label>
                         <div><img [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"></div>
-                        <small>{{ signature.signerName }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
+                        <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
                     </div>
                     <div class="col-lg-8 text-muted" *ngIf="inspectionLoaded && signaturesOf('INSPECTION').length === 0">No signature: inspected before electronic signatures were introduced.</div>
                 </div>
                 <hr>
                 <div class="row">
                     <div class="col-lg-4">
-                        <az-signature-pad label="Registrar Signature" [(signature)]="registrarSignature"></az-signature-pad>
+                        <az-signature-pad label="Registrar Signature" [caption]="userName" pendingNote="Your name is added when saved" [(signature)]="registrarSignature"></az-signature-pad>
                         <small class="text-muted">Review the vehicle and driver details above before signing.</small>
                     </div>
                 </div>
@@ -1381,9 +1390,18 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Parking Zone</label>
-                            <select class="form-control" [(ngModel)]="parkingZoneName">
+                            <select class="form-control" [(ngModel)]="parkingZoneName" (ngModelChange)="parkingSlotNo = $event === originalZoneName ? originalSlotNo : null">
                                 <option></option>
                                 <option *ngFor="let option of modifyZoneOptions()" [value]="option.name">{{ option.label }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3" *ngIf="modifySlotOptions().length > 0">
+                        <div class="form-group">
+                            <label>Parking Slot</label>
+                            <select class="form-control" [(ngModel)]="parkingSlotNo">
+                                <option [ngValue]="null"></option>
+                                <option *ngFor="let slot of modifySlotOptions()" [ngValue]="slot">Slot {{ slot }}{{ slot === originalSlotNo && parkingZoneName === originalZoneName ? ' (current)' : '' }}</option>
                             </select>
                         </div>
                     </div> 
@@ -1500,7 +1518,7 @@
                 <hr>
                 <div class="row">
                     <div class="col-lg-4">
-                        <az-signature-pad label="Your Signature" [(signature)]="modifierSignature"></az-signature-pad>
+                        <az-signature-pad label="Your Signature" [caption]="userName" pendingNote="Your name is added when saved" [(signature)]="modifierSignature"></az-signature-pad>
                         <small class="text-muted">Your name, signature, the time and what you changed are kept with the record.</small>
                     </div>
                 </div>
