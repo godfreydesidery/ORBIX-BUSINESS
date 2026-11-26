@@ -111,6 +111,16 @@ vehicle with the inspection in the same transaction (`/parkings/create` without 
 already registered with that chassis and still waiting for its inspection rather than duplicating it. Existing
 Vehicle still opens a known vehicle and inspects it.
 
+## Who enters what (latest)
+
+- **Inspection:** vehicle type, **category** (In-transit / Local), chassis, colour, the condition checklist, device
+  status and number of devices, interior details, body condition, comments, inspector and driver signatures.
+- **Registration (Open):** owner and agent details, **Sub T1 number**, driver details, parking zone and slot, keys,
+  card no, billing start date, registrar signature. Vehicle type and category are shown read-only there.
+- A vehicle inspected before category moved to the inspection must have its inspection edited (category chosen)
+  before it can be registered.
+- The Parking page no longer has the All / List of Vehicles / Checked In buttons: one list, searched by chassis.
+
 ## Found while building
 
 - "Register Parking" (`/vehicle_equipments/create` with service PARKING) used to create a PENDING parking straight
