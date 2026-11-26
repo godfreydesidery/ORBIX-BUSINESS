@@ -8,13 +8,16 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { AuthService } from 'src/app/auth.service';
 import { IMaintenance } from 'src/app/domain/maintenance';
-import { IParking } from 'src/app/domain/parking';
+import { IParking, IParkingInspection, IParkingSignature, isOwnerPending } from 'src/app/domain/parking';
+import { SignaturePadComponent } from 'src/app/common/components/signature-pad/signature-pad.component';
 import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleEquipment } from 'src/app/domain/vehicle-equipment';
 import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
 import { Byte } from 'src/custom-packages/util';
 import { environment } from 'src/environments/environment';
 import { trackById } from 'src/app/common/utils/track-by-id';
+import { IPage } from 'src/app/domain/page';
+import { pageParams } from 'src/app/common/utils/page-params';
 
 const API_URL = environment.apiUrl;
 
@@ -24,7 +27,8 @@ const API_URL = environment.apiUrl;
   imports: [
     CommonModule,
     FormsModule,
-    NgSelectModule
+    NgSelectModule,
+    SignaturePadComponent
   ],
   templateUrl: './vehicle-and-equipment-register.component.html',
   styleUrl: './vehicle-and-equipment-register.component.scss'
@@ -188,6 +192,19 @@ export class VehicleEquipmentRegisterComponent {
   parkingZoneName: string = ''
 
   hasKeys: string = 'YES'
+
+  // Inspection: the parking exists only once the signed inspection is submitted
+  parkingStatus: string = ''
+  interiorDetails: string = ''
+  bodyCondition: string = ''
+  // How many tracking devices are attached, when Device Status is ATTACHED
+  deviceCount: number | null = null
+  inspectorSignature: string | null = null
+  driverSignature: string | null = null
+  // Shown under the inspector's signature once signed; the driver's name comes later, from the registrar
+  userName: string = localStorage.getItem('user-name') ?? ''
+  // The signatures already given, shown when an inspection is opened again
+  inspectionSignatures: IParkingSignature[] = []
 
 
 
@@ -395,10 +412,11 @@ export class VehicleEquipmentRegisterComponent {
     }
 
 
-    if (this.ownerIdType != 'NONE' && this.ownerIdType === '') {
+    // For parking the owner is entered at registration
+    if (service !== 'PARKING' && this.ownerIdType != 'NONE' && this.ownerIdType === '') {
       this.msg.showErrorMessage3('ID No is required')
     }
-    if (this.ownerPhoneNo === '') {
+    if (service !== 'PARKING' && this.ownerPhoneNo === '') {
       this.msg.showErrorMessage3('Phone No is required')
     }
 
@@ -412,7 +430,11 @@ export class VehicleEquipmentRegisterComponent {
             this.showVehicleEquipmentData(data!)
             // this.getAllActiveVehicleEquipments()
 
-            this.msg.showSuccessMessage('Saved Successfully')
+            if (service === 'PARKING') {
+              this.msg.showSuccessMessage('Vehicle registered. Complete the inspection below, sign and submit it.')
+            } else {
+              this.msg.showSuccessMessage('Saved Successfully')
+            }
 
             if (data!.parkingId != null) {
               this.getParking(data!.parkingId)
@@ -420,7 +442,6 @@ export class VehicleEquipmentRegisterComponent {
               this.getMaintenance(data!.maintenanceId)
             }
 
-            this.getParking(data!.parkingId)
             this.mode = ''
 
 
@@ -511,7 +532,8 @@ export class VehicleEquipmentRegisterComponent {
     this.agentEmail = data.agentEmail
     this.agentAddress = data.agentAddress
 
-    this.deviceStatus = data.deviceStatus
+    // The vehicle record gives '1' or '0'; the form uses ATTACHED / NOT-ATTACHED
+    this.deviceStatus = (data.deviceStatus as any) == '1' || (data.deviceStatus as any) === true ? 'ATTACHED' : 'NOT-ATTACHED'
     this.active = data.active
     this.companyId = data.companyId
     this.companyName = data.companyName
@@ -573,6 +595,13 @@ export class VehicleEquipmentRegisterComponent {
 
   }
 
+  // After an inspection is submitted or updated the form goes away, leaving only the buttons on top
+  closeForm() {
+    this.clearParkingData()
+    this.clear()
+    this.mode = ''
+  }
+
   setExistingMode() {
     this.clearParkingData()
     this.clear()
@@ -616,9 +645,11 @@ export class VehicleEquipmentRegisterComponent {
   showParkingData(data: IParking) {
     this.parkingId = data?.id;
     this.parkingNo = data!.no;
-    this.ownerFirstName = data?.ownerFirstName;
+    // The placeholder owner is shown as empty
+    const pending = isOwnerPending(data?.ownerFirstName, data?.ownerLastName)
+    this.ownerFirstName = pending ? '' : data?.ownerFirstName;
     this.ownerMiddleName = data?.ownerMiddleName;
-    this.ownerLastName = data?.ownerLastName;
+    this.ownerLastName = pending ? '' : data?.ownerLastName;
     this.ownerCompanyName = data?.ownerCompanyName;
     this.ownerIdNo = data?.ownerIdNo;
     this.ownerIdType = data?.ownerIdType;
@@ -672,7 +703,149 @@ export class VehicleEquipmentRegisterComponent {
 
     this.billingType = data!.billingType
 
+    this.parkingStatus = data!.status
+    this.interiorDetails = data!.interiorDetails ?? ''
+    this.bodyCondition = data!.bodyCondition ?? ''
+    this.inspectorSignature = null
+    this.driverSignature = null
+    this.deviceCount = data!.deviceCount ? Number(data!.deviceCount) : null
+    this.getInspection(data!.id)
+  }
 
+  // The signatures of the opened parking
+  async getInspection(id: any) {
+    this.inspectionSignatures = []
+    if (id === null || id === undefined || id === '') return
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.get<IParkingInspection>(API_URL + '/parkings/get_inspection?id=' + id, options)
+      .toPromise()
+      .then(
+        data => {
+          this.inspectionSignatures = (data?.signatures ?? []).filter(s => s.stage === 'INSPECTION')
+        }
+      )
+      .catch(error => console.log(error))
+  }
+
+  // The condition checklist: left and right items, then single items (each 'YES' present or 'NO' missing/damaged)
+  checklistPairs = [
+    { label: 'Front Lamps', left: 'leftFrontLamp', right: 'rightFrontLamp' },
+    { label: 'Rear Lamps', left: 'leftRearLamp', right: 'rightRearLamp' },
+    { label: 'Side Mirrors', left: 'leftSideMirror', right: 'rightSideMirror' },
+    { label: 'Wipers', left: 'leftWiper', right: 'rightWiper' },
+  ]
+  checklistSingles = [
+    { label: 'Back Wiper', key: 'backWiper' },
+    { label: 'Fuel Cap', key: 'fuelCap' },
+    { label: 'Spare Tyre', key: 'spareTire' },
+    { label: 'Battery', key: 'battery' },
+    { label: 'Starter', key: 'starter' },
+    { label: 'Aerial', key: 'aerial' },
+    { label: 'Wheel Cap', key: 'wheelCap' },
+    { label: 'Round Mirror', key: 'roundMirror' },
+    { label: 'Tyre Indicator', key: 'tireIndicator' },
+  ]
+
+  flag(key: string): string {
+    return (this as any)[key]
+  }
+
+  setFlag(key: string, value: 'YES' | 'NO') {
+    (this as any)[key] = value
+  }
+
+  missingCount(): number {
+    const keys = this.checklistPairs.flatMap(p => [p.left, p.right]).concat(this.checklistSingles.map(s => s.key))
+    return keys.filter(key => this.flag(key) === 'NO').length
+  }
+
+  // What the inspection still lacks, or '' when it can be submitted
+  inspectionProblem(): string {
+    if (!this.chasisNo?.trim()) return 'Chassis number is required'
+    if (!this.vehicleEquipmentTypeName) return 'Vehicle type is required'
+    if (this.vehicleEquipmentCategory !== 'IN-TRANSIT' && this.vehicleEquipmentCategory !== 'LOCAL') return 'Select the category'
+    if (!this.bodyCondition?.trim()) return 'Body condition is required'
+    if (this.deviceStatus === 'ATTACHED' && !(this.deviceCount && this.deviceCount >= 1)) return 'Enter the number of tracking devices attached'
+    if (this.isNewInspection()) {
+      if (!this.inspectorSignature) return 'Inspector signature is required'
+      if (!this.driverSignature) return 'Driver signature is required'
+    }
+    return ''
+  }
+
+  vehicleList: IParking[] = []
+  vehicleListTotal: number = 0
+  vehicleListPage: number = 1
+  vehicleListSize: number = 10
+  vehicleListSearch: string = ''
+  vehicleListTimer: any = null
+  // REGISTERED for the vehicles awaiting check-in (Vehicle List), PENDING for those awaiting registration
+  vehicleListStatus: string = 'REGISTERED'
+
+  setListMode(status: string) {
+    this.clearParkingData()
+    this.clear()
+    this.mode = 'list'
+    this.vehicleListStatus = status
+    this.vehicleListPage = 1
+    this.loadVehicleList()
+  }
+
+  async loadVehicleList() {
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
+    }
+    await this.http.get<IPage<IParking>>(API_URL + '/parkings/get_all_pending_or_checked_in_page?'
+        + pageParams(this.vehicleListPage, this.vehicleListSize, this.vehicleListSearch) + '&status=' + this.vehicleListStatus, options)
+      .toPromise()
+      .then(data => {
+        this.vehicleList = data?.content ?? []
+        this.vehicleListTotal = data?.totalElements ?? 0
+      })
+      .catch(error => this.msg.showErrorMessage(error, 'Error'))
+  }
+
+  searchVehicleList() {
+    clearTimeout(this.vehicleListTimer)
+    this.vehicleListTimer = setTimeout(() => {
+      this.vehicleListPage = 1
+      this.loadVehicleList()
+    }, 300)
+  }
+
+  vehicleListPages(): number {
+    return Math.max(1, Math.ceil(this.vehicleListTotal / this.vehicleListSize))
+  }
+
+  goToVehicleListPage(page: number) {
+    if (page < 1 || page > this.vehicleListPages()) return
+    this.vehicleListPage = page
+    this.loadVehicleList()
+  }
+
+  ownerPending(parking: IParking): boolean {
+    return isOwnerPending(parking.ownerFirstName, parking.ownerLastName)
+  }
+
+  // The registrar registers a vehicle on the Parking page, which opens its registration
+  registerFromList(parking: IParking) {
+    this.router.navigate(['/app/parking-management/parking'], { queryParams: { register: parking.id } })
+  }
+
+  // Opens an inspected vehicle in the form below, to view or edit its inspection
+  async openFromVehicleList(parking: IParking) {
+    this.clearParkingData()
+    this.clear()
+    this.mode = ''
+    await this.getParking(parking.id)
+    this.id = parking.vehicleEquipmentId
+  }
+
+  // No parking yet: submitting creates it with its signatures
+  isNewInspection(): boolean {
+    return this.parkingId === null || this.parkingId === undefined || this.parkingId === ''
   }
 
   clearParkingData() {
@@ -735,6 +908,14 @@ export class VehicleEquipmentRegisterComponent {
     this.parkingZoneName = ''
 
     this.billingType = 'DAILY'
+
+    this.parkingStatus = ''
+    this.interiorDetails = ''
+    this.bodyCondition = ''
+    this.deviceCount = null
+    this.inspectorSignature = null
+    this.driverSignature = null
+    this.inspectionSignatures = []
   }
 
 
@@ -903,25 +1084,34 @@ export class VehicleEquipmentRegisterComponent {
 
       cardNo: this.cardNo,
 
-      billintType: this.billingType
+      billintType: this.billingType,
+
+      // Inspection
+      interiorDetails: this.interiorDetails,
+      bodyCondition: this.bodyCondition,
+      deviceCount: this.deviceStatus === 'ATTACHED' ? this.deviceCount : null,
+      // Signatures are given once, when the inspection is first submitted
+      inspectorSignature: this.isNewInspection() ? this.inspectorSignature : null,
+      driverSignature: this.isNewInspection() ? this.driverSignature : null
     }
 
-    console.log(parking)
+    const problem = this.inspectionProblem()
+    if (problem !== '') {
+      this.msg.showErrorMessage3(problem)
+      return
+    }
 
-    if (this.parkingId === null || this.parkingId === undefined || this.parkingId === '') {
-      /**Create new parking */
+    if (this.isNewInspection()) {
+      /**Submit the inspection: the vehicle then waits for registration */
       await this.http.post<IParking>(API_URL + '/parkings/create', parking, options)
         .toPromise()
         .then(
           data => {
-            this.showParkingData(data!)
-
             console.log(data)
 
-            // this.getAllPendingOrCheckedInParkings()
+            this.msg.showSuccessMessage('Inspection submitted. ' + data!.no + ' is waiting for registration.')
 
-            this.msg.showSuccessMessage('Parking created successifully')
-
+            this.closeForm()
           }
 
         )
@@ -943,9 +1133,9 @@ export class VehicleEquipmentRegisterComponent {
 
             // this.getAllPendingOrCheckedInParkings()
 
-            this.msg.showSuccessMessage('Parking updated successifully, Vehicle available for check in')
+            this.msg.showSuccessMessage('Inspection updated. The vehicle is waiting for registration.')
 
-            this.setNewMode()
+            this.closeForm()
           }
 
         )
@@ -1134,7 +1324,8 @@ export class VehicleEquipmentRegisterComponent {
     var countOfAccess = 0
     var pri = ''
     for(let i = 0; i < prevs.length; i++){
-      if(this.auth.checkPrivilege(prevs[i])){
+      // Inspecting arriving vehicles (PKNG-INSPECT) also opens the parking service here
+      if(this.auth.checkPrivilege(prevs[i]) || (prevs[i] === 'PKNG-ACCESS' && this.auth.checkPrivilege('PKNG-INSPECT'))){
         pri = prevs[i]
         countOfAccess = countOfAccess + 1
       }

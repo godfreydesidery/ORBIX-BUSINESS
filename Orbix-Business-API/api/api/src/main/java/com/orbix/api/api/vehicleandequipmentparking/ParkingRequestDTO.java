@@ -1,6 +1,7 @@
 package com.orbix.api.api.vehicleandequipmentparking;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 import javax.persistence.Column;
 import javax.persistence.FetchType;
@@ -80,6 +81,8 @@ public class ParkingRequestDTO {
 
     Long parkingZoneId;
     String parkingZoneName;
+    /** The slot within the zone, 1 to its no of slots */
+    Integer parkingSlotNo;
 	
     Long vehicleEquipmentTypeId;	
     Long branchId;
@@ -95,4 +98,24 @@ public class ParkingRequestDTO {
     double billingAmount;
     
     String startBillingAt;
+
+    /**Inspection*/
+    String interiorDetails;
+    String bodyCondition;
+    /** How many tracking devices are attached, when deviceStatus says attached */
+    Integer deviceCount;
+
+    /**Driver*/
+    String driverName;
+    String driverPhoneNo;
+    String driverIdType;
+    String driverIdNo;
+
+    /**Signatures: base64 PNGs, optionally with their data: prefix*/
+    String inspectorSignature;
+    String driverSignature;
+    String registrarSignature;
+    String modifierSignature;
+    /** Optional at check-in */
+    String checkInSignature;
 }

@@ -53,6 +53,8 @@ public class ParkingResponseDTO {
 	String tireIndicator;
 	String hasKeys;
 	String deviceStatus;
+	/** How many tracking devices are attached; empty when none or not recorded */
+	String deviceCount;
 	String keyStatus;
 	Byte[] image;
 	
@@ -68,6 +70,10 @@ public class ParkingResponseDTO {
 
     String parkingZoneId;
     String parkingZoneName;
+    /** The slot within the zone; empty when the zone has no slots or none was recorded */
+    String parkingSlotNo;
+    /** The registered vehicle, so its inspection can be opened again */
+    String vehicleEquipmentId;
     
     String vehicleEquipmentName;
 	String vehicleEquipmentColor;
@@ -95,4 +101,12 @@ public class ParkingResponseDTO {
     String paidAmount;
     
     List<ServiceBillItem> serviceBillItems;
+
+    /**Inspection and driver; the signatures come from /parkings/get_inspection*/
+    String interiorDetails;
+    String bodyCondition;
+    String driverName;
+    String driverPhoneNo;
+    String driverIdType;
+    String driverIdNo;
 }

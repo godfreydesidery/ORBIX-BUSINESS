@@ -46,6 +46,7 @@ export interface IParking {
     tireIndicator: boolean
     hasKeys: boolean
     deviceStatus: boolean
+    deviceCount: string // how many tracking devices are attached; '' when none or not recorded
     //image: Byte[]
 
     comments : string
@@ -55,7 +56,7 @@ export interface IParking {
     billingAmount : number
     billingStartAt : string
 
-    status: "PENDING",
+    status: string, // PENDING (awaiting registration), REGISTERED (awaiting check-in), CHECKED-IN, CHECKED-OUT
 
     // INSIDE the yard, or OUTSIDE on a temporary trip
     custody: 'INSIDE' | 'OUTSIDE'
@@ -73,10 +74,35 @@ export interface IParking {
 
 
     parkingZoneName : string
+    parkingSlotNo : string // the slot within the zone; '' when the zone has no slots
+    vehicleEquipmentId : any // the registered vehicle, to open its inspection again
 
     cardNo : string
 
     serviceBillItems : IServiceBillItem[]
+
+    // Inspection and driver; signatures come from /parkings/get_inspection
+    interiorDetails : string
+    bodyCondition : string
+    driverName : string
+    driverPhoneNo : string
+    driverIdType : string
+    driverIdNo : string
+}
+
+// A signature given at one step of the parking
+export interface IParkingSignature {
+    stage : 'INSPECTION' | 'REGISTRATION' | 'CHECK_IN' | 'MODIFICATION'
+    role : 'INSPECTOR' | 'DRIVER' | 'REGISTRAR' | 'CHECK_IN_OFFICER' | 'MODIFIER'
+    signerName : string
+    signedAt : string
+    image : string // data:image/png;base64,...
+    changes : string // MODIFICATION only: one "Field: old → new" per line
+}
+
+export interface IParkingInspection {
+    parkingId : string
+    signatures : IParkingSignature[]
 }
 
 export interface IServiceBillItem{
@@ -85,4 +111,12 @@ export interface IServiceBillItem{
     qty : number
     payStatus : string
     amount : number
+}
+
+// The owner is entered by the registrar; until then the API keeps the placeholder "PENDING REGISTRATION"
+export const OWNER_PENDING_FIRST_NAME = 'PENDING'
+export const OWNER_PENDING_LAST_NAME = 'REGISTRATION'
+
+export function isOwnerPending(firstName : string | null | undefined, lastName : string | null | undefined) : boolean {
+    return firstName === OWNER_PENDING_FIRST_NAME && lastName === OWNER_PENDING_LAST_NAME
 }

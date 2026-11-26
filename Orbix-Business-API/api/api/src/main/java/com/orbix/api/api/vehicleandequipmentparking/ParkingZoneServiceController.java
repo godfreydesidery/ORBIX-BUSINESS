@@ -1,7 +1,9 @@
 package com.orbix.api.api.vehicleandequipmentparking;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ParkingZoneServiceController implements ParkingZoneService {
 	
 	private final ParkingZoneRepository parkingZoneRepository;
+	private final ParkingRepository parkingRepository;
 	private final CompanyRepository companyRepository;
 	private final BranchRepository branchRepository;
 	private final UserService userService;
@@ -61,6 +64,43 @@ public class ParkingZoneServiceController implements ParkingZoneService {
 		for(ParkingZone parkingZone : parkingZones) {
 			parkingZoneResponses.add(parkingZoneResponseDTOMapper(parkingZone));					
 		}		
+		return parkingZoneResponses;
+	}
+
+	/**
+	 * The branch's active zones that still have space, each with its free slot numbers (1 to no of slots, less those
+	 * held by registered or checked-in vehicles) and their count. Vehicles parked before slots existed hold no number.
+	 * A zone with no of slots 0 has no limit and no slots. Space frees itself when a vehicle is checked out.
+	 */
+	@Override
+	public List<ParkingZoneResponseDTO> getAllBranchAvailableParkingZones(HttpServletRequest request) {
+		Branch branch = userService.getUser(request).getBranch();
+		List<ParkingZone> parkingZones = parkingZoneRepository.findAllByBranchAndActive(branch, true);
+		Map<Long, java.util.Set<Integer>> takenSlots = new HashMap<>();
+		if(!parkingZones.isEmpty()) {
+			for(Object[] row : parkingRepository.getTakenSlots(parkingZones)) {
+				takenSlots.computeIfAbsent((Long) row[0], k -> new java.util.HashSet<>()).add((Integer) row[1]);
+			}
+		}
+		List<ParkingZoneResponseDTO> parkingZoneResponses = new ArrayList<>();
+		for(ParkingZone parkingZone : parkingZones) {
+			ParkingZoneResponseDTO parkingZoneResponse = parkingZoneResponseDTOMapper(parkingZone);
+			if(parkingZone.getNoOfSlots() > 0) {
+				// Free slots are the numbers not held by a registered or checked-in vehicle; vehicles parked before
+				// slots existed have no number and do not hide the zone
+				java.util.Set<Integer> taken = takenSlots.getOrDefault(parkingZone.getId(), java.util.Collections.emptySet());
+				List<Integer> freeSlotNos = new ArrayList<>();
+				for(int slotNo = 1; slotNo <= parkingZone.getNoOfSlots(); slotNo++) {
+					if(!taken.contains(slotNo)) freeSlotNos.add(slotNo);
+				}
+				if(freeSlotNos.isEmpty()) continue;
+				parkingZoneResponse.setFreeSlots(String.valueOf(freeSlotNos.size()));
+				parkingZoneResponse.setFreeSlotNos(freeSlotNos);
+			}else {
+				parkingZoneResponse.setFreeSlots("");
+			}
+			parkingZoneResponses.add(parkingZoneResponse);
+		}
 		return parkingZoneResponses;
 	}
 

@@ -2,7 +2,7 @@
     <div class="col">
         <div widget class="card">
             <div class="card-header">
-                <span>Vehicle Register | {{ currentService ? currentService : 'No Service Selected' }}</span>
+                <span>{{ currentService === 'Parking' ? 'Vehicle Inspection' : 'Vehicle Register' }} | {{ currentService ? currentService : 'No Service Selected' }}</span>
             </div>
             
             <div class="card-body widget-body min-vh-100">
@@ -23,6 +23,9 @@
 
                 <br><br>
                 <br><br><br><br> -->
+                <div class="alert alert-warning" role="alert" *ngIf="currentService === 'Parking' && !grant(['PKNG-INSPECT'])">
+                    Submitting and editing inspections needs the <b>PKNG-INSPECT</b> privilege. Ask the system administrator to add it to your role.
+                </div>
                 <div class="alert alert-warning" role="alert" *ngIf="isServicesAllowed === false">
                     <strong>Warning!</strong> You do not have permission to offer services. Please contact the system administrator for assistance.
                 </div>
@@ -41,19 +44,84 @@
                 </div>
                 <div class="row" *ngIf="currentServiceSelected === true">
                     <div class="col-sm-12">
-                        <button type="button" class="btn btn-outline-success btn-round-custom" (click)="setNewMode()"
-                            style="margin: 3px;"><i class="fa fa-file"></i> New Vehicle</button>
-                        <button type="button" class="btn btn-outline-success btn-round-custom"
-                            (click)="setExistingMode()" (click)="getAllVehicleEquipmentChasisNos()"
-                            style="margin: 3px;"><i class="fa fa-file-text"></i> Existing Vehicle</button>
-                        <hr>
+                        <button type="button" class="btn btn-round-custom action-button" [ngClass]="mode === 'new' ? 'btn-success' : 'btn-outline-success'" (click)="setNewMode()">
+                            <i class="fa fa-plus-circle"></i> New Vehicle</button>
+                        <button type="button" class="btn btn-round-custom action-button" [ngClass]="mode === 'existing' ? 'btn-info' : 'btn-outline-info'"
+                            (click)="setExistingMode()" (click)="getAllVehicleEquipmentChasisNos()">
+                            <i class="fa fa-search"></i> Existing Vehicle</button>
+                        <button type="button" class="btn btn-round-custom action-button" *ngIf="currentService === 'Parking'"
+                            [ngClass]="mode === 'list' && vehicleListStatus === 'REGISTERED' ? 'btn-primary' : 'btn-outline-primary'" (click)="setListMode('REGISTERED')">
+                            <i class="fa fa-list-alt"></i> Vehicle List</button>
+                        <button type="button" class="btn btn-round-custom action-button" *ngIf="currentService === 'Parking'"
+                            [ngClass]="mode === 'list' && vehicleListStatus === 'PENDING' ? 'btn-warning' : 'btn-outline-warning'" (click)="setListMode('PENDING')">
+                            <i class="fa fa-hourglass-half"></i> Awaiting Registration</button>
+                        <hr *ngIf="mode !== 'new'">
+                    </div>
+                </div>
+                <!-- Vehicle List: registered vehicles awaiting check-in; Awaiting Registration: inspected vehicles not yet registered. Both can still be edited -->
+                <div class="row" *ngIf="mode === 'list'">
+                    <div class="col-sm-12">
+                        <div class="vehicle-list-card">
+                            <div class="row">
+                                <div class="col-sm-8">
+                                    <h6 *ngIf="vehicleListStatus === 'REGISTERED'"><i class="fa fa-list-alt text-primary"></i> <b>Registered vehicles awaiting check-in</b></h6>
+                                    <h6 *ngIf="vehicleListStatus === 'PENDING'"><i class="fa fa-hourglass-half text-warning"></i> <b>Inspected vehicles awaiting registration</b></h6>
+                                    <small class="text-muted">Open a vehicle to view or edit its inspection. Once it is checked in, changes go through Modify on the Parking page.</small>
+                                </div>
+                                <div class="col-sm-4">
+                                    <input type="text" class="form-control" [(ngModel)]="vehicleListSearch" (ngModelChange)="searchVehicleList()" placeholder="Search by chassis no...">
+                                </div>
+                            </div>
+                            <br>
+                            <div class="table-responsive">
+                                <table class="table table-sm table-striped">
+                                    <thead>
+                                        <tr>
+                                            <th>No</th>
+                                            <th>Chassis No</th>
+                                            <th>Vehicle Type</th>
+                                            <th>Status</th>
+                                            <th></th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr *ngFor="let p of vehicleList; trackBy: trackById">
+                                            <td>{{ p.no }}</td>
+                                            <td><b style="color: rgb(228, 85, 8);">{{ p.chasisNo }}</b></td>
+                                            <td>{{ p.vehicleEquipmentTypeName }}</td>
+                                            <td>
+                                                <span class="badge badge-warning" *ngIf="p.status === 'PENDING'">AWAITING REGISTRATION</span>
+                                                <span class="badge badge-info" *ngIf="p.status === 'REGISTERED'">AWAITING CHECK-IN</span>
+                                                <span class="badge badge-success" *ngIf="p.status === 'CHECKED-IN'">CHECKED-IN</span>
+                                            </td>
+                                            <td class="text-right">
+                                                <button type="button" class="btn btn-sm btn-primary btn-round-custom text-nowrap" (click)="openFromVehicleList(p)">
+                                                    <i class="fa fa-folder-open"></i> {{ p.status !== 'CHECKED-IN' && grant(['PKNG-INSPECT']) ? 'Open / Edit' : 'Open' }}</button>
+                                                <button type="button" class="btn btn-sm btn-success btn-round-custom text-nowrap" style="margin-left: 3px;"
+                                                    *ngIf="p.status === 'PENDING' && grant(['PKNG-REGISTER'])" (click)="registerFromList(p)">
+                                                    <i class="fa fa-check"></i> Register</button>
+                                            </td>
+                                        </tr>
+                                        <tr *ngIf="vehicleList.length === 0">
+                                            <td colspan="5" class="text-muted">{{ vehicleListStatus === 'PENDING' ? 'No inspected vehicles are waiting for registration.' : 'No registered vehicles are waiting for check-in.' }}</td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                            <div class="text-right" *ngIf="vehicleListTotal > vehicleListSize">
+                                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="vehicleListPage <= 1" (click)="goToVehicleListPage(vehicleListPage - 1)"><i class="fa fa-chevron-left"></i></button>
+                                <span style="margin: 0 8px;">Page {{ vehicleListPage }} of {{ vehicleListPages() }}</span>
+                                <button type="button" class="btn btn-sm btn-outline-secondary" [disabled]="vehicleListPage >= vehicleListPages()" (click)="goToVehicleListPage(vehicleListPage + 1)"><i class="fa fa-chevron-right"></i></button>
+                            </div>
+                        </div>
                     </div>
                 </div>
                 <!-- Start ofContent header for new vehicle -->
-                <div class="row" *ngIf="mode === 'new'">
+                <!-- New vehicle for maintenance; for parking, New Vehicle opens the whole inspection below in one step -->
+                <div class="row" *ngIf="mode === 'new' && currentService !== 'Parking'">
                     <div class="col-sm-12">
-                        <p><b>Owner Information</b></p><br>
-                        <div class="row">
+                        <p *ngIf="currentService !== 'Parking'"><b>Owner Information</b></p><br *ngIf="currentService !== 'Parking'">
+                        <div class="row" *ngIf="currentService !== 'Parking'">
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>First Name*</label>
@@ -116,9 +184,9 @@
                                 </div>
                             </div> -->
                         </div>
-                        <h6 *ngIf="currentService === 'Parking'"><b>Agent Information</b></h6>
-                        <hr *ngIf="currentService === 'Parking'">
-                        <div class="row" *ngIf="currentService === 'Parking'">
+                        <!-- The agent is entered at registration -->
+                        <h6 *ngIf="false"><b>Agent Information</b></h6>
+                        <div class="row" *ngIf="false">
                             <input type="hidden" [(ngModel)]="id">
                             <div class="col-lg-3">
                                 <div class="form-group">
@@ -169,7 +237,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-3">
+                            <div class="col-lg-3" *ngIf="currentService !== 'Parking'">
                                 <div class="form-group">
                                     <label>Device Status*</label>
                                     <select class="form-control" [(ngModel)]="deviceStatus">
@@ -241,8 +309,8 @@
                     </div>
                     <div class="row">
                         <div class="col-sm-12">
-                            <button class="btn btn-success btn-round-custom" *ngIf="currentService === 'Parking'" (click)="saveForParking()"><i class="fa fa-pencil-square-o"></i> Register
-                                Parking</button>
+                            <button class="btn btn-success btn-round-custom" *ngIf="currentService === 'Parking'" (click)="saveForParking()"><i class="fa fa-pencil-square-o"></i> Register Vehicle
+                                and Start Inspection</button>
                             <button class="btn btn-success btn-round-custom" *ngIf="currentService === 'Maintenance'" (click)="saveForMaintenance()"><i class="fa fa-pencil-square-o"></i> Register
                                 Maintenance</button>
                         </div>
@@ -321,13 +389,14 @@
                 <!-- End of content header for existing vehicle -->
 
                 <!-- Start of main page content, to be displayed only if a vehicle is registered and a parking is selected -->
-                <div class="row" *ngIf="id != null">
+                <div class="row" *ngIf="id != null || (mode === 'new' && currentService === 'Parking')">
                     <div class="col-sm-12">
-                        <hr>
-                        <h6>Driver/Owner Information</h6>
-                        <hr>
-                        <div class="row">
-                            <input type="hidden" [(ngModel)]="parkingId">
+                        <hr *ngIf="currentService !== 'Parking'">
+                        <!-- Parking: the owner is entered by the registrar -->
+                        <h6 *ngIf="currentService !== 'Parking'">Driver/Owner Information</h6>
+                        <hr *ngIf="currentService !== 'Parking'">
+                        <input type="hidden" [(ngModel)]="parkingId">
+                        <div class="row" *ngIf="currentService !== 'Parking'">
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>First Name</label>
@@ -393,11 +462,11 @@
                             </div>                      -->
                         </div>
 
-                        <h6 *ngIf="currentService === 'Parking'">Agent Information</h6>
-                        <hr *ngIf="currentService === 'Parking'">
-                        <div class="row" *ngIf="currentService === 'Parking'">
-                            <input type="hidden" [(ngModel)]="id">
-                            <div class="col-lg-6">
+                        <!-- The transit document (Sub T1), the owner and the agent are entered at registration -->
+                        <input type="hidden" [(ngModel)]="id">
+                        <div class="row" *ngIf="false">
+                            <!-- The agent is entered by the registrar -->
+                            <div class="col-lg-6" *ngIf="false">
                                 <div class="form-group">
                                     <label>Agent Name</label>
                                     <input class="form-control" type="text" [(ngModel)]="agentName" autocomplete="nope">
@@ -409,7 +478,7 @@
                                     <input class="form-control" type="text" [(ngModel)]="agentAddress" autocomplete="nope">
                                 </div>
                             </div>  -->
-                            <div class="col-lg-3">
+                            <div class="col-lg-3" *ngIf="false">
                                 <div class="form-group">
                                     <label>Agent Phone</label>
                                     <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo"
@@ -431,427 +500,200 @@
                             </div>
 
                         </div>
-                        <h6>Vehicle Information</h6>
-                        <hr>
-                        <div class="row">
-
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Front Lamp</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>Left</td>
-                                            <td>Right</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="leftFrontLamp">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="rightFrontLamp">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Rear Lamp</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>Left</td>
-                                            <td>Right</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="leftRearLamp">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="rightRearLamp">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Side Mirror</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>Left</td>
-                                            <td>Right</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="leftSideMirror">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="rightSideMirror">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Wipers</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>Left</td>
-                                            <td>Right</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="leftWiper">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="rightWiper">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Back Wipers</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>|</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="backWiper">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Fuel Cap</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>|</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="fuelCap">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Spare Tires</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>|</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="spareTire">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Battery</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>|</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="battery">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Starter</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>|</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="starter">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Aerial</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>|</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="aerial">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Wheel Cap</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>|</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="wheelCap">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Round Mirror</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>|</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="roundMirror">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Tire Indicator</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>|</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="tireIndicator">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Device Status</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>|</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="deviceStatus">
-                                                    <option>ATTACHED</option>
-                                                    <option>NOT-ATTACHED</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Keys</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <td>|</td>
-                                        </thead>
-                                        <tbody>
-                                            <td>
-                                                <select class="form-control" [(ngModel)]="hasKeys">
-                                                    <option>YES</option>
-                                                    <option>NO</option>
-                                                </select>
-                                            </td>
-                                        </tbody>
-                                    </table>
-                                </div>
-                            </div>
-                        </div>
-                        <hr>
-                        <div class="row">
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Select Vehicle Typee</label>
-                                    <!-- <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
-                                        <option></option>
-                                        <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
-                                    </select> -->
-
-                                    <!-- <input class="form-control" type="text" list="venames"
-                                        [(ngModel)]="vehicleEquipmentTypeName" />
-                                    <datalist id="venames">
-                                        <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">
-                                    </datalist> -->
-
-                                    <ng-select [items]="vehicleEquipmentTypes"
-                                            bindLabel="name"
-                                            bindValue="name"
+                        <!-- Vehicle details -->
+                        <div class="form-section">
+                            <div class="form-section-title"><i class="fa fa-car"></i> Vehicle Details</div>
+                            <div class="row">
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="form-group">
+                                        <label>Vehicle Type<span class="req">*</span></label>
+                                        <ng-select [items]="vehicleEquipmentTypes" bindLabel="name" bindValue="name" placeholder="Select type"
                                             [(ngModel)]="vehicleEquipmentTypeName"
                                             class="custom-ng-select .ng-input input .ng-dropdown-panel .ng-option .ng-dropdown-panel">
-                                    </ng-select>
-
-                                    <!-- <input class="form-control" type="text" list="nos" [(ngModel)]="chasisNo" (change)="searchVehicleEquipmentByChasisNo(chasisNo)"/>
-                                    <datalist id="nos">
-                                        <option *ngFor="let option of chasisNos" [value]="option">
-                                    </datalist> -->
-
-
+                                        </ng-select>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div class="col-lg-3" *ngIf="currentService === 'Parking'">
-                                <div class="form-group">
-                                    <label>Category</label>
-                                    <select class="form-control" [(ngModel)]="vehicleEquipmentCategory">
-                                        <!-- <option></option> -->
-                                        <option>IN-TRANSIT</option>
-                                        <option>LOCAL</option>
-                                    </select>
+                                <div class="col-lg-3 col-md-6" *ngIf="currentService === 'Parking'">
+                                    <div class="form-group">
+                                        <label>Category<span class="req">*</span></label>
+                                        <select class="form-control" [(ngModel)]="vehicleEquipmentCategory">
+                                            <option></option>
+                                            <option>IN-TRANSIT</option>
+                                            <option>LOCAL</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-
-                            <div class="col-lg-3" *ngIf="currentService === 'Parking'">
-                                <div class="form-group">
-                                    <label>Parking Zone</label>
-                                    <select class="form-control" [(ngModel)]="parkingZoneName">
-                                        <option></option>
-                                        <option *ngFor="let option of parkingZones; trackBy: trackById" [value]="option.name">{{ option.name
-                                            }}</option>
-                                    </select>
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="form-group">
+                                        <label>Chassis No / Reg No<span class="req">*</span></label>
+                                        <input class="form-control" type="text" [(ngModel)]="chasisNo" placeholder="e.g. NZE121-1234567" autocomplete="nope">
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3" *ngIf="currentService === 'Parking'">
-                                <div class="form-group">
-                                    <label>Select Billing Type</label>
-                                    <select class="form-control" [(ngModel)]="billingType">
-                                        <option>DAILY</option>
-                                    </select>
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="form-group">
+                                        <label>Colour</label>
+                                        <select class="form-control" [(ngModel)]="vehicleEquipmentColor">
+                                            <option></option>
+                                            <option value="black">Black</option>
+                                            <option value="white">White</option>
+                                            <option value="red">Red</option>
+                                            <option value="dark-blue">Dark Blue</option>
+                                            <option value="silver">Silver</option>
+                                            <option value="yellow">Yellow</option>
+                                            <option value="brown">Brown</option>
+                                            <option value="blue">Blue</option>
+                                            <option value="green">Green</option>
+                                            <option value="gray">Gray</option>
+                                            <option value="purple">Purple</option>
+                                            <option value="pink">Pink</option>
+                                            <option value="snow">Snow</option>
+                                            <option value="gold">Gold</option>
+                                            <option value="orange">Orange</option>
+                                            <option value="azul">Azul</option>
+                                            <option value="tomato">Tomato</option>
+                                            <option value="multicolour">Multicolour</option>
+                                        </select>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Chasis No/ Reg No</label>
-                                    <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
-                                </div>
-                            </div>
-
-
-                            <!-- <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Vehicle Name</label>
-                                    <input class="form-control" type="text" [(ngModel)]="vehicleEquipmentName" autocomplete="nope">
-                                </div>
-                            </div> -->
-
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Select Vehicle Color</label>
-                                    <select class="form-control" [(ngModel)]="vehicleEquipmentColor">
-                                        <option></option>
-                                        <option value="black">Black</option>
-                                        <option value="white">White</option>
-                                        <option value="red">Red</option>
-                                        <option value="dark-blue">Dark Blue</option>
-                                        <option value="silver">Silver</option>
-                                        <option value="yellow">Yellow</option>
-                                        <option value="brown">Brown</option>
-                                        <option value="blue">Blue</option>
-                                        <option value="green">Green</option>
-                                        <option value="gray">Gray</option>
-                                        <option value="purple">Purple</option>
-                                        <option value="pink">Pink</option>
-                                        <option value="snow">Snow</option>
-                                        <option value="gold">Gold</option>
-                                        <option value="orange">Orange</option>
-                                        <option value="azul">Azul</option>
-                                        <option value="tomato">Tomato</option>
-                                        <option value="multicolour">Multicolour</option>
-                                    </select>
-                                </div>
-                            </div>
-
-
-
-                            <div class="col-lg-3">
-                                <div class="form-group">
-                                    <label>Vehicle Image</label>
-                                    <input class="form-control" type="file" autocomplete="nope">
+                                <div class="col-lg-3 col-md-6">
+                                    <div class="form-group">
+                                        <label>Vehicle Image</label>
+                                        <input class="form-control-file" type="file" autocomplete="nope">
+                                    </div>
                                 </div>
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <button type="button" class="btn btn-primary btn-round-custom pull-right"  *ngIf="currentService === 'Parking'"
-                                    (click)="saveParking()"><i class="fa fa-save"></i> Update</button>
+                        <!-- Condition checklist: every item is present (Yes) unless marked missing or damaged (No) -->
+                        <div class="form-section">
+                            <div class="form-section-title">
+                                <i class="fa fa-check-square-o"></i> Condition Checklist
+                                <span class="checklist-summary" [class.has-missing]="missingCount() > 0">
+                                    {{ missingCount() === 0 ? 'All items present' : missingCount() + (missingCount() === 1 ? ' item missing or damaged' : ' items missing or damaged') }}
+                                </span>
                             </div>
+                            <div class="checklist-grid">
+                                <div class="check-tile" *ngFor="let item of checklistPairs" [class.missing]="flag(item.left) === 'NO' || flag(item.right) === 'NO'">
+                                    <div class="check-name">{{ item.label }}</div>
+                                    <div class="check-sides">
+                                        <div class="check-side" *ngFor="let side of [{ name : 'Left', key : item.left }, { name : 'Right', key : item.right }]">
+                                            <span class="side-name">{{ side.name }}</span>
+                                            <div class="yes-no">
+                                                <button type="button" [class.yes]="flag(side.key) === 'YES'" (click)="setFlag(side.key, 'YES')">Yes</button>
+                                                <button type="button" [class.no]="flag(side.key) === 'NO'" (click)="setFlag(side.key, 'NO')">No</button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="check-tile" *ngFor="let item of checklistSingles" [class.missing]="flag(item.key) === 'NO'">
+                                    <div class="check-name">{{ item.label }}</div>
+                                    <div class="yes-no">
+                                        <button type="button" [class.yes]="flag(item.key) === 'YES'" (click)="setFlag(item.key, 'YES')">Yes</button>
+                                        <button type="button" [class.no]="flag(item.key) === 'NO'" (click)="setFlag(item.key, 'NO')">No</button>
+                                    </div>
+                                </div>
+                                <div class="check-tile" *ngIf="currentService !== 'Parking'" [class.missing]="hasKeys === 'NO'">
+                                    <div class="check-name">Keys</div>
+                                    <div class="yes-no">
+                                        <button type="button" [class.yes]="hasKeys === 'YES'" (click)="hasKeys = 'YES'">Yes</button>
+                                        <button type="button" [class.no]="hasKeys === 'NO'" (click)="hasKeys = 'NO'">No</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tracking device -->
+                        <div class="form-section">
+                            <div class="form-section-title"><i class="fa fa-map-marker"></i> Tracking Device</div>
+                            <div class="row align-items-end">
+                                <div class="col-lg-4 col-md-6">
+                                    <div class="form-group">
+                                        <label>Device Status</label>
+                                        <div class="segmented">
+                                            <button type="button" [class.active]="deviceStatus === 'ATTACHED'" (click)="deviceStatus = 'ATTACHED'"><i class="fa fa-link"></i> Attached</button>
+                                            <button type="button" [class.active]="deviceStatus === 'NOT-ATTACHED'" (click)="deviceStatus = 'NOT-ATTACHED'"><i class="fa fa-chain-broken"></i> Not attached</button>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-lg-3 col-md-6" *ngIf="currentService === 'Parking' && deviceStatus === 'ATTACHED'">
+                                    <div class="form-group">
+                                        <label>Number of Devices<span class="req">*</span></label>
+                                        <input class="form-control" type="number" min="1" [(ngModel)]="deviceCount" placeholder="How many">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Inspection: interior, devices attached, body condition and signatures (parking only) -->
+                        <ng-container *ngIf="currentService === 'Parking'">
+                            <div class="form-section">
+                            <div class="form-section-title"><i class="fa fa-search"></i> Inspection</div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Interior Details</label>
+                                        <textarea class="form-control" rows="3" [(ngModel)]="interiorDetails"
+                                            placeholder="Seats, dashboard, mats, radio..." autocomplete="nope"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Body Condition<span class="req">*</span></label>
+                                        <textarea class="form-control" rows="3" [(ngModel)]="bodyCondition"
+                                            placeholder="Scratches, dents, cracks and where they are" autocomplete="nope"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Comments</label>
+                                        <textarea class="form-control" rows="2" [(ngModel)]="comments" autocomplete="nope"></textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            </div>
+
+                            <div class="form-section">
+                            <div class="form-section-title"><i class="fa fa-pencil"></i> Signatures</div>
+                            <!-- New inspection: the inspector and the driver sign once, when it is submitted -->
+                            <div class="row" *ngIf="isNewInspection()">
+                                <div class="col-lg-4">
+                                    <az-signature-pad label="Inspector Signature" [caption]="userName" pendingNote="Your name is added when saved" [(signature)]="inspectorSignature"></az-signature-pad>
+                                </div>
+                                <div class="col-lg-4">
+                                    <az-signature-pad label="Driver Signature" pendingNote="Driver's name is added at registration" [(signature)]="driverSignature"></az-signature-pad>
+                                </div>
+                            </div>
+                            <!-- Inspection opened again: the signatures already given -->
+                            <div class="row" *ngIf="!isNewInspection()">
+                                <div class="col-lg-4" *ngFor="let signature of inspectionSignatures">
+                                    <label><b>{{ signature.role === 'INSPECTOR' ? 'Inspector' : 'Driver' }}</b></label>
+                                    <div><img *ngIf="signature.image" [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"><span *ngIf="!signature.image" class="text-muted" style="display: inline-block; padding: 8px 0;"><i>Signature image removed</i></span></div>
+                                    <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
+                                </div>
+                                <div class="col-sm-12 text-muted" *ngIf="inspectionSignatures.length === 0">
+                                    No signatures: inspected before electronic signatures were introduced.
+                                </div>
+                            </div>
+                            </div>
+                        </ng-container>
+
+                        <div class="row" *ngIf="currentService === 'Parking'">
+                            <div class="col-sm-12">
+                                <br>
+                                <span class="text-danger" *ngIf="inspectionProblem() !== ''">{{ inspectionProblem() }}</span>
+                                <span class="text-muted" *ngIf="!isNewInspection() && parkingStatus === 'CHECKED-IN'">
+                                    This vehicle is checked in: change it with Modify on the Parking page.</span>
+                                <button type="button" class="btn btn-success btn-round-custom pull-right"
+                                    *ngIf="isNewInspection() && grant(['PKNG-INSPECT'])"
+                                    [disabled]="inspectionProblem() !== ''"
+                                    (click)="saveParking()"><i class="fa fa-check"></i> Submit Inspection</button>
+                                <button type="button" class="btn btn-primary btn-round-custom pull-right"
+                                    *ngIf="!isNewInspection() && (parkingStatus === 'PENDING' || parkingStatus === 'REGISTERED') && grant(['PKNG-INSPECT'])"
+                                    [disabled]="inspectionProblem() !== ''"
+                                    (click)="saveParking()"><i class="fa fa-save"></i> Update Inspection</button>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-sm-12">
                                 <button type="button" class="btn btn-primary pull-right btn-round-custom"  *ngIf="currentService === 'Maintenance'"
                                     (click)="sendToMaintenance()">Send to Maintenance</button>

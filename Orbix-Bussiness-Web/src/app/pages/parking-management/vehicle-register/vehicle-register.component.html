@@ -2,9 +2,14 @@
     <div class="col">
         <div widget class="card">
             <div class="card-header">
-                <span>Vehicle List</span>
+                <span>Parking</span>
             </div>
-            <div class="card-body widget-body"> 
+            <div class="card-body widget-body">
+                <div class="alert alert-warning" role="alert" *ngIf="!grant(['PKNG-INSPECT']) || !grant(['PKNG-REGISTER'])">
+                    <span *ngIf="!grant(['PKNG-INSPECT'])">Editing inspections needs the <b>PKNG-INSPECT</b> privilege. </span>
+                    <span *ngIf="!grant(['PKNG-REGISTER'])">Registering and checking in vehicles needs the <b>PKNG-REGISTER</b> privilege. </span>
+                    Ask the system administrator to add it to your role.
+                </div>
 
                 <div class="row">
                     <div class="col-sm-12">
@@ -14,17 +19,17 @@
                 </div>
 
                 <div class="row">
-                    <div class="col-sm-4"></div>
-                    <div class="col-sm-4"></div>
+                    <div class="col-sm-8">
+                    </div>
                     <div class="col-sm-4">
-                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchList()" placeholder="Search..." style="max-width: 8cm;">
+                        <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchList()" placeholder="Search by chassis no..." style="max-width: 8cm;">
                     </div>
                 </div>
 
                 <br>    
 
                 <div class="table-responsive table-striped table-sm">
-                    <table class="table">
+                    <table class="table table-bordered parking-list">
                         <thead>
                             <tr>
                                 <th>SN</th>
@@ -45,7 +50,7 @@
                                 <tr *ngFor="let p of $any(parkings) | paginate: { itemsPerPage: pageSize, currentPage: page, totalItems: totalParkings }; trackBy: trackById">
                                     <td>{{p.sn}}</td>
                                     <td>{{p.no}}</td>
-                                    <td>{{p.ownerFirstName}} {{p.ownerLastName}}</td>
+                                    <td><span *ngIf="!ownerPending(p)">{{p.ownerFirstName}} {{p.ownerLastName}}</span></td>
                                     <td><b style="color: rgb(228, 85, 8);">{{p.chasisNo}}</b></td>
                                     <td><b class="text-primary">{{p.vehicleEquipmentTypeName}}</b></td>
                                     <td>{{p.ownerPhoneNo}}</td>
@@ -54,7 +59,8 @@
                                     <td><span class="badge badge-primary">{{p.billingType}}</span></td>
                                     <td style="text-align: right;"><b class="text-danger">{{p.billingAmount | currency:'':''}}</b></td>
                                     <td>
-                                        <span class="badge badge-warning" *ngIf="p.status === 'PENDING'">{{p.status}}</span>
+                                        <span class="badge badge-warning" *ngIf="p.status === 'PENDING'">AWAITING REGISTRATION</span>
+                                        <span class="badge badge-info" *ngIf="p.status === 'REGISTERED'">AWAITING CHECK-IN</span>
                                         <span class="badge badge-success" *ngIf="p.status === 'CHECKED-IN'">{{p.status}}</span>
                                         <span class="badge badge-danger" *ngIf="p.status === 'CHECKED-IN' && p.custody === 'OUTSIDE'" style="margin-left: 3px;">OUTSIDE YARD</span>
                                         <span class="badge badge-danger" *ngIf="p.status === 'CHECKED-OUT'">{{p.status}}</span>
@@ -62,10 +68,10 @@
                                     <td>
                                         <table style="border-style: none;">
                                             <tr>
-                                                <td *ngIf="p.status === 'CHECKED-IN'"><button type="button" class="btn btn-primary btn-round-custom btn-sm text-nowrap" (click)="get(p.id)" data-toggle="modal" data-target="#view-modal" style="cursor: pointer;"><i class="fa fa-eye"></i> View</button></td>
-                                                <td *ngIf="p.status === 'CHECKED-IN' && grant(['PKNG-MODIFY'])"><button type="button" class="btn btn-warning btn-round-custom btn-sm text-nowrap" (click)="get(p.id)" data-toggle="modal" data-target="#modify-modal" style="cursor: pointer;"><i class="fa fa-wrench"></i> Modify</button></td>
-                                                <td *ngIf="p.status === 'PENDING'"><button type="button" class="btn btn-primary btn-round-custom btn-sm text-nowrap" (click)="get(p.id)" data-toggle="modal" data-target="#edit-modal" style="cursor: pointer;"><i class="fa fa-pencil-square-o"></i> Edit</button></td>
-                                                <td *ngIf="p.status === 'PENDING'"><button type="button" class="btn btn-success btn-round-custom btn-sm text-nowrap" (click)="get(p.id)" data-toggle="modal" data-target="#check-in-modal" style="cursor: pointer; margin-left: 3px;"><i class="fa fa-sign-in"></i> Check In</button></td>
+                                                <td><button type="button" class="btn btn-primary btn-round-custom btn-sm text-nowrap" (click)="get(p.id)" data-toggle="modal" data-target="#view-modal" style="cursor: pointer;"><i class="fa fa-eye"></i> View</button></td>
+                                                <td *ngIf="p.status === 'CHECKED-IN' && grant(['PKNG-MODIFY'])"><button type="button" class="btn btn-warning btn-round-custom btn-sm text-nowrap" (click)="openModify(p.id)" data-toggle="modal" data-target="#modify-modal" style="cursor: pointer;"><i class="fa fa-wrench"></i> Modify</button></td>
+                                                <td *ngIf="p.status === 'REGISTERED' && grant(['PKNG-REGISTER'])"><button type="button" class="btn btn-success btn-round-custom btn-sm text-nowrap" (click)="openCheckIn(p.id)" data-toggle="modal" data-target="#check-in-step-modal" style="cursor: pointer; margin-left: 3px;"><i class="fa fa-sign-in"></i> Check In</button></td>
+                                                <td *ngIf="p.status === 'REGISTERED' && !grant(['PKNG-REGISTER'])"><small class="text-muted text-nowrap" style="margin-left: 3px;">No permission</small></td>
                                                 <td *ngIf="p.status === 'CHECKED-IN' && grant(['PKNG-ARCHIVE'])"><button type="button" class="btn btn-warning btn-round-custom btn-sm text-nowrap" (click)="get(p.id)" (click)="clearRemove()" data-toggle="modal"data-target="#remove-modal"><i class="fa fa-cogs"></i> Archive</button></td>
                                                 <!-- <td><button type="button" class="btn btn-danger btn-round-custom" *ngIf="p.status === 'CHECKED-IN'" (click)="get(p.id)" data-toggle="modal" data-target="#check-out-modal" style="cursor: pointer; margin-left: 3px;">Check Out</button></td> -->
                                             </tr>
@@ -90,12 +96,12 @@
     <div class="modal-dialog modal-xl" role="document" style="top: 0;">
         <div class="modal-content">
             <div class="modal-header state modal-default">                                    
-                <h4 class="modal-title" id="modal-large-label">Vehicle Registration</h4>
+                <h4 class="modal-title" id="modal-large-label">Edit Inspection | {{parkingNo}}</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
             </div>
             <div class="modal-body">
-                <h6>Driver/Owner Information</h6><hr>
-                <div class="row">
+                <!-- The owner and agent are entered at registration -->
+                <div class="row" *ngIf="false">
                     <!-- <input type="hidden" [(ngModel)]="parkingId"> -->
                     <div class="col-lg-3">
                         <div class="form-group">
@@ -137,22 +143,22 @@
                     </div> 
                 </div>
 
-                <h6>Agent Information</h6><hr>
-                <div class="row">
-                    <input type="hidden" [(ngModel)]="parkingId">
-                    <div class="col-lg-6">
+                <!-- The transit document (Sub T1) is entered at registration -->
+                <input type="hidden" [(ngModel)]="parkingId">
+                <div class="row" *ngIf="false">
+                    <div class="col-lg-6" *ngIf="false">
                         <div class="form-group">
                             <label>Agent Name</label>
                             <input class="form-control" type="text" [(ngModel)]="agentName" autocomplete="nope">
                         </div>
                     </div>     
-                    <div class="col-lg-3">
+                    <div class="col-lg-3" *ngIf="false">
                         <div class="form-group">
                             <label>Agent Address</label>
                             <input class="form-control" type="text" [(ngModel)]="agentAddress" autocomplete="nope">
                         </div>
                     </div> 
-                    <div class="col-lg-3">
+                    <div class="col-lg-3" *ngIf="false">
                         <div class="form-group">
                             <label>Agent Phone</label>
                             <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo" autocomplete="nope">
@@ -439,33 +445,17 @@
                         </div>
                     </div>
                     
+
                     <div class="col-lg-3">
                         <div class="form-group">
-                            <label>Category</label>
+                            <label>Category*</label>
                             <select class="form-control" [(ngModel)]="vehicleEquipmentCategory">
+                                <option></option>
                                 <option>IN-TRANSIT</option>
                                 <option>LOCAL</option>
                             </select>
                         </div>
-                    </div> 
-
-                    <div class="col-lg-3">
-                        <div class="form-group">
-                            <label>Parking Zone</label>
-                            <select class="form-control" [(ngModel)]="parkingZoneName">
-                                <option></option>
-                                <option *ngFor="let option of parkingZones; trackBy: trackById" [value]="option.name">{{ option.name }}</option>
-                            </select>
-                        </div>
-                    </div> 
-                    <div class="col-lg-3">
-                        <div class="form-group">
-                            <label>Select Billing Type</label>
-                            <select class="form-control" [(ngModel)]="billingType">
-                                <option>DAILY</option>
-                            </select>
-                        </div>
-                    </div> 
+                    </div>
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Chasis No</label>
@@ -479,9 +469,41 @@
                         </div>
                     </div>  
                 </div>
+                <hr>
+                <h6>Inspection</h6><hr>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Interior Details</label>
+                            <textarea class="form-control" rows="3" [(ngModel)]="interiorDetails" autocomplete="nope"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Body Condition*</label>
+                            <textarea class="form-control" rows="3" [(ngModel)]="bodyCondition" autocomplete="nope"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-3" *ngIf="deviceStatus === 'ATTACHED'">
+                        <div class="form-group">
+                            <label>Number of Devices</label>
+                            <input class="form-control" type="number" min="1" [(ngModel)]="deviceCount">
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <label>Signatures</label>
+                        <div *ngFor="let signature of signaturesOf('INSPECTION')" style="margin-bottom: 6px;">
+                            <img *ngIf="signature.image" [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"><span *ngIf="!signature.image" class="text-muted" style="display: inline-block; padding: 8px 0;"><i>Signature image removed</i></span><br>
+                            <small><b>{{ roleLabel(signature.role) }}:</b> {{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
+                        </div>
+                        <div class="text-muted" *ngIf="inspectionLoaded && signaturesOf('INSPECTION').length === 0">No signature (inspected before electronic signatures)</div>
+                        <small class="text-muted">Editing does not need new signatures.</small>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" (click)="save()" data-dismiss="modal">Save/Register</button>
+                <span class="text-danger mr-auto" *ngIf="inspectionEditProblem() !== ''">{{ inspectionEditProblem() }}</span>
+                <button type="button" class="btn btn-primary" [disabled]="inspectionEditProblem() !== ''" (click)="save()" data-dismiss="modal">Update Inspection</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -503,10 +525,10 @@
                 <div class="row">
                     <div class="col-lg-4">
                         <table class="table table-striped table-sm">
-                            <thead>
+                            <thead *ngIf="status !== 'PENDING'">
                                 <p><b>Driver/Owner Information</b></p>
                             </thead>
-                            <tbody>
+                            <tbody *ngIf="status !== 'PENDING'">
                                 <tr><td><b>First Name</b></td><td>{{ownerFirstName}}</td></tr>
                                 <tr><td><b>Last Name</b></td><td>{{ownerLastName}}</td></tr> 
                                 <tr><td><b>ID Type</b></td><td>{{ownerIdType}}</td></tr>
@@ -514,10 +536,10 @@
                                 <tr><td><b>Phone No</b></td><td>{{ownerPhoneNo}}</td></tr>   
                                 <tr><td><b>Email</b></td><td>{{ownerEmail}}</td></tr>    
                             </tbody>
-                            <thead>
+                            <thead *ngIf="status !== 'PENDING'">
                                 <p><b>Agent Information</b></p>
                             </thead>
-                            <tbody>
+                            <tbody *ngIf="status !== 'PENDING'">
                                 <tr><td><b>Name</b></td><td>{{agentName}}</td></tr>
                                 <tr><td><b>Phone No</b></td><td>{{agentPhoneNo}}</td></tr>
                                 <tr><td><b>Email</b></td><td>{{agentEmail}}</td></tr> 
@@ -527,7 +549,7 @@
                             </thead>
                             <tbody>
                                 <tr><td><b>Sub T1 Number</b></td><td>{{tformNumber}}</td></tr>
-                                <tr><td><b>Device Status</b></td><td>{{deviceStatus}}</td></tr>
+                                <tr><td><b>Device Status</b></td><td>{{ deviceText() }}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -542,7 +564,7 @@
                                 <tr><td><b>Chassis No</b></td><td style="color: red;"><b>{{chasisNo}}</b></td></tr>
                                 <tr><td><b>Billing Type</b></td><td>{{billingType}}</td></tr>
                                 <tr><td><b>Billing Start Date</b></td><td style="color: red;"><b>{{startBillingAt}}</b></td></tr> 
-                                <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}</td></tr>   
+                                <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}<span *ngIf="parkingSlotNo"> · Slot {{parkingSlotNo}}</span></td></tr>   
                                 <tr><td><b>Parking No</b></td><td>{{parkingNo}}</td></tr>   
                                 <tr><td><b>Vhc/Eq Category</b></td><td>{{vehicleEquipmentCategory}}</td></tr>
                                 <tr><td><b>Keys</b></td><td>{{hasKeys}}</td></tr>
@@ -580,6 +602,77 @@
                         <p><b>Comments</b></p>
                         <textarea class="form-control" placeholder="Comments" [(ngModel)]="comments" readonly style="background-color: white;"></textarea>
                     </div>
+                    <!-- The steps in order: inspection, registration and check-in, then later modifications -->
+                    <div class="col-lg-12"><hr><h6><b>1. Inspection</b></h6></div>
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm">
+                            <tbody>
+                                <tr><td><b>Interior Details</b></td><td style="white-space: pre-wrap;">{{interiorDetails}}</td></tr>
+                                <tr><td><b>Body Condition</b></td><td style="white-space: pre-wrap;">{{bodyCondition}}</td></tr>
+                                <tr><td><b>Tracking Device</b></td><td>{{ deviceText() }}</td></tr>
+                                <tr><td><b>Category</b></td><td>{{vehicleEquipmentCategory}}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-4" *ngFor="let signature of signaturesOf('INSPECTION')">
+                        <label><b>{{ roleLabel(signature.role) }}</b></label>
+                        <div><img *ngIf="signature.image" [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"><span *ngIf="!signature.image" class="text-muted" style="display: inline-block; padding: 8px 0;"><i>Signature image removed</i></span></div>
+                        <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
+                    </div>
+                    <div class="col-lg-8 text-muted" *ngIf="inspectionLoaded && signaturesOf('INSPECTION').length === 0">No signature: inspected before electronic signatures were introduced.</div>
+
+                    <div class="col-lg-12"><hr><h6><b>2. Registration</b></h6></div>
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm">
+                            <tbody>
+                                <tr><td><b>Driver</b></td><td>{{driverName}}</td></tr>
+                                <tr><td><b>Driver Phone</b></td><td>{{driverPhoneNo}}</td></tr>
+                                <tr><td><b>Driver ID</b></td><td>{{driverIdType}} {{driverIdNo}}</td></tr>
+                                <tr><td><b>Sub T1 Number</b></td><td>{{tformNumber}}</td></tr>
+                                <tr *ngIf="status !== 'PENDING'"><td><b>Parking Zone</b></td><td>{{parkingZoneName}}<span *ngIf="parkingSlotNo"> · Slot {{parkingSlotNo}}</span></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-4" *ngFor="let signature of signaturesOf('REGISTRATION')">
+                        <label><b>{{ roleLabel(signature.role) }}</b></label>
+                        <div><img *ngIf="signature.image" [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"><span *ngIf="!signature.image" class="text-muted" style="display: inline-block; padding: 8px 0;"><i>Signature image removed</i></span></div>
+                        <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
+                    </div>
+                    <div class="col-lg-8 text-muted" *ngIf="inspectionLoaded && status !== 'PENDING' && signaturesOf('REGISTRATION').length === 0">No signature: registered before electronic signatures were introduced.</div>
+                    <div class="col-lg-8 text-muted" *ngIf="status === 'PENDING'">Waiting for registration.</div>
+
+                    <div class="col-lg-12"><hr><h6><b>3. Check-in</b></h6></div>
+                    <div class="col-lg-4" *ngIf="status === 'CHECKED-IN'">
+                        <table class="table table-striped table-sm">
+                            <tbody>
+                                <tr><td><b>Card No</b></td><td>{{cardNo}}</td></tr>
+                                <tr><td><b>Keys</b></td><td>{{hasKeys}}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-4" *ngFor="let signature of signaturesOf('CHECK_IN')">
+                        <label><b>{{ roleLabel(signature.role) }}</b></label>
+                        <div><img *ngIf="signature.image" [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"><span *ngIf="!signature.image" class="text-muted" style="display: inline-block; padding: 8px 0;"><i>Signature image removed</i></span></div>
+                        <small>{{ signature.signerName }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
+                    </div>
+                    <div class="col-lg-8 text-muted" *ngIf="status === 'PENDING' || status === 'REGISTERED'">Waiting for check-in.</div>
+
+                    <ng-container *ngIf="signaturesOf('MODIFICATION').length > 0">
+                        <div class="col-lg-12"><hr><h6><b>4. Modifications</b></h6></div>
+                        <div class="col-lg-12" *ngFor="let signature of signaturesOf('MODIFICATION')">
+                            <table class="table table-sm table-bordered">
+                                <tbody>
+                                    <tr>
+                                        <td style="width: 220px;">
+                                            <img *ngIf="signature.image" [src]="signature.image" alt="Signature" style="max-width: 200px;"><span *ngIf="!signature.image" class="text-muted" style="display: inline-block; padding: 8px 0;"><i>Signature image removed</i></span><br>
+                                            <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
+                                        </td>
+                                        <td style="white-space: pre-wrap;">{{ signature.changes }}</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </ng-container>
                 </div>
             </div>
             
@@ -631,7 +724,7 @@
                             </thead>
                             <tbody>
                                 <tr><td><b>Sub T1 Number</b></td><td>{{tformNumber}}</td></tr>
-                                <tr><td><b>Device Status</b></td><td>{{deviceStatus}}</td></tr>
+                                <tr><td><b>Device Status</b></td><td>{{ deviceText() }}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -691,54 +784,153 @@
     </div>
 </div>
 
+<!-- Opens the registration when Vehicle Register › Awaiting Registration › Register brings the user here -->
+<button type="button" id="open-registration" class="d-none" data-toggle="modal" data-target="#check-in-modal"></button>
 <div class="modal fade" id="check-in-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
     <div class="modal-dialog modal-xl" role="document" style="top: 0;">
         <div class="modal-content">
             <div class="modal-header state modal-default">                                    
-                <h4 class="modal-title" id="modal-large-label">Complete Registration</h4>
+                <h4 class="modal-title" id="modal-large-label">Register | {{parkingNo}}</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
             </div>
             <div class="modal-body">
+                <h6>Owner Details</h6><hr>
                 <div class="row">
                     <div class="col-lg-3">
                         <div class="form-group">
-                            <label>Keys</label>
-                            <select class="form-control" [(ngModel)]="hasKeys">
-                                <option>YES</option>
-                                <option>NO</option>
-                            </select>
+                            <label>Owner First Name*</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerFirstName" autocomplete="nope">
                         </div>
-                    </div> 
+                    </div>
                     <div class="col-lg-3">
                         <div class="form-group">
-                            <label>Card No</label><br>
-                            <input class="form-control" type="tel" [(ngModel)]="cardNo" autocomplete="nope">
+                            <label>Owner Last Name*</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerLastName" autocomplete="nope">
                         </div>
-                    </div> 
-                    <!-- <div class="col-lg-3">
+                    </div>
+                    <div class="col-lg-3">
                         <div class="form-group">
-                            <label>Parking Zone</label>
-                            <select class="form-control" [(ngModel)]="parkingZoneName">
+                            <label>Owner ID Type</label>
+                            <select class="form-control" [(ngModel)]="ownerIdType">
                                 <option></option>
-                                <option *ngFor="let option of parkingZones" [value]="option.name">{{ option.name }}</option>
+                                <option>NATIONAL ID</option>
+                                <option>VOTER ID</option>
+                                <option>PASSPORT</option>
+                                <option>DRIVING LICENCE</option>
+                                <option>LETTER</option>
+                                <option>VISA</option>
+                                <option>NONE</option>
                             </select>
                         </div>
-                    </div> -->
+                    </div>
                     <div class="col-lg-3">
                         <div class="form-group">
-                            <label>Select Billing Start Date</label>
-                            <input type="date" class="form-control" [(ngModel)]="startBillingAt">
+                            <label>Owner ID No</label>
+                            <input class="form-control" type="text" [(ngModel)]="ownerIdNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Owner Phone No</label>
+                            <input class="form-control" type="tel" [(ngModel)]="ownerPhoneNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Agent Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="agentName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Agent Phone</label>
+                            <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Sub T1 Number</label>
+                            <input class="form-control" type="text" [(ngModel)]="tformNumber" autocomplete="nope">
                         </div>
                     </div>
                 </div>
+                <h6>Driver Details</h6><hr>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Driver Name*</label>
+                            <input class="form-control" type="text" [(ngModel)]="driverName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Driver Phone</label>
+                            <input class="form-control" type="tel" [(ngModel)]="driverPhoneNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Driver ID Type</label>
+                            <select class="form-control" [(ngModel)]="driverIdType">
+                                <option></option>
+                                <option>NATIONAL ID</option>
+                                <option>VOTER ID</option>
+                                <option>PASSPORT</option>
+                                <option>DRIVING LICENCE</option>
+                                <option>LETTER</option>
+                                <option>VISA</option>
+                                <option>NONE</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Driver ID No</label>
+                            <input class="form-control" type="text" [(ngModel)]="driverIdNo" autocomplete="nope">
+                        </div>
+                    </div>
+                </div>
+                <h6>Parking</h6><hr>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Parking Zone*</label>
+                            <select class="form-control" [(ngModel)]="parkingZoneName" (ngModelChange)="parkingSlotNo = null">
+                                <option></option>
+                                <option *ngFor="let zone of availableZones; trackBy: trackById" [value]="zone.name">{{ zoneLabel(zone) }}</option>
+                            </select>
+                            <small class="text-danger" *ngIf="availableZones.length === 0">No parking zone has space</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" *ngIf="parkingZoneName">
+                        <div class="form-group">
+                            <label>Parking Slot<span *ngIf="slotOptions().length > 0">*</span></label>
+                            <select class="form-control" [(ngModel)]="parkingSlotNo" *ngIf="slotOptions().length > 0">
+                                <option [ngValue]="null"></option>
+                                <option *ngFor="let slot of slotOptions()" [ngValue]="slot">Slot {{ slot }}</option>
+                            </select>
+                            <select class="form-control" disabled *ngIf="slotOptions().length === 0"><option>No slots set for this zone</option></select>
+                            <small class="text-muted" *ngIf="slotOptions().length === 0">This zone has no numbered slots (No of Slots is 0 in Parking Zones), so no slot is needed.</small>
+                        </div>
+                    </div>
+                </div>
+                <!-- The registrar signs here, between the details entered and the inspection shown below -->
+                <div class="row justify-content-center registrar-signature">
+                    <div class="col-lg-5 col-md-8">
+                        <az-signature-pad label="Registrar Signature" [caption]="userName" pendingNote="Your name is added when saved" [(signature)]="registrarSignature"></az-signature-pad>
+                        <small class="text-muted d-block text-center">Check the owner, driver and inspection details before signing.</small>
+                    </div>
+                </div>
+                <hr>
+                <h6>Inspection (read only)</h6>
                 <hr>
                 <div class="row">
                     <div class="col-lg-4">
                         <table class="table table-striped table-sm">
-                            <thead>
+                            <thead *ngIf="false">
                                 <p><b>Driver/Owner Information</b></p>
                             </thead>
-                            <tbody>
+                            <tbody *ngIf="false">
                                 <tr><td><b>First Name</b></td><td>{{ownerFirstName}}</td></tr>
                                 <!-- <tr><td><b>Middle Name</b></td><td>{{ownerMiddleName}}</td></tr> -->
                                 <tr><td><b>Last Name</b></td><td>{{ownerLastName}}</td></tr> 
@@ -747,10 +939,10 @@
                                 <tr><td><b>Phone No</b></td><td>{{ownerPhoneNo}}</td></tr>   
                                 <!-- <tr><td><b>Email</b></td><td>{{ownerEmail}}</td></tr>     -->
                             </tbody>
-                            <thead>
+                            <thead *ngIf="false">
                                 <p><b>Agent Information</b></p>
                             </thead>
-                            <tbody>
+                            <tbody *ngIf="false">
                                 <tr><td><b>Name</b></td><td>{{agentName}}</td></tr>
                                 <tr><td><b>Phone No</b></td><td>{{agentPhoneNo}}</td></tr>
                                 <tr><td><b>Email</b></td><td>{{agentEmail}}</td></tr> 
@@ -760,7 +952,7 @@
                             </thead>
                             <tbody>
                                 <tr><td><b>Sub T1 Number</b></td><td>{{tformNumber}}</td></tr>
-                                <tr><td><b>Device Status</b></td><td>{{deviceStatus}}</td></tr>
+                                <tr><td><b>Device Status</b></td><td>{{ deviceText() }}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -774,7 +966,7 @@
                                 <tr><td><b>Color</b></td><td>{{vehicleEquipmentColor}}</td></tr>
                                 <tr><td><b>Billing Type</b></td><td>{{billingType}}</td></tr>
                                 <tr><td><b>Billing Amount</b></td><td style="text-align: right;">{{billingAmount}}</td></tr> 
-                                <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}</td></tr>   
+                                <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}<span *ngIf="parkingSlotNo"> · Slot {{parkingSlotNo}}</span></td></tr>   
                                 <tr><td><b>Parking No</b></td><td>{{parkingNo}}</td></tr>   
                                 <tr><td><b>Vhc/Eq Category</b></td><td>{{vehicleEquipmentCategory}}</td></tr>   
                                 <tr><td><b>Keys</b></td><td>{{hasKeys}}</td></tr>  
@@ -810,9 +1002,107 @@
 
                 
                 
+                <div class="row">
+                    <div class="col-lg-4">
+                        <table class="table table-striped table-sm">
+                            <tbody>
+                                <tr><td><b>Interior Details</b></td><td style="white-space: pre-wrap;">{{interiorDetails}}</td></tr>
+                                <tr><td><b>Body Condition</b></td><td style="white-space: pre-wrap;">{{bodyCondition}}</td></tr>
+                                <tr><td><b>Tracking Device</b></td><td>{{ deviceText() }}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-4" *ngFor="let signature of signaturesOf('INSPECTION')">
+                        <label><b>{{ roleLabel(signature.role) }}</b></label>
+                        <div><img *ngIf="signature.image" [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"><span *ngIf="!signature.image" class="text-muted" style="display: inline-block; padding: 8px 0;"><i>Signature image removed</i></span></div>
+                        <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
+                    </div>
+                    <div class="col-lg-8 text-muted" *ngIf="inspectionLoaded && signaturesOf('INSPECTION').length === 0">No signature: inspected before electronic signatures were introduced.</div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" (click)="checkIn()" data-dismiss="modal">Complete and Check In</button>
+                <span class="text-danger mr-auto" *ngIf="registrationProblem() !== ''">{{ registrationProblem() }}</span>
+                <button type="button" class="btn btn-success" [disabled]="registrationProblem() !== ''" (click)="register()" data-dismiss="modal"><i class="fa fa-check"></i> Register</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Check-in of a registered vehicle: parking zone and slot, keys, card and the day billing starts -->
+<div class="modal fade" id="check-in-step-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="check-in-step-label" style="top: 0;">
+    <div class="modal-dialog modal-lg" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">
+                <h4 class="modal-title" id="check-in-step-label">Check In | {{parkingNo}}</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped table-sm">
+                    <tbody>
+                        <tr><td><b>Chassis No</b></td><td><b style="color: rgb(228, 85, 8);">{{chasisNo}}</b></td><td><b>Vehicle Type</b></td><td>{{vehicleEquipmentTypeName}}</td></tr>
+                        <tr><td><b>Category</b></td><td>{{vehicleEquipmentCategory}}</td><td><b>Owner</b></td><td>{{ownerFirstName}} {{ownerLastName}}</td></tr>
+                        <tr><td><b>Driver</b></td><td>{{driverName}}</td><td><b>Sub T1 Number</b></td><td>{{tformNumber}}</td></tr>
+                        <tr *ngIf="!checkInNeedsZone"><td><b>Parking Zone</b></td><td colspan="3"><b>{{parkingZoneName}}</b><span *ngIf="parkingSlotNo"> · Slot {{parkingSlotNo}}</span></td></tr>
+                    </tbody>
+                </table>
+                <!-- Only for a vehicle registered without a zone (before zone and slot moved to registration) -->
+                <div class="row" *ngIf="checkInNeedsZone">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Parking Zone*</label>
+                            <select class="form-control" [(ngModel)]="parkingZoneName" (ngModelChange)="parkingSlotNo = null">
+                                <option></option>
+                                <option *ngFor="let zone of availableZones; trackBy: trackById" [value]="zone.name">{{ zoneLabel(zone) }}</option>
+                            </select>
+                            <small class="text-muted">This vehicle was registered without a parking zone, so choose it here.</small>
+                            <small class="text-danger d-block" *ngIf="availableZones.length === 0">No parking zone has space</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" *ngIf="parkingZoneName">
+                        <div class="form-group">
+                            <label>Parking Slot<span *ngIf="slotOptions().length > 0">*</span></label>
+                            <select class="form-control" [(ngModel)]="parkingSlotNo" *ngIf="slotOptions().length > 0">
+                                <option [ngValue]="null"></option>
+                                <option *ngFor="let slot of slotOptions()" [ngValue]="slot">Slot {{ slot }}</option>
+                            </select>
+                            <select class="form-control" disabled *ngIf="slotOptions().length === 0"><option>No slots set for this zone</option></select>
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label>Keys</label>
+                            <select class="form-control" [(ngModel)]="hasKeys">
+                                <option>YES</option>
+                                <option>NO</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label>Card No</label>
+                            <input class="form-control" type="tel" [(ngModel)]="cardNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label>Billing Start Date</label>
+                            <input type="date" class="form-control" [(ngModel)]="startBillingAt">
+                        </div>
+                    </div>
+                </div>
+                <div class="row justify-content-center">
+                    <div class="col-lg-7 col-md-9">
+                        <az-signature-pad label="Check-in Signature (optional)" [required]="false" [caption]="userName" pendingNote="Your name is added when saved" [(signature)]="checkInSignature"></az-signature-pad>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span class="text-danger mr-auto" *ngIf="checkInProblem() !== ''">{{ checkInProblem() }}</span>
+                <button type="button" class="btn btn-success" [disabled]="checkInProblem() !== ''" (click)="checkIn()" data-dismiss="modal"><i class="fa fa-sign-in"></i> Check In</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>
@@ -1228,9 +1518,18 @@
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Parking Zone</label>
-                            <select class="form-control" [(ngModel)]="parkingZoneName">
+                            <select class="form-control" [(ngModel)]="parkingZoneName" (ngModelChange)="parkingSlotNo = $event === originalZoneName ? originalSlotNo : null">
                                 <option></option>
-                                <option *ngFor="let option of parkingZones; trackBy: trackById" [value]="option.name">{{ option.name }}</option>
+                                <option *ngFor="let option of modifyZoneOptions()" [value]="option.name">{{ option.label }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3" *ngIf="modifySlotOptions().length > 0">
+                        <div class="form-group">
+                            <label>Parking Slot</label>
+                            <select class="form-control" [(ngModel)]="parkingSlotNo">
+                                <option [ngValue]="null"></option>
+                                <option *ngFor="let slot of modifySlotOptions()" [ngValue]="slot">Slot {{ slot }}{{ slot === originalSlotNo && parkingZoneName === originalZoneName ? ' (current)' : '' }}</option>
                             </select>
                         </div>
                     </div> 
@@ -1285,9 +1584,76 @@
                     </div>
                 </div>
 
+                <hr>
+                <h6>Inspection</h6><hr>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Interior Details</label>
+                            <textarea class="form-control" rows="3" [(ngModel)]="interiorDetails" autocomplete="nope"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Body Condition</label>
+                            <textarea class="form-control" rows="3" [(ngModel)]="bodyCondition" autocomplete="nope"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-lg-3" *ngIf="deviceStatus === 'ATTACHED'">
+                        <div class="form-group">
+                            <label>Number of Devices</label>
+                            <input class="form-control" type="number" min="1" [(ngModel)]="deviceCount">
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <h6>Driver</h6><hr>
+                <div class="row">
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Driver Name</label>
+                            <input class="form-control" type="text" [(ngModel)]="driverName" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Driver Phone</label>
+                            <input class="form-control" type="tel" [(ngModel)]="driverPhoneNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Driver ID Type</label>
+                            <select class="form-control" [(ngModel)]="driverIdType">
+                                <option></option>
+                                <option>NATIONAL ID</option>
+                                <option>VOTER ID</option>
+                                <option>PASSPORT</option>
+                                <option>DRIVING LICENCE</option>
+                                <option>LETTER</option>
+                                <option>VISA</option>
+                                <option>NONE</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Driver ID No</label>
+                            <input class="form-control" type="text" [(ngModel)]="driverIdNo" autocomplete="nope">
+                        </div>
+                    </div>
+                </div>
+                <hr>
+                <div class="row">
+                    <div class="col-lg-4">
+                        <az-signature-pad label="Your Signature" [caption]="userName" pendingNote="Your name is added when saved" [(signature)]="modifierSignature"></az-signature-pad>
+                        <small class="text-muted">Your name, signature, the time and what you changed are kept with the record.</small>
+                    </div>
+                </div>
             </div>
             <div class="modal-footer">
-                <button type="button" class="btn btn-primary" (click)="modify()" data-dismiss="modal">Modify</button>
+                <span class="text-danger mr-auto" *ngIf="modifyProblem() !== ''">{{ modifyProblem() }}</span>
+                <button type="button" class="btn btn-primary" [disabled]="modifyProblem() !== ''" (click)="modify()" data-dismiss="modal">Sign &amp; Modify</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>

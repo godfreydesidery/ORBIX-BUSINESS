@@ -17,11 +17,13 @@ public interface ParkingService {
 	List<ParkingResponseDTO> getAllCheckedInParkings(HttpServletRequest request);	
 	List<ParkingResponseDTO> getAllWithDiscounts(HttpServletRequest request);
 	ParkingResponseDTO get(Long id, HttpServletRequest request);
+	ParkingInspectionResponseDTO getInspection(Long id, HttpServletRequest request);
 	List<ParkingBillReceivableResponseDTO> getParkingBillReceivables(Long id, HttpServletRequest request);
 	ParkingResponseDTO createParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	ParkingResponseDTO updateParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	ParkingResponseDTO modifyParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	
+	ParkingResponseDTO registerParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	ParkingResponseDTO checkIn(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	ParkingResponseDTO checkOut(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 //	ApiCustomResponse activateParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
@@ -33,7 +35,8 @@ public interface ParkingService {
 	
 	void removeVehicleEquipment(Long parkingId, String reason, HttpServletRequest request);
 
-	PageResponseDTO<ParkingResponseDTO> getPendingOrCheckedInParkingPage(int page, int size, String search, HttpServletRequest request);
+	/** status: PENDING or CHECKED-IN for one of them, empty for both */
+	PageResponseDTO<ParkingResponseDTO> getPendingOrCheckedInParkingPage(int page, int size, String search, String status, HttpServletRequest request);
 	PageResponseDTO<ParkingResponseDTO> getCheckedInParkingPage(int page, int size, String search, HttpServletRequest request);
 	PageResponseDTO<ParkingResponseDTO> getWithDiscountsParkingPage(int page, int size, String search, HttpServletRequest request);
 	PageResponseDTO<ParkingResponseDTO> getRecentCheckedOutParkingPage(int page, int size, String search, HttpServletRequest request);

@@ -88,6 +88,8 @@ public class Parking {
 	private boolean tireIndicator = true;
 	private boolean hasKeys = true;
 	private boolean deviceStatus = true;
+	/** How many tracking devices are attached when deviceStatus says attached; empty for older records */
+	private Integer deviceCount;
 	private Byte[] image;
 	private String cardNo;
 	
@@ -96,11 +98,44 @@ public class Parking {
 	private String vehicleEquipmentCategory;
 	private String vehicleEquipmentName;
 	private String vehicleEquipmentColor;
-	
+
+	/**Inspection (all optional in the database; required ones are checked when the inspection is submitted)*/
+	@Column(length = 1000)
+	private String interiorDetails;
+	@Column(length = 1000)
+	private String bodyCondition;
+
+	/**Driver who brought the vehicle in, recorded at registration*/
+	private String driverName;
+	private String driverPhoneNo;
+	private String driverIdType;
+	private String driverIdNo;
+
 	private LocalDateTime startBillingAt = LocalDateTime.now();
 	
 	@NotBlank
 	private String status = "PENDING";
+
+	/**
+	 * The owner's names are entered by the registrar, but the owner name columns are required (NOT NULL) and the
+	 * record is created at inspection. Until registration the owner is therefore "PENDING REGISTRATION".
+	 */
+	public static final String OWNER_PENDING_FIRST_NAME = "PENDING";
+	public static final String OWNER_PENDING_LAST_NAME = "REGISTRATION";
+
+	/** The given name, or the placeholder when it is empty */
+	public static String ownerFirstNameOrPending(String name) {
+		return name == null || name.trim().isEmpty() ? OWNER_PENDING_FIRST_NAME : name.trim();
+	}
+
+	public static String ownerLastNameOrPending(String name) {
+		return name == null || name.trim().isEmpty() ? OWNER_PENDING_LAST_NAME : name.trim();
+	}
+
+	/** Whether the owner is still the placeholder, waiting for the registrar */
+	public static boolean isOwnerPending(String firstName, String lastName) {
+		return OWNER_PENDING_FIRST_NAME.equals(firstName) && OWNER_PENDING_LAST_NAME.equals(lastName);
+	}
 
 	public static final String INSIDE = "INSIDE";
 	public static final String OUTSIDE = "OUTSIDE";
@@ -120,6 +155,9 @@ public class Parking {
 	private String billingType;
 	private double billingAmount;
 	
+	/** The slot within the parking zone, numbered 1 to the zone's no of slots; empty for zones without a limit and older records */
+	private Integer parkingSlotNo;
+
 	@ManyToOne(targetEntity = ParkingZone.class, fetch = FetchType.EAGER,  optional = true)
     @JoinColumn(name = "parking_zone_id", nullable = true , updatable = true)
     @OnDelete(action = OnDeleteAction.NO_ACTION)
