@@ -39,7 +39,7 @@ the check-in.
 
 ## Database (added by `ddl-auto = update`)
 
-- `parkings`: + `device_count` (beside the existing `device_status`), `interior_details`, `body_condition`,
+- `parkings`: + `device_count` (beside the existing `device_status`), `parking_slot_no`, `interior_details`, `body_condition`,
   `driver_name`, `driver_phone_no`, `driver_id_type`, `driver_id_no`
 - `parking_signatures`: `parking_id`, `stage` (INSPECTION / REGISTRATION / MODIFICATION),
   `role` (INSPECTOR / DRIVER / REGISTRAR / MODIFIER), `user_id`, `signer_name`, `image`, `signed_at`, `changes`
@@ -70,6 +70,22 @@ The document's "Device Attached" with "idadi ya vifaa" means the tracking device
 The existing Device Status (Attached / Not attached) stays, with a Number of Devices beside it, required when
 Attached for a new inspection. A first version used a free list of items with quantities; it was replaced, since
 loose items are already covered by the yes/no condition checklist.
+
+## Client's second write-up (same branch)
+
+- The driver signs at inspection without a name. The name under the driver's signature stays blank until the
+  registrar enters the driver's details, then is filled in automatically (and follows a correction made with Modify).
+- The inspector's name, date and time appear under their signature as soon as they sign.
+- The inspection page has a **Vehicle List** button: inspected vehicles awaiting registration, searchable by chassis,
+  which the inspector can open and edit until check-in.
+- The registrar's list is the Parking page's **List of Vehicles (Awaiting Registration)** tab, searched by chassis.
+- **Parking slots:** each zone's slots are numbered 1 to its no of slots. The registrar picks a free slot after the
+  zone (Open), and Modify can move a vehicle to another free zone or slot. A taken slot is refused, a zone with no free
+  slot is hidden, and check-out frees the slot. One nullable column, `parkings.parking_slot_no`, with no slot table.
+  Zones with no of slots 0 still have no limit and no slots. Vehicles checked in before slots existed have no slot.
+- The registrar's save still checks the vehicle in; there is no separate check-in step.
+- Styling: signature boxes with a header, a "Signed" badge, a signing line and a Clear button; larger buttons with
+  icons for New Vehicle / Existing Vehicle / Vehicle List and for the Parking tabs.
 
 ## Found while building
 
