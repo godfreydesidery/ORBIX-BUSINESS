@@ -20,11 +20,6 @@
 
                 <div class="row">
                     <div class="col-sm-8">
-                        <div class="btn-group" role="group">
-                            <button type="button" class="btn tab-button" [ngClass]="statusFilter === '' ? 'btn-primary' : 'btn-outline-primary'" (click)="setStatusFilter('')"><i class="fa fa-th-list"></i> All</button>
-                            <button type="button" class="btn tab-button" [ngClass]="statusFilter === 'PENDING' ? 'btn-warning' : 'btn-outline-warning'" (click)="setStatusFilter('PENDING')"><i class="fa fa-list-alt"></i> List of Vehicles (Awaiting Registration)</button>
-                            <button type="button" class="btn tab-button" [ngClass]="statusFilter === 'CHECKED-IN' ? 'btn-success' : 'btn-outline-success'" (click)="setStatusFilter('CHECKED-IN')"><i class="fa fa-check-circle"></i> Checked In</button>
-                        </div>
                     </div>
                     <div class="col-sm-4">
                         <input type="text" class="form-control pull-right" [(ngModel)]="filterRecords" (ngModelChange)="searchList()" placeholder="Search by chassis no..." style="max-width: 8cm;">
@@ -148,9 +143,9 @@
                     </div> 
                 </div>
 
-                <h6>Transit Document</h6><hr>
-                <div class="row">
-                    <input type="hidden" [(ngModel)]="parkingId">
+                <!-- The transit document (Sub T1) is entered at registration -->
+                <input type="hidden" [(ngModel)]="parkingId">
+                <div class="row" *ngIf="false">
                     <div class="col-lg-6" *ngIf="false">
                         <div class="form-group">
                             <label>Agent Name</label>
@@ -451,6 +446,16 @@
                     </div>
                     
 
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Category*</label>
+                            <select class="form-control" [(ngModel)]="vehicleEquipmentCategory">
+                                <option></option>
+                                <option>IN-TRANSIT</option>
+                                <option>LOCAL</option>
+                            </select>
+                        </div>
+                    </div>
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Chasis No</label>
@@ -823,6 +828,12 @@
                             <input class="form-control" type="tel" [(ngModel)]="agentPhoneNo" autocomplete="nope">
                         </div>
                     </div>
+                    <div class="col-lg-3">
+                        <div class="form-group">
+                            <label>Sub T1 Number</label>
+                            <input class="form-control" type="text" [(ngModel)]="tformNumber" autocomplete="nope">
+                        </div>
+                    </div>
                 </div>
                 <h6>Driver Details</h6><hr>
                 <div class="row">
@@ -862,24 +873,6 @@
                 </div>
                 <h6>Registration</h6><hr>
                 <div class="row">
-                    <div class="col-lg-3">
-                        <div class="form-group">
-                            <label>Vehicle Type*</label>
-                            <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
-                                <option *ngFor="let option of vehicleEquipmentTypes; trackBy: trackById" [value]="option.name">{{ option.name }}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="form-group">
-                            <label>Category*</label>
-                            <select class="form-control" [(ngModel)]="vehicleEquipmentCategory">
-                                <option></option>
-                                <option>IN-TRANSIT</option>
-                                <option>LOCAL</option>
-                            </select>
-                        </div>
-                    </div>
                     <div class="col-lg-3">
                         <div class="form-group">
                             <label>Parking Zone*</label>

@@ -451,10 +451,9 @@
                             </div>                      -->
                         </div>
 
-                        <h6 *ngIf="currentService === 'Parking'">Transit Document</h6>
-                        <hr *ngIf="currentService === 'Parking'">
-                        <div class="row" *ngIf="currentService === 'Parking'">
-                            <input type="hidden" [(ngModel)]="id">
+                        <!-- The transit document (Sub T1), the owner and the agent are entered at registration -->
+                        <input type="hidden" [(ngModel)]="id">
+                        <div class="row" *ngIf="false">
                             <!-- The agent is entered by the registrar -->
                             <div class="col-lg-6" *ngIf="false">
                                 <div class="form-group">
@@ -831,6 +830,16 @@
                                 </div>
                             </div>
 
+                            <div class="col-lg-3" *ngIf="currentService === 'Parking'">
+                                <div class="form-group">
+                                    <label>Category*</label>
+                                    <select class="form-control" [(ngModel)]="vehicleEquipmentCategory">
+                                        <option></option>
+                                        <option>IN-TRANSIT</option>
+                                        <option>LOCAL</option>
+                                    </select>
+                                </div>
+                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Chasis No/ Reg No*</label>

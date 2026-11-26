@@ -133,7 +133,7 @@ export class VehicleRegisterComponent {
 
   parkingZones : IParkingZone[] = []
 
-  // List tab: '' for all, PENDING (awaiting registration) or CHECKED-IN
+  // The list shows waiting and checked-in vehicles together ('' = both)
   statusFilter : string = ''
 
   // Inspection, recorded by the inspector
@@ -210,12 +210,6 @@ export class VehicleRegisterComponent {
         this.totalParkings = data!.totalElements
       }
     )
-  }
-
-  setStatusFilter(status : string){
-    this.statusFilter = status
-    this.page = 1
-    this.getAllPendingOrCheckedInParkings()
   }
 
   pageChanged(page : number){
@@ -297,10 +291,6 @@ export class VehicleRegisterComponent {
     this.registrarSignature = null
     this.availableZones = []
     await this.get(id)
-    // An earlier category is kept; otherwise the registrar chooses one
-    if(this.vehicleEquipmentCategory !== 'IN-TRANSIT' && this.vehicleEquipmentCategory !== 'LOCAL'){
-      this.vehicleEquipmentCategory = ''
-    }
     this.parkingZoneName = ''
     this.parkingSlotNo = null
     // Billing starts today unless the registrar picks another date (the API takes a plain yyyy-MM-dd date)
@@ -341,8 +331,7 @@ export class VehicleRegisterComponent {
   registrationProblem() : string {
     if(!this.ownerFirstName?.trim() || !this.ownerLastName?.trim()) return "Owner's first and last name are required"
     if(!this.driverName?.trim()) return 'Driver name is required'
-    if(!this.vehicleEquipmentTypeName) return 'Vehicle type is required'
-    if(this.vehicleEquipmentCategory !== 'IN-TRANSIT' && this.vehicleEquipmentCategory !== 'LOCAL') return 'Select the category'
+    if(this.vehicleEquipmentCategory !== 'IN-TRANSIT' && this.vehicleEquipmentCategory !== 'LOCAL') return 'The category is missing: edit the inspection and choose it there'
     if(!this.parkingZoneName) return 'Select the parking zone'
     if(this.slotOptions().length > 0 && !this.parkingSlotNo) return 'Select the parking slot'
     if(!this.registrarSignature) return 'Registrar signature is required'
@@ -353,6 +342,7 @@ export class VehicleRegisterComponent {
   inspectionEditProblem() : string {
     if(!this.chasisNo?.trim()) return 'Chassis number is required'
     if(!this.bodyCondition?.trim()) return 'Body condition is required'
+    if(this.vehicleEquipmentCategory !== 'IN-TRANSIT' && this.vehicleEquipmentCategory !== 'LOCAL') return 'Select the category'
     if(this.deviceStatus === 'ATTACHED' && this.deviceCount !== null && this.deviceCount < 1) return 'The number of devices must be at least 1'
     return ''
   }
@@ -723,9 +713,8 @@ export class VehicleRegisterComponent {
       ownerPhoneNo : this.ownerPhoneNo,
       agentName : this.agentName,
       agentPhoneNo : this.agentPhoneNo,
+      tformNumber : this.tformNumber,
 
-      vehicleEquipmentTypeName : this.vehicleEquipmentTypeName,
-      vehicleEquipmentCategory : this.vehicleEquipmentCategory,
       driverName : this.driverName,
       driverPhoneNo : this.driverPhoneNo,
       driverIdType : this.driverIdType,

@@ -426,6 +426,7 @@ public class ParkingServiceController implements ParkingService {
 		// What the inspection must have; the database itself requires none of the new values
 		required(parkingRequest.getChasisNo(), "Chassis number is required");
 		required(parkingRequest.getBodyCondition(), "Body condition is required");
+		String category = category(parkingRequest);
 		byte[] inspectorSignature = SignatureImages.decode(parkingRequest.getInspectorSignature(), "Inspector");
 		byte[] driverSignature = SignatureImages.decode(parkingRequest.getDriverSignature(), "Driver");
 		Integer deviceCount = deviceCount(parkingRequest, true);
@@ -452,7 +453,7 @@ public class ParkingServiceController implements ParkingService {
 				? vehicleEquipmentRepository.findById(parkingRequest.getVehicleEquipmentId()).orElseThrow(() -> new NotFoundException("Vehicle and equipment not found"))
 				: vehicleForInspection(parkingRequest, vehicleEquipmentType_.get(), branch_.get(), request);
 		
-		// The parking zone and category are chosen at registration, not at inspection
+		// The parking zone and slot are chosen at registration; the vehicle type and category here, at inspection
 
 		Parking parking = new Parking();
 		parking.setNo(String.valueOf(Math.random()));
@@ -501,6 +502,7 @@ public class ParkingServiceController implements ParkingService {
 		//parking.setImage(parkingRequest.getImage());
 		parking.setStatus("PENDING");
 		parking.setVehicleEquipmentType(vehicleEquipmentType_.get());
+		parking.setVehicleEquipmentCategory(category);
 		
 		parking.setVehicleEquipmentName(vehicleEquipmentType_.get().getName()); // Look here later
 		parking.setVehicleEquipmentColor(parkingRequest.getVehicleEquipmentColor());
@@ -573,7 +575,8 @@ public class ParkingServiceController implements ParkingService {
 		if(!Objects.equals(vehicleEquipmentType_.get().getCompany().getId(), company_.get().getId())) 
 			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
 		
-		// The parking zone and category belong to registration: editing an inspection leaves them as they are
+		// The parking zone belongs to registration: editing an inspection leaves it as it is
+		String editedCategory = category(parkingRequest);
 		
 		Parking parking = parking_.get();
 		parking.setOwnerFirstName(Parking.ownerFirstNameOrPending(parkingRequest.getOwnerFirstName()));
@@ -613,6 +616,7 @@ public class ParkingServiceController implements ParkingService {
 		parking.setHasKeys(parkingRequest.isHasKeys());
 		parking.setDeviceStatus(parkingRequest.isDeviceStatus());
 		parking.setVehicleEquipmentType(vehicleEquipmentType_.get());
+		parking.setVehicleEquipmentCategory(editedCategory);
 
 		parking.setVehicleEquipmentName(vehicleEquipmentType_.get().getName()); // Look here later
 		parking.setVehicleEquipmentColor(parkingRequest.getVehicleEquipmentColor());
@@ -1041,6 +1045,13 @@ public class ParkingServiceController implements ParkingService {
 		return values;
 	}
 
+	/** The category chosen at inspection: In-transit or Local */
+	private static String category(ParkingRequestDTO parkingRequest) {
+		String category = required(parkingRequest.getVehicleEquipmentCategory(), "Select the category").toUpperCase();
+		if(!CATEGORIES.contains(category)) throw new InvalidEntryException("Select the category: In-transit or Local");
+		return category;
+	}
+
 	private static String yesNo(boolean value) {
 		return value ? "Yes" : "No";
 	}
@@ -1083,8 +1094,9 @@ public class ParkingServiceController implements ParkingService {
 		Parking parking = parking_.get();
 
 		// What registration must have; the database itself requires none of the new values
-		String category = required(parkingRequest.getVehicleEquipmentCategory(), "Select the category").toUpperCase();
-		if(!CATEGORIES.contains(category)) throw new InvalidEntryException("Select the category: In-transit or Local");
+		// The category comes from the inspection; a vehicle inspected before it was asked there must have it edited first
+		if(parking_.get().getVehicleEquipmentCategory() == null || !CATEGORIES.contains(parking_.get().getVehicleEquipmentCategory()))
+			throw new InvalidOperationException("The category is missing: edit the inspection and choose In-transit or Local");
 		String ownerFirstName = required(parkingRequest.getOwnerFirstName(), "Owner first name is required");
 		String ownerLastName = required(parkingRequest.getOwnerLastName(), "Owner last name is required");
 		if(Parking.isOwnerPending(ownerFirstName, ownerLastName)) throw new InvalidEntryException("Enter the owner's name");
@@ -1095,15 +1107,7 @@ public class ParkingServiceController implements ParkingService {
 		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
 		ParkingZone parkingZone = zoneWithSpace(parkingZone_.get(), parkingRequest.getParkingSlotNo(), null);
 
-		// The registrar confirms the vehicle type, and may correct it; the daily price follows the final type
-		if(text(parkingRequest.getVehicleEquipmentTypeName()) != null) {
-			Company company = companyRepository.findById(userService.getUserCompany(request).getId()).orElseThrow(() -> new NotFoundException("Company not found"));
-			VehicleEquipmentType vehicleEquipmentType = vehicleEquipmentTypeRepository.findByNameAndCompany(parkingRequest.getVehicleEquipmentTypeName(), company)
-					.orElseThrow(() -> new NotFoundException("Vehicle or equipment type not found"));
-			parking.setVehicleEquipmentType(vehicleEquipmentType);
-			parking.setVehicleEquipmentName(vehicleEquipmentType.getName());
-		}
-		parking.setVehicleEquipmentCategory(category);
+		// The vehicle type and category were set at inspection; the daily price follows the type
 		parking.setOwnerFirstName(ownerFirstName);
 		parking.setOwnerMiddleName(text(parkingRequest.getOwnerMiddleName()));
 		parking.setOwnerLastName(ownerLastName);
@@ -1117,6 +1121,8 @@ public class ParkingServiceController implements ParkingService {
 		parking.setAgentPhoneNo(text(parkingRequest.getAgentPhoneNo()));
 		parking.setAgentAddress(text(parkingRequest.getAgentAddress()));
 		parking.setAgentEmail(text(parkingRequest.getAgentEmail()));
+		// The transit document (Sub T1) is entered at registration
+		parking.setTformNumber(text(parkingRequest.getTformNumber()));
 		// The vehicle keeps its owner too, so "Existing Vehicle" fills it in next time
 		VehicleEquipment vehicleEquipment = parking.getVehicleEquipment();
 		if(vehicleEquipment != null) {
@@ -1133,6 +1139,7 @@ public class ParkingServiceController implements ParkingService {
 			vehicleEquipment.setAgentPhoneNo(parking.getAgentPhoneNo());
 			vehicleEquipment.setAgentAddress(parking.getAgentAddress());
 			vehicleEquipment.setAgentEmail(parking.getAgentEmail());
+			vehicleEquipment.setTformNumber(parking.getTformNumber());
 			vehicleEquipmentRepository.save(vehicleEquipment);
 		}
 		parking.setDriverName(driverName);

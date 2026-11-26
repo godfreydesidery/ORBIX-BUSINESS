@@ -726,6 +726,7 @@ export class VehicleEquipmentRegisterComponent {
   inspectionProblem(): string {
     if (!this.chasisNo?.trim()) return 'Chassis number is required'
     if (!this.vehicleEquipmentTypeName) return 'Vehicle type is required'
+    if (this.vehicleEquipmentCategory !== 'IN-TRANSIT' && this.vehicleEquipmentCategory !== 'LOCAL') return 'Select the category'
     if (!this.bodyCondition?.trim()) return 'Body condition is required'
     if (this.deviceStatus === 'ATTACHED' && !(this.deviceCount && this.deviceCount >= 1)) return 'Enter the number of tracking devices attached'
     if (this.isNewInspection()) {
