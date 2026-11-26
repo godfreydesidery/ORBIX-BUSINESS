@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { ActivatedRoute, Router } from '@angular/router';
 import { AuthService } from 'src/app/auth.service';
 import { NgxPaginationModule } from 'ngx-pagination';
 import { IParking, IParkingInspection, IParkingSignature, isOwnerPending } from 'src/app/domain/parking';
@@ -133,8 +134,8 @@ export class VehicleRegisterComponent {
 
   parkingZones : IParkingZone[] = []
 
-  // The list shows waiting and checked-in vehicles together ('' = both)
-  statusFilter : string = ''
+  // The list shows vehicles awaiting check-in and checked-in vehicles; those awaiting registration are on Vehicle Register
+  statusFilter : string = 'REGISTERED,CHECKED-IN'
 
   // Inspection, recorded by the inspector
   interiorDetails : string = ''
@@ -169,13 +170,22 @@ export class VehicleRegisterComponent {
     private http :HttpClient,
     private auth : AuthService,
     private data : DataService,
-    private msg : MsgBoxService
+    private msg : MsgBoxService,
+    private route : ActivatedRoute,
+    private router : Router
   ) {}
 
   ngOnInit(){
-    this.getAllPendingOrCheckedInParkings()   
+    this.getAllPendingOrCheckedInParkings()
     this.getAllCompanyActiveVehicleAndEquipmentTypes()
     this.getAllBranchActiveParkingZones();
+    // Vehicle Register › Awaiting Registration › Register opens the registration of that vehicle here
+    const registerId = this.route.snapshot.queryParamMap.get('register')
+    if(registerId){
+      // Opened through a hidden data-toggle button: the page's second copy of jQuery has no Bootstrap modal()
+      this.open(registerId).then(() => document.getElementById('open-registration')?.click())
+      this.router.navigate([], { relativeTo : this.route, queryParams : {}, replaceUrl : true })
+    }
   }
 
   async getAllPendingOrCheckedInParkings(){
@@ -286,17 +296,30 @@ export class VehicleRegisterComponent {
     return this.deviceCount ? 'Attached: ' + this.deviceCount + (this.deviceCount === 1 ? ' device' : ' devices') : 'Attached'
   }
 
-  // Opens a PENDING vehicle for registration and check-in
+  // Opens an inspected (PENDING) vehicle for registration
   async open(id : any){
     this.registrarSignature = null
+    await this.get(id)
+  }
+
+  // Opens a registered vehicle for check-in: zone and slot, keys, card and the day billing starts
+  async openCheckIn(id : any){
     this.availableZones = []
     await this.get(id)
     this.parkingZoneName = ''
     this.parkingSlotNo = null
-    // Billing starts today unless the registrar picks another date (the API takes a plain yyyy-MM-dd date)
+    this.hasKeys = 'YES'
+    // Billing starts today unless another date is picked (the API takes a plain yyyy-MM-dd date)
     const today = new Date()
     this.startBillingAt = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0')
     await this.getAvailableZones()
+  }
+
+  // What check-in still lacks, or '' when the vehicle can be checked in
+  checkInProblem() : string {
+    if(!this.parkingZoneName) return 'Select the parking zone'
+    if(this.slotOptions().length > 0 && !this.parkingSlotNo) return 'Select the parking slot'
+    return ''
   }
 
   async getAvailableZones(){
@@ -327,13 +350,11 @@ export class VehicleRegisterComponent {
     return slots.sort((a, b) => a - b)
   }
 
-  // What registration still lacks, or '' when the vehicle can be checked in
+  // What registration still lacks, or '' when the vehicle can be registered
   registrationProblem() : string {
     if(!this.ownerFirstName?.trim() || !this.ownerLastName?.trim()) return "Owner's first and last name are required"
     if(!this.driverName?.trim()) return 'Driver name is required'
     if(this.vehicleEquipmentCategory !== 'IN-TRANSIT' && this.vehicleEquipmentCategory !== 'LOCAL') return 'The category is missing: edit the inspection and choose it there'
-    if(!this.parkingZoneName) return 'Select the parking zone'
-    if(this.slotOptions().length > 0 && !this.parkingSlotNo) return 'Select the parking slot'
     if(!this.registrarSignature) return 'Registrar signature is required'
     return ''
   }
@@ -693,19 +714,15 @@ export class VehicleRegisterComponent {
       )
   }
 
-  async checkIn(){
+  // Registers the vehicle: owner, agent, Sub T1 and driver, signed by the registrar; it then waits for check-in
+  async register(){
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
     }
 
     var parking = {
       id : this.parkingId,
-      cardNo : this.cardNo,
-      hasKeys : this.hasKeys === 'YES' ? 1 : 0,
-      parkingZoneName : this.parkingZoneName,
-      startBillingAt : this.startBillingAt,
 
-      // The owner and agent, entered at registration
       ownerFirstName : this.ownerFirstName,
       ownerLastName : this.ownerLastName,
       ownerIdType : this.ownerIdType,
@@ -720,23 +737,47 @@ export class VehicleRegisterComponent {
       driverIdType : this.driverIdType,
       driverIdNo : this.driverIdNo,
 
-      registrarSignature : this.registrarSignature,
-      parkingSlotNo : this.parkingSlotNo
+      registrarSignature : this.registrarSignature
+    }
+
+    await this.http.post<IParking>(API_URL+'/parkings/register', parking, options)
+      .toPromise()
+      .then(
+        data => {
+          this.getAllPendingOrCheckedInParkings()
+          this.msg.showSuccessMessage('Registered. ' + data!.no + ' is waiting for check-in.')
+        }
+      )
+      .catch(
+        error => {
+          console.log(error)
+          this.msg.showErrorMessage(error, 'Error')
+        }
+      )
+  }
+
+  // Checks a registered vehicle in
+  async checkIn(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+
+    var parking = {
+      id : this.parkingId,
+      parkingZoneName : this.parkingZoneName,
+      parkingSlotNo : this.parkingSlotNo,
+      cardNo : this.cardNo,
+      hasKeys : this.hasKeys === 'YES' ? 1 : 0,
+      startBillingAt : this.startBillingAt
     }
 
     await this.http.post<IParking>(API_URL+'/parkings/check_in', parking, options)
       .toPromise()
       .then(
         data => {
-
-          console.log(data)
-
           this.getAllPendingOrCheckedInParkings()
-
-          this.msg.showSuccessMessage('Registered and checked in successfully')
-
+          this.msg.showSuccessMessage('Checked in successfully')
         }
-
       )
       .catch(
         error => {

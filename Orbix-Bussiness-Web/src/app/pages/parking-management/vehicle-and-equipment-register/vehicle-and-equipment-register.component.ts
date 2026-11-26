@@ -722,6 +722,38 @@ export class VehicleEquipmentRegisterComponent {
       .catch(error => console.log(error))
   }
 
+  // The condition checklist: left and right items, then single items (each 'YES' present or 'NO' missing/damaged)
+  checklistPairs = [
+    { label: 'Front Lamps', left: 'leftFrontLamp', right: 'rightFrontLamp' },
+    { label: 'Rear Lamps', left: 'leftRearLamp', right: 'rightRearLamp' },
+    { label: 'Side Mirrors', left: 'leftSideMirror', right: 'rightSideMirror' },
+    { label: 'Wipers', left: 'leftWiper', right: 'rightWiper' },
+  ]
+  checklistSingles = [
+    { label: 'Back Wiper', key: 'backWiper' },
+    { label: 'Fuel Cap', key: 'fuelCap' },
+    { label: 'Spare Tyre', key: 'spareTire' },
+    { label: 'Battery', key: 'battery' },
+    { label: 'Starter', key: 'starter' },
+    { label: 'Aerial', key: 'aerial' },
+    { label: 'Wheel Cap', key: 'wheelCap' },
+    { label: 'Round Mirror', key: 'roundMirror' },
+    { label: 'Tyre Indicator', key: 'tireIndicator' },
+  ]
+
+  flag(key: string): string {
+    return (this as any)[key]
+  }
+
+  setFlag(key: string, value: 'YES' | 'NO') {
+    (this as any)[key] = value
+  }
+
+  missingCount(): number {
+    const keys = this.checklistPairs.flatMap(p => [p.left, p.right]).concat(this.checklistSingles.map(s => s.key))
+    return keys.filter(key => this.flag(key) === 'NO').length
+  }
+
   // What the inspection still lacks, or '' when it can be submitted
   inspectionProblem(): string {
     if (!this.chasisNo?.trim()) return 'Chassis number is required'
@@ -742,11 +774,14 @@ export class VehicleEquipmentRegisterComponent {
   vehicleListSize: number = 10
   vehicleListSearch: string = ''
   vehicleListTimer: any = null
+  // '' for every inspected vehicle (Vehicle List), PENDING for those awaiting registration
+  vehicleListStatus: string = ''
 
-  setListMode() {
+  setListMode(status: string) {
     this.clearParkingData()
     this.clear()
     this.mode = 'list'
+    this.vehicleListStatus = status
     this.vehicleListPage = 1
     this.loadVehicleList()
   }
@@ -756,7 +791,7 @@ export class VehicleEquipmentRegisterComponent {
       headers: new HttpHeaders().set('Authorization', 'Bearer ' + this.auth.user.access_token)
     }
     await this.http.get<IPage<IParking>>(API_URL + '/parkings/get_all_pending_or_checked_in_page?'
-        + pageParams(this.vehicleListPage, this.vehicleListSize, this.vehicleListSearch) + '&status=PENDING', options)
+        + pageParams(this.vehicleListPage, this.vehicleListSize, this.vehicleListSearch) + '&status=' + this.vehicleListStatus, options)
       .toPromise()
       .then(data => {
         this.vehicleList = data?.content ?? []
@@ -785,6 +820,11 @@ export class VehicleEquipmentRegisterComponent {
 
   ownerPending(parking: IParking): boolean {
     return isOwnerPending(parking.ownerFirstName, parking.ownerLastName)
+  }
+
+  // The registrar registers a vehicle on the Parking page, which opens its registration
+  registerFromList(parking: IParking) {
+    this.router.navigate(['/app/parking-management/parking'], { queryParams: { register: parking.id } })
   }
 
   // Opens an inspected vehicle in the form below, to view or edit its inspection

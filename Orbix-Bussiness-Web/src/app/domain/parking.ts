@@ -56,7 +56,7 @@ export interface IParking {
     billingAmount : number
     billingStartAt : string
 
-    status: "PENDING",
+    status: string, // PENDING (awaiting registration), REGISTERED (awaiting check-in), CHECKED-IN, CHECKED-OUT
 
     // INSIDE the yard, or OUTSIDE on a temporary trip
     custody: 'INSIDE' | 'OUTSIDE'

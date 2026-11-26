@@ -60,6 +60,7 @@
                                     <td style="text-align: right;"><b class="text-danger">{{p.billingAmount | currency:'':''}}</b></td>
                                     <td>
                                         <span class="badge badge-warning" *ngIf="p.status === 'PENDING'">AWAITING REGISTRATION</span>
+                                        <span class="badge badge-info" *ngIf="p.status === 'REGISTERED'">AWAITING CHECK-IN</span>
                                         <span class="badge badge-success" *ngIf="p.status === 'CHECKED-IN'">{{p.status}}</span>
                                         <span class="badge badge-danger" *ngIf="p.status === 'CHECKED-IN' && p.custody === 'OUTSIDE'" style="margin-left: 3px;">OUTSIDE YARD</span>
                                         <span class="badge badge-danger" *ngIf="p.status === 'CHECKED-OUT'">{{p.status}}</span>
@@ -69,9 +70,8 @@
                                             <tr>
                                                 <td><button type="button" class="btn btn-primary btn-round-custom btn-sm text-nowrap" (click)="get(p.id)" data-toggle="modal" data-target="#view-modal" style="cursor: pointer;"><i class="fa fa-eye"></i> View</button></td>
                                                 <td *ngIf="p.status === 'CHECKED-IN' && grant(['PKNG-MODIFY'])"><button type="button" class="btn btn-warning btn-round-custom btn-sm text-nowrap" (click)="openModify(p.id)" data-toggle="modal" data-target="#modify-modal" style="cursor: pointer;"><i class="fa fa-wrench"></i> Modify</button></td>
-                                                <td *ngIf="p.status === 'PENDING' && grant(['PKNG-INSPECT'])"><button type="button" class="btn btn-primary btn-round-custom btn-sm text-nowrap" (click)="get(p.id)" data-toggle="modal" data-target="#edit-modal" style="cursor: pointer;"><i class="fa fa-pencil-square-o"></i> Edit</button></td>
-                                                <td *ngIf="p.status === 'PENDING' && !grant(['PKNG-INSPECT', 'PKNG-REGISTER'])"><small class="text-muted text-nowrap" style="margin-left: 3px;">No permission</small></td>
-                                                <td *ngIf="p.status === 'PENDING' && grant(['PKNG-REGISTER'])"><button type="button" class="btn btn-success btn-round-custom btn-sm text-nowrap" (click)="open(p.id)" data-toggle="modal" data-target="#check-in-modal" style="cursor: pointer; margin-left: 3px;"><i class="fa fa-folder-open"></i> Open</button></td>
+                                                <td *ngIf="p.status === 'REGISTERED' && grant(['PKNG-REGISTER'])"><button type="button" class="btn btn-success btn-round-custom btn-sm text-nowrap" (click)="openCheckIn(p.id)" data-toggle="modal" data-target="#check-in-step-modal" style="cursor: pointer; margin-left: 3px;"><i class="fa fa-sign-in"></i> Check In</button></td>
+                                                <td *ngIf="p.status === 'REGISTERED' && !grant(['PKNG-REGISTER'])"><small class="text-muted text-nowrap" style="margin-left: 3px;">No permission</small></td>
                                                 <td *ngIf="p.status === 'CHECKED-IN' && grant(['PKNG-ARCHIVE'])"><button type="button" class="btn btn-warning btn-round-custom btn-sm text-nowrap" (click)="get(p.id)" (click)="clearRemove()" data-toggle="modal"data-target="#remove-modal"><i class="fa fa-cogs"></i> Archive</button></td>
                                                 <!-- <td><button type="button" class="btn btn-danger btn-round-custom" *ngIf="p.status === 'CHECKED-IN'" (click)="get(p.id)" data-toggle="modal" data-target="#check-out-modal" style="cursor: pointer; margin-left: 3px;">Check Out</button></td> -->
                                             </tr>
@@ -610,6 +610,7 @@
                                 <tr><td><b>Interior Details</b></td><td style="white-space: pre-wrap;">{{interiorDetails}}</td></tr>
                                 <tr><td><b>Body Condition</b></td><td style="white-space: pre-wrap;">{{bodyCondition}}</td></tr>
                                 <tr><td><b>Tracking Device</b></td><td>{{ deviceText() }}</td></tr>
+                                <tr><td><b>Category</b></td><td>{{vehicleEquipmentCategory}}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -620,15 +621,14 @@
                     </div>
                     <div class="col-lg-8 text-muted" *ngIf="inspectionLoaded && signaturesOf('INSPECTION').length === 0">No signature: inspected before electronic signatures were introduced.</div>
 
-                    <div class="col-lg-12"><hr><h6><b>2. Registration and Check-in</b></h6></div>
+                    <div class="col-lg-12"><hr><h6><b>2. Registration</b></h6></div>
                     <div class="col-lg-4">
                         <table class="table table-striped table-sm">
                             <tbody>
                                 <tr><td><b>Driver</b></td><td>{{driverName}}</td></tr>
                                 <tr><td><b>Driver Phone</b></td><td>{{driverPhoneNo}}</td></tr>
                                 <tr><td><b>Driver ID</b></td><td>{{driverIdType}} {{driverIdNo}}</td></tr>
-                                <tr><td><b>Category</b></td><td>{{vehicleEquipmentCategory}}</td></tr>
-                                <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}<span *ngIf="parkingSlotNo"> · Slot {{parkingSlotNo}}</span></td></tr>
+                                <tr><td><b>Sub T1 Number</b></td><td>{{tformNumber}}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -637,11 +637,23 @@
                         <div><img *ngIf="signature.image" [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"><span *ngIf="!signature.image" class="text-muted" style="display: inline-block; padding: 8px 0;"><i>Signature image removed</i></span></div>
                         <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
                     </div>
-                    <div class="col-lg-8 text-muted" *ngIf="inspectionLoaded && status === 'CHECKED-IN' && signaturesOf('REGISTRATION').length === 0">No signature: checked in before electronic signatures were introduced.</div>
+                    <div class="col-lg-8 text-muted" *ngIf="inspectionLoaded && status !== 'PENDING' && signaturesOf('REGISTRATION').length === 0">No signature: registered before electronic signatures were introduced.</div>
                     <div class="col-lg-8 text-muted" *ngIf="status === 'PENDING'">Waiting for registration.</div>
 
+                    <div class="col-lg-12"><hr><h6><b>3. Check-in</b></h6></div>
+                    <div class="col-lg-4" *ngIf="status === 'CHECKED-IN'">
+                        <table class="table table-striped table-sm">
+                            <tbody>
+                                <tr><td><b>Parking Zone</b></td><td>{{parkingZoneName}}<span *ngIf="parkingSlotNo"> · Slot {{parkingSlotNo}}</span></td></tr>
+                                <tr><td><b>Card No</b></td><td>{{cardNo}}</td></tr>
+                                <tr><td><b>Keys</b></td><td>{{hasKeys}}</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="col-lg-8 text-muted" *ngIf="status === 'PENDING' || status === 'REGISTERED'">Waiting for check-in.</div>
+
                     <ng-container *ngIf="signaturesOf('MODIFICATION').length > 0">
-                        <div class="col-lg-12"><hr><h6><b>3. Modifications</b></h6></div>
+                        <div class="col-lg-12"><hr><h6><b>4. Modifications</b></h6></div>
                         <div class="col-lg-12" *ngFor="let signature of signaturesOf('MODIFICATION')">
                             <table class="table table-sm table-bordered">
                                 <tbody>
@@ -767,11 +779,13 @@
     </div>
 </div>
 
+<!-- Opens the registration when Vehicle Register › Awaiting Registration › Register brings the user here -->
+<button type="button" id="open-registration" class="d-none" data-toggle="modal" data-target="#check-in-modal"></button>
 <div class="modal fade" id="check-in-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="modal-large-label" style="top: 0;">
     <div class="modal-dialog modal-xl" role="document" style="top: 0;">
         <div class="modal-content">
             <div class="modal-header state modal-default">                                    
-                <h4 class="modal-title" id="modal-large-label">Register &amp; Check In | {{parkingNo}}</h4>
+                <h4 class="modal-title" id="modal-large-label">Register | {{parkingNo}}</h4>
                 <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
             </div>
             <div class="modal-body">
@@ -868,49 +882,6 @@
                         <div class="form-group">
                             <label>Driver ID No</label>
                             <input class="form-control" type="text" [(ngModel)]="driverIdNo" autocomplete="nope">
-                        </div>
-                    </div>
-                </div>
-                <h6>Registration</h6><hr>
-                <div class="row">
-                    <div class="col-lg-3">
-                        <div class="form-group">
-                            <label>Parking Zone*</label>
-                            <select class="form-control" [(ngModel)]="parkingZoneName" (ngModelChange)="parkingSlotNo = null">
-                                <option></option>
-                                <option *ngFor="let zone of availableZones; trackBy: trackById" [value]="zone.name">{{ zoneLabel(zone) }}</option>
-                            </select>
-                            <small class="text-danger" *ngIf="availableZones.length === 0">No parking zone has space</small>
-                        </div>
-                    </div>
-                    <div class="col-lg-3" *ngIf="slotOptions().length > 0">
-                        <div class="form-group">
-                            <label>Parking Slot*</label>
-                            <select class="form-control" [(ngModel)]="parkingSlotNo">
-                                <option [ngValue]="null"></option>
-                                <option *ngFor="let slot of slotOptions()" [ngValue]="slot">Slot {{ slot }}</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="form-group">
-                            <label>Keys</label>
-                            <select class="form-control" [(ngModel)]="hasKeys">
-                                <option>YES</option>
-                                <option>NO</option>
-                            </select>
-                        </div>
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="form-group">
-                            <label>Card No</label><br>
-                            <input class="form-control" type="tel" [(ngModel)]="cardNo" autocomplete="nope">
-                        </div>
-                    </div>
-                    <div class="col-lg-3">
-                        <div class="form-group">
-                            <label>Select Billing Start Date</label>
-                            <input type="date" class="form-control" [(ngModel)]="startBillingAt">
                         </div>
                     </div>
                 </div>
@@ -1021,7 +992,76 @@
             </div>
             <div class="modal-footer">
                 <span class="text-danger mr-auto" *ngIf="registrationProblem() !== ''">{{ registrationProblem() }}</span>
-                <button type="button" class="btn btn-success" [disabled]="registrationProblem() !== ''" (click)="checkIn()" data-dismiss="modal"><i class="fa fa-sign-in"></i> Register &amp; Check In</button>
+                <button type="button" class="btn btn-success" [disabled]="registrationProblem() !== ''" (click)="register()" data-dismiss="modal"><i class="fa fa-check"></i> Register</button>
+                <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Check-in of a registered vehicle: parking zone and slot, keys, card and the day billing starts -->
+<div class="modal fade" id="check-in-step-modal" data-backdrop="static" tabindex="-1" role="dialog" aria-labelledby="check-in-step-label" style="top: 0;">
+    <div class="modal-dialog modal-lg" role="document" style="top: 0;">
+        <div class="modal-content">
+            <div class="modal-header state modal-default">
+                <h4 class="modal-title" id="check-in-step-label">Check In | {{parkingNo}}</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">×</span></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-striped table-sm">
+                    <tbody>
+                        <tr><td><b>Chassis No</b></td><td><b style="color: rgb(228, 85, 8);">{{chasisNo}}</b></td><td><b>Vehicle Type</b></td><td>{{vehicleEquipmentTypeName}}</td></tr>
+                        <tr><td><b>Category</b></td><td>{{vehicleEquipmentCategory}}</td><td><b>Owner</b></td><td>{{ownerFirstName}} {{ownerLastName}}</td></tr>
+                        <tr><td><b>Driver</b></td><td>{{driverName}}</td><td><b>Sub T1 Number</b></td><td>{{tformNumber}}</td></tr>
+                    </tbody>
+                </table>
+                <div class="row">
+                    <div class="col-lg-6">
+                        <div class="form-group">
+                            <label>Parking Zone*</label>
+                            <select class="form-control" [(ngModel)]="parkingZoneName" (ngModelChange)="parkingSlotNo = null">
+                                <option></option>
+                                <option *ngFor="let zone of availableZones; trackBy: trackById" [value]="zone.name">{{ zoneLabel(zone) }}</option>
+                            </select>
+                            <small class="text-danger" *ngIf="availableZones.length === 0">No parking zone has space</small>
+                        </div>
+                    </div>
+                    <div class="col-lg-6" *ngIf="slotOptions().length > 0">
+                        <div class="form-group">
+                            <label>Parking Slot*</label>
+                            <select class="form-control" [(ngModel)]="parkingSlotNo">
+                                <option [ngValue]="null"></option>
+                                <option *ngFor="let slot of slotOptions()" [ngValue]="slot">Slot {{ slot }}</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label>Keys</label>
+                            <select class="form-control" [(ngModel)]="hasKeys">
+                                <option>YES</option>
+                                <option>NO</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label>Card No</label>
+                            <input class="form-control" type="tel" [(ngModel)]="cardNo" autocomplete="nope">
+                        </div>
+                    </div>
+                    <div class="col-lg-4">
+                        <div class="form-group">
+                            <label>Billing Start Date</label>
+                            <input type="date" class="form-control" [(ngModel)]="startBillingAt">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <span class="text-danger mr-auto" *ngIf="checkInProblem() !== ''">{{ checkInProblem() }}</span>
+                <button type="button" class="btn btn-success" [disabled]="checkInProblem() !== ''" (click)="checkIn()" data-dismiss="modal"><i class="fa fa-sign-in"></i> Check In</button>
                 <button type="button" class="btn btn-danger" data-dismiss="modal">Close</button>
             </div>
         </div>
