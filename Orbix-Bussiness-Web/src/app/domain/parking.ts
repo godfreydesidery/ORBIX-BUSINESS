@@ -92,8 +92,8 @@ export interface IParking {
 
 // A signature given at one step of the parking
 export interface IParkingSignature {
-    stage : 'INSPECTION' | 'REGISTRATION' | 'MODIFICATION'
-    role : 'INSPECTOR' | 'DRIVER' | 'REGISTRAR' | 'MODIFIER'
+    stage : 'INSPECTION' | 'REGISTRATION' | 'CHECK_IN' | 'MODIFICATION'
+    role : 'INSPECTOR' | 'DRIVER' | 'REGISTRAR' | 'CHECK_IN_OFFICER' | 'MODIFIER'
     signerName : string
     signedAt : string
     image : string // data:image/png;base64,...

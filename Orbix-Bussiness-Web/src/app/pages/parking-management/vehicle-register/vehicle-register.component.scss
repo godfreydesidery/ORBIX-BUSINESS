@@ -1,1 +1,6 @@
 
+
+/* The parking list: bordered, the actions cell without the inner table's own borders */
+.parking-list th { background: #f5f7fa; vertical-align: middle; }
+.parking-list td { vertical-align: middle; }
+.parking-list td table td { border: 0; padding: 0 3px 0 0; }

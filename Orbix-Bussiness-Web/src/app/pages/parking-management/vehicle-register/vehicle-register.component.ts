@@ -161,6 +161,8 @@ export class VehicleRegisterComponent {
   originalZoneName : string = ''
   originalSlotNo : number | null = null
   modifierSignature : string | null = null
+  // Optional signature of whoever checks the vehicle in
+  checkInSignature : string | null = null
 
   // Active zones that still have space, for registration
   availableZones : IAvailableZone[] = []
@@ -286,6 +288,7 @@ export class VehicleRegisterComponent {
       case 'INSPECTOR': return 'Inspector'
       case 'DRIVER': return 'Driver'
       case 'REGISTRAR': return 'Registrar'
+      case 'CHECK_IN_OFFICER': return 'Checked in by'
       case 'MODIFIER': return 'Modified by'
       default: return role
     }
@@ -296,29 +299,29 @@ export class VehicleRegisterComponent {
     return this.deviceCount ? 'Attached: ' + this.deviceCount + (this.deviceCount === 1 ? ' device' : ' devices') : 'Attached'
   }
 
-  // Opens an inspected (PENDING) vehicle for registration
+  // Opens an inspected (PENDING) vehicle for registration, with the zones that still have space
   async open(id : any){
     this.registrarSignature = null
-    await this.get(id)
-  }
-
-  // Opens a registered vehicle for check-in: zone and slot, keys, card and the day billing starts
-  async openCheckIn(id : any){
     this.availableZones = []
     await this.get(id)
     this.parkingZoneName = ''
     this.parkingSlotNo = null
+    await this.getAvailableZones()
+  }
+
+  // Opens a registered vehicle for check-in: keys, card and the day billing starts (zone and slot come from registration)
+  async openCheckIn(id : any){
+    this.checkInSignature = null
+    await this.get(id)
     this.hasKeys = 'YES'
     // Billing starts today unless another date is picked (the API takes a plain yyyy-MM-dd date)
     const today = new Date()
     this.startBillingAt = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0')
-    await this.getAvailableZones()
   }
 
   // What check-in still lacks, or '' when the vehicle can be checked in
   checkInProblem() : string {
-    if(!this.parkingZoneName) return 'Select the parking zone'
-    if(this.slotOptions().length > 0 && !this.parkingSlotNo) return 'Select the parking slot'
+    if(!this.parkingZoneName) return 'The parking zone is missing: it is chosen at registration'
     return ''
   }
 
@@ -355,6 +358,8 @@ export class VehicleRegisterComponent {
     if(!this.ownerFirstName?.trim() || !this.ownerLastName?.trim()) return "Owner's first and last name are required"
     if(!this.driverName?.trim()) return 'Driver name is required'
     if(this.vehicleEquipmentCategory !== 'IN-TRANSIT' && this.vehicleEquipmentCategory !== 'LOCAL') return 'The category is missing: edit the inspection and choose it there'
+    if(!this.parkingZoneName) return 'Select the parking zone'
+    if(this.slotOptions().length > 0 && !this.parkingSlotNo) return 'Select the parking slot'
     if(!this.registrarSignature) return 'Registrar signature is required'
     return ''
   }
@@ -737,6 +742,9 @@ export class VehicleRegisterComponent {
       driverIdType : this.driverIdType,
       driverIdNo : this.driverIdNo,
 
+      parkingZoneName : this.parkingZoneName,
+      parkingSlotNo : this.parkingSlotNo,
+
       registrarSignature : this.registrarSignature
     }
 
@@ -764,11 +772,10 @@ export class VehicleRegisterComponent {
 
     var parking = {
       id : this.parkingId,
-      parkingZoneName : this.parkingZoneName,
-      parkingSlotNo : this.parkingSlotNo,
       cardNo : this.cardNo,
       hasKeys : this.hasKeys === 'YES' ? 1 : 0,
-      startBillingAt : this.startBillingAt
+      startBillingAt : this.startBillingAt,
+      checkInSignature : this.checkInSignature
     }
 
     await this.http.post<IParking>(API_URL+'/parkings/check_in', parking, options)
