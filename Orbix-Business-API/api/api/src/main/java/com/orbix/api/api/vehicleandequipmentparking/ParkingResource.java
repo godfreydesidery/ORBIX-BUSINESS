@@ -10,6 +10,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.transaction.Transactional;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -87,8 +88,9 @@ public class ParkingResource {
 			@RequestParam(name = "page") int page,
 			@RequestParam(name = "size") int size,
 			@RequestParam(name = "search", defaultValue = "") String search,
+			@RequestParam(name = "status", defaultValue = "") String status,
 			HttpServletRequest request){
-		return ResponseEntity.ok().body(parkingService.getPendingOrCheckedInParkingPage(page, size, search, request));
+		return ResponseEntity.ok().body(parkingService.getPendingOrCheckedInParkingPage(page, size, search, status, request));
 	}
 
 	@GetMapping("/parkings/get_all_checked_in_page")
@@ -156,8 +158,18 @@ public class ParkingResource {
 		return ResponseEntity.ok().body(parkingService.getParkingBillReceivables(id, request));		
 	}
 	
+	@GetMapping("/parkings/get_inspection")
+	@org.springframework.transaction.annotation.Transactional(readOnly = true)
+	public ResponseEntity<ParkingInspectionResponseDTO>getInspection(
+			@RequestParam(name = "id") Long id,
+			HttpServletRequest request){
+		return ResponseEntity.ok().body(parkingService.getInspection(id, request));
+	}
+	
+	/** Submits a vehicle's inspection: it is then PENDING, waiting for registration */
 	@PostMapping("/parkings/create")
-	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	@Audited(category = "OPERATIONS", action = "VEHICLE_INSPECTED", entityType = "Parking", entityId = "result.id", entityRef = "result.no", summary = "Inspected parking {result.no} ({result.chasisNo})", details = {"result.chasisNo", "result.registrationNo"})
+	@PreAuthorize("hasAnyAuthority('PKNG-INSPECT')")
 	public ResponseEntity<ParkingResponseDTO>create(
 			@RequestBody ParkingRequestDTO parkingRequest,
 			HttpServletRequest request){		
@@ -165,8 +177,10 @@ public class ParkingResource {
 		return ResponseEntity.created(uri).body(parkingService.createParking(parkingRequest, request));
 	}
 	
+	/** Edits the inspection of a PENDING vehicle; no new signatures */
 	@PostMapping("/parkings/update")
-	//@PreAuthorize("hasAnyAuthority('COM-ALL')")
+	@Audited(category = "OPERATIONS", action = "INSPECTION_EDITED", entityType = "Parking", entityRef = "result.no", summary = "Edited the inspection of parking {ref}", changeOf = Parking.class, changeId = "parkingRequest.id")
+	@PreAuthorize("hasAnyAuthority('PKNG-INSPECT')")
 	public ResponseEntity<ParkingResponseDTO>update(
 			@RequestBody ParkingRequestDTO parkingRequest,
 			HttpServletRequest request){		
@@ -184,8 +198,10 @@ public class ParkingResource {
 		return ResponseEntity.created(uri).body(parkingService.modifyParking(parkingRequest, request));
 	}
 	
+	/** Registers an inspected vehicle and checks it in */
 	@PostMapping("/parkings/check_in")
-	@Audited(category = "OPERATIONS", action = "CHECKED_IN", entityType = "Parking", entityRef = "result.no", summary = "Checked in parking {result.no} ({result.chasisNo})", details = {"result.chasisNo"})
+	@Audited(category = "OPERATIONS", action = "CHECKED_IN", entityType = "Parking", entityRef = "result.no", summary = "Registered and checked in parking {result.no} ({result.chasisNo}) in zone {result.parkingZoneName}", details = {"result.chasisNo", "result.parkingZoneName", "result.vehicleEquipmentCategory", "result.driverName"})
+	@PreAuthorize("hasAnyAuthority('PKNG-REGISTER')")
 	public ResponseEntity<ParkingResponseDTO>checkIn(
 			@RequestBody ParkingRequestDTO parkingRequest,
 			HttpServletRequest request){		

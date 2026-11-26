@@ -10,6 +10,7 @@ import com.orbix.api.api.commons.ApiCustomResponse;
 public interface ParkingZoneService {
 	List<ParkingZoneResponseDTO> getAllParkingZones(HttpServletRequest request);
 	List<ParkingZoneResponseDTO> getAllBranchActiveParkingZones(HttpServletRequest request);	
+	List<ParkingZoneResponseDTO> getAllBranchAvailableParkingZones(HttpServletRequest request);
 	ParkingZoneResponseDTO get(Long id, HttpServletRequest request);
 	ParkingZoneResponseDTO createParkingZone(ParkingZoneRequestDTO parkingZoneRequest, HttpServletRequest request);
 	ParkingZoneResponseDTO updateParkingZone(ParkingZoneRequestDTO parkingZoneRequest, HttpServletRequest request);

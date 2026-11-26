@@ -95,4 +95,12 @@ public class ParkingResponseDTO {
     String paidAmount;
     
     List<ServiceBillItem> serviceBillItems;
+
+    /**Inspection and driver; the devices and signatures come from /parkings/get_inspection*/
+    String interiorDetails;
+    String bodyCondition;
+    String driverName;
+    String driverPhoneNo;
+    String driverIdType;
+    String driverIdNo;
 }

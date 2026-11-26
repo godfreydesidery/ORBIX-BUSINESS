@@ -96,7 +96,19 @@ public class Parking {
 	private String vehicleEquipmentCategory;
 	private String vehicleEquipmentName;
 	private String vehicleEquipmentColor;
-	
+
+	/**Inspection (all optional in the database; required ones are checked when the inspection is submitted)*/
+	@Column(length = 1000)
+	private String interiorDetails;
+	@Column(length = 1000)
+	private String bodyCondition;
+
+	/**Driver who brought the vehicle in, recorded at registration*/
+	private String driverName;
+	private String driverPhoneNo;
+	private String driverIdType;
+	private String driverIdNo;
+
 	private LocalDateTime startBillingAt = LocalDateTime.now();
 	
 	@NotBlank

@@ -232,74 +232,10 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		
 		
 		if(vehicleEquipmentRequest.getService().equals("PARKING")) {
-			// After creating, save also to parking
-			
-			if (vehicleEquipment.getChasisNo() != null && !vehicleEquipment.getChasisNo().trim().isEmpty()) {
-				List<String> statuses = new ArrayList<>();
-				statuses.add("PENDING");
-				statuses.add("CHECKED-IN");
-			    if (parkingRepository.existsByChasisNoAndStatusIn(vehicleEquipment.getChasisNo(), statuses)) {
-			        throw new InvalidOperationException("Chasis number already exist in parking");
-			    }		    
-			}
-			
-			ParkingRequestDTO parkingRequest = new ParkingRequestDTO();
-			
-//			Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(vehicleEquipmentRequest.getParkingZoneName(), branch_.get());
-//			if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
-//			
-//			parkingRequest.setParkingZoneName(vehicleEquipmentRequest.getParkingZoneName());
+			// The parking is created only when the inspector submits the signed inspection (/parkings/create),
+			// so a vehicle is never waiting for registration without its inspection
+			return vehicleEquipmentResponseDTOMapper(vehicleEquipment, null, null);
 
-			parkingRequest.setOwnerFirstName(vehicleEquipment.getOwnerFirstName());
-			parkingRequest.setOwnerMiddleName(vehicleEquipment.getOwnerMiddleName());
-			parkingRequest.setOwnerLastName(vehicleEquipment.getOwnerLastName());
-			parkingRequest.setOwnerCompanyName(vehicleEquipment.getOwnerCompanyName());
-			parkingRequest.setOwnerIdNo(vehicleEquipment.getOwnerIdNo());
-			parkingRequest.setOwnerIdType(vehicleEquipment.getOwnerIdType());
-			parkingRequest.setOwnerPhoneNo(vehicleEquipment.getOwnerPhoneNo());
-			parkingRequest.setOwnerEmail(vehicleEquipment.getOwnerEmail());
-			parkingRequest.setOwnerAddress(vehicleEquipment.getOwnerAddress());
-			parkingRequest.setVehicleEquipmentTypeName(vehicleEquipment.getVehicleEquipmentType().getName());
-			parkingRequest.setVehicleEquipmentId(vehicleEquipment.getId());
-			
-			parkingRequest.setChasisNo(vehicleEquipment.getChasisNo());
-			
-			parkingRequest.setTformNumber(vehicleEquipment.getTformNumber());
-			
-			parkingRequest.setVehicleEquipmentColor(vehicleEquipment.getVehicleEquipmentColor());
-			
-			parkingRequest.setAgentName(vehicleEquipment.getAgentName());
-			parkingRequest.setAgentAddress(vehicleEquipment.getAgentAddress());
-			parkingRequest.setAgentPhoneNo(vehicleEquipment.getAgentPhoneNo());
-			parkingRequest.setAgentEmail(vehicleEquipment.getAgentEmail());
-			parkingRequest.setDeviceStatus(vehicleEquipment.isDeviceStatus());
-			
-			parkingRequest.setComments(vehicleEquipmentRequest.getComments());
-			
-				
-			parkingRequest.setLeftFrontLamp(true);
-			parkingRequest.setRightFrontLamp(true);
-			parkingRequest.setLeftRearLamp(true);
-			parkingRequest.setRightRearLamp(true);
-			parkingRequest.setLeftSideMirror(true);
-			parkingRequest.setRightSideMirror(true);
-			parkingRequest.setLeftWiper(true);
-			parkingRequest.setRightWiper(true);
-			parkingRequest.setBackWiper(true);
-			parkingRequest.setFuelCap(true);
-			parkingRequest.setSpareTire(true);
-			parkingRequest.setBattery(true);
-			parkingRequest.setStarter(true);
-			parkingRequest.setAerial(true);
-			parkingRequest.setWheelCap(true);
-			parkingRequest.setRoundMirror(true);
-			parkingRequest.setTireIndicator(true);
-			parkingRequest.setHasKeys(true);
-			
-			ParkingResponseDTO parkingResponse = parkingService.createParking(parkingRequest, request);
-			
-			return vehicleEquipmentResponseDTOMapper(vehicleEquipment, parkingResponse, null);
-			
 		}else if(vehicleEquipmentRequest.getService().equals("MAINTENANCE")) {
 			// After creating, save also to parking
 			

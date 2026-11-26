@@ -35,6 +35,7 @@ import com.orbix.api.modules.finance.InvoiceReceivable;
 import com.orbix.api.modules.finance.InvoiceReceivableDetail;
 import com.orbix.api.modules.finance.InvoiceReceivableDetailRepository;
 import com.orbix.api.modules.finance.InvoiceReceivableRepository;
+import com.orbix.api.modules.identityandaccess.User;
 import com.orbix.api.modules.identityandaccess.UserService;
 import com.orbix.api.modules.warehouse.RemovedGood;
 import com.orbix.api.modules.warehouse.Storage;
@@ -76,6 +77,11 @@ public class ParkingServiceController implements ParkingService {
 	private final RemovedVehicleEquipmentRepository removedVehicleEquipmentRepository;
 
 	private final ParkingTripRepository parkingTripRepository;
+
+	private final ParkingDeviceRepository parkingDeviceRepository;
+	private final ParkingSignatureRepository parkingSignatureRepository;
+
+	private static final List<String> CATEGORIES = List.of("IN-TRANSIT", "LOCAL");
 
 		
 	
@@ -240,11 +246,15 @@ public class ParkingServiceController implements ParkingService {
 	}
 	
 	@Override
-	public PageResponseDTO<ParkingResponseDTO> getPendingOrCheckedInParkingPage(int page, int size, String search, HttpServletRequest request) {
+	public PageResponseDTO<ParkingResponseDTO> getPendingOrCheckedInParkingPage(int page, int size, String search, String status, HttpServletRequest request) {
 
 		List<String> statuses = new ArrayList<>();
-		statuses.add("PENDING");
-		statuses.add("CHECKED-IN");
+		if("PENDING".equals(status) || "CHECKED-IN".equals(status)) {
+			statuses.add(status);
+		}else {
+			statuses.add("PENDING");
+			statuses.add("CHECKED-IN");
+		}
 
 		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
 		Page<Parking> parkings = parkingRepository.getPageByStatusIn(statuses, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
@@ -357,6 +367,29 @@ public class ParkingServiceController implements ParkingService {
 	}
 	
 	@Override
+	public ParkingInspectionResponseDTO getInspection(Long id, HttpServletRequest request) {
+		Parking parking = parkingRepository.findById(id).orElseThrow(() -> new NotFoundException("Parking not found"));
+
+		ParkingInspectionResponseDTO inspection = new ParkingInspectionResponseDTO();
+		inspection.setParkingId(String.valueOf(parking.getId()));
+		inspection.setDevices(deviceDTOs(parkingDeviceRepository.findAllByParkingOrderById(parking)));
+
+		List<ParkingInspectionResponseDTO.Signature> signatures = new ArrayList<>();
+		for(ParkingSignature parkingSignature : parkingSignatureRepository.findAllByParkingOrderBySignedAtAscIdAsc(parking)) {
+			ParkingInspectionResponseDTO.Signature signature = new ParkingInspectionResponseDTO.Signature();
+			signature.setStage(parkingSignature.getStage());
+			signature.setRole(parkingSignature.getRole());
+			signature.setSignerName(parkingSignature.getSignerName());
+			signature.setSignedAt(parkingSignature.getSignedAt() == null ? "" : parkingSignature.getSignedAt().toString());
+			signature.setImage(SignatureImages.encode(parkingSignature.getImage()));
+			signature.setChanges(parkingSignature.getChanges());
+			signatures.add(signature);
+		}
+		inspection.setSignatures(signatures);
+		return inspection;
+	}
+
+	@Override
 	public List<ParkingBillReceivableResponseDTO> getParkingBillReceivables(Long id, HttpServletRequest request) {		
 		Optional<Parking> parking_ = parkingRepository.findById(id);
 		if(parking_.isEmpty()) {
@@ -387,10 +420,18 @@ public class ParkingServiceController implements ParkingService {
 		    }
 		}
 		
-		/**Validate data*/		
+		/**Validate data*/
 		if(!validateParkingData(parkingRequest)) {
 			throw new InvalidEntryException("Validation failed");
 		}
+		// What the inspection must have; the database itself requires none of the new values
+		required(parkingRequest.getChasisNo(), "Chassis number is required");
+		required(parkingRequest.getOwnerFirstName(), "Owner first name is required");
+		required(parkingRequest.getOwnerLastName(), "Owner last name is required");
+		required(parkingRequest.getBodyCondition(), "Body condition is required");
+		String driverSignerName = required(parkingRequest.getDriverSignerName(), "Driver name is required beside the driver signature");
+		byte[] inspectorSignature = SignatureImages.decode(parkingRequest.getInspectorSignature(), "Inspector");
+		byte[] driverSignature = SignatureImages.decode(parkingRequest.getDriverSignature(), "Driver");
 		
 		Optional<Company> company_ = companyRepository.findById(userService.getUserCompany(request).getId());
 		if(company_.isEmpty()) {
@@ -412,8 +453,8 @@ public class ParkingServiceController implements ParkingService {
 		Optional<VehicleEquipment> vehicleEquipment_ = vehicleEquipmentRepository.findById(parkingRequest.getVehicleEquipmentId());
 		if(vehicleEquipment_.isEmpty()) throw new NotFoundException("Vehicle and equipment not found");
 		
-		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), branch_.get());
-		
+		// The parking zone and category are chosen at registration, not at inspection
+
 		Parking parking = new Parking();
 		parking.setNo(String.valueOf(Math.random()));
 		parking.setOwnerFirstName(parkingRequest.getOwnerFirstName());
@@ -464,22 +505,29 @@ public class ParkingServiceController implements ParkingService {
 		parking.setVehicleEquipmentName(vehicleEquipmentType_.get().getName()); // Look here later
 		parking.setVehicleEquipmentColor(parkingRequest.getVehicleEquipmentColor());
 		
-		parking.setVehicleEquipmentCategory("IN-TRANSIT");
 		parking.setVehicleEquipment(vehicleEquipment_.get());
-		
-		
-		
-		parking.setBranch(branch_.get());
-		
-		if(!parkingZone_.isEmpty()) parking.setParkingZone(parkingZone_.get());
 
-		parking.setCreatedByUser(userService.getUser(request));
+		parking.setInteriorDetails(text(parkingRequest.getInteriorDetails()));
+		parking.setBodyCondition(text(parkingRequest.getBodyCondition()));
+		// The registrar completes the driver's details; the name is already known from the driver's signature
+		parking.setDriverName(driverSignerName);
+
+		parking.setBranch(branch_.get());
+
+		User user = userService.getUser(request);
+		parking.setCreatedByUser(user);
 		parking.setCreatedDateTime(dayService.getTimeStamp());
-		
+
 		parking = parkingRepository.save(parking);
 		/**Create  parking no*/
 		parking.setNo("PKN/"+ parking.getId().toString());
+		if(parkingRequest.getDevices() != null) {
+			parking.setDeviceStatus(replaceDevices(parking, parkingRequest.getDevices()) > 0);
+		}
 		parking = parkingRepository.save(parking);
+
+		sign(parking, ParkingSignature.INSPECTION, ParkingSignature.INSPECTOR, user, nameOf(user), inspectorSignature, null);
+		sign(parking, ParkingSignature.INSPECTION, ParkingSignature.DRIVER, null, driverSignerName, driverSignature, null);
 		
 		
 		//parking.setParkingStatus(parkingRequest.getParkingStatus() != null ? parkingRequest.getParkingStatus() : "PENDING");
@@ -528,11 +576,8 @@ public class ParkingServiceController implements ParkingService {
 		if(vehicleEquipmentType_.get().getCompany().getId() != company_.get().getId()) 
 			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
 		
-		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), branch_.get());
-		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
-		
-		
-		
+		// The parking zone and category belong to registration: editing an inspection leaves them as they are
+
 		Parking parking = parking_.get();
 		parking.setOwnerFirstName(parkingRequest.getOwnerFirstName());
 		parking.setOwnerMiddleName(parkingRequest.getOwnerMiddleName());
@@ -571,20 +616,23 @@ public class ParkingServiceController implements ParkingService {
 		parking.setHasKeys(parkingRequest.isHasKeys());
 		parking.setDeviceStatus(parkingRequest.isDeviceStatus());
 		parking.setVehicleEquipmentType(vehicleEquipmentType_.get());
-		parking.setVehicleEquipmentCategory(parkingRequest.getVehicleEquipmentCategory());
-		
+
 		parking.setVehicleEquipmentName(vehicleEquipmentType_.get().getName()); // Look here later
 		parking.setVehicleEquipmentColor(parkingRequest.getVehicleEquipmentColor());
-		
+
 		parking.setComments(parkingRequest.getComments());
-		
-		parking.setParkingZone(parkingZone_.get());
-		
-		parking.setBillingType(parkingRequest.getBillingType());
-				
+
+		parking.setInteriorDetails(text(parkingRequest.getInteriorDetails()));
+		parking.setBodyCondition(text(parkingRequest.getBodyCondition()));
+		if(parkingRequest.getDevices() != null) {
+			parking.setDeviceStatus(replaceDevices(parking, parkingRequest.getDevices()) > 0);
+		}
+
+		if(parkingRequest.getBillingType() != null) parking.setBillingType(parkingRequest.getBillingType());
+
 		parking = parkingRepository.save(parking);
-		
-		return parkingResponseDTOMapper(parking);			
+
+		return parkingResponseDTOMapper(parking);
 	}
 	
 	@Override
@@ -614,12 +662,16 @@ public class ParkingServiceController implements ParkingService {
 		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
 		
 		List<ParkingBillReceivable> parkingBillReceivables = parkingBillReceivableRepository.findAllByParkingIn(Collections.singletonList(parking_.get()));
-		
+
 		if(!parkingBillReceivables.isEmpty()) {
 			throw new InvalidOperationException("Cannot proceed with modification as there are already existing bills.");
 		}
-		
+
+		byte[] modifierSignature = SignatureImages.decode(parkingRequest.getModifierSignature(), "Your");
+
 		Parking parking = parking_.get();
+		// What the record looked like, to keep what changed beside the signature
+		Map<String, String> before = snapshot(parking, parkingDeviceRepository.findAllByParkingOrderById(parking));
 		parking.setOwnerFirstName(parkingRequest.getOwnerFirstName());
 		parking.setOwnerMiddleName(parkingRequest.getOwnerMiddleName());
 		parking.setOwnerLastName(parkingRequest.getOwnerLastName());
@@ -682,10 +734,24 @@ public class ParkingServiceController implements ParkingService {
 		parking.setBillingType(parkingRequest.getBillingType());
 		
 		parking.setBillingAmount(parking.getVehicleEquipmentType().getDailyPrice());
-				
+
+		parking.setInteriorDetails(text(parkingRequest.getInteriorDetails()));
+		parking.setBodyCondition(text(parkingRequest.getBodyCondition()));
+		parking.setDriverName(text(parkingRequest.getDriverName()));
+		parking.setDriverPhoneNo(text(parkingRequest.getDriverPhoneNo()));
+		parking.setDriverIdType(text(parkingRequest.getDriverIdType()));
+		parking.setDriverIdNo(text(parkingRequest.getDriverIdNo()));
+		if(parkingRequest.getDevices() != null) {
+			parking.setDeviceStatus(replaceDevices(parking, parkingRequest.getDevices()) > 0);
+		}
+
 		parking = parkingRepository.save(parking);
-		
-		return parkingResponseDTOMapper(parking);			
+
+		User user = userService.getUser(request);
+		String changes = changes(before, snapshot(parking, parkingDeviceRepository.findAllByParkingOrderById(parking)));
+		sign(parking, ParkingSignature.MODIFICATION, ParkingSignature.MODIFIER, user, nameOf(user), modifierSignature, changes.isEmpty() ? "No changes" : changes);
+
+		return parkingResponseDTOMapper(parking);
 	}
 
 	private ParkingResponseDTO parkingResponseDTOMapper(Parking parking) {
@@ -753,6 +819,12 @@ public class ParkingServiceController implements ParkingService {
 			);
 		
 		parkingResponse.setComments(parking.getComments());
+		parkingResponse.setInteriorDetails(parking.getInteriorDetails());
+		parkingResponse.setBodyCondition(parking.getBodyCondition());
+		parkingResponse.setDriverName(parking.getDriverName());
+		parkingResponse.setDriverPhoneNo(parking.getDriverPhoneNo());
+		parkingResponse.setDriverIdType(parking.getDriverIdType());
+		parkingResponse.setDriverIdNo(parking.getDriverIdNo());
 		//parking.setImage(parkingRequest.getImage());
 		parkingResponse.setStatus(parking.getStatus());
 		parkingResponse.setCustody(parking.isOutside() ? Parking.OUTSIDE : Parking.INSIDE);
@@ -806,6 +878,140 @@ public class ParkingServiceController implements ParkingService {
 		return parkingResponse;
 	}
 	
+	private static String text(String value) {
+		if(value == null) return null;
+		String trimmed = value.trim();
+		return trimmed.isEmpty() ? null : trimmed;
+	}
+
+	private static String required(String value, String message) {
+		String trimmed = text(value);
+		if(trimmed == null) throw new InvalidEntryException(message);
+		return trimmed;
+	}
+
+	private static String nameOf(User user) {
+		if(user == null) return null;
+		String name = ((user.getFirstName() == null ? "" : user.getFirstName()) + " " + (user.getLastName() == null ? "" : user.getLastName())).trim();
+		if(name.isEmpty()) name = user.getNickname();
+		if(name == null || name.trim().isEmpty()) name = user.getUsername();
+		return name;
+	}
+
+	/** Keeps a signature given at one step of the parking; signatures are never changed afterwards */
+	private void sign(Parking parking, String stage, String role, User user, String signerName, byte[] image, String changes) {
+		ParkingSignature signature = new ParkingSignature();
+		signature.setParking(parking);
+		signature.setStage(stage);
+		signature.setRole(role);
+		signature.setUser(user);
+		signature.setSignerName(signerName);
+		signature.setImage(image);
+		signature.setSignedAt(dayService.getTimeStamp());
+		signature.setChanges(changes);
+		parkingSignatureRepository.save(signature);
+	}
+
+	/** Replaces the vehicle's devices with the named ones given (a missing or bad quantity counts as 1); returns how many */
+	private int replaceDevices(Parking parking, List<ParkingDeviceDTO> devices) {
+		parkingDeviceRepository.deleteAllOfParking(parking);
+		int saved = 0;
+		for(ParkingDeviceDTO device : devices) {
+			String name = device == null ? null : text(device.getName());
+			if(name == null) continue;
+			ParkingDevice parkingDevice = new ParkingDevice();
+			parkingDevice.setParking(parking);
+			parkingDevice.setName(name);
+			parkingDevice.setQty(device.getQty() == null || device.getQty() < 1 ? 1 : device.getQty());
+			parkingDeviceRepository.save(parkingDevice);
+			saved++;
+		}
+		return saved;
+	}
+
+	private static List<ParkingDeviceDTO> deviceDTOs(List<ParkingDevice> parkingDevices) {
+		List<ParkingDeviceDTO> devices = new ArrayList<>();
+		for(ParkingDevice parkingDevice : parkingDevices) {
+			ParkingDeviceDTO device = new ParkingDeviceDTO();
+			device.setName(parkingDevice.getName());
+			device.setQty(parkingDevice.getQty());
+			devices.add(device);
+		}
+		return devices;
+	}
+
+	/** The values a modification can change, by the label people see, to tell what a modification changed */
+	private static Map<String, String> snapshot(Parking parking, List<ParkingDevice> devices) {
+		Map<String, String> values = new LinkedHashMap<>();
+		values.put("Owner first name", parking.getOwnerFirstName());
+		values.put("Owner middle name", parking.getOwnerMiddleName());
+		values.put("Owner last name", parking.getOwnerLastName());
+		values.put("Owner company", parking.getOwnerCompanyName());
+		values.put("Owner ID type", parking.getOwnerIdType());
+		values.put("Owner ID no", parking.getOwnerIdNo());
+		values.put("Owner phone", parking.getOwnerPhoneNo());
+		values.put("Owner email", parking.getOwnerEmail());
+		values.put("Owner address", parking.getOwnerAddress());
+		values.put("Agent name", parking.getAgentName());
+		values.put("Agent address", parking.getAgentAddress());
+		values.put("Agent phone", parking.getAgentPhoneNo());
+		values.put("Agent email", parking.getAgentEmail());
+		values.put("T-form no", parking.getTformNumber());
+		values.put("Registration no", parking.getRegistrationNo());
+		values.put("Chassis no", parking.getChasisNo());
+		values.put("Card no", parking.getCardNo());
+		values.put("Vehicle type", parking.getVehicleEquipmentType() == null ? null : parking.getVehicleEquipmentType().getName());
+		values.put("Category", parking.getVehicleEquipmentCategory());
+		values.put("Colour", parking.getVehicleEquipmentColor());
+		values.put("Parking zone", parking.getParkingZone() == null ? null : parking.getParkingZone().getName());
+		values.put("Billing starts", parking.getStartBillingAt() == null ? null : parking.getStartBillingAt().toLocalDate().toString());
+		values.put("Left front lamp", yesNo(parking.isLeftFrontLamp()));
+		values.put("Right front lamp", yesNo(parking.isRightFrontLamp()));
+		values.put("Left rear lamp", yesNo(parking.isLeftRearLamp()));
+		values.put("Right rear lamp", yesNo(parking.isRightRearLamp()));
+		values.put("Left side mirror", yesNo(parking.isLeftSideMirror()));
+		values.put("Right side mirror", yesNo(parking.isRightSideMirror()));
+		values.put("Left wiper", yesNo(parking.isLeftWiper()));
+		values.put("Right wiper", yesNo(parking.isRightWiper()));
+		values.put("Back wiper", yesNo(parking.isBackWiper()));
+		values.put("Fuel cap", yesNo(parking.isFuelCap()));
+		values.put("Spare tyre", yesNo(parking.isSpareTire()));
+		values.put("Battery", yesNo(parking.isBattery()));
+		values.put("Starter", yesNo(parking.isStarter()));
+		values.put("Aerial", yesNo(parking.isAerial()));
+		values.put("Wheel cap", yesNo(parking.isWheelCap()));
+		values.put("Round mirror", yesNo(parking.isRoundMirror()));
+		values.put("Tyre indicator", yesNo(parking.isTireIndicator()));
+		values.put("Has keys", yesNo(parking.isHasKeys()));
+		values.put("Interior details", parking.getInteriorDetails());
+		values.put("Body condition", parking.getBodyCondition());
+		values.put("Devices attached", devices.stream().map(d -> d.getName() + " x" + d.getQty()).collect(Collectors.joining(", ")));
+		values.put("Driver name", parking.getDriverName());
+		values.put("Driver phone", parking.getDriverPhoneNo());
+		values.put("Driver ID type", parking.getDriverIdType());
+		values.put("Driver ID no", parking.getDriverIdNo());
+		values.put("Comments", parking.getComments());
+		return values;
+	}
+
+	private static String yesNo(boolean value) {
+		return value ? "Yes" : "No";
+	}
+
+	/** One "Label: old → new" line per value that differs */
+	private static String changes(Map<String, String> before, Map<String, String> after) {
+		StringBuilder changes = new StringBuilder();
+		for(Map.Entry<String, String> entry : after.entrySet()) {
+			String old = text(before.get(entry.getKey()));
+			String now = text(entry.getValue());
+			if(old == null ? now != null : !old.equals(now)) {
+				if(changes.length() > 0) changes.append('\n');
+				changes.append(entry.getKey()).append(": ").append(old == null ? "(empty)" : old).append(" → ").append(now == null ? "(empty)" : now);
+			}
+		}
+		return changes.toString();
+	}
+
 	boolean validateParkingData(ParkingRequestDTO parkingRequest) {
 		
 		return true;
@@ -814,29 +1020,56 @@ public class ParkingServiceController implements ParkingService {
 	@Override
 	public ParkingResponseDTO checkIn(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
 		
-		Optional<Parking> parking_ = parkingRepository.findById(parkingRequest.getId());
-		
-		if(parking_.isEmpty()) 
-			throw new NotFoundException("Parking not found");			
-		if(parking_.get().getBranch().getId() != userService.getUser(request).getBranch().getId()) 
+		// Locked, so the same vehicle cannot be checked in twice at once
+		Optional<Parking> parking_ = parkingRepository.findByIdForUpdate(parkingRequest.getId());
+
+		if(parking_.isEmpty())
+			throw new NotFoundException("Parking not found");
+		User user = userService.getUser(request);
+		if(parking_.get().getBranch().getId() != user.getBranch().getId())
 			throw new InvalidOperationException("Checking in can only be done by a branch user");
-		if(!parking_.get().getStatus().equals("PENDING")) 
+		if(!parking_.get().getStatus().equals("PENDING"))
 			throw new InvalidOperationException("Can not check in, only a pending parking can be checked in");
-		
-		//now check in vehicle, if it has a pending status
-		
+
+		//now register and check in the vehicle, if it has a pending status
+
 		Parking parking = parking_.get();
-		
+
+		// What registration must have; the database itself requires none of the new values
+		String category = required(parkingRequest.getVehicleEquipmentCategory(), "Select the category").toUpperCase();
+		if(!CATEGORIES.contains(category)) throw new InvalidEntryException("Select the category: In-transit or Local");
+		String driverName = required(parkingRequest.getDriverName(), "Driver name is required");
+		byte[] registrarSignature = SignatureImages.decode(parkingRequest.getRegistrarSignature(), "Registrar");
+
 		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), parking_.get().getBranch());
 		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
-		
+		// Locked, so two check-ins cannot both take the zone's last space; no of slots 0 means no limit
+		ParkingZone parkingZone = parkingZoneRepository.findByIdForUpdate(parkingZone_.get().getId()).orElseThrow(() -> new NotFoundException("Parking Zone not found"));
+		if(!parkingZone.isActive()) throw new InvalidOperationException("Parking Zone " + parkingZone.getName() + " is not active");
+		if(parkingZone.getNoOfSlots() > 0 && parkingRepository.countByParkingZoneAndStatus(parkingZone, "CHECKED-IN") >= parkingZone.getNoOfSlots())
+			throw new InvalidOperationException("Parking Zone " + parkingZone.getName() + " is full, select another zone");
+
+		// The registrar confirms the vehicle type, and may correct it; the daily price follows the final type
+		if(text(parkingRequest.getVehicleEquipmentTypeName()) != null) {
+			Company company = companyRepository.findById(userService.getUserCompany(request).getId()).orElseThrow(() -> new NotFoundException("Company not found"));
+			VehicleEquipmentType vehicleEquipmentType = vehicleEquipmentTypeRepository.findByNameAndCompany(parkingRequest.getVehicleEquipmentTypeName(), company)
+					.orElseThrow(() -> new NotFoundException("Vehicle or equipment type not found"));
+			parking.setVehicleEquipmentType(vehicleEquipmentType);
+			parking.setVehicleEquipmentName(vehicleEquipmentType.getName());
+		}
+		parking.setVehicleEquipmentCategory(category);
+		parking.setDriverName(driverName);
+		parking.setDriverPhoneNo(text(parkingRequest.getDriverPhoneNo()));
+		parking.setDriverIdType(text(parkingRequest.getDriverIdType()));
+		parking.setDriverIdNo(text(parkingRequest.getDriverIdNo()));
+
 		parking.setBillingAmount(parking.getVehicleEquipmentType().getDailyPrice());
-		
-		parking.setParkingZone(parkingZone_.get());
+
+		parking.setParkingZone(parkingZone);
 		parking.setStatus("CHECKED-IN");
 		parking.setCardNo(parkingRequest.getCardNo());
 		parking.setHasKeys(parkingRequest.isHasKeys());
-		parking.setCheckedInByUser(userService.getUser(request));
+		parking.setCheckedInByUser(user);
 		parking.setCheckedInDateTime(dayService.getTimeStamp());
 		
 		if(parkingRequest.startBillingAt == null) {
@@ -848,8 +1081,10 @@ public class ParkingServiceController implements ParkingService {
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 			LocalDateTime dateTime = LocalDateTime.parse(dateString, formatter);
 			parking.setStartBillingAt(dateTime);
-		}		
+		}
 		parking = parkingRepository.save(parking);
+
+		sign(parking, ParkingSignature.REGISTRATION, ParkingSignature.REGISTRAR, user, nameOf(user), registrarSignature, null);
 		
 //		//generate bill, for day 1 depending on billing type
 //		

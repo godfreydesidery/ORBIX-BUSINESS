@@ -43,6 +43,9 @@ public class Operation {
 	 public static String SENDOUT = "SENDOUT";
 	 public static String SENDIN = "SENDIN";
 	 public static String TRIPS = "TRIPS";
+	 // Parking: inspection of an arriving vehicle (PKNG-INSPECT) and its registration and check-in (PKNG-REGISTER)
+	 public static String INSPECT = "INSPECT";
+	 public static String REGISTER = "REGISTER";
 			 
 	 
 	 

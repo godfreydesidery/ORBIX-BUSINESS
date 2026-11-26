@@ -1,7 +1,9 @@
 package com.orbix.api.api.vehicleandequipmentparking;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -33,6 +35,7 @@ import lombok.extern.slf4j.Slf4j;
 public class ParkingZoneServiceController implements ParkingZoneService {
 	
 	private final ParkingZoneRepository parkingZoneRepository;
+	private final ParkingRepository parkingRepository;
 	private final CompanyRepository companyRepository;
 	private final BranchRepository branchRepository;
 	private final UserService userService;
@@ -61,6 +64,35 @@ public class ParkingZoneServiceController implements ParkingZoneService {
 		for(ParkingZone parkingZone : parkingZones) {
 			parkingZoneResponses.add(parkingZoneResponseDTOMapper(parkingZone));					
 		}		
+		return parkingZoneResponses;
+	}
+
+	/**
+	 * The branch's active zones that still have space, each with its free count: no of slots less the vehicles
+	 * checked in there. A zone with no of slots 0 has no limit. Space frees itself when a vehicle is checked out.
+	 */
+	@Override
+	public List<ParkingZoneResponseDTO> getAllBranchAvailableParkingZones(HttpServletRequest request) {
+		Branch branch = userService.getUser(request).getBranch();
+		List<ParkingZone> parkingZones = parkingZoneRepository.findAllByBranchAndActive(branch, true);
+		Map<Long, Long> checkedIn = new HashMap<>();
+		if(!parkingZones.isEmpty()) {
+			for(Object[] row : parkingRepository.countCheckedInByZone(parkingZones)) {
+				checkedIn.put((Long) row[0], (Long) row[1]);
+			}
+		}
+		List<ParkingZoneResponseDTO> parkingZoneResponses = new ArrayList<>();
+		for(ParkingZone parkingZone : parkingZones) {
+			ParkingZoneResponseDTO parkingZoneResponse = parkingZoneResponseDTOMapper(parkingZone);
+			if(parkingZone.getNoOfSlots() > 0) {
+				long free = parkingZone.getNoOfSlots() - checkedIn.getOrDefault(parkingZone.getId(), 0L);
+				if(free <= 0) continue;
+				parkingZoneResponse.setFreeSlots(String.valueOf(free));
+			}else {
+				parkingZoneResponse.setFreeSlots("");
+			}
+			parkingZoneResponses.add(parkingZoneResponse);
+		}
 		return parkingZoneResponses;
 	}
 

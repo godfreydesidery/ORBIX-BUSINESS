@@ -25,6 +25,12 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
 	@Query("SELECT p FROM Parking p WHERE p.id = :id")
 	Optional<Parking> findByIdForUpdate(@Param("id") Long id);
 
+	/** Checked-in parkings per zone, as [zone id, count], for the zones' free space; a vehicle out on a trip keeps its space */
+	@Query("SELECT p.parkingZone.id, COUNT(p) FROM Parking p WHERE p.status = 'CHECKED-IN' AND p.parkingZone IN :zones GROUP BY p.parkingZone.id")
+	List<Object[]> countCheckedInByZone(@Param("zones") List<ParkingZone> zones);
+
+	long countByParkingZoneAndStatus(ParkingZone parkingZone, String status);
+
 	List<Parking> findAllByVehicleEquipmentAndStatusIn(VehicleEquipment vehicleEquipment, List<String> statuses);
 
 	@Query("SELECT p.id FROM Parking p WHERE p.vehicleEquipment = :vehicleEquipment AND p.status IN :statuses ORDER BY p.id")
