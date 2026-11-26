@@ -68,21 +68,16 @@ public class ParkingZoneServiceController implements ParkingZoneService {
 	}
 
 	/**
-	 * The branch's active zones that still have space, each with its free count (no of slots less the vehicles
-	 * registered or checked in there) and its free slot numbers (1 to no of slots, less those held by registered or
-	 * checked-in vehicles).
+	 * The branch's active zones that still have space, each with its free slot numbers (1 to no of slots, less those
+	 * held by registered or checked-in vehicles) and their count. Vehicles parked before slots existed hold no number.
 	 * A zone with no of slots 0 has no limit and no slots. Space frees itself when a vehicle is checked out.
 	 */
 	@Override
 	public List<ParkingZoneResponseDTO> getAllBranchAvailableParkingZones(HttpServletRequest request) {
 		Branch branch = userService.getUser(request).getBranch();
 		List<ParkingZone> parkingZones = parkingZoneRepository.findAllByBranchAndActive(branch, true);
-		Map<Long, Long> checkedIn = new HashMap<>();
 		Map<Long, java.util.Set<Integer>> takenSlots = new HashMap<>();
 		if(!parkingZones.isEmpty()) {
-			for(Object[] row : parkingRepository.countCheckedInByZone(parkingZones)) {
-				checkedIn.put((Long) row[0], (Long) row[1]);
-			}
 			for(Object[] row : parkingRepository.getTakenSlots(parkingZones)) {
 				takenSlots.computeIfAbsent((Long) row[0], k -> new java.util.HashSet<>()).add((Integer) row[1]);
 			}
@@ -91,14 +86,15 @@ public class ParkingZoneServiceController implements ParkingZoneService {
 		for(ParkingZone parkingZone : parkingZones) {
 			ParkingZoneResponseDTO parkingZoneResponse = parkingZoneResponseDTOMapper(parkingZone);
 			if(parkingZone.getNoOfSlots() > 0) {
-				long free = parkingZone.getNoOfSlots() - checkedIn.getOrDefault(parkingZone.getId(), 0L);
-				if(free <= 0) continue;
-				parkingZoneResponse.setFreeSlots(String.valueOf(free));
+				// Free slots are the numbers not held by a registered or checked-in vehicle; vehicles parked before
+				// slots existed have no number and do not hide the zone
 				java.util.Set<Integer> taken = takenSlots.getOrDefault(parkingZone.getId(), java.util.Collections.emptySet());
 				List<Integer> freeSlotNos = new ArrayList<>();
 				for(int slotNo = 1; slotNo <= parkingZone.getNoOfSlots(); slotNo++) {
 					if(!taken.contains(slotNo)) freeSlotNos.add(slotNo);
 				}
+				if(freeSlotNos.isEmpty()) continue;
+				parkingZoneResponse.setFreeSlots(String.valueOf(freeSlotNos.size()));
 				parkingZoneResponse.setFreeSlotNos(freeSlotNos);
 			}else {
 				parkingZoneResponse.setFreeSlots("");

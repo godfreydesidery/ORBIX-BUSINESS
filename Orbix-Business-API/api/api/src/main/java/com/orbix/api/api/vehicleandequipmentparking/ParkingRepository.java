@@ -34,6 +34,12 @@ public interface ParkingRepository extends JpaRepository<Parking, Long> {
 
 	long countByParkingZoneAndStatusIn(ParkingZone parkingZone, List<String> statuses);
 
+	/** How many of the zone's slots 1..max are held by registered or checked-in vehicles (vehicles parked before slots
+	 * existed have no slot number and hold none) */
+	@Query("SELECT COUNT(DISTINCT p.parkingSlotNo) FROM Parking p WHERE p.status IN ('REGISTERED', 'CHECKED-IN') AND p.parkingZone = :zone"
+			+ " AND p.parkingSlotNo IS NOT NULL AND p.parkingSlotNo BETWEEN 1 AND :max")
+	long countTakenSlots(@Param("zone") ParkingZone zone, @Param("max") Integer max);
+
 	/** Slots taken by registered and checked-in vehicles, as [zone id, slot no] */
 	@Query("SELECT p.parkingZone.id, p.parkingSlotNo FROM Parking p WHERE p.status IN ('REGISTERED', 'CHECKED-IN') AND p.parkingZone IN :zones AND p.parkingSlotNo IS NOT NULL")
 	List<Object[]> getTakenSlots(@Param("zones") List<ParkingZone> zones);

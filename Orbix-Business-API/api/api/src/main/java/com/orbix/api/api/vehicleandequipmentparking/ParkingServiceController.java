@@ -928,8 +928,10 @@ public class ParkingServiceController implements ParkingService {
 		ParkingZone parkingZone = parkingZoneRepository.findByIdForUpdate(zone.getId()).orElseThrow(() -> new NotFoundException("Parking Zone not found"));
 		if(!parkingZone.isActive()) throw new InvalidOperationException("Parking Zone " + parkingZone.getName() + " is not active");
 		if(parkingZone.getNoOfSlots() <= 0) return parkingZone;
-		boolean alreadyInZone = moving != null && moving.getParkingZone() != null && Objects.equals(moving.getParkingZone().getId(), parkingZone.getId());
-		if(!alreadyInZone && parkingRepository.countByParkingZoneAndStatusIn(parkingZone, List.of("REGISTERED", "CHECKED-IN")) >= parkingZone.getNoOfSlots())
+		// A zone with numbered slots is full when every slot number is held; vehicles parked before slots existed hold none
+		boolean holdsSlotHere = moving != null && moving.getParkingZone() != null && Objects.equals(moving.getParkingZone().getId(), parkingZone.getId())
+				&& moving.getParkingSlotNo() != null && moving.getParkingSlotNo() >= 1 && moving.getParkingSlotNo() <= parkingZone.getNoOfSlots();
+		if(!holdsSlotHere && parkingRepository.countTakenSlots(parkingZone, parkingZone.getNoOfSlots()) >= parkingZone.getNoOfSlots())
 			throw new InvalidOperationException("Parking Zone " + parkingZone.getName() + " is full, select another zone");
 		if(slotNo == null || slotNo < 1 || slotNo > parkingZone.getNoOfSlots())
 			throw new InvalidEntryException("Select a slot in Parking Zone " + parkingZone.getName() + " (1 to " + parkingZone.getNoOfSlots() + ")");
@@ -1179,8 +1181,17 @@ public class ParkingServiceController implements ParkingService {
 		// The check-in signature is optional; when given it must be a proper (small) image
 		byte[] checkInSignature = SignatureImages.isPresent(parkingRequest.getCheckInSignature())
 				? SignatureImages.decode(parkingRequest.getCheckInSignature(), "Check-in") : null;
-		if(parking.getParkingZone() == null)
-			throw new InvalidOperationException("The parking zone is missing: it is chosen at registration");
+		// Normally the zone and slot were chosen at registration. A vehicle registered before that (or without them)
+		// gets its zone and slot here instead
+		if(parking.getParkingZone() == null) {
+			if(parkingRequest.getParkingZoneName() == null || parkingRequest.getParkingZoneName().isBlank())
+				throw new InvalidEntryException("Select the parking zone");
+			ParkingZone requestedZone = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), parking.getBranch())
+					.orElseThrow(() -> new NotFoundException("Parking Zone not found"));
+			ParkingZone parkingZone = zoneWithSpace(requestedZone, parkingRequest.getParkingSlotNo(), parking);
+			parking.setParkingZone(parkingZone);
+			parking.setParkingSlotNo(parkingZone.getNoOfSlots() > 0 ? parkingRequest.getParkingSlotNo() : null);
+		}
 
 		// The vehicle type and category were set at inspection; the daily price follows the type
 		parking.setBillingAmount(parking.getVehicleEquipmentType().getDailyPrice());
