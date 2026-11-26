@@ -7,7 +7,7 @@ Branch: `inspection-registration`.
 
 ```
 Inspector + Driver   Reception › Vehicle Register (parking mode, "Vehicle Inspection")
-                       vehicle info, condition checklist, interior details, devices attached (item + qty),
+                       vehicle info, condition checklist, tracking device (attached + number), interior details,
                        body condition, owner/agent details, Inspector signature, Driver signature (typed name)
                        [Submit Inspection]                                        -> status PENDING
 Registrar            Reception › Parking › Awaiting Registration › [Open]
@@ -39,21 +39,20 @@ the check-in.
 
 ## Database (added by `ddl-auto = update`)
 
-- `parkings`: + `interior_details`, `body_condition`, `driver_name`, `driver_phone_no`, `driver_id_type`,
-  `driver_id_no`
-- `parking_devices`: `parking_id`, `name`, `qty`
+- `parkings`: + `device_count` (beside the existing `device_status`), `interior_details`, `body_condition`,
+  `driver_name`, `driver_phone_no`, `driver_id_type`, `driver_id_no`
 - `parking_signatures`: `parking_id`, `stage` (INSPECTION / REGISTRATION / MODIFICATION),
   `role` (INSPECTOR / DRIVER / REGISTRAR / MODIFIER), `user_id`, `signer_name`, `image`, `signed_at`, `changes`
 
 ## API
 
 - `POST /parkings/create` (Submit Inspection, `PKNG-INSPECT`): requires both signatures and the driver's name;
-  saves the devices; no zone or category is set.
-- `POST /parkings/update` (Edit while PENDING, `PKNG-INSPECT`): no zone or category; replaces the device list.
+  an attached tracking device needs its number; no zone or category is set.
+- `POST /parkings/update` (Edit while PENDING, `PKNG-INSPECT`): no zone or category.
 - `POST /parkings/check_in` (Register & Check In, `PKNG-REGISTER`): zone, category, type, driver and the registrar
   signature; locks the zone and checks its space.
 - `POST /parkings/modify`: requires the modifier signature and records what changed.
-- `GET /parkings/get_inspection?id=`: devices and signatures of one vehicle.
+- `GET /parkings/get_inspection?id=`: the signatures of one vehicle.
 - `GET /parking_zones/get_all_branch_available`: active zones with space, with their free count.
 - `GET /parkings/get_all_pending_or_checked_in_page`: optional `status` filter.
 - New privileges: `PKNG-INSPECT`, `PKNG-REGISTER`.
@@ -65,6 +64,13 @@ the check-in.
 - The Parking list: Awaiting Registration / Checked In tabs, Open (Register & Check In), View with sections and
   signatures, Modify with a signature.
 
+## Devices attached
+
+The document's "Device Attached" with "idadi ya vifaa" means the tracking device (ECTS) fitted to transit vehicles.
+The existing Device Status (Attached / Not attached) stays, with a Number of Devices beside it, required when
+Attached for a new inspection. A first version used a free list of items with quantities; it was replaced, since
+loose items are already covered by the yes/no condition checklist.
+
 ## Found while building
 
 - "Register Parking" (`/vehicle_equipments/create` with service PARKING) used to create a PENDING parking straight
@@ -74,6 +80,12 @@ the check-in.
   with an empty message ("message": null). That hid every "invalid operation" reason in the app, including
   "Parking Zone ... is full". It now passes the message on.
 - A missing privilege (`@PreAuthorize`) comes back as 500 "Access is denied", the app's existing behaviour, not 403.
+- Fixed after review:
+  - the same chassis could be registered twice while waiting for its inspection;
+  - Modify could move a vehicle into a full zone;
+  - the screens now say which privilege is missing instead of silently hiding the buttons;
+  - branch and company ids in the parking module are compared by value (`Long` `!=` failed for ids above 127).
+  The same `Long` comparison remains in 18 places outside the parking module.
 - Opening a vehicle for registration now sets the billing start date to today. Before, it carried the parking's full
   timestamp, which the API could not parse as a date.
 
@@ -82,7 +94,7 @@ the check-in.
 `ddl-auto=update` created the new tables and columns. An end-to-end script passed all 38 checks:
 - inspection refused without signatures, driver name, body condition or PKNG-INSPECT, and refused for a non-PNG or
   an over-5 KB signature;
-- signed inspection → PENDING, with its devices and both signatures;
+- signed inspection → PENDING, with its tracking-device count and both signatures;
 - the Awaiting Registration and Checked In filters;
 - editing a pending inspection without signatures;
 - registration refused without the registrar signature, a valid category or PKNG-REGISTER;
