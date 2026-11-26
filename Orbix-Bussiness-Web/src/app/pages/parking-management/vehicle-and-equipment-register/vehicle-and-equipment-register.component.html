@@ -921,7 +921,7 @@
                             <div class="row" *ngIf="!isNewInspection()">
                                 <div class="col-lg-4" *ngFor="let signature of inspectionSignatures">
                                     <label><b>{{ signature.role === 'INSPECTOR' ? 'Inspector' : 'Driver' }}</b></label>
-                                    <div><img [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"></div>
+                                    <div><img *ngIf="signature.image" [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"><span *ngIf="!signature.image" class="text-muted" style="display: inline-block; padding: 8px 0;"><i>Signature image removed</i></span></div>
                                     <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
                                 </div>
                                 <div class="col-sm-12 text-muted" *ngIf="inspectionSignatures.length === 0">

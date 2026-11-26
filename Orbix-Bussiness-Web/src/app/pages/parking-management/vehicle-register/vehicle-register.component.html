@@ -488,7 +488,7 @@
                     <div class="col-lg-6">
                         <label>Signatures</label>
                         <div *ngFor="let signature of signaturesOf('INSPECTION')" style="margin-bottom: 6px;">
-                            <img [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"><br>
+                            <img *ngIf="signature.image" [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"><span *ngIf="!signature.image" class="text-muted" style="display: inline-block; padding: 8px 0;"><i>Signature image removed</i></span><br>
                             <small><b>{{ roleLabel(signature.role) }}:</b> {{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
                         </div>
                         <div class="text-muted" *ngIf="inspectionLoaded && signaturesOf('INSPECTION').length === 0">No signature (inspected before electronic signatures)</div>
@@ -610,7 +610,7 @@
                     </div>
                     <div class="col-lg-4" *ngFor="let signature of signaturesOf('INSPECTION')">
                         <label><b>{{ roleLabel(signature.role) }}</b></label>
-                        <div><img [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"></div>
+                        <div><img *ngIf="signature.image" [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"><span *ngIf="!signature.image" class="text-muted" style="display: inline-block; padding: 8px 0;"><i>Signature image removed</i></span></div>
                         <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
                     </div>
                     <div class="col-lg-8 text-muted" *ngIf="inspectionLoaded && signaturesOf('INSPECTION').length === 0">No signature: inspected before electronic signatures were introduced.</div>
@@ -629,7 +629,7 @@
                     </div>
                     <div class="col-lg-4" *ngFor="let signature of signaturesOf('REGISTRATION')">
                         <label><b>{{ roleLabel(signature.role) }}</b></label>
-                        <div><img [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"></div>
+                        <div><img *ngIf="signature.image" [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"><span *ngIf="!signature.image" class="text-muted" style="display: inline-block; padding: 8px 0;"><i>Signature image removed</i></span></div>
                         <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
                     </div>
                     <div class="col-lg-8 text-muted" *ngIf="inspectionLoaded && status === 'CHECKED-IN' && signaturesOf('REGISTRATION').length === 0">No signature: checked in before electronic signatures were introduced.</div>
@@ -642,7 +642,7 @@
                                 <tbody>
                                     <tr>
                                         <td style="width: 220px;">
-                                            <img [src]="signature.image" alt="Signature" style="max-width: 200px;"><br>
+                                            <img *ngIf="signature.image" [src]="signature.image" alt="Signature" style="max-width: 200px;"><span *ngIf="!signature.image" class="text-muted" style="display: inline-block; padding: 8px 0;"><i>Signature image removed</i></span><br>
                                             <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
                                         </td>
                                         <td style="white-space: pre-wrap;">{{ signature.changes }}</td>
@@ -959,7 +959,7 @@
                     </div>
                     <div class="col-lg-4" *ngFor="let signature of signaturesOf('INSPECTION')">
                         <label><b>{{ roleLabel(signature.role) }}</b></label>
-                        <div><img [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"></div>
+                        <div><img *ngIf="signature.image" [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"><span *ngIf="!signature.image" class="text-muted" style="display: inline-block; padding: 8px 0;"><i>Signature image removed</i></span></div>
                         <small>{{ signature.signerName || "Driver's name is added at registration" }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
                     </div>
                     <div class="col-lg-8 text-muted" *ngIf="inspectionLoaded && signaturesOf('INSPECTION').length === 0">No signature: inspected before electronic signatures were introduced.</div>
