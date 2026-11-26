@@ -152,6 +152,18 @@ Reception   Parking (awaiting check-in + checked in; never awaiting registration
 - Once a zone is chosen the slot field always shows; a zone with no of slots 0 says it has no numbered slots.
 - The Parking list is bordered.
 
+## Fixes after testing (latest)
+
+- **Zones with slots stay selectable.** A zone with numbered slots is offered while any slot number 1..N is free, and
+  its free count is the number of free slot numbers. Vehicles parked before the zone had slots hold no slot number,
+  so they no longer fill the zone. Trade-off: the system does not know which spot those older vehicles stand in, so
+  staff pick a physically empty slot until they leave.
+- **A registered vehicle without a zone** (registered before zone and slot moved to Register) is no longer stuck:
+  Check In asks for the zone and slot for that vehicle only.
+- **Vehicle Register › Vehicle List** shows only registered vehicles awaiting check-in; newly inspected vehicles are
+  under Awaiting Registration.
+- New Vehicle has no horizontal rules (`<hr>`).
+
 ## Found while building
 
 - "Register Parking" (`/vehicle_equipments/create` with service PARKING) used to create a PENDING parking straight
