@@ -106,6 +106,7 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		
 		List<String> statuses = new ArrayList<>();
 		statuses.add("PENDING");
+		statuses.add("REGISTERED");
 		statuses.add("CHECKED-IN");
 		
 		ParkingResponseDTO parkingResponse = new ParkingResponseDTO();
@@ -128,6 +129,7 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		
 		List<String> statuses = new ArrayList<>();
 		statuses.add("PENDING");
+		statuses.add("REGISTERED");
 		statuses.add("CHECKED-IN");
 		
 		MaintenanceResponseDTO maintenanceResponse = new MaintenanceResponseDTO();
@@ -159,6 +161,7 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 			if (vehicleEquipmentRequest.getChasisNo() != null && !vehicleEquipmentRequest.getChasisNo().trim().isEmpty()) {
 				List<String> statuses = new ArrayList<>();
 				statuses.add("PENDING");
+				statuses.add("REGISTERED");
 				statuses.add("CHECKED-IN");
 			    if (parkingRepository.existsByChasisNoAndStatusIn(vehicleEquipmentRequest.getChasisNo(), statuses)) {
 			        throw new InvalidOperationException("Chasis number already exist in parking");

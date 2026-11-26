@@ -23,6 +23,7 @@ public interface ParkingService {
 	ParkingResponseDTO updateParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	ParkingResponseDTO modifyParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	
+	ParkingResponseDTO registerParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	ParkingResponseDTO checkIn(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 	ParkingResponseDTO checkOut(ParkingRequestDTO parkingRequest, HttpServletRequest request);
 //	ApiCustomResponse activateParking(ParkingRequestDTO parkingRequest, HttpServletRequest request);

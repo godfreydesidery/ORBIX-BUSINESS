@@ -82,6 +82,8 @@ public class ParkingServiceController implements ParkingService {
 	private final ParkingSignatureRepository parkingSignatureRepository;
 
 	private static final List<String> CATEGORIES = List.of("IN-TRANSIT", "LOCAL");
+	/** A parking still at the yard: inspected (PENDING), registered (REGISTERED) or checked in */
+	private static final List<String> ACTIVE_STATUSES = List.of("PENDING", "REGISTERED", "CHECKED-IN");
 
 		
 	
@@ -155,9 +157,10 @@ public class ParkingServiceController implements ParkingService {
 	
 	@Override
 	public List<ParkingResponseDTO> getAllPendingOrCheckedInParkings(HttpServletRequest request) {
-		
+
 		List<String> statuses = new ArrayList<>();
 		statuses.add("PENDING");
+		statuses.add("REGISTERED");
 		statuses.add("CHECKED-IN");
 		
 		List<Parking> parkings = parkingRepository.findAllByStatusIn(statuses);
@@ -248,13 +251,14 @@ public class ParkingServiceController implements ParkingService {
 	@Override
 	public PageResponseDTO<ParkingResponseDTO> getPendingOrCheckedInParkingPage(int page, int size, String search, String status, HttpServletRequest request) {
 
+		// status: one or more of PENDING (awaiting registration), REGISTERED (awaiting check-in) and CHECKED-IN,
+		// separated by commas; empty for all three
 		List<String> statuses = new ArrayList<>();
-		if("PENDING".equals(status) || "CHECKED-IN".equals(status)) {
-			statuses.add(status);
-		}else {
-			statuses.add("PENDING");
-			statuses.add("CHECKED-IN");
+		for(String one : (status == null ? "" : status).split(",")) {
+			String value = one.trim().toUpperCase();
+			if(ACTIVE_STATUSES.contains(value) && !statuses.contains(value)) statuses.add(value);
 		}
+		if(statuses.isEmpty()) statuses.addAll(ACTIVE_STATUSES);
 
 		// One page, newest first (the screen showed the full list reversed), searched on the shown columns
 		Page<Parking> parkings = parkingRepository.getPageByStatusIn(statuses, PageRequests.searchPattern(search), PageRequests.of(page, size, Sort.by(Sort.Direction.DESC, "id")));
@@ -413,6 +417,7 @@ public class ParkingServiceController implements ParkingService {
 		if (parkingRequest.getChasisNo() != null && !parkingRequest.getChasisNo().trim().isEmpty()) {
 			List<String> statuses = new ArrayList<>();
 			statuses.add("PENDING");
+			statuses.add("REGISTERED");
 			statuses.add("CHECKED-IN");
 		    if (parkingRepository.existsByChasisNoAndStatusIn(parkingRequest.getChasisNo(), statuses)) {
 		        throw new InvalidOperationException("Chasis number already exist");
@@ -556,7 +561,8 @@ public class ParkingServiceController implements ParkingService {
 		Optional<Parking> parking_ = parkingRepository.findById(parkingRequest.getId());
 		if(parking_.isEmpty()) throw new NotFoundException("Parking not found in database");
 			
-		if(!parking_.get().getStatus().equals("PENDING")) throw new NotFoundException("Can not update, only pending parking can be updated");
+		if(!"PENDING".equals(parking_.get().getStatus()) && !"REGISTERED".equals(parking_.get().getStatus()))
+			throw new InvalidOperationException("Can not edit the inspection: the vehicle is already checked in (use Modify)");
 			
 		if(!validateParkingData(parkingRequest)) throw new InvalidEntryException("Could not validate data");
 			
@@ -1075,27 +1081,24 @@ public class ParkingServiceController implements ParkingService {
 		return true;
 	}
 
+	/**
+	 * Registers an inspected (PENDING) vehicle: the owner, agent, Sub T1 and driver, signed by the registrar. The vehicle
+	 * then waits to be checked in (REGISTERED); the parking zone, slot, card and keys are taken at check-in.
+	 */
 	@Override
-	public ParkingResponseDTO checkIn(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
-		
-		// Locked, so the same vehicle cannot be checked in twice at once
-		Optional<Parking> parking_ = parkingRepository.findByIdForUpdate(parkingRequest.getId());
+	public ParkingResponseDTO registerParking(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
 
-		if(parking_.isEmpty())
-			throw new NotFoundException("Parking not found");
+		// Locked, so the same vehicle cannot be registered twice at once
+		Parking parking = parkingRepository.findByIdForUpdate(parkingRequest.getId()).orElseThrow(() -> new NotFoundException("Parking not found"));
 		User user = userService.getUser(request);
-		if(!Objects.equals(parking_.get().getBranch().getId(), user.getBranch().getId()))
-			throw new InvalidOperationException("Checking in can only be done by a branch user");
-		if(!parking_.get().getStatus().equals("PENDING"))
-			throw new InvalidOperationException("Can not check in, only a pending parking can be checked in");
-
-		//now register and check in the vehicle, if it has a pending status
-
-		Parking parking = parking_.get();
+		if(!Objects.equals(parking.getBranch().getId(), user.getBranch().getId()))
+			throw new InvalidOperationException("Registering can only be done by a branch user");
+		if(!"PENDING".equals(parking.getStatus()))
+			throw new InvalidOperationException("Can not register, only an inspected vehicle waiting for registration can be registered");
 
 		// What registration must have; the database itself requires none of the new values
 		// The category comes from the inspection; a vehicle inspected before it was asked there must have it edited first
-		if(parking_.get().getVehicleEquipmentCategory() == null || !CATEGORIES.contains(parking_.get().getVehicleEquipmentCategory()))
+		if(parking.getVehicleEquipmentCategory() == null || !CATEGORIES.contains(parking.getVehicleEquipmentCategory()))
 			throw new InvalidOperationException("The category is missing: edit the inspection and choose In-transit or Local");
 		String ownerFirstName = required(parkingRequest.getOwnerFirstName(), "Owner first name is required");
 		String ownerLastName = required(parkingRequest.getOwnerLastName(), "Owner last name is required");
@@ -1103,11 +1106,6 @@ public class ParkingServiceController implements ParkingService {
 		String driverName = required(parkingRequest.getDriverName(), "Driver name is required");
 		byte[] registrarSignature = SignatureImages.decode(parkingRequest.getRegistrarSignature(), "Registrar");
 
-		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), parking_.get().getBranch());
-		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
-		ParkingZone parkingZone = zoneWithSpace(parkingZone_.get(), parkingRequest.getParkingSlotNo(), null);
-
-		// The vehicle type and category were set at inspection; the daily price follows the type
 		parking.setOwnerFirstName(ownerFirstName);
 		parking.setOwnerMiddleName(text(parkingRequest.getOwnerMiddleName()));
 		parking.setOwnerLastName(ownerLastName);
@@ -1146,7 +1144,36 @@ public class ParkingServiceController implements ParkingService {
 		parking.setDriverPhoneNo(text(parkingRequest.getDriverPhoneNo()));
 		parking.setDriverIdType(text(parkingRequest.getDriverIdType()));
 		parking.setDriverIdNo(text(parkingRequest.getDriverIdNo()));
+		parking.setStatus("REGISTERED");
+		parking = parkingRepository.save(parking);
 
+		sign(parking, ParkingSignature.REGISTRATION, ParkingSignature.REGISTRAR, user, nameOf(user), registrarSignature, null);
+		parkingSignatureRepository.nameDriver(parking, driverName);
+		return parkingResponseDTOMapper(parking);
+	}
+
+	@Override
+	public ParkingResponseDTO checkIn(ParkingRequestDTO parkingRequest, HttpServletRequest request) {
+
+		// Locked, so the same vehicle cannot be checked in twice at once
+		Optional<Parking> parking_ = parkingRepository.findByIdForUpdate(parkingRequest.getId());
+
+		if(parking_.isEmpty())
+			throw new NotFoundException("Parking not found");
+		User user = userService.getUser(request);
+		if(!Objects.equals(parking_.get().getBranch().getId(), user.getBranch().getId()))
+			throw new InvalidOperationException("Checking in can only be done by a branch user");
+		if(!"REGISTERED".equals(parking_.get().getStatus()))
+			throw new InvalidOperationException("Can not check in, only a registered vehicle can be checked in");
+
+		// Check-in: the parking zone and slot, the card and keys, and the day billing starts
+		Parking parking = parking_.get();
+
+		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), parking_.get().getBranch());
+		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
+		ParkingZone parkingZone = zoneWithSpace(parkingZone_.get(), parkingRequest.getParkingSlotNo(), null);
+
+		// The vehicle type and category were set at inspection; the daily price follows the type
 		parking.setBillingAmount(parking.getVehicleEquipmentType().getDailyPrice());
 
 		parking.setParkingZone(parkingZone);
@@ -1156,11 +1183,11 @@ public class ParkingServiceController implements ParkingService {
 		parking.setHasKeys(parkingRequest.isHasKeys());
 		parking.setCheckedInByUser(user);
 		parking.setCheckedInDateTime(dayService.getTimeStamp());
-		
+
 		if(parkingRequest.startBillingAt == null) {
 			parking.setStartBillingAt(dayService.getTimeStamp().toLocalDate().atStartOfDay()); // You can change this depending on user billing preferences
 		}else {
-			
+
 			//String dateString = "2024-10-26 15:30:45" ;
 			String dateString = parkingRequest.getStartBillingAt() + " 00:00:00";
 			DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
@@ -1168,9 +1195,6 @@ public class ParkingServiceController implements ParkingService {
 			parking.setStartBillingAt(dateTime);
 		}
 		parking = parkingRepository.save(parking);
-
-		sign(parking, ParkingSignature.REGISTRATION, ParkingSignature.REGISTRAR, user, nameOf(user), registrarSignature, null);
-		parkingSignatureRepository.nameDriver(parking, driverName);
 		
 //		//generate bill, for day 1 depending on billing type
 //		
