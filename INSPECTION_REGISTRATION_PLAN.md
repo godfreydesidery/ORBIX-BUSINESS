@@ -162,7 +162,11 @@ Reception   Parking (awaiting check-in + checked in; never awaiting registration
   Check In asks for the zone and slot for that vehicle only.
 - **Vehicle Register › Vehicle List** shows only registered vehicles awaiting check-in; newly inspected vehicles are
   under Awaiting Registration.
-- New Vehicle has no horizontal rules (`<hr>`).
+- New Vehicle has no horizontal rules (`<hr>`), and the form closes after Submit Inspection or Update Inspection,
+  leaving only the buttons on top.
+- **The steps in every parking View.** The View dialogs on Finance › Parking Billing and Parking Discounts show the same
+  1. Inspection, 2. Registration, 3. Check-in and 4. Modifications sections (with signatures) as the Parking page,
+  through the shared `app-parking-steps` component, reloaded each time a View opens.
 
 ## Found while building
 
