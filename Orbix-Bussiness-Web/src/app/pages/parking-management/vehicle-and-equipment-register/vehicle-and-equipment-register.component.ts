@@ -595,6 +595,13 @@ export class VehicleEquipmentRegisterComponent {
 
   }
 
+  // After an inspection is submitted or updated the form goes away, leaving only the buttons on top
+  closeForm() {
+    this.clearParkingData()
+    this.clear()
+    this.mode = ''
+  }
+
   setExistingMode() {
     this.clearParkingData()
     this.clear()
@@ -1104,7 +1111,7 @@ export class VehicleEquipmentRegisterComponent {
 
             this.msg.showSuccessMessage('Inspection submitted. ' + data!.no + ' is waiting for registration.')
 
-            this.setNewMode()
+            this.closeForm()
           }
 
         )
@@ -1128,7 +1135,7 @@ export class VehicleEquipmentRegisterComponent {
 
             this.msg.showSuccessMessage('Inspection updated. The vehicle is waiting for registration.')
 
-            this.setNewMode()
+            this.closeForm()
           }
 
         )

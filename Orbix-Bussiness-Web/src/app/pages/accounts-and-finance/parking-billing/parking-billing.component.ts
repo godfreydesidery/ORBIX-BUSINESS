@@ -1,6 +1,7 @@
 import { CommonModule } from '@angular/common';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { Component } from '@angular/core';
+import { Component, ViewChild } from '@angular/core';
+import { ParkingStepsComponent } from 'src/app/common/components/parking-steps/parking-steps.component';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/auth.service';
 import { NgxPaginationModule } from 'ngx-pagination';
@@ -29,6 +30,7 @@ const API_URL = environment.apiUrl;
   standalone: true,
   imports: [
     FormsModule,
+    ParkingStepsComponent,
     CommonModule,
     NgxPaginationModule,
     RouterModule
@@ -457,7 +459,11 @@ export class ParkingBillingComponent {
 
   }
 
+  // The View's inspection, registration and check-in steps, with their signatures
+  @ViewChild(ParkingStepsComponent) steps? : ParkingStepsComponent
+
   async get(id : any){
+    this.steps?.load(id)
 
     let options = {
       headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
