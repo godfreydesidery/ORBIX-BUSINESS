@@ -142,6 +142,16 @@ Reception   Parking (awaiting check-in + checked in; never awaiting registration
   while REGISTERED. Reports that count CHECKED-IN vehicles do not count REGISTERED ones.
 - View shows 1. Inspection, 2. Registration, 3. Check-in, 4. Modifications.
 
+## Zone and slot at registration, optional check-in signature (latest)
+
+- The registrar picks the **parking zone and slot** in Register, below the owner and driver details and above the
+  registrar's signature, which sits in the middle of the dialog. The slot is held from registration until check-out:
+  zone free counts and taken slots count REGISTERED and CHECKED-IN vehicles.
+- **Check In** takes keys, card no and billing start date, shows the zone and slot read-only, and offers an
+  **optional** signature (stage CHECK_IN, role CHECK_IN_OFFICER), shown in View under 3. Check-in.
+- Once a zone is chosen the slot field always shows; a zone with no of slots 0 says it has no numbered slots.
+- The Parking list is bordered.
+
 ## Found while building
 
 - "Register Parking" (`/vehicle_equipments/create` with service PARKING) used to create a PENDING parking straight
