@@ -4,7 +4,8 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/auth.service';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { IParking } from 'src/app/domain/parking';
+import { IParking, IParkingDevice, IParkingInspection, IParkingSignature } from 'src/app/domain/parking';
+import { SignaturePadComponent } from 'src/app/common/components/signature-pad/signature-pad.component';
 import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
 import { Byte } from 'src/custom-packages/util';
@@ -27,7 +28,8 @@ const API_URL = environment.apiUrl;
   imports: [
     FormsModule,
     CommonModule,
-    NgxPaginationModule
+    NgxPaginationModule,
+    SignaturePadComponent
   ],
   templateUrl: './vehicle-register.component.html',
   styleUrl: './vehicle-register.component.scss'
@@ -128,7 +130,29 @@ export class VehicleRegisterComponent {
 
   parkingZones : IParkingZone[] = []
 
-  
+  // List tab: '' for all, PENDING (awaiting registration) or CHECKED-IN
+  statusFilter : string = ''
+
+  // Inspection, recorded by the inspector
+  interiorDetails : string = ''
+  bodyCondition : string = ''
+  devices : IParkingDevice[] = []
+  signatures : IParkingSignature[] = []
+  inspectionLoaded : boolean = false
+
+  // Driver, completed by the registrar
+  driverName : string = ''
+  driverPhoneNo : string = ''
+  driverIdType : string = ''
+  driverIdNo : string = ''
+
+  registrarSignature : string | null = null
+  modifierSignature : string | null = null
+
+  // Active zones that still have space, for registration
+  availableZones : (IParkingZone & { freeSlots : string })[] = []
+
+
   constructor(
     private http :HttpClient,
     private auth : AuthService,
@@ -150,7 +174,7 @@ export class VehicleRegisterComponent {
     var page = this.page
     var request = ++this.parkingsRequest
 
-    await this.http.get<IPage<IParking>>(API_URL+'/parkings/get_all_pending_or_checked_in_page?' + pageParams(page, this.pageSize, this.filterRecords), options)
+    await this.http.get<IPage<IParking>>(API_URL+'/parkings/get_all_pending_or_checked_in_page?' + pageParams(page, this.pageSize, this.filterRecords) + '&status=' + this.statusFilter, options)
     .toPromise()
     .then(
       data => {
@@ -174,6 +198,12 @@ export class VehicleRegisterComponent {
         this.totalParkings = data!.totalElements
       }
     )
+  }
+
+  setStatusFilter(status : string){
+    this.statusFilter = status
+    this.page = 1
+    this.getAllPendingOrCheckedInParkings()
   }
 
   pageChanged(page : number){
@@ -206,6 +236,113 @@ export class VehicleRegisterComponent {
         console.log(data)
       }
     )
+    await this.getInspection(id)
+  }
+
+  // The devices and signatures of one parking
+  async getInspection(id : any){
+    this.devices = []
+    this.signatures = []
+    this.inspectionLoaded = false
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    await this.http.get<IParkingInspection>(API_URL+'/parkings/get_inspection?id=' + id, options)
+    .toPromise()
+    .then(
+      data => {
+        this.devices = (data?.devices ?? []).map(d => ({ name : d.name, qty : d.qty }))
+        this.signatures = data?.signatures ?? []
+        this.inspectionLoaded = true
+      }
+    )
+    .catch(error => console.log(error))
+  }
+
+  signaturesOf(stage : string) : IParkingSignature[] {
+    return this.signatures.filter(s => s.stage === stage)
+  }
+
+  roleLabel(role : string) : string {
+    switch(role){
+      case 'INSPECTOR': return 'Inspector'
+      case 'DRIVER': return 'Driver'
+      case 'REGISTRAR': return 'Registrar'
+      case 'MODIFIER': return 'Modified by'
+      default: return role
+    }
+  }
+
+  devicesText() : string {
+    return this.devices.map(d => d.name + ' x' + d.qty).join(', ')
+  }
+
+  addDevice(){
+    this.devices.push({ name : '', qty : 1 })
+  }
+
+  removeDevice(index : number){
+    this.devices.splice(index, 1)
+  }
+
+  // Opens a PENDING vehicle for registration and check-in
+  async open(id : any){
+    this.registrarSignature = null
+    this.availableZones = []
+    await this.get(id)
+    // An earlier category is kept; otherwise the registrar chooses one
+    if(this.vehicleEquipmentCategory !== 'IN-TRANSIT' && this.vehicleEquipmentCategory !== 'LOCAL'){
+      this.vehicleEquipmentCategory = ''
+    }
+    this.parkingZoneName = ''
+    // Billing starts today unless the registrar picks another date (the API takes a plain yyyy-MM-dd date)
+    const today = new Date()
+    this.startBillingAt = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0')
+    await this.getAvailableZones()
+  }
+
+  async getAvailableZones(){
+    let options = {
+      headers: new HttpHeaders().set('Authorization', 'Bearer '+this.auth.user.access_token)
+    }
+    await this.http.get<(IParkingZone & { freeSlots : string })[]>(API_URL+'/parking_zones/get_all_branch_available', options)
+    .toPromise()
+    .then(data => this.availableZones = data ?? [])
+    .catch(error => console.log(error))
+  }
+
+  zoneLabel(zone : IParkingZone & { freeSlots : string }) : string {
+    return zone.freeSlots ? zone.name + ' (' + zone.freeSlots + ' free)' : zone.name
+  }
+
+  // What registration still lacks, or '' when the vehicle can be checked in
+  registrationProblem() : string {
+    if(!this.driverName?.trim()) return 'Driver name is required'
+    if(!this.vehicleEquipmentTypeName) return 'Vehicle type is required'
+    if(this.vehicleEquipmentCategory !== 'IN-TRANSIT' && this.vehicleEquipmentCategory !== 'LOCAL') return 'Select the category'
+    if(!this.parkingZoneName) return 'Select the parking zone'
+    if(!this.registrarSignature) return 'Registrar signature is required'
+    return ''
+  }
+
+  // Editing an inspection that is waiting for registration
+  inspectionEditProblem() : string {
+    if(!this.ownerFirstName?.trim() || !this.ownerLastName?.trim()) return 'Owner first and last name are required'
+    if(!this.chasisNo?.trim()) return 'Chassis number is required'
+    if(!this.bodyCondition?.trim()) return 'Body condition is required'
+    if(this.devices.some(d => !d.name?.trim())) return 'Name every device attached, or remove its row'
+    return ''
+  }
+
+  openModify(id : any){
+    this.modifierSignature = null
+    this.get(id)
+  }
+
+  modifyProblem() : string {
+    if(this.devices.some(d => !d.name?.trim())) return 'Name every device attached, or remove its row'
+    if(!this.modifierSignature) return 'Your signature is required to modify'
+    return ''
   }
 
   reasonToRemove : string = '';
@@ -324,7 +461,11 @@ export class VehicleRegisterComponent {
 
       billintType : this.billingType,
 
-      parkingZoneName : this.parkingZoneName
+      parkingZoneName : this.parkingZoneName,
+
+      interiorDetails : this.interiorDetails,
+      bodyCondition : this.bodyCondition,
+      devices : this.devices.map(d => ({ name : d.name, qty : d.qty }))
     }
 
     console.log(parking)
@@ -449,7 +590,17 @@ export class VehicleRegisterComponent {
 
       startBillingAt : startBillingAt,
 
-      parkingZoneName : this.parkingZoneName
+      parkingZoneName : this.parkingZoneName,
+
+      interiorDetails : this.interiorDetails,
+      bodyCondition : this.bodyCondition,
+      devices : this.devices.map(d => ({ name : d.name, qty : d.qty })),
+      driverName : this.driverName,
+      driverPhoneNo : this.driverPhoneNo,
+      driverIdType : this.driverIdType,
+      driverIdNo : this.driverIdNo,
+
+      modifierSignature : this.modifierSignature
     }
 
     console.log(parking)
@@ -523,7 +674,16 @@ export class VehicleRegisterComponent {
       cardNo : this.cardNo,
       hasKeys : this.hasKeys === 'YES' ? 1 : 0,
       parkingZoneName : this.parkingZoneName,
-      startBillingAt : this.startBillingAt
+      startBillingAt : this.startBillingAt,
+
+      vehicleEquipmentTypeName : this.vehicleEquipmentTypeName,
+      vehicleEquipmentCategory : this.vehicleEquipmentCategory,
+      driverName : this.driverName,
+      driverPhoneNo : this.driverPhoneNo,
+      driverIdType : this.driverIdType,
+      driverIdNo : this.driverIdNo,
+
+      registrarSignature : this.registrarSignature
     }
 
     await this.http.post<IParking>(API_URL+'/parkings/check_in', parking, options)
@@ -535,7 +695,7 @@ export class VehicleRegisterComponent {
 
           this.getAllPendingOrCheckedInParkings()
 
-          this.msg.showSuccessMessage('Checked in Successifully')
+          this.msg.showSuccessMessage('Registered and checked in successfully')
 
         }
 
@@ -678,6 +838,13 @@ export class VehicleRegisterComponent {
      this.billingType = data!.billingType
      this.startBillingAt = data!.billingStartAt
 
+    this.status = data!.status
+    this.interiorDetails = data!.interiorDetails ?? ''
+    this.bodyCondition = data!.bodyCondition ?? ''
+    this.driverName = data!.driverName ?? ''
+    this.driverPhoneNo = data!.driverPhoneNo ?? ''
+    this.driverIdType = data!.driverIdType ?? ''
+    this.driverIdNo = data!.driverIdNo ?? ''
   }
 
   clearParkingData(){

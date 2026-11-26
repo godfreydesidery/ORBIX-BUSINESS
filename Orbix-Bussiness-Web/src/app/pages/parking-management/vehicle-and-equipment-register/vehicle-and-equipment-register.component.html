@@ -2,7 +2,7 @@
     <div class="col">
         <div widget class="card">
             <div class="card-header">
-                <span>Vehicle Register | {{ currentService ? currentService : 'No Service Selected' }}</span>
+                <span>{{ currentService === 'Parking' ? 'Vehicle Inspection' : 'Vehicle Register' }} | {{ currentService ? currentService : 'No Service Selected' }}</span>
             </div>
             
             <div class="card-body widget-body min-vh-100">
@@ -169,7 +169,7 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-3">
+                            <div class="col-lg-3" *ngIf="currentService !== 'Parking'">
                                 <div class="form-group">
                                     <label>Device Status*</label>
                                     <select class="form-control" [(ngModel)]="deviceStatus">
@@ -241,8 +241,8 @@
                     </div>
                     <div class="row">
                         <div class="col-sm-12">
-                            <button class="btn btn-success btn-round-custom" *ngIf="currentService === 'Parking'" (click)="saveForParking()"><i class="fa fa-pencil-square-o"></i> Register
-                                Parking</button>
+                            <button class="btn btn-success btn-round-custom" *ngIf="currentService === 'Parking'" (click)="saveForParking()"><i class="fa fa-pencil-square-o"></i> Register Vehicle
+                                and Start Inspection</button>
                             <button class="btn btn-success btn-round-custom" *ngIf="currentService === 'Maintenance'" (click)="saveForMaintenance()"><i class="fa fa-pencil-square-o"></i> Register
                                 Maintenance</button>
                         </div>
@@ -324,7 +324,8 @@
                 <div class="row" *ngIf="id != null">
                     <div class="col-sm-12">
                         <hr>
-                        <h6>Driver/Owner Information</h6>
+                        <h6 *ngIf="currentService === 'Parking'">Owner Information</h6>
+                        <h6 *ngIf="currentService !== 'Parking'">Driver/Owner Information</h6>
                         <hr>
                         <div class="row">
                             <input type="hidden" [(ngModel)]="parkingId">
@@ -431,7 +432,7 @@
                             </div>
 
                         </div>
-                        <h6>Vehicle Information</h6>
+                        <h6>{{ currentService === 'Parking' ? 'Vehicle Information and Condition' : 'Vehicle Information' }}</h6>
                         <hr>
                         <div class="row">
 
@@ -697,7 +698,7 @@
                                     </table>
                                 </div>
                             </div>
-                            <div class="col-lg-3">
+                            <div class="col-lg-3" *ngIf="currentService !== 'Parking'">
                                 <div class="form-group">
                                     <label>Device Status</label>
                                     <table class="table table-sm table-bordered">
@@ -715,7 +716,7 @@
                                     </table>
                                 </div>
                             </div>
-                            <div class="col-lg-3">
+                            <div class="col-lg-3" *ngIf="currentService !== 'Parking'">
                                 <div class="form-group">
                                     <label>Keys</label>
                                     <table class="table table-sm table-bordered">
@@ -738,7 +739,7 @@
                         <div class="row">
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>Select Vehicle Typee</label>
+                                    <label>Vehicle Type*</label>
                                     <!-- <select class="form-control" [(ngModel)]="vehicleEquipmentTypeName">
                                         <option></option>
                                         <option *ngFor="let option of vehicleEquipmentTypes" [value]="option.name">{{ option.name }}</option>
@@ -766,38 +767,9 @@
                                 </div>
                             </div>
 
-                            <div class="col-lg-3" *ngIf="currentService === 'Parking'">
-                                <div class="form-group">
-                                    <label>Category</label>
-                                    <select class="form-control" [(ngModel)]="vehicleEquipmentCategory">
-                                        <!-- <option></option> -->
-                                        <option>IN-TRANSIT</option>
-                                        <option>LOCAL</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div class="col-lg-3" *ngIf="currentService === 'Parking'">
-                                <div class="form-group">
-                                    <label>Parking Zone</label>
-                                    <select class="form-control" [(ngModel)]="parkingZoneName">
-                                        <option></option>
-                                        <option *ngFor="let option of parkingZones; trackBy: trackById" [value]="option.name">{{ option.name
-                                            }}</option>
-                                    </select>
-                                </div>
-                            </div>
-                            <div class="col-lg-3" *ngIf="currentService === 'Parking'">
-                                <div class="form-group">
-                                    <label>Select Billing Type</label>
-                                    <select class="form-control" [(ngModel)]="billingType">
-                                        <option>DAILY</option>
-                                    </select>
-                                </div>
-                            </div>
                             <div class="col-lg-3">
                                 <div class="form-group">
-                                    <label>Chasis No/ Reg No</label>
+                                    <label>Chasis No/ Reg No*</label>
                                     <input class="form-control" type="text" [(ngModel)]="chasisNo" autocomplete="nope">
                                 </div>
                             </div>
@@ -847,11 +819,99 @@
                             </div>
                         </div>
 
-                        <div class="row">
-                            <div class="col-sm-12">
-                                <button type="button" class="btn btn-primary btn-round-custom pull-right"  *ngIf="currentService === 'Parking'"
-                                    (click)="saveParking()"><i class="fa fa-save"></i> Update</button>
+                        <!-- Inspection: interior, devices attached, body condition and signatures (parking only) -->
+                        <ng-container *ngIf="currentService === 'Parking'">
+                            <hr>
+                            <h6>Inspection</h6>
+                            <hr>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Interior Details</label>
+                                        <textarea class="form-control" rows="3" [(ngModel)]="interiorDetails"
+                                            placeholder="Seats, dashboard, mats, radio..." autocomplete="nope"></textarea>
+                                    </div>
+                                </div>
+                                <div class="col-lg-6">
+                                    <div class="form-group">
+                                        <label>Body Condition*</label>
+                                        <textarea class="form-control" rows="3" [(ngModel)]="bodyCondition"
+                                            placeholder="Scratches, dents, cracks and where they are" autocomplete="nope"></textarea>
+                                    </div>
+                                </div>
                             </div>
+                            <div class="row">
+                                <div class="col-lg-6">
+                                    <label>Devices Attached</label>
+                                    <table class="table table-sm table-bordered">
+                                        <thead>
+                                            <tr>
+                                                <th>Device</th>
+                                                <th style="width: 110px;">Quantity</th>
+                                                <th style="width: 50px;"></th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr *ngFor="let device of devices; let i = index">
+                                                <td><input class="form-control form-control-sm" type="text" [(ngModel)]="device.name"
+                                                        placeholder="e.g. Radio, Jack, Spare tyre" autocomplete="nope"></td>
+                                                <td><input class="form-control form-control-sm" type="number" min="1" [(ngModel)]="device.qty"></td>
+                                                <td><button type="button" class="btn btn-sm btn-outline-danger" title="Remove"
+                                                        (click)="removeDevice(i)"><i class="fa fa-trash"></i></button></td>
+                                            </tr>
+                                            <tr *ngIf="devices.length === 0">
+                                                <td colspan="3" class="text-muted">No devices attached</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                    <button type="button" class="btn btn-sm btn-outline-success" (click)="addDevice()">
+                                        <i class="fa fa-plus"></i> Add Device</button>
+                                </div>
+                            </div>
+
+                            <hr>
+                            <h6>Signatures</h6>
+                            <hr>
+                            <!-- New inspection: the inspector and the driver sign once, when it is submitted -->
+                            <div class="row" *ngIf="isNewInspection()">
+                                <div class="col-lg-4">
+                                    <az-signature-pad label="Inspector Signature" [(signature)]="inspectorSignature"></az-signature-pad>
+                                </div>
+                                <div class="col-lg-4">
+                                    <az-signature-pad label="Driver Signature" [askName]="true" namePlaceholder="Driver's full name"
+                                        [(signerName)]="driverSignerName" [(signature)]="driverSignature"></az-signature-pad>
+                                </div>
+                            </div>
+                            <!-- Inspection opened again: the signatures already given -->
+                            <div class="row" *ngIf="!isNewInspection()">
+                                <div class="col-lg-4" *ngFor="let signature of inspectionSignatures">
+                                    <label><b>{{ signature.role === 'INSPECTOR' ? 'Inspector' : 'Driver' }}</b></label>
+                                    <div><img [src]="signature.image" alt="Signature" style="border: 1px solid #ddd; max-width: 200px;"></div>
+                                    <small>{{ signature.signerName }} · {{ signature.signedAt | date:'dd-MM-yyyy HH:mm' }}</small>
+                                </div>
+                                <div class="col-sm-12 text-muted" *ngIf="inspectionSignatures.length === 0">
+                                    No signatures: inspected before electronic signatures were introduced.
+                                </div>
+                            </div>
+                        </ng-container>
+
+                        <div class="row" *ngIf="currentService === 'Parking'">
+                            <div class="col-sm-12">
+                                <br>
+                                <span class="text-danger" *ngIf="inspectionProblem() !== ''">{{ inspectionProblem() }}</span>
+                                <span class="text-muted" *ngIf="!isNewInspection() && parkingStatus === 'CHECKED-IN'">
+                                    This vehicle is checked in: change it with Modify on the Parking page.</span>
+                                <button type="button" class="btn btn-success btn-round-custom pull-right"
+                                    *ngIf="isNewInspection() && grant(['PKNG-INSPECT'])"
+                                    [disabled]="inspectionProblem() !== ''"
+                                    (click)="saveParking()"><i class="fa fa-check"></i> Submit Inspection</button>
+                                <button type="button" class="btn btn-primary btn-round-custom pull-right"
+                                    *ngIf="!isNewInspection() && parkingStatus === 'PENDING' && grant(['PKNG-INSPECT'])"
+                                    [disabled]="inspectionProblem() !== ''"
+                                    (click)="saveParking()"><i class="fa fa-save"></i> Update Inspection</button>
+                            </div>
+                        </div>
+                        <div class="row">
                             <div class="col-sm-12">
                                 <button type="button" class="btn btn-primary pull-right btn-round-custom"  *ngIf="currentService === 'Maintenance'"
                                     (click)="sendToMaintenance()">Send to Maintenance</button>

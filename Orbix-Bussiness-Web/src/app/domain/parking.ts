@@ -77,6 +77,36 @@ export interface IParking {
     cardNo : string
 
     serviceBillItems : IServiceBillItem[]
+
+    // Inspection and driver; devices and signatures come from /parkings/get_inspection
+    interiorDetails : string
+    bodyCondition : string
+    driverName : string
+    driverPhoneNo : string
+    driverIdType : string
+    driverIdNo : string
+}
+
+// A device found attached to the vehicle at inspection
+export interface IParkingDevice {
+    name : string
+    qty : number
+}
+
+// A signature given at one step of the parking
+export interface IParkingSignature {
+    stage : 'INSPECTION' | 'REGISTRATION' | 'MODIFICATION'
+    role : 'INSPECTOR' | 'DRIVER' | 'REGISTRAR' | 'MODIFIER'
+    signerName : string
+    signedAt : string
+    image : string // data:image/png;base64,...
+    changes : string // MODIFICATION only: one "Field: old → new" per line
+}
+
+export interface IParkingInspection {
+    parkingId : string
+    devices : IParkingDevice[]
+    signatures : IParkingSignature[]
 }
 
 export interface IServiceBillItem{
