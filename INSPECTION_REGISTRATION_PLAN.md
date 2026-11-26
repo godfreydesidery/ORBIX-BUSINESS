@@ -24,7 +24,8 @@ the check-in.
 ## Decisions
 
 - Registration and check-in are one action.
-- Owner/agent details stay on the inspection form, because `owner_first_name` and `owner_last_name` are NOT NULL.
+- Owner/agent details: first kept on the inspection form because the owner name columns are NOT NULL; later moved
+  to registration with a placeholder owner (see below).
 - The existing Vehicle Register page is reused as the inspection form, on its parking path only.
 - Zone space is counted, not tracked by numbered slot: free = `noOfSlots` minus the CHECKED-IN parkings in the zone.
   `noOfSlots = 0` means unlimited, full zones are hidden, and space frees itself at check-out. A vehicle out on a
@@ -86,6 +87,20 @@ loose items are already covered by the yes/no condition checklist.
 - The registrar's save still checks the vehicle in; there is no separate check-in step.
 - Styling: signature boxes with a header, a "Signed" badge, a signing line and a Clear button; larger buttons with
   icons for New Vehicle / Existing Vehicle / Vehicle List and for the Parking tabs.
+
+## Owner and agent at registration (placeholder)
+
+The client moved the owner's details to registration. The owner name columns of `parkings` and
+`vehicle_equipments` are NOT NULL and the records are created at inspection, so until registration the owner is
+saved as the placeholder **PENDING REGISTRATION** (first name `PENDING`, last name `REGISTRATION`). No schema change.
+- Inspection (New Vehicle / the inspection form) has no owner or agent fields; Sub T1 stays with the inspector,
+  under "Transit Document".
+- Before registration, owner and agent information is hidden everywhere: the Vehicle List, the Parking list's owner
+  cell, the Edit form, the read-only part of Open, and View.
+- Open has an **Owner Details** section (names required, ID, phone, agent). Register & Check In refuses a missing
+  owner or the placeholder, and copies the real owner and agent onto the vehicle record too, so "Existing Vehicle"
+  fills them in next time.
+- Modify refuses a blank or placeholder owner.
 
 ## Found while building
 
