@@ -23,6 +23,9 @@
 
                 <br><br>
                 <br><br><br><br> -->
+                <div class="alert alert-warning" role="alert" *ngIf="currentService === 'Parking' && !grant(['PKNG-INSPECT'])">
+                    Submitting and editing inspections needs the <b>PKNG-INSPECT</b> privilege. Ask the system administrator to add it to your role.
+                </div>
                 <div class="alert alert-warning" role="alert" *ngIf="isServicesAllowed === false">
                     <strong>Warning!</strong> You do not have permission to offer services. Please contact the system administrator for assistance.
                 </div>
@@ -698,7 +701,7 @@
                                     </table>
                                 </div>
                             </div>
-                            <div class="col-lg-3" *ngIf="currentService !== 'Parking'">
+                            <div class="col-lg-3">
                                 <div class="form-group">
                                     <label>Device Status</label>
                                     <table class="table table-sm table-bordered">
@@ -714,6 +717,12 @@
                                             </td>
                                         </tbody>
                                     </table>
+                                </div>
+                            </div>
+                            <div class="col-lg-3" *ngIf="currentService === 'Parking' && deviceStatus === 'ATTACHED'">
+                                <div class="form-group">
+                                    <label>Number of Devices*</label>
+                                    <input class="form-control" type="number" min="1" [(ngModel)]="deviceCount" placeholder="Tracking devices attached">
                                 </div>
                             </div>
                             <div class="col-lg-3" *ngIf="currentService !== 'Parking'">
@@ -838,34 +847,6 @@
                                         <textarea class="form-control" rows="3" [(ngModel)]="bodyCondition"
                                             placeholder="Scratches, dents, cracks and where they are" autocomplete="nope"></textarea>
                                     </div>
-                                </div>
-                            </div>
-                            <div class="row">
-                                <div class="col-lg-6">
-                                    <label>Devices Attached</label>
-                                    <table class="table table-sm table-bordered">
-                                        <thead>
-                                            <tr>
-                                                <th>Device</th>
-                                                <th style="width: 110px;">Quantity</th>
-                                                <th style="width: 50px;"></th>
-                                            </tr>
-                                        </thead>
-                                        <tbody>
-                                            <tr *ngFor="let device of devices; let i = index">
-                                                <td><input class="form-control form-control-sm" type="text" [(ngModel)]="device.name"
-                                                        placeholder="e.g. Radio, Jack, Spare tyre" autocomplete="nope"></td>
-                                                <td><input class="form-control form-control-sm" type="number" min="1" [(ngModel)]="device.qty"></td>
-                                                <td><button type="button" class="btn btn-sm btn-outline-danger" title="Remove"
-                                                        (click)="removeDevice(i)"><i class="fa fa-trash"></i></button></td>
-                                            </tr>
-                                            <tr *ngIf="devices.length === 0">
-                                                <td colspan="3" class="text-muted">No devices attached</td>
-                                            </tr>
-                                        </tbody>
-                                    </table>
-                                    <button type="button" class="btn btn-sm btn-outline-success" (click)="addDevice()">
-                                        <i class="fa fa-plus"></i> Add Device</button>
                                 </div>
                             </div>
 

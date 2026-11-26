@@ -4,7 +4,7 @@ import { Component } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { AuthService } from 'src/app/auth.service';
 import { NgxPaginationModule } from 'ngx-pagination';
-import { IParking, IParkingDevice, IParkingInspection, IParkingSignature } from 'src/app/domain/parking';
+import { IParking, IParkingInspection, IParkingSignature } from 'src/app/domain/parking';
 import { SignaturePadComponent } from 'src/app/common/components/signature-pad/signature-pad.component';
 import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleEquipmentType } from 'src/app/domain/vehicle-equipment-type';
@@ -136,7 +136,8 @@ export class VehicleRegisterComponent {
   // Inspection, recorded by the inspector
   interiorDetails : string = ''
   bodyCondition : string = ''
-  devices : IParkingDevice[] = []
+  // How many tracking devices are attached, when Device Status is ATTACHED
+  deviceCount : number | null = null
   signatures : IParkingSignature[] = []
   inspectionLoaded : boolean = false
 
@@ -239,9 +240,8 @@ export class VehicleRegisterComponent {
     await this.getInspection(id)
   }
 
-  // The devices and signatures of one parking
+  // The signatures of one parking
   async getInspection(id : any){
-    this.devices = []
     this.signatures = []
     this.inspectionLoaded = false
     let options = {
@@ -251,7 +251,6 @@ export class VehicleRegisterComponent {
     .toPromise()
     .then(
       data => {
-        this.devices = (data?.devices ?? []).map(d => ({ name : d.name, qty : d.qty }))
         this.signatures = data?.signatures ?? []
         this.inspectionLoaded = true
       }
@@ -273,16 +272,9 @@ export class VehicleRegisterComponent {
     }
   }
 
-  devicesText() : string {
-    return this.devices.map(d => d.name + ' x' + d.qty).join(', ')
-  }
-
-  addDevice(){
-    this.devices.push({ name : '', qty : 1 })
-  }
-
-  removeDevice(index : number){
-    this.devices.splice(index, 1)
+  deviceText() : string {
+    if(this.deviceStatus !== 'ATTACHED') return 'Not attached'
+    return this.deviceCount ? 'Attached: ' + this.deviceCount + (this.deviceCount === 1 ? ' device' : ' devices') : 'Attached'
   }
 
   // Opens a PENDING vehicle for registration and check-in
@@ -330,17 +322,28 @@ export class VehicleRegisterComponent {
     if(!this.ownerFirstName?.trim() || !this.ownerLastName?.trim()) return 'Owner first and last name are required'
     if(!this.chasisNo?.trim()) return 'Chassis number is required'
     if(!this.bodyCondition?.trim()) return 'Body condition is required'
-    if(this.devices.some(d => !d.name?.trim())) return 'Name every device attached, or remove its row'
+    if(this.deviceStatus === 'ATTACHED' && this.deviceCount !== null && this.deviceCount < 1) return 'The number of devices must be at least 1'
     return ''
   }
 
   openModify(id : any){
     this.modifierSignature = null
+    this.availableZones = []
     this.get(id)
+    this.getAvailableZones()
+  }
+
+  // Modify may keep the vehicle's zone, or move it to one that still has space
+  modifyZoneOptions() : { name : string, label : string }[] {
+    const options = this.availableZones.map(zone => ({ name : zone.name, label : this.zoneLabel(zone) }))
+    if(this.parkingZoneName && !options.some(option => option.name === this.parkingZoneName)){
+      options.unshift({ name : this.parkingZoneName, label : this.parkingZoneName + ' (current)' })
+    }
+    return options
   }
 
   modifyProblem() : string {
-    if(this.devices.some(d => !d.name?.trim())) return 'Name every device attached, or remove its row'
+    if(this.deviceStatus === 'ATTACHED' && this.deviceCount !== null && this.deviceCount < 1) return 'The number of devices must be at least 1'
     if(!this.modifierSignature) return 'Your signature is required to modify'
     return ''
   }
@@ -465,7 +468,7 @@ export class VehicleRegisterComponent {
 
       interiorDetails : this.interiorDetails,
       bodyCondition : this.bodyCondition,
-      devices : this.devices.map(d => ({ name : d.name, qty : d.qty }))
+      deviceCount : this.deviceStatus === 'ATTACHED' ? this.deviceCount : null
     }
 
     console.log(parking)
@@ -594,7 +597,7 @@ export class VehicleRegisterComponent {
 
       interiorDetails : this.interiorDetails,
       bodyCondition : this.bodyCondition,
-      devices : this.devices.map(d => ({ name : d.name, qty : d.qty })),
+      deviceCount : this.deviceStatus === 'ATTACHED' ? this.deviceCount : null,
       driverName : this.driverName,
       driverPhoneNo : this.driverPhoneNo,
       driverIdType : this.driverIdType,
@@ -839,6 +842,7 @@ export class VehicleRegisterComponent {
      this.startBillingAt = data!.billingStartAt
 
     this.status = data!.status
+    this.deviceCount = data!.deviceCount ? Number(data!.deviceCount) : null
     this.interiorDetails = data!.interiorDetails ?? ''
     this.bodyCondition = data!.bodyCondition ?? ''
     this.driverName = data!.driverName ?? ''

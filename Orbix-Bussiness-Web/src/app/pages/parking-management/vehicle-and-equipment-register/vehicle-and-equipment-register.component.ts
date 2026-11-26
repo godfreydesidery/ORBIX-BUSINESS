@@ -8,7 +8,7 @@ import { NgSelectModule } from '@ng-select/ng-select';
 import { MsgBoxService } from '@services/custom/msg-box.service';
 import { AuthService } from 'src/app/auth.service';
 import { IMaintenance } from 'src/app/domain/maintenance';
-import { IParking, IParkingDevice, IParkingInspection, IParkingSignature } from 'src/app/domain/parking';
+import { IParking, IParkingInspection, IParkingSignature } from 'src/app/domain/parking';
 import { SignaturePadComponent } from 'src/app/common/components/signature-pad/signature-pad.component';
 import { IParkingZone } from 'src/app/domain/parking-zone';
 import { IVehicleEquipment } from 'src/app/domain/vehicle-equipment';
@@ -195,7 +195,8 @@ export class VehicleEquipmentRegisterComponent {
   parkingStatus: string = ''
   interiorDetails: string = ''
   bodyCondition: string = ''
-  devices: IParkingDevice[] = []
+  // How many tracking devices are attached, when Device Status is ATTACHED
+  deviceCount: number | null = null
   inspectorSignature: string | null = null
   driverSignature: string | null = null
   driverSignerName: string = ''
@@ -694,12 +695,12 @@ export class VehicleEquipmentRegisterComponent {
     this.inspectorSignature = null
     this.driverSignature = null
     this.driverSignerName = ''
+    this.deviceCount = data!.deviceCount ? Number(data!.deviceCount) : null
     this.getInspection(data!.id)
   }
 
-  // The devices and signatures of the opened parking
+  // The signatures of the opened parking
   async getInspection(id: any) {
-    this.devices = []
     this.inspectionSignatures = []
     if (id === null || id === undefined || id === '') return
     let options = {
@@ -709,19 +710,10 @@ export class VehicleEquipmentRegisterComponent {
       .toPromise()
       .then(
         data => {
-          this.devices = (data?.devices ?? []).map(d => ({ name: d.name, qty: d.qty }))
           this.inspectionSignatures = (data?.signatures ?? []).filter(s => s.stage === 'INSPECTION')
         }
       )
       .catch(error => console.log(error))
-  }
-
-  addDevice() {
-    this.devices.push({ name: '', qty: 1 })
-  }
-
-  removeDevice(index: number) {
-    this.devices.splice(index, 1)
   }
 
   // What the inspection still lacks, or '' when it can be submitted
@@ -730,7 +722,7 @@ export class VehicleEquipmentRegisterComponent {
     if (!this.chasisNo?.trim()) return 'Chassis number is required'
     if (!this.vehicleEquipmentTypeName) return 'Vehicle type is required'
     if (!this.bodyCondition?.trim()) return 'Body condition is required'
-    if (this.devices.some(d => !d.name?.trim())) return 'Name every device attached, or remove its row'
+    if (this.deviceStatus === 'ATTACHED' && !(this.deviceCount && this.deviceCount >= 1)) return 'Enter the number of tracking devices attached'
     if (this.isNewInspection()) {
       if (!this.inspectorSignature) return 'Inspector signature is required'
       if (!this.driverSignerName?.trim()) return 'Driver name is required beside the driver signature'
@@ -808,7 +800,7 @@ export class VehicleEquipmentRegisterComponent {
     this.parkingStatus = ''
     this.interiorDetails = ''
     this.bodyCondition = ''
-    this.devices = []
+    this.deviceCount = null
     this.inspectorSignature = null
     this.driverSignature = null
     this.driverSignerName = ''
@@ -986,7 +978,7 @@ export class VehicleEquipmentRegisterComponent {
       // Inspection
       interiorDetails: this.interiorDetails,
       bodyCondition: this.bodyCondition,
-      devices: this.devices.map(d => ({ name: d.name, qty: d.qty })),
+      deviceCount: this.deviceStatus === 'ATTACHED' ? this.deviceCount : null,
       // Signatures are given once, when the inspection is first submitted
       inspectorSignature: this.isNewInspection() ? this.inspectorSignature : null,
       driverSignature: this.isNewInspection() ? this.driverSignature : null,

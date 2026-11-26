@@ -9,6 +9,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
@@ -78,7 +79,6 @@ public class ParkingServiceController implements ParkingService {
 
 	private final ParkingTripRepository parkingTripRepository;
 
-	private final ParkingDeviceRepository parkingDeviceRepository;
 	private final ParkingSignatureRepository parkingSignatureRepository;
 
 	private static final List<String> CATEGORIES = List.of("IN-TRANSIT", "LOCAL");
@@ -372,7 +372,6 @@ public class ParkingServiceController implements ParkingService {
 
 		ParkingInspectionResponseDTO inspection = new ParkingInspectionResponseDTO();
 		inspection.setParkingId(String.valueOf(parking.getId()));
-		inspection.setDevices(deviceDTOs(parkingDeviceRepository.findAllByParkingOrderById(parking)));
 
 		List<ParkingInspectionResponseDTO.Signature> signatures = new ArrayList<>();
 		for(ParkingSignature parkingSignature : parkingSignatureRepository.findAllByParkingOrderBySignedAtAscIdAsc(parking)) {
@@ -432,6 +431,7 @@ public class ParkingServiceController implements ParkingService {
 		String driverSignerName = required(parkingRequest.getDriverSignerName(), "Driver name is required beside the driver signature");
 		byte[] inspectorSignature = SignatureImages.decode(parkingRequest.getInspectorSignature(), "Inspector");
 		byte[] driverSignature = SignatureImages.decode(parkingRequest.getDriverSignature(), "Driver");
+		Integer deviceCount = deviceCount(parkingRequest, true);
 		
 		Optional<Company> company_ = companyRepository.findById(userService.getUserCompany(request).getId());
 		if(company_.isEmpty()) {
@@ -446,7 +446,7 @@ public class ParkingServiceController implements ParkingService {
 		if(vehicleEquipmentType_.isEmpty()) {
 			throw new NotFoundException("Vehicle or  a equipment type not found");
 		}
-		if(vehicleEquipmentType_.get().getCompany().getId() != company_.get().getId()) {
+		if(!Objects.equals(vehicleEquipmentType_.get().getCompany().getId(), company_.get().getId())) {
 			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
 		}
 		
@@ -521,9 +521,7 @@ public class ParkingServiceController implements ParkingService {
 		parking = parkingRepository.save(parking);
 		/**Create  parking no*/
 		parking.setNo("PKN/"+ parking.getId().toString());
-		if(parkingRequest.getDevices() != null) {
-			parking.setDeviceStatus(replaceDevices(parking, parkingRequest.getDevices()) > 0);
-		}
+		parking.setDeviceCount(deviceCount);
 		parking = parkingRepository.save(parking);
 
 		sign(parking, ParkingSignature.INSPECTION, ParkingSignature.INSPECTOR, user, nameOf(user), inspectorSignature, null);
@@ -573,7 +571,7 @@ public class ParkingServiceController implements ParkingService {
 		if(vehicleEquipmentType_.isEmpty()) throw new NotFoundException("Vehicle or equipment type not found");
 			
 		
-		if(vehicleEquipmentType_.get().getCompany().getId() != company_.get().getId()) 
+		if(!Objects.equals(vehicleEquipmentType_.get().getCompany().getId(), company_.get().getId())) 
 			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
 		
 		// The parking zone and category belong to registration: editing an inspection leaves them as they are
@@ -624,9 +622,7 @@ public class ParkingServiceController implements ParkingService {
 
 		parking.setInteriorDetails(text(parkingRequest.getInteriorDetails()));
 		parking.setBodyCondition(text(parkingRequest.getBodyCondition()));
-		if(parkingRequest.getDevices() != null) {
-			parking.setDeviceStatus(replaceDevices(parking, parkingRequest.getDevices()) > 0);
-		}
+		parking.setDeviceCount(deviceCount(parkingRequest, false));
 
 		if(parkingRequest.getBillingType() != null) parking.setBillingType(parkingRequest.getBillingType());
 
@@ -655,7 +651,7 @@ public class ParkingServiceController implements ParkingService {
 		if(vehicleEquipmentType_.isEmpty()) throw new NotFoundException("Vehicle or equipment type not found");
 			
 		
-		if(vehicleEquipmentType_.get().getCompany().getId() != company_.get().getId()) 
+		if(!Objects.equals(vehicleEquipmentType_.get().getCompany().getId(), company_.get().getId())) 
 			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
 		
 		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), branch_.get());
@@ -669,9 +665,15 @@ public class ParkingServiceController implements ParkingService {
 
 		byte[] modifierSignature = SignatureImages.decode(parkingRequest.getModifierSignature(), "Your");
 
+		// Moving the vehicle to another zone takes a space there, so that zone must have one
+		ParkingZone currentZone = parking_.get().getParkingZone();
+		if(currentZone == null || !Objects.equals(currentZone.getId(), parkingZone_.get().getId())) {
+			zoneWithSpace(parkingZone_.get());
+		}
+
 		Parking parking = parking_.get();
 		// What the record looked like, to keep what changed beside the signature
-		Map<String, String> before = snapshot(parking, parkingDeviceRepository.findAllByParkingOrderById(parking));
+		Map<String, String> before = snapshot(parking);
 		parking.setOwnerFirstName(parkingRequest.getOwnerFirstName());
 		parking.setOwnerMiddleName(parkingRequest.getOwnerMiddleName());
 		parking.setOwnerLastName(parkingRequest.getOwnerLastName());
@@ -741,14 +743,12 @@ public class ParkingServiceController implements ParkingService {
 		parking.setDriverPhoneNo(text(parkingRequest.getDriverPhoneNo()));
 		parking.setDriverIdType(text(parkingRequest.getDriverIdType()));
 		parking.setDriverIdNo(text(parkingRequest.getDriverIdNo()));
-		if(parkingRequest.getDevices() != null) {
-			parking.setDeviceStatus(replaceDevices(parking, parkingRequest.getDevices()) > 0);
-		}
+		parking.setDeviceCount(deviceCount(parkingRequest, false));
 
 		parking = parkingRepository.save(parking);
 
 		User user = userService.getUser(request);
-		String changes = changes(before, snapshot(parking, parkingDeviceRepository.findAllByParkingOrderById(parking)));
+		String changes = changes(before, snapshot(parking));
 		sign(parking, ParkingSignature.MODIFICATION, ParkingSignature.MODIFIER, user, nameOf(user), modifierSignature, changes.isEmpty() ? "No changes" : changes);
 
 		return parkingResponseDTOMapper(parking);
@@ -802,6 +802,7 @@ public class ParkingServiceController implements ParkingService {
 		parkingResponse.setTireIndicator(parking.isTireIndicator() ? "1" : "0");
 		parkingResponse.setHasKeys(parking.isHasKeys() ? "1" : "0");
 		parkingResponse.setDeviceStatus(parking.isDeviceStatus() ? "1" : "0");
+		parkingResponse.setDeviceCount(parking.getDeviceCount() == null ? "" : String.valueOf(parking.getDeviceCount()));
 		parkingResponse.setVehicleEquipmentCategory(parking.getVehicleEquipmentCategory());
 		parkingResponse.setVehicleEquipmentName(parking.getVehicleEquipmentName());
 		parkingResponse.setVehicleEquipmentColor(parking.getVehicleEquipmentColor());
@@ -898,6 +899,18 @@ public class ParkingServiceController implements ParkingService {
 		return name;
 	}
 
+	/**
+	 * The zone, locked until the transaction ends so two vehicles cannot both take its last space, once it is known
+	 * to be active and to have a free space. No of slots 0 means no limit.
+	 */
+	private ParkingZone zoneWithSpace(ParkingZone zone) {
+		ParkingZone parkingZone = parkingZoneRepository.findByIdForUpdate(zone.getId()).orElseThrow(() -> new NotFoundException("Parking Zone not found"));
+		if(!parkingZone.isActive()) throw new InvalidOperationException("Parking Zone " + parkingZone.getName() + " is not active");
+		if(parkingZone.getNoOfSlots() > 0 && parkingRepository.countByParkingZoneAndStatus(parkingZone, "CHECKED-IN") >= parkingZone.getNoOfSlots())
+			throw new InvalidOperationException("Parking Zone " + parkingZone.getName() + " is full, select another zone");
+		return parkingZone;
+	}
+
 	/** Keeps a signature given at one step of the parking; signatures are never changed afterwards */
 	private void sign(Parking parking, String stage, String role, User user, String signerName, byte[] image, String changes) {
 		ParkingSignature signature = new ParkingSignature();
@@ -912,36 +925,20 @@ public class ParkingServiceController implements ParkingService {
 		parkingSignatureRepository.save(signature);
 	}
 
-	/** Replaces the vehicle's devices with the named ones given (a missing or bad quantity counts as 1); returns how many */
-	private int replaceDevices(Parking parking, List<ParkingDeviceDTO> devices) {
-		parkingDeviceRepository.deleteAllOfParking(parking);
-		int saved = 0;
-		for(ParkingDeviceDTO device : devices) {
-			String name = device == null ? null : text(device.getName());
-			if(name == null) continue;
-			ParkingDevice parkingDevice = new ParkingDevice();
-			parkingDevice.setParking(parking);
-			parkingDevice.setName(name);
-			parkingDevice.setQty(device.getQty() == null || device.getQty() < 1 ? 1 : device.getQty());
-			parkingDeviceRepository.save(parkingDevice);
-			saved++;
-		}
-		return saved;
-	}
-
-	private static List<ParkingDeviceDTO> deviceDTOs(List<ParkingDevice> parkingDevices) {
-		List<ParkingDeviceDTO> devices = new ArrayList<>();
-		for(ParkingDevice parkingDevice : parkingDevices) {
-			ParkingDeviceDTO device = new ParkingDeviceDTO();
-			device.setName(parkingDevice.getName());
-			device.setQty(parkingDevice.getQty());
-			devices.add(device);
-		}
-		return devices;
+	/**
+	 * How many tracking devices are attached: none when no device is attached, otherwise at least 1. Required for a new
+	 * inspection; older records may have none recorded, so editing them only checks a count that is given.
+	 */
+	private static Integer deviceCount(ParkingRequestDTO parkingRequest, boolean required) {
+		if(!parkingRequest.isDeviceStatus()) return null;
+		Integer count = parkingRequest.getDeviceCount();
+		if(count == null && !required) return null;
+		if(count == null || count < 1) throw new InvalidEntryException("Enter the number of tracking devices attached");
+		return count;
 	}
 
 	/** The values a modification can change, by the label people see, to tell what a modification changed */
-	private static Map<String, String> snapshot(Parking parking, List<ParkingDevice> devices) {
+	private static Map<String, String> snapshot(Parking parking) {
 		Map<String, String> values = new LinkedHashMap<>();
 		values.put("Owner first name", parking.getOwnerFirstName());
 		values.put("Owner middle name", parking.getOwnerMiddleName());
@@ -985,7 +982,8 @@ public class ParkingServiceController implements ParkingService {
 		values.put("Has keys", yesNo(parking.isHasKeys()));
 		values.put("Interior details", parking.getInteriorDetails());
 		values.put("Body condition", parking.getBodyCondition());
-		values.put("Devices attached", devices.stream().map(d -> d.getName() + " x" + d.getQty()).collect(Collectors.joining(", ")));
+		values.put("Device status", parking.isDeviceStatus() ? "Attached" : "Not attached");
+		values.put("Number of devices", parking.getDeviceCount() == null ? null : String.valueOf(parking.getDeviceCount()));
 		values.put("Driver name", parking.getDriverName());
 		values.put("Driver phone", parking.getDriverPhoneNo());
 		values.put("Driver ID type", parking.getDriverIdType());
@@ -1026,7 +1024,7 @@ public class ParkingServiceController implements ParkingService {
 		if(parking_.isEmpty())
 			throw new NotFoundException("Parking not found");
 		User user = userService.getUser(request);
-		if(parking_.get().getBranch().getId() != user.getBranch().getId())
+		if(!Objects.equals(parking_.get().getBranch().getId(), user.getBranch().getId()))
 			throw new InvalidOperationException("Checking in can only be done by a branch user");
 		if(!parking_.get().getStatus().equals("PENDING"))
 			throw new InvalidOperationException("Can not check in, only a pending parking can be checked in");
@@ -1043,11 +1041,7 @@ public class ParkingServiceController implements ParkingService {
 
 		Optional<ParkingZone> parkingZone_ = parkingZoneRepository.findByNameAndBranch(parkingRequest.getParkingZoneName(), parking_.get().getBranch());
 		if(parkingZone_.isEmpty())throw new NotFoundException("Parking Zone not found");
-		// Locked, so two check-ins cannot both take the zone's last space; no of slots 0 means no limit
-		ParkingZone parkingZone = parkingZoneRepository.findByIdForUpdate(parkingZone_.get().getId()).orElseThrow(() -> new NotFoundException("Parking Zone not found"));
-		if(!parkingZone.isActive()) throw new InvalidOperationException("Parking Zone " + parkingZone.getName() + " is not active");
-		if(parkingZone.getNoOfSlots() > 0 && parkingRepository.countByParkingZoneAndStatus(parkingZone, "CHECKED-IN") >= parkingZone.getNoOfSlots())
-			throw new InvalidOperationException("Parking Zone " + parkingZone.getName() + " is full, select another zone");
+		ParkingZone parkingZone = zoneWithSpace(parkingZone_.get());
 
 		// The registrar confirms the vehicle type, and may correct it; the daily price follows the final type
 		if(text(parkingRequest.getVehicleEquipmentTypeName()) != null) {

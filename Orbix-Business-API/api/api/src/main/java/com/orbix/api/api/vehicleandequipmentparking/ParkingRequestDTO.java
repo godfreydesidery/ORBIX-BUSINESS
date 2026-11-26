@@ -100,8 +100,8 @@ public class ParkingRequestDTO {
     /**Inspection*/
     String interiorDetails;
     String bodyCondition;
-    /** Devices attached; when given, replaces the vehicle's list */
-    List<ParkingDeviceDTO> devices;
+    /** How many tracking devices are attached, when deviceStatus says attached */
+    Integer deviceCount;
 
     /**Driver*/
     String driverName;

@@ -46,6 +46,7 @@ export interface IParking {
     tireIndicator: boolean
     hasKeys: boolean
     deviceStatus: boolean
+    deviceCount: string // how many tracking devices are attached; '' when none or not recorded
     //image: Byte[]
 
     comments : string
@@ -78,19 +79,13 @@ export interface IParking {
 
     serviceBillItems : IServiceBillItem[]
 
-    // Inspection and driver; devices and signatures come from /parkings/get_inspection
+    // Inspection and driver; signatures come from /parkings/get_inspection
     interiorDetails : string
     bodyCondition : string
     driverName : string
     driverPhoneNo : string
     driverIdType : string
     driverIdNo : string
-}
-
-// A device found attached to the vehicle at inspection
-export interface IParkingDevice {
-    name : string
-    qty : number
 }
 
 // A signature given at one step of the parking
@@ -105,7 +100,6 @@ export interface IParkingSignature {
 
 export interface IParkingInspection {
     parkingId : string
-    devices : IParkingDevice[]
     signatures : IParkingSignature[]
 }
 

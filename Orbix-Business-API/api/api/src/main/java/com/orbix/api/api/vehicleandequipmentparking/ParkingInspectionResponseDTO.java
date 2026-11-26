@@ -4,12 +4,11 @@ import java.util.List;
 
 import lombok.Data;
 
-/** The devices and signatures of one parking, for its View; kept out of the lists, which never need them */
+/** The signatures of one parking, for its View; kept out of the lists, which never need them */
 @Data
 public class ParkingInspectionResponseDTO {
 
 	String parkingId;
-	List<ParkingDeviceDTO> devices;
 	List<Signature> signatures;
 
 	@Data

@@ -2,6 +2,7 @@ package com.orbix.api.api.vehicleandequipmentparking;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 import javax.servlet.http.HttpServletRequest;
@@ -161,10 +162,16 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 				statuses.add("CHECKED-IN");
 			    if (parkingRepository.existsByChasisNoAndStatusIn(vehicleEquipmentRequest.getChasisNo(), statuses)) {
 			        throw new InvalidOperationException("Chasis number already exist in parking");
-			    }		    
+			    }
+			    // Registering a vehicle no longer creates its parking, so the same chassis could be registered again
+			    // before its inspection is submitted
+			    if (vehicleEquipmentRepository.existsAwaitingInspection(vehicleEquipmentRequest.getChasisNo().trim(), userService.getUserBranch(request))) {
+			        throw new InvalidOperationException("Chasis number " + vehicleEquipmentRequest.getChasisNo().trim()
+			        		+ " is already registered and waiting for its inspection: use Existing Vehicle to inspect it");
+			    }
 			}
 		}
-		
+
 		if(!(vehicleEquipmentRequest.getService().equals("PARKING") || vehicleEquipmentRequest.getService().equals("MAINTENANCE"))) {
 			throw new InvalidOperationException("Valid Service not specified");
 		}
@@ -187,7 +194,7 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		if(vehicleEquipmentType_.isEmpty()) 
 			throw new NotFoundException("Vehicle or // equipment type not found");
 
-		if(vehicleEquipmentType_.get().getCompany().getId() != company_.get().getId()) 
+		if(!Objects.equals(vehicleEquipmentType_.get().getCompany().getId(), company_.get().getId())) 
 			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
 
 		
@@ -316,7 +323,7 @@ public class VehicleEquipmentServiceController implements VehicleEquipmentServic
 		if(vehicleEquipmentType_.isEmpty()) {
 			throw new NotFoundException("Vehicle or / equipment type not found");
 		}
-		if(vehicleEquipmentType_.get().getCompany().getId() != company_.get().getId()) {
+		if(!Objects.equals(vehicleEquipmentType_.get().getCompany().getId(), company_.get().getId())) {
 			throw new InvalidOperationException("Vehicle or equipment type does not belong to this company");
 		}
 		

@@ -4,7 +4,12 @@
             <div class="card-header">
                 <span>Parking</span>
             </div>
-            <div class="card-body widget-body"> 
+            <div class="card-body widget-body">
+                <div class="alert alert-warning" role="alert" *ngIf="!grant(['PKNG-INSPECT']) || !grant(['PKNG-REGISTER'])">
+                    <span *ngIf="!grant(['PKNG-INSPECT'])">Editing inspections needs the <b>PKNG-INSPECT</b> privilege. </span>
+                    <span *ngIf="!grant(['PKNG-REGISTER'])">Registering and checking in vehicles needs the <b>PKNG-REGISTER</b> privilege. </span>
+                    Ask the system administrator to add it to your role.
+                </div>
 
                 <div class="row">
                     <div class="col-sm-12">
@@ -70,6 +75,7 @@
                                                 <td><button type="button" class="btn btn-primary btn-round-custom btn-sm text-nowrap" (click)="get(p.id)" data-toggle="modal" data-target="#view-modal" style="cursor: pointer;"><i class="fa fa-eye"></i> View</button></td>
                                                 <td *ngIf="p.status === 'CHECKED-IN' && grant(['PKNG-MODIFY'])"><button type="button" class="btn btn-warning btn-round-custom btn-sm text-nowrap" (click)="openModify(p.id)" data-toggle="modal" data-target="#modify-modal" style="cursor: pointer;"><i class="fa fa-wrench"></i> Modify</button></td>
                                                 <td *ngIf="p.status === 'PENDING' && grant(['PKNG-INSPECT'])"><button type="button" class="btn btn-primary btn-round-custom btn-sm text-nowrap" (click)="get(p.id)" data-toggle="modal" data-target="#edit-modal" style="cursor: pointer;"><i class="fa fa-pencil-square-o"></i> Edit</button></td>
+                                                <td *ngIf="p.status === 'PENDING' && !grant(['PKNG-INSPECT', 'PKNG-REGISTER'])"><small class="text-muted text-nowrap" style="margin-left: 3px;">No permission</small></td>
                                                 <td *ngIf="p.status === 'PENDING' && grant(['PKNG-REGISTER'])"><button type="button" class="btn btn-success btn-round-custom btn-sm text-nowrap" (click)="open(p.id)" data-toggle="modal" data-target="#check-in-modal" style="cursor: pointer; margin-left: 3px;"><i class="fa fa-folder-open"></i> Open</button></td>
                                                 <td *ngIf="p.status === 'CHECKED-IN' && grant(['PKNG-ARCHIVE'])"><button type="button" class="btn btn-warning btn-round-custom btn-sm text-nowrap" (click)="get(p.id)" (click)="clearRemove()" data-toggle="modal"data-target="#remove-modal"><i class="fa fa-cogs"></i> Archive</button></td>
                                                 <!-- <td><button type="button" class="btn btn-danger btn-round-custom" *ngIf="p.status === 'CHECKED-IN'" (click)="get(p.id)" data-toggle="modal" data-target="#check-out-modal" style="cursor: pointer; margin-left: 3px;">Check Out</button></td> -->
@@ -473,20 +479,11 @@
                             <textarea class="form-control" rows="3" [(ngModel)]="bodyCondition" autocomplete="nope"></textarea>
                         </div>
                     </div>
-                    <div class="col-lg-6">
-                        <label>Devices Attached</label>
-                        <table class="table table-sm table-bordered">
-                            <thead><tr><th>Device</th><th style="width: 110px;">Quantity</th><th style="width: 50px;"></th></tr></thead>
-                            <tbody>
-                                <tr *ngFor="let device of devices; let i = index">
-                                    <td><input class="form-control form-control-sm" type="text" [(ngModel)]="device.name" autocomplete="nope"></td>
-                                    <td><input class="form-control form-control-sm" type="number" min="1" [(ngModel)]="device.qty"></td>
-                                    <td><button type="button" class="btn btn-sm btn-outline-danger" title="Remove" (click)="removeDevice(i)"><i class="fa fa-trash"></i></button></td>
-                                </tr>
-                                <tr *ngIf="devices.length === 0"><td colspan="3" class="text-muted">No devices attached</td></tr>
-                            </tbody>
-                        </table>
-                        <button type="button" class="btn btn-sm btn-outline-success" (click)="addDevice()"><i class="fa fa-plus"></i> Add Device</button>
+                    <div class="col-lg-3" *ngIf="deviceStatus === 'ATTACHED'">
+                        <div class="form-group">
+                            <label>Number of Devices</label>
+                            <input class="form-control" type="number" min="1" [(ngModel)]="deviceCount">
+                        </div>
                     </div>
                     <div class="col-lg-6">
                         <label>Signatures</label>
@@ -547,7 +544,7 @@
                             </thead>
                             <tbody>
                                 <tr><td><b>Sub T1 Number</b></td><td>{{tformNumber}}</td></tr>
-                                <tr><td><b>Device Status</b></td><td>{{deviceStatus}}</td></tr>
+                                <tr><td><b>Device Status</b></td><td>{{ deviceText() }}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -607,7 +604,7 @@
                             <tbody>
                                 <tr><td><b>Interior Details</b></td><td style="white-space: pre-wrap;">{{interiorDetails}}</td></tr>
                                 <tr><td><b>Body Condition</b></td><td style="white-space: pre-wrap;">{{bodyCondition}}</td></tr>
-                                <tr><td><b>Devices Attached</b></td><td>{{ devicesText() || 'None' }}</td></tr>
+                                <tr><td><b>Tracking Device</b></td><td>{{ deviceText() }}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -705,7 +702,7 @@
                             </thead>
                             <tbody>
                                 <tr><td><b>Sub T1 Number</b></td><td>{{tformNumber}}</td></tr>
-                                <tr><td><b>Device Status</b></td><td>{{deviceStatus}}</td></tr>
+                                <tr><td><b>Device Status</b></td><td>{{ deviceText() }}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -891,7 +888,7 @@
                             </thead>
                             <tbody>
                                 <tr><td><b>Sub T1 Number</b></td><td>{{tformNumber}}</td></tr>
-                                <tr><td><b>Device Status</b></td><td>{{deviceStatus}}</td></tr>
+                                <tr><td><b>Device Status</b></td><td>{{ deviceText() }}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -947,7 +944,7 @@
                             <tbody>
                                 <tr><td><b>Interior Details</b></td><td style="white-space: pre-wrap;">{{interiorDetails}}</td></tr>
                                 <tr><td><b>Body Condition</b></td><td style="white-space: pre-wrap;">{{bodyCondition}}</td></tr>
-                                <tr><td><b>Devices Attached</b></td><td>{{ devicesText() || 'None' }}</td></tr>
+                                <tr><td><b>Tracking Device</b></td><td>{{ deviceText() }}</td></tr>
                             </tbody>
                         </table>
                     </div>
@@ -1386,7 +1383,7 @@
                             <label>Parking Zone</label>
                             <select class="form-control" [(ngModel)]="parkingZoneName">
                                 <option></option>
-                                <option *ngFor="let option of parkingZones; trackBy: trackById" [value]="option.name">{{ option.name }}</option>
+                                <option *ngFor="let option of modifyZoneOptions()" [value]="option.name">{{ option.label }}</option>
                             </select>
                         </div>
                     </div> 
@@ -1456,20 +1453,11 @@
                             <textarea class="form-control" rows="3" [(ngModel)]="bodyCondition" autocomplete="nope"></textarea>
                         </div>
                     </div>
-                    <div class="col-lg-6">
-                        <label>Devices Attached</label>
-                        <table class="table table-sm table-bordered">
-                            <thead><tr><th>Device</th><th style="width: 110px;">Quantity</th><th style="width: 50px;"></th></tr></thead>
-                            <tbody>
-                                <tr *ngFor="let device of devices; let i = index">
-                                    <td><input class="form-control form-control-sm" type="text" [(ngModel)]="device.name" autocomplete="nope"></td>
-                                    <td><input class="form-control form-control-sm" type="number" min="1" [(ngModel)]="device.qty"></td>
-                                    <td><button type="button" class="btn btn-sm btn-outline-danger" title="Remove" (click)="removeDevice(i)"><i class="fa fa-trash"></i></button></td>
-                                </tr>
-                                <tr *ngIf="devices.length === 0"><td colspan="3" class="text-muted">No devices attached</td></tr>
-                            </tbody>
-                        </table>
-                        <button type="button" class="btn btn-sm btn-outline-success" (click)="addDevice()"><i class="fa fa-plus"></i> Add Device</button>
+                    <div class="col-lg-3" *ngIf="deviceStatus === 'ATTACHED'">
+                        <div class="form-group">
+                            <label>Number of Devices</label>
+                            <input class="form-control" type="number" min="1" [(ngModel)]="deviceCount">
+                        </div>
                     </div>
                 </div>
                 <hr>

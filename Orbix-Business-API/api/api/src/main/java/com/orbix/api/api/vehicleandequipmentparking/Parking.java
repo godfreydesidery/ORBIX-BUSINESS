@@ -88,6 +88,8 @@ public class Parking {
 	private boolean tireIndicator = true;
 	private boolean hasKeys = true;
 	private boolean deviceStatus = true;
+	/** How many tracking devices are attached when deviceStatus says attached; empty for older records */
+	private Integer deviceCount;
 	private Byte[] image;
 	private String cardNo;
 	

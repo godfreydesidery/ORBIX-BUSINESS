@@ -53,6 +53,8 @@ public class ParkingResponseDTO {
 	String tireIndicator;
 	String hasKeys;
 	String deviceStatus;
+	/** How many tracking devices are attached; empty when none or not recorded */
+	String deviceCount;
 	String keyStatus;
 	Byte[] image;
 	
@@ -96,7 +98,7 @@ public class ParkingResponseDTO {
     
     List<ServiceBillItem> serviceBillItems;
 
-    /**Inspection and driver; the devices and signatures come from /parkings/get_inspection*/
+    /**Inspection and driver; the signatures come from /parkings/get_inspection*/
     String interiorDetails;
     String bodyCondition;
     String driverName;
